@@ -1,0 +1,335 @@
+/**************************************************************
+ ********************  USTAWIENIA GLOBALNE  ********************
+ **************************************************************/
+
+/* ==================================================================
+   ZMIENNE: Tutaj definiujesz powtarzalne wartości (paddings, kolory)
+   Jeśli zmienisz coś w :root, zmieni się w całym kodzie
+   ================================================================== */
+:root {
+    /* GŁÓWNY GRADIENT TŁA */
+    --bg-gradient-start: #1aa899;
+    --bg-gradient-end: #f2a94c;
+
+    /* PRZYCISKI W HEADERZE (Login/Register) */
+    --auth-btn-pad-v: 1vh;   /* padding pionowy (vertical) */
+    --auth-btn-pad-h: 2.5vw; /* padding poziomy (horizontal) */
+    --auth-btn-font-min: 14px;
+    --auth-btn-font-range: 1.4vw;
+    --auth-btn-font-max: 16px;
+
+    /* PRZYCISKI POD ŁAWKĄ W .actions */
+    --actions-btn-pad-v: 1.5vh;
+    --actions-btn-pad-h: 3vw;
+    --actions-btn-font-max: 38px; /* clamp(14px, 1.5vw, 38px) */
+
+    /* RÓŻNE STAŁE */
+    --main-gap: 20px;   /* Margines między elementami */
+    --header-pad: 15px; /* Padding w headerze */
+    --header-gap: 10px; /* Gap między buttonami w headerze */
+
+    /* TYLKO DO PRZYKŁADU – MOŻESZ DODAĆ WIĘCEJ */
+}
+
+/**************************************************************
+ ********************  GLOBALNY RESET/CORPUS  ******************
+ **************************************************************/
+
+/* =====================================================================
+   GLOBALNY RESET: Zeruje marginesy i paddingi oraz ustawia model pudełkowy
+   ===================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* =====================================================================
+   STYLE PODSTAWOWE BODY
+   ===================================================================== */
+body {
+    font-family: 'Verdana', sans-serif;
+    background: linear-gradient(to bottom, var(--bg-gradient-start), var(--bg-gradient-end));
+    color: #fff;
+    height: 100vh;
+    overflow-x: hidden;
+}
+
+/**************************************************************
+ **********************  NAGŁÓWEK (HEADER)  ********************
+ **************************************************************/
+
+/* =====================================================================
+   NAGŁÓWEK - HEADER
+   ===================================================================== */
+header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: var(--header-pad) calc(var(--header-pad)*1.666);
+    /* 15px x 25px, tak jak poprzednio, ale można by też użyć var
+       np. padding: var(--header-pad) var(--header-gap);
+       Jeśli chcesz 1:1 oryginał: 15px 25px, zostaw tak */
+}
+
+/* Kontener przycisków (Login, Register) */
+.auth-buttons {
+    display: flex;
+    gap: var(--header-gap); /* 10px */
+}
+
+/* =====================================================================
+   PRZYCISKI W HEADERZE (LOGIN, REGISTER)
+   ===================================================================== */
+.auth-buttons button {
+    background: linear-gradient(to right, #f6f6f6, #e0e0e0);
+    color: #0c7730;
+    padding: var(--auth-btn-pad-v) var(--auth-btn-pad-h); /* 1vh 2.5vw */
+    font-size: clamp(var(--auth-btn-font-min),
+    var(--auth-btn-font-range),
+    var(--auth-btn-font-max));
+    font-weight: bold;
+    border: 1px solid #cfcfcf;
+    border-radius: 0.6vw;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.auth-buttons button:hover {
+    background: linear-gradient(to right, #ffffff, #d8ffd8);
+    transform: scale(1.05);
+}
+
+/**************************************************************
+ **********************  GŁÓWNA TREŚĆ  *************************
+ **************************************************************/
+
+/* =====================================================================
+   GŁÓWNA TREŚĆ - MAIN
+   ===================================================================== */
+main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    height: calc(100vh - 70px); /* odejmuje wysokość nagłówka */
+    padding: var(--main-gap);   /* 20px */
+}
+
+/**************************************************************
+ *************   LEWA SEKCJA (LOGO I TYTUŁ)  ********************
+ **************************************************************/
+
+/* .left: Logo i tytuł RanchBot */
+.left {
+    text-align: center;
+}
+
+/* Skalowalne logo – szerokość od 180px do 600px */
+.logo-big {
+    width: clamp(180px, 25vw, 600px);
+    height: auto;
+}
+
+.left h1 {
+    margin-top: 20px;
+    font-size: 5rem; /* zrezygnowałem z clampa, bo tak chciałeś w deskopc/ach */
+    font-weight: bold;
+    color: white;
+}
+
+/**************************************************************
+ *************   PRAWA SEKCJA (ŁAWKA + FORM)   *****************
+ **************************************************************/
+
+/* .right – wrapper na ławkę i ewentualne przyciski */
+.right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Kontener ławki – szerokość od 280px do max 900px, kwadrat */
+.bench-container {
+    position: relative;
+    width: clamp(280px, 40vw, 900px);
+    aspect-ratio: 1 / 1;
+}
+
+/* Samego obrazka ławki nie zmieniamy */
+.bench-image {
+    width: 100%;
+    height: auto;
+}
+
+/**************************************************************
+ ******  FORM OVERLAY – FORMULARZ UMIESZCZONY NA ŁAWCE  *******
+ **************************************************************/
+
+/* Ten kontener formy zawsze nakrywa 100% ławki */
+.form-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Wspólne cechy inputów */
+.form-overlay input {
+    position: absolute;
+    left: 12%;
+    width: 76%;
+    height: 8%;
+    font-size: clamp(14px, 1.2vw, 18px);
+    border: none;
+    border-radius: 8px;
+    text-align: center;
+    background-color: #ffe4b5;
+    box-shadow: inset 0 0 3px rgba(0,0,0,0.3);
+}
+
+/* KONKRETNE POŁOŻENIE inputa "login" */
+.form-overlay input[name="login"] {
+    top: 23.5%;
+    left: 15%;
+    width: 70%;
+    background-color: #fdda9f;
+}
+
+/* KONKRETNE POŁOŻENIE inputa "password" */
+.form-overlay input[name="password"] {
+    top: 37%;
+    left: 15%;
+    width: 70%;
+    background-color: #fdda9f;
+}
+
+/* Stylizacja GUZIKA "continue" */
+.form-overlay button {
+    position: absolute;
+    top: 53%;
+    left: 0%;
+    width: 100%;
+    height: 5.5%;
+    font-size: clamp(14px, 1.2vw, 18px);
+    font-weight: bold;
+    background-color: #d2b48c;
+    border: 2px solid #aa9169;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0,0,0,0.2);
+    color: #000;
+    transition: all 0.2s ease-in-out;
+}
+
+/* FOCUS i HOVER */
+.form-overlay input:focus {
+    outline: 2px solid #c58b4f;
+    background-color: #ffe0a3;
+}
+.form-overlay button:hover {
+    background-color: #e6c59d;
+    transform: translateY(-1px);
+    box-shadow: 0px 6px 10px rgba(0,0,0,0.3);
+}
+
+/**************************************************************
+ *****************   SEKCJA PRZYCISKÓW POD ŁAWKĄ  **************
+ **************************************************************/
+
+/* .actions – sekcja przycisków Create account / Forgot password */
+.actions {
+    margin-top: 20px;
+    display: flex;
+    gap: var(--main-gap); /* 20px */
+}
+
+/* Przycisk w .actions (zielony) – dynamicznie skalowalny */
+.actions button {
+    background-color: #4CAF50;
+    color: white;
+    padding: var(--actions-btn-pad-v) var(--actions-btn-pad-h);
+    /* 1.5vh 3vw  => dynamicznie z ekranu */
+    font-size: clamp(14px, 1.5vw, var(--actions-btn-font-max));
+    /* clamp(14px, 1.5vw, 38px) */
+    border: none;
+    border-radius: 0.6vw;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+/**************************************************************
+ ********   MEDIA QUERIES – DLA EKRANÓW O SZEROKOŚCI DO 600px  **
+ **************************************************************/
+
+@media screen and (max-width: 600px) {
+
+    main {
+        flex-direction: column;
+        padding-top: 15px;
+        height: auto;
+    }
+
+    .logo-big {
+        width: clamp(150px, 40vw, 250px);
+        margin-bottom: 10px;
+    }
+
+    /* Zmniejszona czcionka logo, by się mieściło */
+    .left h1 {
+        font-size: clamp(45px, 6vw, 50px);
+    }
+
+    .bench-container {
+        width: clamp(220px, 80vw, 300px);
+        margin-bottom: 10px;
+    }
+
+    .actions {
+        flex-direction: column;
+        gap: 10px;
+        width: 90%;
+    }
+
+    .actions button {
+        width: 100%;
+        padding: 10px; /* nadpisuje var(--actions-btn-pad-v/h) */
+        font-size: clamp(12px, 3.5vw, 18px);
+    }
+
+    .form-overlay input {
+        left: 10%;
+        width: 80%;
+        height: 8%;
+        font-size: 13px;
+    }
+
+    .form-overlay input[name="login"] {
+        top: 23%;
+    }
+
+    .form-overlay input[name="password"] {
+        top: 36.5%;
+    }
+
+    .form-overlay button {
+        top: 50%;
+        left: 25%;
+        width: 50%;
+        height: 30px;
+        font-size: 13px;
+    }
+
+    /* UWAGA: poniższy blok zdaje się dublować styl .form-overlay button
+       Jeśli go pozostawisz, to nadpisze poprzedni - sprawdź i usuń, jeśli niepotrzebny */
+    .form-overlay button {
+        position: absolute;
+        top: 53%;
+        left: 0%;
+        width: 100%;
+        height: 5%;
+        font-size: clamp(10px, 1.2vw, 18px);
+    }
+}

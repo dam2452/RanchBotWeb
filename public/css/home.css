@@ -121,7 +121,7 @@ html, body {
 /* ================================
    DESKTOP (min-width: 1201px)
    ================================ */
-@media (min-width: 1025px) {
+@media (min-width: 851px) {
     .hero {
         flex-direction: row;
     }
@@ -141,7 +141,7 @@ html, body {
    MOBILE (max-width: 1200px)
    - układ pionowy: lewa kolumna, strzałka pod guzikiem, obrazek pod strzałką
    ================================ */
-@media (max-width: 1024px) {
+@media (max-width: 850px) {
     .hero {
         margin-top: -20px;
         flex-direction: column;

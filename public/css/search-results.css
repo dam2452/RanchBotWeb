@@ -1,12 +1,18 @@
 :root {
-    --shadow: rgba(0, 0, 0, 0.3);
+    --bg-gradient-start: #1aa899;
+    --bg-gradient-end: #f2a94c;
+    --search-btn-bg: #888;
+    --search-btn-text: #fff;
+    --shadow: rgba(0, 0, 0, 0.25);
+    --shadow-strong: rgba(0, 0, 0, 0.4);
+    --logo-max: 280px;
 }
 
 body {
     font-family: 'Verdana', sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(to bottom, #1aa899, #f2a94c);
+    background: linear-gradient(to bottom, var(--bg-gradient-start), var(--bg-gradient-end));
     color: #fff;
     overflow: hidden;
 }
@@ -19,6 +25,80 @@ body {
     overflow: hidden;
 }
 
+/* Pole wyszukiwania jak w search.php */
+.search-container {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: clamp(280px, 60vw, 720px);
+}
+
+.search-input {
+    padding: 24px 32px;
+    padding-right: 70px;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    border-radius: 40px;
+    border: none;
+    box-shadow: 0 10px 24px var(--shadow-strong);
+    width: 100%;
+    text-align: center;
+    background: #fff;
+    color: #333;
+    font-weight: bold;
+}
+
+.search-icon-btn {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    width: 42px;
+}
+
+.search-icon-btn img {
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+    filter: drop-shadow(0 0 4px rgba(0,0,0,0.4));
+    transition: transform 0.2s ease;
+}
+
+.search-icon-btn:hover img {
+    transform: scale(1.15);
+}
+
+.filter-btn {
+    position: absolute;
+    bottom: -50px;
+    right: -20px;
+    padding: 14px 24px;
+    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    font-weight: bold;
+    background: var(--search-btn-bg);
+    color: var(--search-btn-text);
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 0 8px 16px var(--shadow-strong);
+    transition: all 0.2s ease;
+    transform: rotate(5deg);
+}
+
+.filter-btn:hover {
+    transform: rotate(5deg) scale(1.08);
+    background: #666;
+}
 
 /* === DESKTOP (pozioma rolka) === */
 .video-reel {
@@ -29,7 +109,7 @@ body {
     height: 100vh;
     scroll-behavior: smooth;
     gap: 60px;
-    padding: 40px;
+    padding: 100px 40px 40px;
     scroll-snap-type: x mandatory;
 }
 
@@ -61,15 +141,18 @@ body {
     border-radius: 30px;
 }
 
-/* === MOBILE (pionowa rolka) === */
 @media screen and (max-width: 850px) {
+    .search-container {
+        top: 75px; /* było 10px – obniżamy żeby nie zasłaniało login/register */
+    }
+
     .video-reel {
         flex-direction: column;
         overflow-y: auto;
         overflow-x: hidden;
         height: 100vh;
         scroll-snap-type: y mandatory;
-        padding: 20px;
+        padding: 160px 20px 20px; /* było 120px – przesuwamy wideo niżej */
         gap: 40px;
     }
 

@@ -8,7 +8,7 @@
         <p class="tagline">Find, cut, and share your favorite Ranczo scene — in seconds.</p>
         <button class="quote-btn" onclick="location.href='login.php'">enter a quote</button>
     </div>
-    <!-- Strzałka jako oddzielny sibling -->
+
     <div class="arrow-wrapper">
         <img src="images/arrow.svg" class="arrow-img" alt="Arrow">
     </div>

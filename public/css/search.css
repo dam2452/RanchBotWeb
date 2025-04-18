@@ -37,7 +37,7 @@ body {
 }
 
 .logo-img {
-    width: clamp(200px, 18vw, var(--logo-max));
+    width: clamp(185px, 18vw, var(--logo-max));
 }
 
 .title {
@@ -54,6 +54,7 @@ body {
 
 .search-input {
     padding: 24px 32px;
+    padding-right: 70px; /* zostawiamy miejsce na ikonę po prawej */
     font-size: clamp(1.4rem, 3vw, 2rem);
     border-radius: 40px;
     border: none;
@@ -64,7 +65,32 @@ body {
     color: #333;
     font-weight: bold;
 }
-
+.search-icon-btn {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    width: 42px;
+}
+.search-icon-btn img {
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+    filter: drop-shadow(0 0 4px rgba(0,0,0,0.4));
+    transition: transform 0.2s ease;
+}
+.search-icon-btn:hover img {
+    transform: scale(1.15);
+}
 /* GUZIK FILTER PO SKOSIE */
 .filter-btn {
     position: absolute;

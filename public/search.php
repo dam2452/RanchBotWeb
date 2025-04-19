@@ -16,5 +16,5 @@
     </div>
 </main>
 
-<script src="js/search.js"></script>
+<script> </script>
 <?php include_once __DIR__ . '/../templates/footer.php'; ?>

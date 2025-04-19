@@ -5,7 +5,9 @@ include_once __DIR__ . '/../templates/header.php';
 
 <main class="hero">
     <div class="left-col">
-        <img src="images/logo.svg" class="logo-img" alt="RanchBot Logo">
+        <a href="index.php">
+            <img src="images/logo.svg" class="logo-img" alt="RanchBot Logo" />
+        </a>
         <h1>RanchBot</h1>
         <p class="tagline">Find, cut, and share your favorite Ranczo scene — in seconds.</p>
         <button class="quote-btn" onclick="location.href=\'login.php\'">enter a quote</button>

@@ -9,7 +9,9 @@ include_once __DIR__ . '/../templates/header.php';
 
 <main>
     <section class="left">
-        <img src="images/logo.svg" class="logo-big" alt="RanchBot Logo" />
+        <a href="index.php">
+            <img src="images/logo.svg" class="logo-img" alt="RanchBot Logo" />
+        </a>
         <h1>RanchBot</h1>
     </section>
 

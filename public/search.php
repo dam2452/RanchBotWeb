@@ -3,7 +3,9 @@
 
 <main class="search-page">
     <div class="logo-wrapper">
-        <img src="images/logo.svg" alt="RanchBot Logo" class="logo-img" />
+        <a href="index.php">
+            <img src="images/logo.svg" class="logo-img" alt="RanchBot Logo" />
+        </a>
         <h1 class="title">RanchBot</h1>
     </div>
 

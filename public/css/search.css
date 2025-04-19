@@ -56,6 +56,7 @@ body {
     flex-direction: column;
     align-items: center;
     gap: var(--logo-gap);
+    /* logo-wrapper już jest centrowany przez .search-page */
 }
 
 .logo-img {
@@ -69,18 +70,27 @@ body {
 }
 
 .search-container {
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: var(--search-width);
+    margin: 0 auto;
+    position: relative;
+}
+
+.search-input-wrapper {
+    position: relative;
+    width: 100%;
 }
 
 .search-input {
+    width: 100%;
     padding: var(--search-padding);
     padding-right: var(--search-padding-right);
     font-size: var(--search-font-size);
     border-radius: var(--radius-xl);
     border: none;
     box-shadow: 0 10px 24px var(--shadow-strong);
-    width: 100%;
     text-align: center;
     background: var(--color-white);
     color: var(--color-dark);
@@ -90,19 +100,19 @@ body {
 .search-icon-btn {
     position: absolute;
     top: 50%;
-    right: 20px;
+    right: -30px;
     transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    margin: 0;
+    height: var(--search-btn-size);
+    width: var(--search-btn-size);
     display: flex;
     align-items: center;
     justify-content: center;
-    height: var(--search-btn-size);
-    width: var(--search-btn-size);
+    background: transparent;
+    border: none;
+    cursor: pointer;
 }
+
+
 
 .search-icon-btn img {
     width: 100%;
@@ -119,7 +129,7 @@ body {
 .filter-btn {
     position: absolute;
     bottom: -50px;
-    right: -20px;
+    right: 8px;               /* stałe odsunięcie od prawej */
     padding: var(--filter-btn-padding);
     font-size: var(--filter-font-size);
     font-weight: bold;
@@ -136,4 +146,30 @@ body {
 .filter-btn:hover {
     transform: rotate(5deg) scale(1.08);
     background: var(--color-btn-bg-hover);
+}
+
+@media screen and (max-width: 850px) {
+    .search-container {
+        width: 60vw;
+        margin: 0 auto;
+    }
+
+    .search-input {
+        font-size: 1.2rem;
+        padding: 16px 20px;
+        padding-right: 60px;
+    }
+
+    .search-icon-btn {
+        right: -30px;
+        height: 36px;
+        width: 36px;
+    }
+
+    .filter-btn {
+        right: 8px;
+        bottom: -40px;
+        font-size: 1rem;
+        padding: 10px 16px;
+    }
 }

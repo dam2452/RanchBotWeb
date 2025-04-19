@@ -2,7 +2,6 @@
 <link rel="stylesheet" href="css/search-results.css">
 
 <main class="search-results-page">
-    <!-- Pole wyszukiwania -->
     <div class="search-container">
         <input type="text" class="search-input" id="query-input" placeholder="enter a quote" />
         <button class="search-icon-btn" aria-label="Search">
@@ -11,20 +10,17 @@
         <button class="filter-btn">filters</button>
     </div>
 
-    <!-- ROLKA VIDEO -->
     <div class="video-reel">
         <div class="reel-item active" data-id="0">
             <video autoplay muted loop preload="metadata">
                 <source src="videos/scene-001.mp4" type="video/mp4">
             </video>
         </div>
-
         <div class="reel-item" data-id="1">
             <video loop preload="metadata">
                 <source src="videos/scene-002.mp4" type="video/mp4">
             </video>
         </div>
-
         <div class="reel-item" data-id="2">
             <video loop preload="metadata">
                 <source src="videos/scene-003.mp4" type="video/mp4">
@@ -34,91 +30,105 @@
 </main>
 
 <script>
-    const isMobile = window.matchMedia("(max-width: 850px)").matches;
-    const items = document.querySelectorAll('.reel-item');
+    const container = document.querySelector('.video-reel');
+    const items = Array.from(document.querySelectorAll('.reel-item'));
     let activeIndex = 0;
     let firstPlayedMuted = true;
 
-    function activate(index) {
-        if (index < 0 || index >= items.length) return;
-
-        const oldItem = items[activeIndex];
-        const oldVideo = oldItem.querySelector('video');
-
-        oldItem.classList.remove('active');
-        oldVideo.pause();
-
-        activeIndex = index;
-
-        const newItem = items[activeIndex];
-        const newVideo = newItem.querySelector('video');
-
-        newItem.classList.add('active');
-
-        // Jeśli pierwszy raz na index 0 → zmutowany autoplay już działa
-        if (activeIndex === 0 && firstPlayedMuted) {
-            // nic nie robimy, autoplay muted leci
-        } else {
-            newVideo.muted = false;
-            newVideo.volume = 1.0;
-            newVideo.currentTime = 0;
-            newVideo.play();
-        }
-
-        const offset = isMobile
-            ? newItem.offsetTop - 20
-            : newItem.offsetLeft - 20;
-
-        document.querySelector('.video-reel').scrollTo({
-            top: isMobile ? offset : 0,
-            left: isMobile ? 0 : offset,
-            behavior: 'smooth'
-        });
+    function isMobile() {
+        return window.matchMedia('(max-width:850px)').matches;
     }
 
-    document.querySelector('.video-reel').addEventListener('click', (e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
-        const half = isMobile ? rect.height / 2 : rect.width / 2;
+    function centerItem(idx) {
+        const item = items[idx];
+        const rect = container.getBoundingClientRect();
+        if (isMobile()) {
+            const offset = item.offsetTop - (rect.height - item.offsetHeight)/2;
+            container.scrollTo({ top: offset, behavior: 'smooth' });
+        } else {
+            const offset = item.offsetLeft - (rect.width - item.offsetWidth)/2;
+            container.scrollTo({ left: offset, behavior: 'smooth' });
+        }
+    }
 
-        const activeVideo = items[activeIndex].querySelector('video');
-        const clickedItem = e.target.closest('.reel-item');
+    function activate(idx) {
+        if (idx < 0 || idx >= items.length) return;
+        // deactivate old
+        const old = items[activeIndex];
+        old.classList.remove('active');
+        old.querySelector('video').pause();
 
-        // Klik w aktywny element
-        if (clickedItem && clickedItem.classList.contains('active')) {
-            if (activeIndex === 0 && activeVideo.muted) {
-                // odmutuj pierwszy przy kliknięciu
-                activeVideo.muted = false;
-                activeVideo.volume = 1.0;
-                activeVideo.play();
-                firstPlayedMuted = false;
-            } else {
-                if (activeVideo.paused) {
-                    activeVideo.play();
+        // activate new
+        activeIndex = idx;
+        const current = items[activeIndex];
+        const vid = current.querySelector('video');
+        current.classList.add('active');
+
+        if (activeIndex === 0 && firstPlayedMuted) {
+            vid.muted = true;
+            vid.play();
+        } else {
+            vid.muted = false;
+            vid.volume = 1;
+            vid.currentTime = 0;
+            vid.play();
+            firstPlayedMuted = false;
+        }
+
+        centerItem(activeIndex);
+    }
+
+    // click handler: item or background
+    container.addEventListener('click', e => {
+        const clicked = e.target.closest('.reel-item');
+        if (clicked) {
+            const idx = items.indexOf(clicked);
+            if (idx === activeIndex) {
+                const vid = clicked.querySelector('video');
+                if (activeIndex === 0 && vid.muted) {
+                    vid.muted = false;
+                    vid.volume = 1;
+                    firstPlayedMuted = false;
                 } else {
-                    activeVideo.pause();
+                    vid.paused ? vid.play() : vid.pause();
                 }
+            } else {
+                activate(idx);
             }
             return;
         }
 
-        // Przejście L/P lub G/D
-        if (isMobile) {
-            clickY > half ? activate(activeIndex + 1) : activate(activeIndex - 1);
+        const rect = container.getBoundingClientRect();
+        if (isMobile()) {
+            const y = e.clientY - rect.top;
+            activate(activeIndex + (y > rect.height/2 ? 1 : -1));
         } else {
-            clickX > half ? activate(activeIndex + 1) : activate(activeIndex - 1);
+            const x = e.clientX - rect.left;
+            activate(activeIndex + (x > rect.width/2 ? 1 : -1));
         }
     });
 
-    window.addEventListener('DOMContentLoaded', () => {
-        // query z URL
-        const params = new URLSearchParams(window.location.search);
-        const query = params.get('q');
-        if (query) {
-            document.getElementById('query-input').value = query;
+    // keyboard navigation
+    window.addEventListener('keydown', e => {
+        if (!isMobile()) {
+            if (e.key === 'ArrowLeft')  activate(activeIndex - 1);
+            if (e.key === 'ArrowRight') activate(activeIndex + 1);
+        } else {
+            if (e.key === 'ArrowUp')   activate(activeIndex - 1);
+            if (e.key === 'ArrowDown') activate(activeIndex + 1);
         }
     });
+
+    // on load: restore query & activate first
+    window.addEventListener('DOMContentLoaded', () => {
+        const q = new URLSearchParams(location.search).get('q');
+        if (q) document.getElementById('query-input').value = q;
+        activate(0);
+    });
+
+    // re-center if viewport flips (mobile↔desktop)
+    window.matchMedia('(max-width:850px)')
+        .addEventListener('change', () => centerItem(activeIndex));
 </script>
 
 <?php include_once __DIR__ . '/../templates/footer.php'; ?>

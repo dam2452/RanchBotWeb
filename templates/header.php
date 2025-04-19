@@ -6,13 +6,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="color-scheme" content="only light">
-    <title>RanchBot</title>
-    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <?= $customHead ?? '' ?>
 </head>
 <body>
 <header>
     <div class="auth-buttons">
-        <button onclick="location.href='login.php'">Login</button>
-        <button onclick="location.href='register.php'">Register</button>
+        <button onclick="location.href='/login.php'">Login</button>
+        <button onclick="location.href='/register.php'">Register</button>
     </div>
 </header>

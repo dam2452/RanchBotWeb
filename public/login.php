@@ -1,23 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="color-scheme" content="only light">
-    <title>RanchBot</title>
-    <link rel="stylesheet" href="css/login.css" />
-
-</head>
-<body>
-<header>
-    <div></div>
-    <div class="auth-buttons">
-        <button onclick="location.href='#'">Register</button>
-        <button onclick="location.href='#'">Login</button>
-    </div>
-</header>
+<?php
+$customHead = '
+    <title>Login – RanchBot</title>
+    <link rel="stylesheet" href="css/login.css">
+    <script src="script.js" defer></script>
+';
+include_once __DIR__ . '/../templates/header.php';
+?>
 
 <main>
     <section class="left">
@@ -36,12 +24,10 @@
         </div>
 
         <div class="actions">
-            <button >Create account ?</button>
-            <button >Forgot password ?</button>
+            <button>Create account ?</button>
+            <button>Forgot password ?</button>
         </div>
     </section>
 </main>
 
-<script src="script.js"></script>
-</body>
-</html>
+<?php include_once __DIR__ . '/../templates/footer.php'; ?>

@@ -1,7 +1,6 @@
 :root {
     --font-main: 'Verdana', sans-serif;
 
-    /* Kolory */
     --color-bg-start: #1aa899;
     --color-bg-end: #f2a94c;
     --color-text-light: #fff;
@@ -14,17 +13,14 @@
     --color-btn-green-hover: #5ee271;
     --color-btn-green-hover-dark: #35a33a;
 
-    /* Cienie */
     --shadow: rgba(0, 0, 0, 0.2);
     --shadow-strong: rgba(0, 0, 0, 0.3);
     --shadow-heavy: rgba(0, 0, 0, 0.4);
 
-    /* Promienie */
     --btn-radius: 0.6vw;
     --input-radius: 8px;
     --form-btn-radius: 10px;
 
-    /* Padding/marginesy */
     --header-padding: 15px;
     --header-gap: 10px;
     --main-gap: 20px;
@@ -33,7 +29,6 @@
     --actions-pad-v: 1.5vh;
     --actions-pad-h: 3vw;
 
-    /* Font sizes */
     --font-auth-min: 14px;
     --font-auth-max: 16px;
     --font-auth-range: 1.4vw;
@@ -66,42 +61,6 @@ body {
     background: linear-gradient(to bottom, var(--color-bg-start), var(--color-bg-end));
     color: var(--color-text-light);
     overscroll-behavior: none;
-}
-
-header {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: var(--header-padding) calc(var(--header-padding) * 1.666);
-}
-
-.auth-buttons {
-    display: flex;
-    gap: var(--header-gap);
-}
-
-.auth-buttons button {
-    background: linear-gradient(to right, #ffffff, #d8ffd8);
-    color: var(--color-text-dark);
-    padding: var(--auth-pad-v) var(--auth-pad-h);
-    font-size: clamp(var(--font-auth-min), var(--font-auth-range), var(--font-auth-max));
-    font-weight: bold;
-    border: 1px solid #a0dba0;
-    border-radius: var(--btn-radius);
-    box-shadow: 0 4px 10px var(--shadow);
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
-}
-
-.auth-buttons button:hover {
-    transform: scale(1.05);
-    background: linear-gradient(to right, #eaffea, #b0f7b0);
-    box-shadow: 0 8px 16px var(--shadow-strong);
-}
-
-.auth-buttons button:active {
-    transform: scale(0.95);
-    box-shadow: 0 2px 4px var(--shadow);
 }
 
 main {

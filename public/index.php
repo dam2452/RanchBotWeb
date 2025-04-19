@@ -1,12 +1,14 @@
-<?php include_once __DIR__ . '/../templates/header.php'; ?>
-<link rel="stylesheet" href="css/home.css">
+<?php
+$customHead = '<link rel="stylesheet" href="css/home.css">';
+include_once __DIR__ . '/../templates/header.php';
+?>
 
 <main class="hero">
     <div class="left-col">
         <img src="images/logo.svg" class="logo-img" alt="RanchBot Logo">
         <h1>RanchBot</h1>
         <p class="tagline">Find, cut, and share your favorite Ranczo scene — in seconds.</p>
-        <button class="quote-btn" onclick="location.href='login.php'">enter a quote</button>
+        <button class="quote-btn" onclick="location.href=\'login.php\'">enter a quote</button>
     </div>
 
     <div class="arrow-wrapper">
@@ -18,4 +20,5 @@
 </main>
 
 <script src="js/script.js"></script>
+
 <?php include_once __DIR__ . '/../templates/footer.php'; ?>

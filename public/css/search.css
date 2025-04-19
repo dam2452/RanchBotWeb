@@ -1,17 +1,40 @@
 :root {
-    --bg-gradient-start: #1aa899;
-    --bg-gradient-end: #f2a94c;
-    --search-btn-bg: #888;
-    --search-btn-text: #fff;
+    --font-main: 'Verdana', sans-serif;
+
+    --color-white: #fff;
+    --color-dark: #333;
+    --color-bg-start: #1aa899;
+    --color-bg-end: #f2a94c;
+    --color-btn-bg: #888;
+    --color-btn-bg-hover: #666;
+
     --shadow: rgba(0, 0, 0, 0.25);
     --shadow-strong: rgba(0, 0, 0, 0.4);
-    --logo-max: 280px;
+
+    --radius-xl: 40px;
+    --radius-md: 20px;
+
+    --logo-max-width: 280px;
+    --logo-gap: 10px;
+
+    --search-width: clamp(280px, 60vw, 720px);
+    --search-padding: 24px 32px;
+    --search-padding-right: 70px;
+    --search-font-size: clamp(1.4rem, 3vw, 2rem);
+    --search-btn-size: 42px;
+
+    --title-font-size: clamp(3rem, 6vw, 5rem);
+    --filter-font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    --filter-btn-padding: 14px 24px;
+
+    --section-gap: 60px;
+    --page-padding: 60px 20px 40px;
 }
 
 body {
-    font-family: 'Verdana', sans-serif;
-    background: linear-gradient(to bottom, var(--bg-gradient-start), var(--bg-gradient-end));
-    color: #fff;
+    font-family: var(--font-main);
+    background: linear-gradient(to bottom, var(--color-bg-start), var(--color-bg-end));
+    color: var(--color-white);
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -22,49 +45,48 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;        /* wyżej niż środek */
-    padding: 60px 20px 40px;
-    gap: 60px;
+    justify-content: flex-start;
+    padding: var(--page-padding);
+    gap: var(--section-gap);
     text-align: center;
 }
 
-/* LOGO + TYTUŁ */
 .logo-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: var(--logo-gap);
 }
 
 .logo-img {
-    width: clamp(185px, 18vw, var(--logo-max));
+    width: clamp(185px, 18vw, var(--logo-max-width));
 }
 
 .title {
-    font-size: clamp(3rem, 6vw, 5rem);
+    font-size: var(--title-font-size);
     font-weight: bold;
     margin: 0;
 }
 
-/* INPUT + FILTER (ukośny guzik) */
 .search-container {
     position: relative;
-    width: clamp(280px, 60vw, 720px);
+    width: var(--search-width);
 }
 
 .search-input {
-    padding: 24px 32px;
-    padding-right: 70px; /* zostawiamy miejsce na ikonę po prawej */
-    font-size: clamp(1.4rem, 3vw, 2rem);
-    border-radius: 40px;
+    padding: var(--search-padding);
+    padding-right: var(--search-padding-right);
+    font-size: var(--search-font-size);
+    border-radius: var(--radius-xl);
     border: none;
     box-shadow: 0 10px 24px var(--shadow-strong);
     width: 100%;
     text-align: center;
-    background: #fff;
-    color: #333;
+    background: var(--color-white);
+    color: var(--color-dark);
     font-weight: bold;
 }
+
 .search-icon-btn {
     position: absolute;
     top: 50%;
@@ -78,31 +100,33 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 42px;
-    width: 42px;
+    height: var(--search-btn-size);
+    width: var(--search-btn-size);
 }
+
 .search-icon-btn img {
     width: 100%;
     height: auto;
     pointer-events: none;
-    filter: drop-shadow(0 0 4px rgba(0,0,0,0.4));
+    filter: drop-shadow(0 0 4px var(--shadow-strong));
     transition: transform 0.2s ease;
 }
+
 .search-icon-btn:hover img {
     transform: scale(1.15);
 }
-/* GUZIK FILTER PO SKOSIE */
+
 .filter-btn {
     position: absolute;
     bottom: -50px;
     right: -20px;
-    padding: 14px 24px;
-    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    padding: var(--filter-btn-padding);
+    font-size: var(--filter-font-size);
     font-weight: bold;
-    background: var(--search-btn-bg);
-    color: var(--search-btn-text);
+    background: var(--color-btn-bg);
+    color: var(--color-white);
     border: none;
-    border-radius: 20px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     box-shadow: 0 8px 16px var(--shadow-strong);
     transition: all 0.2s ease;
@@ -111,5 +135,5 @@ body {
 
 .filter-btn:hover {
     transform: rotate(5deg) scale(1.08);
-    background: #666;
+    background: var(--color-btn-bg-hover);
 }

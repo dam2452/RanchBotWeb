@@ -1,20 +1,57 @@
 :root {
-    --bg-gradient-start: #1aa899;
-    --bg-gradient-end: #f2a94c;
-    --btn-bg-color: #78a36f;
-    --shadow: rgba(0,0,0,0.25);
-    color-scheme: only light;
+    --font-main: 'Verdana', sans-serif;
+
+    --color-bg-start: #1aa899;
+    --color-bg-end: #f2a94c;
+    --color-btn-bg: #78a36f;
+    --color-text: #fff;
+
+    --shadow: rgba(0, 0, 0, 0.25);
+
+    --radius-xl: 40px;
+    --radius-img: 20px;
+
+    --gap-hero-desktop: 60px;
+    --gap-hero-mobile: 20px;
+
+    --hero-padding-desktop: 40px;
+    --hero-padding-mobile: 40px 20px;
+
+    --logo-width-desktop: clamp(140px, 18vw, 240px);
+    --logo-width-mobile: clamp(100px, 14vw, 180px);
+
+    --title-size-desktop: clamp(3rem, 6vw, 5rem);
+    --title-size-mobile: clamp(2.2rem, 5vw, 4rem);
+
+    --tagline-size-desktop: clamp(1.5rem, 3vw, 2.2rem);
+    --tagline-size-mobile: clamp(1.1rem, 2.5vw, 1.8rem);
+
+    --btn-font-desktop: clamp(1.2rem, 2vw, 2rem);
+    --btn-font-mobile: clamp(1rem, 2vw, 1.6rem);
+    --btn-padding-desktop: 20px 40px;
+    --btn-padding-mobile: 16px 32px;
+
+    --arrow-width: clamp(80px, 6vw, 120px);
+    --arrow-gap: clamp(100px, 6vw, 150px);
+
+    --preview-max-width: 1080px;
+    --preview-aspect: 16 / 9;
 }
 
-/* GŁÓWNE STYLE */
+html, body {
+    overflow: hidden;
+    height: 100%;
+}
+
 body {
-    font-family: 'Verdana', sans-serif;
-    background: linear-gradient(to bottom, var(--bg-gradient-start), var(--bg-gradient-end));
-    color: #fff;
+    font-family: var(--font-main);
+    background: linear-gradient(to bottom, var(--color-bg-start), var(--color-bg-end));
+    color: var(--color-text);
     margin: 0;
     padding: 0;
     min-height: 100vh;
     overflow-x: hidden;
+    color-scheme: only light;
 }
 
 main {
@@ -24,21 +61,19 @@ main {
     padding: 0 20px;
 }
 
-/* HERO – PEŁNY EKRAN NA DESKTOPIE */
 .hero {
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 100vh;         /* Pełna wysokość ekranu */
-    padding: 40px;
-    gap: 60px;
+    height: 100vh;
+    padding: var(--hero-padding-desktop);
+    gap: var(--gap-hero-desktop);
     box-sizing: border-box;
     max-width: none;
 }
 
-/* Lewa i prawa kolumna */
 .left-col, .right-col {
     flex: 1;
     display: flex;
@@ -46,87 +81,75 @@ main {
     align-items: center;
 }
 
-/* Logo */
 .logo-img {
-    width: clamp(140px, 18vw, 240px);
+    width: var(--logo-width-desktop);
     margin-bottom: 15px;
 }
 
-/* Tytuł i tagline */
 h1 {
-    font-size: clamp(3rem, 6vw, 5rem);
+    font-size: var(--title-size-desktop);
     margin-top: 0;
 }
+
 .tagline {
-    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-size: var(--tagline-size-desktop);
     text-align: center;
     margin: 20px 0;
 }
 
-/* Guzik */
 .quote-btn {
-    background-color: var(--btn-bg-color);
-    color: #fff;
-    font-size: clamp(1.2rem, 2vw, 2rem);
-    padding: 20px 40px;
+    background-color: var(--color-btn-bg);
+    color: var(--color-text);
+    font-size: var(--btn-font-desktop);
+    padding: var(--btn-padding-desktop);
     border: none;
-    border-radius: 40px;
+    border-radius: var(--radius-xl);
     box-shadow: 0 6px 14px var(--shadow);
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
 }
+
 .quote-btn:hover {
     transform: scale(1.05);
     box-shadow: 0 10px 20px var(--shadow);
 }
 
-/* Strzałka – ustawiona jako oddzielny element */
 .arrow-img {
-
-    width: clamp(80px, 6vw, 120px);
+    width: var(--arrow-width);
     aspect-ratio: 260 / 116;
     transition: transform 0.3s ease;
 }
 
-/* Obrazek preview */
-.preview-img {
-    width: 100%;
-    max-width: 1080px;
-    height: auto; /* Automatyczne dopasowanie wysokości do szerokości */
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-    border-radius: 20px;
-    box-shadow: 0 10px 20px var(--shadow);
-}
 .arrow-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: clamp(100px, 6vw, 150px); /* zapewnia przestrzeń między kolumnami */
+    min-width: var(--arrow-gap);
     padding: 0 10px;
 }
 
-
-html, body {
-    overflow: hidden;
-    height: 100%;
+.preview-img {
+    width: 100%;
+    max-width: var(--preview-max-width);
+    height: auto;
+    aspect-ratio: var(--preview-aspect);
+    object-fit: cover;
+    border-radius: var(--radius-img);
+    box-shadow: 0 10px 20px var(--shadow);
 }
 
 @media (prefers-color-scheme: dark) {
     body {
-        background: linear-gradient(to bottom, var(--bg-gradient-start), var(--bg-gradient-end)) !important;
-        color: #fff !important;
+        background: linear-gradient(to bottom, var(--color-bg-start), var(--color-bg-end)) !important;
+        color: var(--color-text) !important;
     }
 }
-/* ================================
-   DESKTOP (min-width: 1201px)
-   ================================ */
+
 @media (min-width: 851px) {
     .hero {
         flex-direction: row;
     }
 
-    /* Ustawienie strzałki pomiędzy kolumnami */
     .arrow-img {
         animation: bounce 1.5s infinite;
     }
@@ -137,39 +160,39 @@ html, body {
     }
 }
 
-/* ================================
-   MOBILE (max-width: 1200px)
-   - układ pionowy: lewa kolumna, strzałka pod guzikiem, obrazek pod strzałką
-   ================================ */
 @media (max-width: 850px) {
     .hero {
         margin-top: -20px;
         flex-direction: column;
         text-align: center;
-        height: auto; /* wyłączamy 100vh na mobile */
-        padding: 40px 20px;
-        gap: 20px;
+        height: auto;
+        padding: var(--hero-padding-mobile);
+        gap: var(--gap-hero-mobile);
     }
+
     .logo-img {
-        width: clamp(100px, 14vw, 180px);
+        width: var(--logo-width-mobile);
     }
+
     h1 {
-        font-size: clamp(2.2rem, 5vw, 4rem);
+        font-size: var(--title-size-mobile);
     }
+
     .tagline {
-        font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+        font-size: var(--tagline-size-mobile);
     }
 
     .quote-btn {
-        font-size: clamp(1rem, 2vw, 1.6rem);
-        padding: 16px 32px;
+        font-size: var(--btn-font-mobile);
+        padding: var(--btn-padding-mobile);
     }
-    /* Mobile: elementy układają się jedno pod drugim */
+
     .arrow-img {
         transform: rotate(90deg);
         margin-top: 20px;
         animation: bounce-rotated 1.5s infinite;
     }
+
     @keyframes bounce-rotated {
         0%, 100% { transform: rotate(90deg) translateX(0); }
         50% { transform: rotate(90deg) translateX(10px); }

@@ -1,41 +1,51 @@
-/**************************************************************
- ********************  USTAWIENIA GLOBALNE  ********************
- **************************************************************/
-/* Zmienne globalne – zmieniasz tutaj wartości i w całym kodzie się aktualizują */
 :root {
-    /* GŁÓWNY GRADIENT TŁA */
-    --bg-gradient-start: #1aa899;
-    --bg-gradient-end: #f2a94c;
+    --font-main: 'Verdana', sans-serif;
 
-    /* PRZYCISKI W HEADERZE (Login/Register) */
-    --auth-btn-pad-v: 1vh;      /* padding pionowy */
-    --auth-btn-pad-h: 2.5vw;    /* padding poziomy */
-    --auth-btn-font-min: 14px;
-    --auth-btn-font-range: 1.4vw;
-    --auth-btn-font-max: 16px;
+    /* Kolory */
+    --color-bg-start: #1aa899;
+    --color-bg-end: #f2a94c;
+    --color-text-light: #fff;
+    --color-text-dark: #0c7730;
+    --color-form-bg: #ffe4b5;
+    --color-form-highlight: #fdda9f;
+    --color-form-focus: #ffe0a3;
+    --color-btn-green: #4CAF50;
+    --color-btn-green-dark: #45a049;
+    --color-btn-green-hover: #5ee271;
+    --color-btn-green-hover-dark: #35a33a;
 
-    /* PRZYCISKI POD ŁAWKĄ (.actions) */
-    --actions-btn-pad-v: 1.5vh;
-    --actions-btn-pad-h: 3vw;
-    --actions-btn-font-max: 38px; /* clamp(14px, 1.5vw, 38px) */
+    /* Cienie */
+    --shadow: rgba(0, 0, 0, 0.2);
+    --shadow-strong: rgba(0, 0, 0, 0.3);
+    --shadow-heavy: rgba(0, 0, 0, 0.4);
 
-    /* RÓŻNE STAŁE */
-    --main-gap: 20px;         /* Margines między elementami */
-    --header-pad: 15px;       /* Padding w headerze */
-    --header-gap: 10px;       /* Odstęp między przyciskami headera */
+    /* Promienie */
+    --btn-radius: 0.6vw;
+    --input-radius: 8px;
+    --form-btn-radius: 10px;
+
+    /* Padding/marginesy */
+    --header-padding: 15px;
+    --header-gap: 10px;
+    --main-gap: 20px;
+    --auth-pad-v: 1vh;
+    --auth-pad-h: 2.5vw;
+    --actions-pad-v: 1.5vh;
+    --actions-pad-h: 3vw;
+
+    /* Font sizes */
+    --font-auth-min: 14px;
+    --font-auth-max: 16px;
+    --font-auth-range: 1.4vw;
+    --font-actions-max: 38px;
 }
 
-/**************************************************************
- ********************  GLOBALNY RESET/CORPUS  ******************
- **************************************************************/
-/* Reset – usuwa marginesy/paddingi i ustawia box-sizing */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Blokada scrollowania na wszystkich urządzeniach oraz dynamiczna wysokość */
 html, body {
     height: 100dvh;
     overflow: hidden;
@@ -48,65 +58,52 @@ html, body {
 input, select, textarea, button {
     appearance: none;
     -webkit-appearance: none;
-    color-scheme: light; /* wymusza jasny wygląd nawet w darkmode */
+    color-scheme: light;
 }
-/* =====================================================================
-   STYLE PODSTAWOWE BODY
-   ===================================================================== */
+
 body {
-    font-family: 'Verdana', sans-serif;
-    background: linear-gradient(to bottom, var(--bg-gradient-start), var(--bg-gradient-end));
-    color: #fff;
+    font-family: var(--font-main);
+    background: linear-gradient(to bottom, var(--color-bg-start), var(--color-bg-end));
+    color: var(--color-text-light);
     overscroll-behavior: none;
 }
 
-/**************************************************************
- **********************  NAGŁÓWEK (HEADER)  ********************
- **************************************************************/
-/* Header – kontener przycisków (Login, Register) */
 header {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    padding: var(--header-pad) calc(var(--header-pad) * 1.666);
+    padding: var(--header-padding) calc(var(--header-padding) * 1.666);
 }
 
-/* Kontener przycisków w headerze */
 .auth-buttons {
     display: flex;
     gap: var(--header-gap);
 }
 
-/* Styl przycisków w headerze */
 .auth-buttons button {
     background: linear-gradient(to right, #ffffff, #d8ffd8);
-    color: #0c7730;
-    padding: var(--auth-btn-pad-v) var(--auth-btn-pad-h);
-    font-size: clamp(var(--auth-btn-font-min), var(--auth-btn-font-range), var(--auth-btn-font-max));
+    color: var(--color-text-dark);
+    padding: var(--auth-pad-v) var(--auth-pad-h);
+    font-size: clamp(var(--font-auth-min), var(--font-auth-range), var(--font-auth-max));
     font-weight: bold;
     border: 1px solid #a0dba0;
-    border-radius: 0.6vw;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: var(--btn-radius);
+    box-shadow: 0 4px 10px var(--shadow);
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
 }
 
 .auth-buttons button:hover {
     transform: scale(1.05);
     background: linear-gradient(to right, #eaffea, #b0f7b0);
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 16px var(--shadow-strong);
 }
 
 .auth-buttons button:active {
     transform: scale(0.95);
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px var(--shadow);
 }
 
-
-/**************************************************************
- **********************  GŁÓWNA TREŚĆ  *************************
- **************************************************************/
-/* Main – kontener głównej zawartości */
 main {
     display: flex;
     flex-wrap: wrap;
@@ -117,44 +114,39 @@ main {
     padding-bottom: calc(var(--main-gap) + env(safe-area-inset-bottom));
 }
 
-/**************************************************************
- *************   LEWA SEKCJA (LOGO I TYTUŁ)  ********************
- **************************************************************/
-/* Sekcja LEWA – logo i tytuł */
 .left {
     text-align: center;
 }
+
 .logo-big {
     width: clamp(180px, 25vw, 600px);
     height: auto;
 }
+
 .left h1 {
     margin-top: 20px;
     font-size: 5rem;
     font-weight: bold;
-    color: white;
+    color: var(--color-text-light);
 }
 
-/**************************************************************
- *************   PRAWA SEKCJA (ŁAWKA + FORM)   *****************
- **************************************************************/
-/* Sekcja PRAWA – ławka i formularz */
 .right {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
+
 .bench-container {
     position: relative;
     width: clamp(280px, 40vw, 900px);
     aspect-ratio: 1 / 1;
 }
+
 .bench-image {
     width: 100%;
     height: auto;
 }
 
-/* FORM OVERLAY – formularz na ławce */
 .form-overlay {
     position: absolute;
     top: 0;
@@ -162,6 +154,7 @@ main {
     width: 100%;
     height: 100%;
 }
+
 .form-overlay input {
     position: absolute;
     left: 12%;
@@ -169,26 +162,26 @@ main {
     height: 8%;
     font-size: clamp(14px, 1.2vw, 18px);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--input-radius);
     text-align: center;
-    background-color: #ffe4b5;
-    box-shadow: inset 0 0 3px rgba(0,0,0,0.3);
+    background-color: var(--color-form-bg);
+    box-shadow: inset 0 0 3px var(--shadow-strong);
 }
-/* Pozycjonowanie inputa "login" */
+
 .form-overlay input[name="login"] {
     top: 23.5%;
     left: 15%;
     width: 70%;
-    background-color: #fdda9f;
+    background-color: var(--color-form-highlight);
 }
-/* Pozycjonowanie inputa "password" */
+
 .form-overlay input[name="password"] {
     top: 37%;
     left: 15%;
     width: 70%;
-    background-color: #fdda9f;
+    background-color: var(--color-form-highlight);
 }
-/* Stylizacja guzika "continue" */
+
 .form-overlay button {
     position: absolute;
     top: 53%;
@@ -199,119 +192,114 @@ main {
     font-weight: bold;
     background: linear-gradient(to right, #fdd99d, #dcae75);
     border: 2px solid #aa9169;
-    border-radius: 10px;
+    border-radius: var(--form-btn-radius);
     cursor: pointer;
     color: #000;
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+    box-shadow: 0 6px 12px var(--shadow-strong);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
 }
 
 .form-overlay button:hover {
     transform: scale(1.04);
     background: linear-gradient(to right, #ffe0b3, #e0b88a);
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 20px var(--shadow-heavy);
 }
 
 .form-overlay button:active {
     transform: scale(0.96);
-    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 3px 6px var(--shadow);
 }
 
 .form-overlay input:focus {
     outline: 2px solid #c58b4f;
-    background-color: #ffe0a3;
-}
-.form-overlay button:hover {
-    background-color: #e6c59d;
-    transform: translateY(-1px);
-    box-shadow: 0px 6px 10px rgba(0,0,0,0.3);
+    background-color: var(--color-form-focus);
 }
 
-/**************************************************************
- *****************   SEKCJA PRZYCISKÓW POD ŁAWKĄ  **************
- **************************************************************/
-/* Sekcja przycisków Create account / Forgot password */
 .actions {
     margin-top: 10px;
     display: flex;
     gap: var(--main-gap);
 }
+
 .actions button {
-    background: linear-gradient(to bottom right, #4CAF50, #45a049);
-    color: white;
-    padding: var(--actions-btn-pad-v) var(--actions-btn-pad-h);
-    font-size: clamp(14px, 1.5vw, var(--actions-btn-font-max));
+    background: linear-gradient(to bottom right, var(--color-btn-green), var(--color-btn-green-dark));
+    color: var(--color-text-light);
+    padding: var(--actions-pad-v) var(--actions-pad-h);
+    font-size: clamp(14px, 1.5vw, var(--font-actions-max));
     border: none;
-    border-radius: 0.6vw;
+    border-radius: var(--btn-radius);
     cursor: pointer;
-    box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.25); /* dynamiczny cień */
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+    box-shadow: 0 6px 14px var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
     position: relative;
     z-index: 1;
 }
 
 .actions button:hover {
     transform: scale(1.05);
-    background: linear-gradient(to bottom right, #5ee271, #35a33a);
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.35);
+    background: linear-gradient(to bottom right, var(--color-btn-green-hover), var(--color-btn-green-hover-dark));
+    box-shadow: 0 8px 20px var(--shadow-heavy);
 }
 
 .actions button:active {
     transform: scale(0.97);
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 6px var(--shadow);
 }
 
-
-/**************************************************************
- ********   MEDIA QUERIES – DLA EKRANÓW O SZEROKOŚCI DO 600px  **
- **************************************************************/
 @media screen and (max-width: 600px) {
-    /* Obniżenie całej zawartości poprzez margines od góry */
     header, main {
-        margin-top: 0px;
+        margin-top: 0;
     }
+
     main {
         flex-direction: column;
-        padding-top: 15px;  /* dodatkowy odstęp od góry */
+        padding-top: 15px;
         height: auto;
     }
+
     .logo-big {
         width: clamp(150px, 40vw, 250px);
         margin-bottom: 10px;
     }
+
     .left h1 {
         font-size: clamp(45px, 6vw, 50px);
     }
+
     .bench-container {
         width: clamp(220px, 80vw, 300px);
         margin-bottom: 10px;
     }
+
     .actions {
         flex-direction: column;
         gap: 10px;
         width: 90%;
-        margin-top: -30px; /* przesunięcie ku górze */
+        margin-top: -30px;
     }
+
     .actions button {
         width: 100%;
         padding: 10px;
         font-size: clamp(12px, 3.5vw, 18px);
     }
+
     .form-overlay input {
         left: 10%;
         width: 80%;
         height: 8%;
-        font-size: 16px;  /* zapewnia brak tap-zoom w Safari */
+        font-size: 16px;
     }
+
     .form-overlay input[name="login"] {
         top: 23%;
     }
+
     .form-overlay input[name="password"] {
         top: 36.5%;
     }
-    /* Finalny przycisk – zostawiamy jeden blok definicji */
+
     .form-overlay button {
-        position: absolute;
         top: 53%;
         left: 0;
         width: 100%;

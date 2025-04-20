@@ -1,10 +1,4 @@
 :root {
-    --font-main: 'Verdana', sans-serif;
-
-    --color-bg-start: #1aa899;
-    --color-bg-end: #f2a94c;
-    --color-text-light: #fff;
-    --color-text-dark: #0c7730;
     --color-form-bg: #ffe4b5;
     --color-form-highlight: #fdda9f;
     --color-form-focus: #ffe0a3;
@@ -13,17 +7,9 @@
     --color-btn-green-hover: #5ee271;
     --color-btn-green-hover-dark: #35a33a;
 
-    --shadow: rgba(0, 0, 0, 0.2);
-    --shadow-strong: rgba(0, 0, 0, 0.3);
-    --shadow-heavy: rgba(0, 0, 0, 0.4);
+    --input-radius: var(--radius-s);
+    --form-btn-radius: var(--radius-m);
 
-    --btn-radius: 0.6vw;
-    --input-radius: 8px;
-    --form-btn-radius: 10px;
-
-    --header-padding: 15px;
-    --header-gap: 10px;
-    --main-gap: 20px;
     --auth-pad-v: 1vh;
     --auth-pad-h: 2.5vw;
     --actions-pad-v: 1.5vh;
@@ -35,33 +21,10 @@
     --font-actions-max: 38px;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html, body {
-    height: 100dvh;
-    overflow: hidden;
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-    touch-action: manipulation;
-}
-
-input, select, textarea, button {
-    appearance: none;
-    -webkit-appearance: none;
-    color-scheme: light;
-}
-
 body {
-    font-family: var(--font-main);
-    background: linear-gradient(to bottom, var(--color-bg-start), var(--color-bg-end));
-    color: var(--color-text-light);
-    overscroll-behavior: none;
+    overflow: hidden;
 }
+
 
 main {
     display: flex;
@@ -75,6 +38,7 @@ main {
 
 .left {
     text-align: center;
+    margin-bottom: var(--main-gap);
 }
 
 .logo-big {
@@ -84,7 +48,7 @@ main {
 
 .left h1 {
     margin-top: 20px;
-    font-size: 5rem;
+    font-size: clamp(3rem, 8vw, 5rem);
     font-weight: bold;
     color: var(--color-text-light);
 }
@@ -104,6 +68,7 @@ main {
 .bench-image {
     width: 100%;
     height: auto;
+    display: block;
 }
 
 .form-overlay {
@@ -178,6 +143,8 @@ main {
     margin-top: 10px;
     display: flex;
     gap: var(--main-gap);
+    width: 100%;
+    justify-content: center;
 }
 
 .actions button {
@@ -186,12 +153,14 @@ main {
     padding: var(--actions-pad-v) var(--actions-pad-h);
     font-size: clamp(14px, 1.5vw, var(--font-actions-max));
     border: none;
-    border-radius: var(--btn-radius);
+    border-radius: var(--radius-m);
     cursor: pointer;
     box-shadow: 0 6px 14px var(--shadow);
     transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
     position: relative;
     z-index: 1;
+    flex-grow: 1;
+    max-width: 250px;
 }
 
 .actions button:hover {
@@ -205,64 +174,66 @@ main {
     box-shadow: 0 2px 6px var(--shadow);
 }
 
-@media screen and (max-width: 600px) {
-    header, main {
-        margin-top: 0;
-    }
-
+@media screen and (max-width: 850px) {
     main {
+        height: auto;
         flex-direction: column;
         padding-top: 15px;
-        height: auto;
-    }
-
-    .logo-big {
-        width: clamp(150px, 40vw, 250px);
-        margin-bottom: 10px;
+        padding-bottom: 80px;
+        justify-content: flex-start;
     }
 
     .left h1 {
-        font-size: clamp(45px, 6vw, 50px);
+        font-size: clamp(2.5rem, 10vw, 3rem);
     }
 
     .bench-container {
-        width: clamp(220px, 80vw, 300px);
+        width: clamp(250px, 70vw, 350px);
         margin-bottom: 10px;
+    }
+
+    .form-overlay input {
+        font-size: 16px;
+        height: 9%;
+    }
+    .form-overlay input[name="login"],
+    .form-overlay input[name="password"] {
+        left: 10%;
+        width: 80%;
+    }
+
+    .form-overlay button {
+        height: 6%;
+        font-size: clamp(14px, 3vw, 18px);
     }
 
     .actions {
         flex-direction: column;
-        gap: 10px;
-        width: 90%;
-        margin-top: -30px;
+        gap: 15px;
+        width: 80%;
+        margin-top: 20px;
+        position: static;
     }
 
     .actions button {
         width: 100%;
-        padding: 10px;
-        font-size: clamp(12px, 3.5vw, 18px);
+        padding: 12px;
+        font-size: clamp(14px, 4vw, 18px);
+        max-width: none;
     }
+}
 
-    .form-overlay input {
-        left: 10%;
-        width: 80%;
-        height: 8%;
-        font-size: 16px;
+@media screen and (max-width: 600px) {
+    .logo-big {
+        width: clamp(150px, 40vw, 200px);
     }
-
-    .form-overlay input[name="login"] {
-        top: 23%;
+    .left h1 {
+        font-size: clamp(2rem, 8vw, 2.5rem);
     }
-
-    .form-overlay input[name="password"] {
-        top: 36.5%;
+    .bench-container {
+        width: clamp(220px, 80vw, 300px);
     }
-
-    .form-overlay button {
-        top: 53%;
-        left: 0;
-        width: 100%;
-        height: 5%;
-        font-size: clamp(10px, 1.2vw, 18px);
+    .actions {
+        width: 90%;
     }
 }

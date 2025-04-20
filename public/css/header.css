@@ -1,15 +1,71 @@
 :root {
-    --header-padding: 15px;
-    --header-gap: 10px;
-    --auth-pad-v: 1vh;
-    --auth-pad-h: 2.5vw;
-    --font-auth-min: 14px;
-    --font-auth-max: 16px;
-    --font-auth-range: 1.4vw;
+    --font-main: 'Verdana', sans-serif;
+
+    --color-bg-start: #1aa899;
+    --color-bg-end: #f2a94c;
+    --color-text-light: #fff;
     --color-text-dark: #0c7730;
-    --btn-radius: 0.6vw;
+    --color-dark: #333;
+    --color-muted: #666;
+    --color-white: #fff;
+
     --shadow: rgba(0, 0, 0, 0.2);
     --shadow-strong: rgba(0, 0, 0, 0.3);
+    --shadow-heavy: rgba(0, 0, 0, 0.4);
+
+    --radius-s: 8px;
+    --radius-m: 10px;
+    --radius-l: 20px;
+    --radius-xl: 40px;
+    --btn-radius-header: 0.6vw;
+
+    --header-padding: 15px;
+    --header-gap: 10px;
+    --main-gap: 20px;
+
+    --search-btn-size: 42px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100dvh;
+    overflow-x: hidden;
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    touch-action: manipulation;
+    color-scheme: only light;
+}
+
+body {
+    font-family: var(--font-main);
+    background: linear-gradient(to bottom, var(--color-bg-start), var(--color-bg-end));
+    color: var(--color-text-light);
+    min-height: 100dvh;
+    overscroll-behavior: none;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    appearance: none;
+    -webkit-appearance: none;
+    color: inherit;
+    font-family: inherit;
+}
+
+input, select, textarea {
+    appearance: none;
+    -webkit-appearance: none;
+    color-scheme: light;
+    font-family: inherit;
 }
 
 header {
@@ -17,6 +73,8 @@ header {
     justify-content: flex-end;
     align-items: center;
     padding: var(--header-padding) calc(var(--header-padding) * 1.666);
+    position: relative;
+    z-index: 100;
 }
 
 .auth-buttons {
@@ -27,13 +85,12 @@ header {
 .auth-buttons button {
     background: linear-gradient(to right, #ffffff, #d8ffd8);
     color: var(--color-text-dark);
-    padding: var(--auth-pad-v) var(--auth-pad-h);
-    font-size: clamp(var(--font-auth-min), var(--font-auth-range), var(--font-auth-max));
+    padding: var(--auth-pad-v, 1vh) var(--auth-pad-h, 2.5vw);
+    font-size: clamp(var(--font-auth-min, 14px), var(--font-auth-range, 1.4vw), var(--font-auth-max, 16px));
     font-weight: bold;
     border: 1px solid #a0dba0;
-    border-radius: var(--btn-radius);
+    border-radius: var(--btn-radius-header);
     box-shadow: 0 4px 10px var(--shadow);
-    cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
 }
 
@@ -46,4 +103,77 @@ header {
 .auth-buttons button:active {
     transform: scale(0.95);
     box-shadow: 0 2px 4px var(--shadow);
+}
+
+.search-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.search-input {
+    width: 100%;
+    padding: clamp(16px, 2vw, 24px) clamp(20px, 3vw, 32px);
+    padding-right: clamp(60px, 6vw, 70px);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: bold;
+    text-align: center;
+    border-radius: var(--radius-xl);
+    border: none;
+    box-shadow: 0 10px 24px var(--shadow-strong);
+    background: var(--color-white);
+    color: var(--color-dark);
+}
+
+.search-icon-btn {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    height: var(--search-btn-size);
+    width: var(--search-btn-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.search-icon-btn img {
+    width: clamp(30px, 4vw, 42px);
+    height: auto;
+    pointer-events: none;
+    filter: drop-shadow(0 0 4px var(--shadow-strong));
+    transition: transform 0.2s ease;
+}
+
+.search-icon-btn:hover img {
+    transform: scale(1.15);
+}
+
+.filter-btn {
+    padding: clamp(10px, 1.5vw, 14px) clamp(16px, 2vw, 24px);
+    font-size: clamp(1rem, 2.5vw, 1.6rem);
+    font-weight: bold;
+    background: var(--color-btn-bg, #888);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-l);
+    cursor: pointer;
+    box-shadow: 0 8px 16px var(--shadow-strong);
+    transition: all 0.2s ease;
+    transform: rotate(5deg);
+}
+
+.filter-btn:hover {
+    transform: rotate(5deg) scale(1.08);
+    background: var(--color-btn-bg-hover, #666);
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(to bottom, var(--color-bg-start), var(--color-bg-end)) !important;
+        color: var(--color-text-light) !important;
+    }
 }

@@ -1,31 +1,9 @@
 :root {
-    --bg-gradient-start: #1aa899;
-    --bg-gradient-end: #f2a94c;
-
-    --color-white: #fff;
-    --color-dark: #333;
-    --color-muted: #666;
     --color-btn-bg: #888;
-
-    --font-main: 'Verdana', sans-serif;
-    --font-size-sm: 1.2rem;
-    --font-size-md: 1.6rem;
-    --font-size-lg: 2rem;
-
-    --shadow: rgba(0, 0, 0, 0.25);
-    --shadow-strong: rgba(0, 0, 0, 0.4);
-
-    --radius-xl: 40px;
-    --radius-lg: 30px;
-    --radius-md: 20px;
-
-    --btn-padding: 14px 24px;
-    --input-padding: 24px 32px;
-    --input-padding-right: 70px;
+    --color-muted: #666;
 
     --video-height-desktop: 70vh;
     --video-width-desktop: 70vw;
-
     --video-height-mobile: 65vh;
     --video-width-mobile: 90vw;
 
@@ -35,15 +13,10 @@
     --padding-desktop: 100px 40px 40px;
     --padding-mobile: 160px 20px 20px;
 
-    --logo-max: 280px;
+    --radius-video: var(--radius-lg);
 }
 
 body {
-    font-family: var(--font-main);
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(to bottom, var(--bg-gradient-start), var(--bg-gradient-end));
-    color: var(--color-white);
     overflow: hidden;
 }
 
@@ -51,9 +24,9 @@ body {
     width: 100%;
     height: 100vh;
     overflow: hidden;
+    position: relative;
 }
 
-/* CENTROWANE POLE WYSZUKIWANIA */
 .search-container {
     position: absolute;
     top: 20px;
@@ -66,79 +39,17 @@ body {
     align-items: center;
 }
 
-.search-input-wrapper {
-    position: relative;
-    width: 100%;
-}
 
-.search-input {
-    padding: var(--input-padding);
-    padding-right: var(--input-padding-right);
-    font-size: clamp(1.4rem, 3vw, var(--font-size-lg));
-    border-radius: var(--radius-xl);
-    border: none;
-    box-shadow: 0 10px 24px var(--shadow-strong);
-    width: 100%;
-    text-align: center;
-    background: var(--color-white);
-    color: var(--color-dark);
-    font-weight: bold;
-}
-
-/* PRZYCISK SZUKAJ */
 .search-icon-btn {
-    position: absolute;
-    top: 50%;
-    right: -30px;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 42px;
-    width: 42px;
-    padding: 0;
-    margin: 0;
 }
 
-.search-icon-btn img {
-    width: 100%;
-    height: auto;
-    pointer-events: none;
-    filter: drop-shadow(0 0 4px rgba(0,0,0,0.4));
-    transition: transform 0.2s ease;
-}
 
-.search-icon-btn:hover img {
-    transform: scale(1.15);
-}
-
-/* PRZYCISK FILTRÓW */
 .filter-btn {
     position: absolute;
     bottom: -50px;
     right: 8px;
-    padding: var(--btn-padding);
-    font-size: clamp(var(--font-size-sm), 2.5vw, var(--font-size-md));
-    font-weight: bold;
-    background: var(--color-btn-bg);
-    color: var(--color-white);
-    border: none;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    box-shadow: 0 8px 16px var(--shadow-strong);
-    transition: all 0.2s ease;
-    transform: rotate(5deg);
 }
 
-.filter-btn:hover {
-    transform: rotate(5deg) scale(1.08);
-    background: var(--color-muted);
-}
-
-/* ROLKA VIDEO */
 .video-reel {
     display: flex;
     flex-direction: row;
@@ -148,21 +59,24 @@ body {
     scroll-behavior: smooth;
     gap: var(--gap-desktop);
     padding: var(--padding-desktop);
+    box-sizing: border-box;
     scroll-snap-type: x mandatory;
+    align-items: center;
 }
 
 .reel-item {
     flex: 0 0 auto;
     width: var(--video-width-desktop);
     height: var(--video-height-desktop);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-video);
     overflow: hidden;
-    box-shadow: 0 10px 30px var(--shadow);
+    box-shadow: 0 10px 30px var(--shadow-strong);
     scroll-snap-align: center;
     opacity: 0.5;
     transform: scale(0.85);
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
     cursor: pointer;
+    position: relative;
 }
 
 .reel-item.active {
@@ -176,44 +90,29 @@ body {
     height: 100%;
     object-fit: cover;
     display: block;
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-video);
 }
 
-/* MOBILE */
 @media screen and (max-width: 850px) {
     .search-container {
         top: 75px;
         width: 70vw;
     }
 
-    .search-input {
-        font-size: 1.2rem;
-        padding: 16px 20px;
-        padding-right: 60px;
-    }
-
-    .search-icon-btn {
-        right: -30px;
-        height: 36px;
-        width: 36px;
-    }
 
     .filter-btn {
         right: 8px;
-        bottom: -40px;
-        font-size: 1rem;
-        padding: 10px 16px;
+        bottom: -45px;
     }
 
     .video-reel {
         flex-direction: column;
         overflow-y: auto;
         overflow-x: hidden;
-        height: 100vh;
         scroll-snap-type: y mandatory;
-        scroll-behavior: smooth;
         padding: var(--padding-mobile);
         gap: var(--gap-mobile);
+        align-items: center;
     }
 
     .reel-item {

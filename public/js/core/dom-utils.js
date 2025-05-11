@@ -3,10 +3,16 @@ export function isMobile() {
 }
 
 export function centerItem(container, item) {
+    // Dodajmy zabezpieczenie na wypadek, gdyby item był null lub undefined
+    if (!item || !container) return;
+
     const rect = container.getBoundingClientRect();
+    const itemRect = item.getBoundingClientRect(); // Potrzebujemy też wymiarów item
+
     const offset = isMobile()
-        ? item.offsetTop - (rect.height - item.offsetHeight) / 2
-        : item.offsetLeft - (rect.width - item.offsetWidth) / 2;
+        ? item.offsetTop - container.offsetTop - (rect.height - itemRect.height) / 2
+        : item.offsetLeft - container.offsetLeft - (rect.width - itemRect.width) / 2;
+
     container.scrollTo({
         top: isMobile() ? offset : 0,
         left: isMobile() ? 0 : offset,

@@ -2,7 +2,6 @@
 $customHead = '
     <title>Login – RanchBot</title>
     <link rel="stylesheet" href="css/login.css">
-    <script src="script.js" defer></script>
 ';
 include_once __DIR__ . '/../templates/header.php';
 ?>

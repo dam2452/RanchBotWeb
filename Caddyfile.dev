@@ -7,15 +7,17 @@ http://localhost {
 
     @api_matcher path /api/v1/*
     handle @api_matcher {
-        reverse_proxy {$EXISTING_RANCHBOT_API_ADDRESS} {
-        }
+        reverse_proxy {$EXISTING_RANCHBOT_API_ADDRESS}
     }
 
     handle {
         root * /srv/php-app/public
+        try_files {path} {path}/ /index.php?{query}
+
         php_fastcgi php-dev:9000 {
-            root /app/public
+            root /srv/php-app/public
         }
+
         file_server
     }
 
@@ -23,5 +25,6 @@ http://localhost {
         output stdout
         format console
     }
-    encode zstd gzip
+
+    encode gzip zstd
 }

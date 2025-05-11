@@ -81,4 +81,7 @@ export class ReelNavigator {
             centerItem(this.container, this.items[this.activeIndex]);
         });
     }
+    refresh() {
+        this.items = Array.from(this.container.querySelectorAll('.reel-item'));
+    }
 }

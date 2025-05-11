@@ -21,6 +21,5 @@ include_once __DIR__ . '/../templates/header.php';
     </div>
 </main>
 
-<script src="js/script.js"></script>
 
 <?php include_once __DIR__ . '/../templates/footer.php'; ?>

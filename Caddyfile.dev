@@ -1,0 +1,27 @@
+{
+    debug
+    auto_https off
+}
+
+http://localhost {
+
+    @api_matcher path /api/v1/*
+    handle @api_matcher {
+        reverse_proxy {$EXISTING_RANCHBOT_API_ADDRESS} {
+        }
+    }
+
+    handle {
+        root * /srv/php-app/public
+        php_fastcgi php-dev:9000 {
+            root /app/public
+        }
+        file_server
+    }
+
+    log {
+        output stdout
+        format console
+    }
+    encode zstd gzip
+}

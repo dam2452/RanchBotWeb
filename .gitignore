@@ -1,2 +1,4 @@
 /.idea
 RANCZO-WIDEO
+.env
+.env.dev

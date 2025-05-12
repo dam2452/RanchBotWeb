@@ -1,0 +1,309 @@
+/* clip-inspector.css */
+.clip-inspector {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    display: none;
+}
+
+.clip-inspector.visible {
+    display: block;
+}
+
+.inspector-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 2001;
+}
+
+.inspector-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85vw;
+    max-width: 1200px;
+    z-index: 2002;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.inspector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+}
+
+.inspector-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.close-inspector-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.close-inspector-btn:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.inspector-video-container {
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 aspect ratio */
+    position: relative;
+    background-color: #000;
+}
+
+.inspector-video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.inspector-controls {
+    padding: 20px;
+    background-color: #fff;
+}
+
+.adjustment-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.time-slider-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.time-slider-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+.time-slider {
+    width: 100%;
+    height: 10px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #ddd;
+    outline: none;
+    border-radius: 5px;
+}
+
+.time-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #666;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.time-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.time-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #666;
+    cursor: pointer;
+    transition: transform 0.2s;
+    border: none;
+}
+
+.time-slider::-moz-range-thumb:hover {
+    transform: scale(1.2);
+}
+
+.save-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.toggle-save-btn {
+    background-color: #666;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.toggle-save-btn:hover {
+    background-color: #888;
+}
+
+.save-form {
+    display: none;
+    flex-direction: row;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.save-form.visible {
+    display: flex;
+}
+
+.clip-name-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.save-clip-btn {
+    background-color: #2266aa;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.save-clip-btn:hover {
+    opacity: 0.9;
+}
+
+.download-adjusted-clip-btn {
+    width: 100%;
+    background-color: #22aa22;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.download-adjusted-clip-btn:hover {
+    opacity: 0.9;
+}
+
+.inspector-status {
+    padding: 12px;
+    background-color: #f5f5f5;
+    color: #333;
+    font-size: 14px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-top: 1px solid #ddd;
+}
+
+.inspector-status.status-visible {
+    opacity: 1;
+}
+
+/* Hide search container when inspector is open */
+.search-container.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+/* Button for inspect */
+.inspect-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 100;
+    background-color: #2266aa;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.inspect-btn:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.reel-item:not(.active) .inspect-btn {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Make inspect button visible on hover for non-active items */
+.reel-item:not(.active):hover .inspect-btn {
+    opacity: 0.8;
+    pointer-events: auto;
+}
+
+/* Mobile adjustments */
+@media screen and (max-width: 850px) {
+    .inspector-container {
+        width: 95vw;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .adjustment-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .save-form {
+        flex-direction: column;
+    }
+
+    .inspect-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+        top: 10px;
+        left: 10px;
+    }
+}

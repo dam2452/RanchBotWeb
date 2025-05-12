@@ -19,9 +19,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
         // Pobierz dane klipów bezpośrednio z API
         console.log('Pobieranie danych klipów z API...');
-        // Użyjemy callApi dla spójności, zakładając, że clips-api.php obsługuje GET bez endpoint/args
-        // Jeśli nie, wróć do fetch('/api/clips-api.php?action=get_clips')
-        // Na razie zostawiam fetch, bo wydaje się dedykowany
+        // Użyj fetch, jak było wcześniej, do dedykowanego endpointu
         const response = await fetch('/api/clips-api.php?action=get_clips');
 
         if (!response.ok) {
@@ -34,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (data.status === 'success' && data.clips && data.clips.length > 0) {
             // Podziel klipy na strony (6 klipów na stronę)
             const clipsPerPage = 6;
-            const pagesData = []; // Zmień nazwę z pages na pagesData, żeby uniknąć konfliktu z querySelectorAll('.clips-page')
+            const pagesData = [];
 
             for (let i = 0; i < data.clips.length; i += clipsPerPage) {
                 pagesData.push(data.clips.slice(i, i + clipsPerPage));
@@ -57,17 +55,18 @@ document.addEventListener('DOMContentLoaded', async function() {
                     const clipElement = document.createElement('div');
                     clipElement.className = 'clip-card';
                     clipElement.setAttribute('data-id', clip.id);
+                    // data-index może być przydatny, zostawiamy
                     clipElement.setAttribute('data-index', globalIndex);
                     clipElement.setAttribute('data-name', clip.name);
 
-                    // --- DODANO PRZYCISK USUWANIA ---
+                    // --- ZMIENIONO źródło wideo i usunięto fallback ---
                     clipElement.innerHTML = `
                         <div class="video-container" data-clip-id="${clip.id}" data-clip-index="${globalIndex}" data-clip-name="${clip.name}">
                             <video
                                 loop
                                 preload="metadata"
                                 class="clip-video">
-                                <source src="debug-video.php?id=${encodeURIComponent(clip.name)}&fallback=1" type="video/mp4">
+                                <source src="/debug-video.php?id=${encodeURIComponent(clip.name)}" type="video/mp4"> 
                             </video>
                             <div class="download-btn">Pobierz</div>
                         </div>
@@ -77,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                             Usuń
                         </button>
                     `;
-                    // --- KONIEC DODAWANIA PRZYCISKU ---
+                    // --- KONIEC ZMIAN W HTML ---
 
                     pageElement.appendChild(clipElement);
                 });
@@ -86,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             });
 
             // Inicjalizuj nawigację i obsługę klipów (w tym przycisków usuwania)
-            initializeClipsNavigationAndActions(); // Zmieniona nazwa funkcji dla jasności
+            initializeClipsNavigationAndActions();
 
         } else {
             console.log('Brak klipów lub błąd w danych:', data);
@@ -101,14 +100,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Funkcja dodająca przycisk nawigacji do wyszukiwarki
     function addSearchNavigationButton() {
-        // ... (bez zmian) ...
         // Stwórz przycisk nawigacyjny
         const searchNavButton = document.createElement('a');
         searchNavButton.className = 'search-nav-button';
         searchNavButton.href = 'search.php';
         searchNavButton.title = 'Szukaj cytatów';
 
-        // Ikona wyszukiwania - w stylu podobnym do reszty aplikacji
+        // Ikona wyszukiwania
         searchNavButton.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="11" cy="11" r="8"></circle>
@@ -120,7 +118,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Dodaj do DOM
         document.querySelector('.my-clips-page').appendChild(searchNavButton);
 
-        // Animacja przy najechaniu na przycisk - opcjonalnie
+        // Animacja przy najechaniu
         searchNavButton.addEventListener('mouseenter', () => {
             searchNavButton.classList.add('hover');
         });
@@ -130,91 +128,74 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
-    // Zmieniona nazwa funkcji, zawiera teraz setupDeleteButtons
+    // Główna funkcja inicjalizująca nawigację i akcje
     function initializeClipsNavigationAndActions() {
-        const pages = document.querySelectorAll('.clips-page'); // Zmieniono z pagesData na querySelectorAll
+        const pages = document.querySelectorAll('.clips-page');
         if (pages.length === 0) return;
 
         console.log(`Inicjalizacja nawigacji i akcji dla ${pages.length} stron`);
 
         let currentPage = 0;
         let activeVideoContainer = null;
-        let videoCompleting = false;
-        let autoplayFailed = false;
+        let videoCompleting = false; // Flaga wskazująca, czy wideo ma się zatrzymać po zakończeniu pętli
+        let autoplayFailedOnce = false; // Zapamiętaj, czy autoplay zawiódł
 
-        // ... (funkcje loadVideo, playVideo, handleVideoLeave, stopAllVideos - bez zmian) ...
-        // Funkcja do ładowania wideo i obsługi błędów
+
+        // Funkcja do ładowania wideo (uproszczona, bez fallbacków)
         function loadVideo(video, videoContainer) {
             // Jeśli wideo nie jest załadowane, załaduj je
             if (video.readyState === 0) {
-                video.load();
+                video.load(); // Rozpocznij ładowanie
 
-                // Obsługa błędu ładowania wideo
-                video.addEventListener('error', function onError() {
-                    console.error('Błąd ładowania wideo', video.error);
-
-                    // Spróbuj alternatywnego źródła
-                    const clipName = videoContainer.dataset.clipName;
-                    const clipId = videoContainer.dataset.clipId;
-                    const clipIndex = videoContainer.dataset.clipIndex;
-
-                    // Najpierw spróbuj z indeksem
-                    const source = video.querySelector('source');
-                    source.src = `debug-video.php?id=${clipIndex}&fallback=1`;
-
-                    // Usuń nasłuchiwacz błędu, aby uniknąć zapętlenia
+                // Podstawowa obsługa błędu ładowania
+                video.addEventListener('error', function onError(e) {
+                    console.error('Błąd ładowania wideo:', video.error?.message || 'Nieznany błąd', 'dla źródła:', video.currentSrc, e);
+                    // Można tu dodać komunikat dla użytkownika w overlayu na wideo
+                    const errorOverlay = document.createElement('div');
+                    errorOverlay.className = 'video-error-overlay';
+                    errorOverlay.textContent = 'Błąd ładowania';
+                    // Upewnij się, że nie dodajesz wielu overlayów
+                    if (!videoContainer.querySelector('.video-error-overlay')) {
+                        videoContainer.appendChild(errorOverlay);
+                    }
+                    // Usunięcie nasłuchiwacza, aby uniknąć wielokrotnych błędów przy próbach
                     video.removeEventListener('error', onError);
-
-                    video.load();
-                    video.play().catch(err => {
-                        console.error('Nadal błąd odtwarzania', err);
-
-                        // Jako ostateczność spróbuj z ID
-                        source.src = `debug-video.php?id=${clipId}&fallback=1`;
-                        video.load();
-                        video.play().catch(e => console.error('Wszystkie próby nieudane', e));
-                    });
-                });
+                }, { once: true }); // Użyj { once: true }, aby obsłużyć tylko pierwszy błąd
             }
         }
 
         // Funkcja do rozpoczęcia odtwarzania wideo
         function playVideo(videoContainer) {
             const video = videoContainer.querySelector('video');
+            // Usuń overlay błędu, jeśli istnieje
+            videoContainer.querySelector('.video-error-overlay')?.remove();
 
-            // Jeśli już jest aktywne, nic nie rób
             if (activeVideoContainer === videoContainer) {
-                videoCompleting = false; // Anuluj ewentualne opóźnione zatrzymanie
+                videoCompleting = false; // Anuluj zatrzymanie
                 return;
             }
 
-            // Zatrzymaj poprzednie aktywne wideo
             if (activeVideoContainer) {
-                const activeVideo = activeVideoContainer.querySelector('video');
-                activeVideo.pause();
-                activeVideoContainer.classList.remove('active');
+                handleVideoLeave(activeVideoContainer, true); // Natychmiast zatrzymaj poprzednie
             }
 
-            // Aktywuj nowe wideo
             videoContainer.classList.add('active');
             activeVideoContainer = videoContainer;
             videoCompleting = false;
 
-            // Załaduj wideo jeśli potrzeba
-            loadVideo(video, videoContainer);
+            loadVideo(video, videoContainer); // Upewnij się, że jest załadowane
 
-            // Rozpocznij odtwarzanie
             if (video.paused) {
                 video.play().catch(err => {
                     console.error('Błąd autoplay:', err);
-                    autoplayFailed = true;
-
-                    // Jeśli autoplay nie działa, należy kliknąć, aby odtworzyć
+                    if (!autoplayFailedOnce) {
+                        // Pokaż komunikat tylko za pierwszym razem, jeśli chcesz
+                        autoplayFailedOnce = true;
+                    }
+                    // Dodaj wizualną wskazówkę, że trzeba kliknąć
                     const playMessage = document.createElement('div');
                     playMessage.className = 'play-message';
                     playMessage.textContent = 'Kliknij, aby odtworzyć';
-
-                    // Dodaj komunikat tylko jeśli jeszcze nie istnieje
                     if (!videoContainer.querySelector('.play-message')) {
                         videoContainer.appendChild(playMessage);
                     }
@@ -222,94 +203,76 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
         }
 
-        // Funkcja do zatrzymania wideo po opuszczeniu
-        function handleVideoLeave(videoContainer) {
+        // Funkcja do obsługi opuszczenia kontenera wideo (zatrzymuje wideo)
+        // Dodano opcjonalny parametr 'forceStop'
+        function handleVideoLeave(videoContainer, forceStop = false) {
             if (activeVideoContainer === videoContainer) {
-                videoCompleting = true;
-
-                // Nie zatrzymujemy od razu, pozwolimy wideo zakończyć cykl
-                // Obsługa tego jest w zdarzeniu 'ended' poniżej
+                if (forceStop) {
+                    const video = videoContainer.querySelector('video');
+                    video.pause();
+                    videoContainer.classList.remove('active');
+                    activeVideoContainer = null;
+                    videoCompleting = false;
+                    videoContainer.querySelector('.play-message')?.remove();
+                    videoContainer.querySelector('.video-error-overlay')?.remove();
+                } else {
+                    // Zaznacz do zatrzymania po zakończeniu pętli
+                    videoCompleting = true;
+                }
             }
         }
 
         // Funkcja do zatrzymania wszystkich wideo
         function stopAllVideos() {
-            const allVideos = document.querySelectorAll('.clip-video');
-            allVideos.forEach(video => {
-                video.pause();
-                video.parentElement.classList.remove('active');
+            document.querySelectorAll('.video-container.active').forEach(container => {
+                handleVideoLeave(container, true); // Użyj handleVideoLeave z forceStop
             });
-            activeVideoContainer = null;
-            videoCompleting = false;
         }
 
 
         // Dodaj obsługę najechania/opuszczenia i kliknięcia na wideo
         document.querySelectorAll('.video-container').forEach(container => {
-            // ... (bez zmian) ...
-            // Najechanie myszą - rozpocznij odtwarzanie
-            container.addEventListener('mouseenter', () => {
-                playVideo(container);
-            });
-
-            // Opuszczenie myszą - zaznacz do zatrzymania
-            container.addEventListener('mouseleave', () => {
-                handleVideoLeave(container);
-            });
-
-            // Kliknięcie - przełącz odtwarzanie
+            container.addEventListener('mouseenter', () => playVideo(container));
+            container.addEventListener('mouseleave', () => handleVideoLeave(container));
             container.addEventListener('click', (e) => {
-                // Ignoruj kliknięcia na przycisk pobierania
-                if (e.target.classList.contains('download-btn')) {
-                    return;
+                if (e.target.classList.contains('download-btn') || e.target.closest('.delete-clip-btn')) {
+                    return; // Ignoruj kliknięcia na przyciski pobierania/usuwania
                 }
 
                 const video = container.querySelector('video');
+                // Usuń komunikat o kliknięciu, jeśli istnieje
+                container.querySelector('.play-message')?.remove();
+                // Usuń overlay błędu, jeśli istnieje
+                container.querySelector('.video-error-overlay')?.remove();
 
-                // Jeśli to jest aktywne wideo, przełącz odtwarzanie
+
                 if (activeVideoContainer === container) {
                     if (video.paused) {
-                        video.play();
-                        container.classList.add('active');
-
-                        // Usuń komunikat o kliknięciu, jeśli istnieje
-                        const playMessage = container.querySelector('.play-message');
-                        if (playMessage) {
-                            playMessage.remove();
-                        }
+                        video.play().catch(err => console.error("Błąd odtwarzania po kliknięciu:", err));
+                        container.classList.add('active'); // Upewnij się, że jest aktywny
                     } else {
                         video.pause();
-                        container.classList.remove('active');
+                        // Nie usuwamy klasy 'active' od razu po pauzie,
+                        // bo użytkownik może chcieć wznowić
                     }
                 } else {
-                    // Jeśli to nowe wideo, odtwórz je
-                    playVideo(container);
+                    playVideo(container); // Aktywuj i odtwórz, jeśli kliknięto nieaktywne
                 }
             });
 
             // Obsługa zdarzenia zakończenia wideo
             const video = container.querySelector('video');
-
-            // Gdy wideo się kończy, sprawdza czy ma być zatrzymane
             video.addEventListener('ended', function() {
-                if (videoCompleting) {
-                    video.pause();
-                    container.classList.remove('active');
-                    activeVideoContainer = null;
-                    videoCompleting = false;
-
-                    // Usuń komunikat o kliknięciu, jeśli istnieje
-                    const playMessage = container.querySelector('.play-message');
-                    if (playMessage) {
-                        playMessage.remove();
-                    }
+                if (videoCompleting && activeVideoContainer === container) {
+                    // Jeśli było zaznaczone do zatrzymania, zatrzymaj teraz
+                    handleVideoLeave(container, true); // Użyj forceStop
                 }
+                // Jeśli nie było zaznaczone, po prostu zacznie od nowa (bo jest loop)
             });
         });
 
-        // Dodaj obsługę pobierania
+        // Dodaj obsługę pobierania - używa teraz poprawnego URL
         document.querySelectorAll('.download-btn').forEach(btn => {
-            // ... (bez zmian) ...
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -317,79 +280,99 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const container = e.target.closest('.video-container');
                 const clipName = container.dataset.clipName;
 
-                // Użyj poprawnej nazwy w komunikacie
+                if (!clipName) {
+                    alert("Nie można zidentyfikować nazwy klipu do pobrania.");
+                    return;
+                }
+
                 btn.textContent = 'Pobieranie...';
-                btn.style.pointerEvents = 'none'; // Wyłącz klikanie podczas pobierania
+                btn.style.pointerEvents = 'none';
 
                 try {
-                    // Pobierz wideo bezpośrednio z serwera
-                    const response = await fetch(`debug-video.php?id=${encodeURIComponent(clipName)}&fallback=1`);
+                    // --- ZMIENIONO URL i usunięto fallback ---
+                    const response = await fetch(`/debug-video.php?id=${encodeURIComponent(clipName)}`);
                     if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
+                        // Spróbuj odczytać błąd JSON, jeśli serwer go wysłał
+                        let errorDetails = `HTTP error! Status: ${response.status}`;
+                        try {
+                            const errorJson = await response.json();
+                            errorDetails += ` - ${errorJson.error || 'Unknown server error'}`;
+                        } catch (jsonError) { /* Ignoruj, jeśli odpowiedź nie jest JSON */ }
+                        throw new Error(errorDetails);
                     }
 
                     const blob = await response.blob();
-                    const url = URL.createObjectURL(blob);
 
-                    // Stwórz link do pobrania
+                    // Sprawdź typ MIME - jeśli to nie wideo, coś jest nie tak
+                    if (!blob.type.startsWith('video/')) {
+                        console.warn(`Pobrano nieoczekiwany typ MIME: ${blob.type} dla klipu ${clipName}. Oczekiwano wideo.`);
+                        // Mimo wszystko spróbujmy pobrać, może serwer źle ustawił nagłówek
+                        // ale poinformujmy użytkownika
+                        // alert(`Serwer zwrócił nieoczekiwany typ pliku (${blob.type}). Plik może nie działać poprawnie.`);
+                    }
+
+                    const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `${clipName}.mp4`;
+                    // Użyj bezpiecznej nazwy pliku
+                    const safeFilename = clipName.replace(/[^a-zA-Z0-9_.-]/g, '_') + '.mp4';
+                    a.download = safeFilename;
                     document.body.appendChild(a);
                     a.click();
 
-                    // Posprzątaj
                     setTimeout(() => {
                         document.body.removeChild(a);
                         URL.revokeObjectURL(url);
-                        btn.textContent = 'Pobierz'; // Przywróć tekst przycisku
-                        btn.style.pointerEvents = 'auto'; // Włącz klikanie z powrotem
+                        btn.textContent = 'Pobierz';
+                        btn.style.pointerEvents = 'auto';
                     }, 100);
 
                 } catch (error) {
                     console.error('Błąd podczas pobierania wideo:', error);
-                    alert('Przepraszamy, wystąpił błąd podczas pobierania wideo.');
-                    btn.textContent = 'Pobierz'; // Przywróć tekst przycisku w razie błędu
-                    btn.style.pointerEvents = 'auto'; // Włącz klikanie z powrotem
+                    alert(`Przepraszamy, wystąpił błąd podczas pobierania wideo: ${error.message}`);
+                    btn.textContent = 'Pobierz';
+                    btn.style.pointerEvents = 'auto';
                 }
             });
         });
 
         // Funkcja do przewijania do określonej strony
         function scrollToPage(pageIndex) {
-            // ... (bez zmian) ...
             if (pageIndex < 0 || pageIndex >= pages.length) return;
 
             console.log(`Przewijanie do strony ${pageIndex + 1} z ${pages.length}`);
             currentPage = pageIndex;
 
-            // Zatrzymaj wszystkie wideo
-            stopAllVideos();
+            stopAllVideos(); // Zatrzymaj wideo przed przewinięciem
 
-            // Przewiń do strony
             const isMobileView = window.innerWidth <= 850;
             const container = document.querySelector('.clips-reel');
 
+            // Sprawdź, czy strona docelowa istnieje w DOM
+            const targetPage = pages[pageIndex];
+            if (!targetPage) {
+                console.error(`Strona o indeksie ${pageIndex} nie istnieje w DOM.`);
+                return;
+            }
+
+
             if (isMobileView) {
-                // Dla widoku mobilnego przewijamy w pionie
                 container.scrollTo({
-                    top: pages[pageIndex].offsetTop - container.offsetTop, // Uwzględnij offset kontenera
+                    top: targetPage.offsetTop - container.offsetTop,
                     behavior: 'smooth'
                 });
             } else {
-                // Dla widoku desktopowego przewijamy w poziomie
                 container.scrollTo({
-                    left: pages[pageIndex].offsetLeft,
+                    left: targetPage.offsetLeft,
                     behavior: 'smooth'
                 });
             }
 
-
-            // Aktualizuj wskaźnik strony
             updatePageIndicator();
         }
 
-        // Dodaj przyciski nawigacji
+        // Dodaj przyciski nawigacji stron
+        const navigationContainer = document.querySelector('.my-clips-page'); // Zakładamy, że chcemy je dodać do głównego kontenera
         const navigationButtons = document.createElement('div');
         navigationButtons.className = 'page-navigation';
         navigationButtons.innerHTML = `
@@ -398,27 +381,29 @@ document.addEventListener('DOMContentLoaded', async function() {
             <button class="next-page" title="Następna strona">&#10095;</button>
         `;
 
-        document.querySelector('.my-clips-page').appendChild(navigationButtons);
+        // Dodaj nawigację pod kontenerem z klipami
+        clipsContainer.parentNode.insertBefore(navigationButtons, clipsContainer.nextSibling);
+        // lub jeśli ma być na dole strony:
+        // navigationContainer.appendChild(navigationButtons);
+
 
         // Aktualizuj wskaźnik strony
         function updatePageIndicator() {
-            document.querySelector('.current-page').textContent = currentPage + 1;
-            document.querySelector('.prev-page').disabled = (currentPage === 0);
-            document.querySelector('.next-page').disabled = (currentPage === pages.length - 1);
+            const currentPageSpan = document.querySelector('.current-page');
+            const prevButton = document.querySelector('.prev-page');
+            const nextButton = document.querySelector('.next-page');
+
+            if(currentPageSpan) currentPageSpan.textContent = currentPage + 1;
+            if(prevButton) prevButton.disabled = (currentPage === 0);
+            if(nextButton) nextButton.disabled = (currentPage >= pages.length - 1); // Użyj >= dla bezpieczeństwa
         }
 
         // Obsługa przycisków nawigacji
-        document.querySelector('.prev-page').addEventListener('click', () => {
-            scrollToPage(currentPage - 1);
-        });
-
-        document.querySelector('.next-page').addEventListener('click', () => {
-            scrollToPage(currentPage + 1);
-        });
+        document.querySelector('.prev-page')?.addEventListener('click', () => scrollToPage(currentPage - 1));
+        document.querySelector('.next-page')?.addEventListener('click', () => scrollToPage(currentPage + 1));
 
         // Obsługa kliknięć w obszar strony (poza klipami)
         document.addEventListener('click', function(e) {
-            // Sprawdź, czy kliknięcie było poza elementami interaktywnymi karty
             if (!e.target.closest('.clip-card') &&
                 !e.target.closest('.page-navigation') &&
                 !e.target.closest('.search-nav-button')) {
@@ -428,18 +413,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         // Obsługa kliknięć w obszar strony do nawigacji (kliknięcie na tło)
         clipsContainer.addEventListener('click', function(e) {
-            if (e.target === clipsContainer) { // Kliknięcie bezpośrednio na tło kontenera
+            if (e.target === clipsContainer) {
                 const rect = clipsContainer.getBoundingClientRect();
                 const isMobileView = window.innerWidth <= 850;
+                const clickThreshold = 0.1; // 10% od krawędzi
 
                 if (isMobileView) {
-                    const clickY = e.clientY - rect.top;
-                    const goForward = clickY > rect.height / 2;
-                    scrollToPage(currentPage + (goForward ? 1 : -1));
+                    const clickYRatio = (e.clientY - rect.top) / rect.height;
+                    if (clickYRatio < clickThreshold) scrollToPage(currentPage - 1);      // Góra
+                    else if (clickYRatio > 1 - clickThreshold) scrollToPage(currentPage + 1); // Dół
                 } else {
-                    const clickX = e.clientX - rect.left;
-                    const goForward = clickX > rect.width / 2;
-                    scrollToPage(currentPage + (goForward ? 1 : -1));
+                    const clickXRatio = (e.clientX - rect.left) / rect.width;
+                    if (clickXRatio < clickThreshold) scrollToPage(currentPage - 1);       // Lewo
+                    else if (clickXRatio > 1 - clickThreshold) scrollToPage(currentPage + 1); // Prawo
                 }
             }
         });
@@ -447,63 +433,60 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         // Obsługa klawiszy strzałek
         window.addEventListener('keydown', function(e) {
-            // Ignoruj klawisze, jeśli fokus jest w polu tekstowym (gdyby było)
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                return;
-            }
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
             const isMobileView = window.innerWidth <= 850;
+            let handled = false;
 
             if (isMobileView) {
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault(); // Zapobiegaj standardowemu przewijaniu strony
-                    scrollToPage(currentPage + 1);
-                }
-                if (e.key === 'ArrowUp') {
-                    e.preventDefault(); // Zapobiegaj standardowemu przewijaniu strony
-                    scrollToPage(currentPage - 1);
-                }
+                if (e.key === 'ArrowDown') scrollToPage(currentPage + 1);
+                else if (e.key === 'ArrowUp') scrollToPage(currentPage - 1);
+                else return; // Ignoruj inne klawisze
             } else {
-                if (e.key === 'ArrowRight') {
-                    e.preventDefault();
-                    scrollToPage(currentPage + 1);
-                }
-                if (e.key === 'ArrowLeft') {
-                    e.preventDefault();
-                    scrollToPage(currentPage - 1);
-                }
+                if (e.key === 'ArrowRight') scrollToPage(currentPage + 1);
+                else if (e.key === 'ArrowLeft') scrollToPage(currentPage - 1);
+                else return; // Ignoruj inne klawisze
             }
+            e.preventDefault(); // Zapobiegaj standardowemu przewijaniu tylko jeśli obsłużyliśmy klawisz
         });
 
-        // Obsługa zmiany rozmiaru okna (np. obrót telefonu)
+        // Obsługa zmiany rozmiaru okna
         let resizeTimeout;
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 console.log("Window resized, adjusting scroll position.");
-                scrollToPage(currentPage); // Dostosuj przewinięcie po zmianie rozmiaru
-            }, 250); // Debounce resize event
+                // Przewiń bez animacji, żeby było natychmiastowe
+                const targetPage = pages[currentPage];
+                if (targetPage) {
+                    const isMobileView = window.innerWidth <= 850;
+                    const container = document.querySelector('.clips-reel');
+                    if (isMobileView) container.scrollTop = targetPage.offsetTop - container.offsetTop;
+                    else container.scrollLeft = targetPage.offsetLeft;
+                }
+            }, 250);
         });
 
-        // Aktywuj pierwszą stronę
-        scrollToPage(0);
+        // Aktywuj pierwszą stronę i zaktualizuj wskaźnik
+        scrollToPage(0); // Inicjalne przewinięcie
+        updatePageIndicator(); // Upewnij się, że wskaźnik jest poprawny na starcie
 
-        // --- NOWA FUNKCJA DO OBSŁUGI PRZYCISKÓW USUWANIA ---
+        // Ustaw nasłuchiwacze dla przycisków usuwania
         setupDeleteButtons();
     } // Koniec initializeClipsNavigationAndActions
 
-    // --- NOWA FUNKCJA ---
+    // Funkcja do obsługi przycisków usuwania
     function setupDeleteButtons() {
-        const clipsContainer = document.querySelector('.clips-reel');
-        if (!clipsContainer) return;
+        const clipsReelContainer = document.querySelector('.clips-reel'); // Zmieniono nazwę zmiennej dla jasności
+        if (!clipsReelContainer) return;
 
         console.log("Ustawianie nasłuchiwaczy dla przycisków usuwania...");
 
-        clipsContainer.addEventListener('click', async (e) => {
+        clipsReelContainer.addEventListener('click', async (e) => {
             const deleteButton = e.target.closest('.delete-clip-btn');
-            if (!deleteButton) return; // Kliknięto poza przyciskiem usuwania
+            if (!deleteButton) return;
 
-            e.stopPropagation(); // Zatrzymaj propagację, aby nie aktywować odtwarzania itp.
+            e.stopPropagation(); // Ważne! Zatrzymaj propagację
 
             const clipCard = deleteButton.closest('.clip-card');
             const clipName = clipCard?.dataset.name;
@@ -514,61 +497,49 @@ document.addEventListener('DOMContentLoaded', async function() {
                 return;
             }
 
-            // Okno dialogowe potwierdzenia
             if (confirm(`Czy na pewno chcesz usunąć klip "${clipName}"? Tej operacji nie można cofnąć.`)) {
                 console.log(`Rozpoczęcie usuwania klipu: ${clipName}`);
                 deleteButton.disabled = true;
-                const originalButtonContent = deleteButton.innerHTML; // Zapisz oryginalną zawartość
-                deleteButton.innerHTML = 'Usuwanie...'; // Zmień tekst na czas operacji
+                const originalButtonContent = deleteButton.innerHTML;
+                deleteButton.innerHTML = 'Usuwanie...';
 
                 try {
-                    // Wywołanie API - używamy callApi, które powinno być zaimportowane
-                    const response = await callApi('uk', [clipName]); // Endpoint 'uk' z nazwą klipu
+                    // Użyj zaimportowanej funkcji callApi
+                    const response = await callApi('uk', [clipName]);
 
                     console.log('Odpowiedź API usuwania:', response);
 
                     if (response && (response.status === 'success' || response.code === 'clip_deleted')) {
                         console.log(`Klip "${clipName}" usunięty pomyślnie.`);
 
-                        // Animowane usuwanie karty z DOM
                         clipCard.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
                         clipCard.style.opacity = '0';
                         clipCard.style.transform = 'scale(0.95) translateY(-10px)';
 
                         setTimeout(() => {
-                            clipCard.remove();
-                            // Opcjonalnie: Sprawdź, czy strona jest pusta i zaktualizuj UI
                             const page = clipCard.closest('.clips-page');
+                            clipCard.remove();
                             if (page && page.querySelectorAll('.clip-card').length === 0) {
                                 console.log("Strona została opróżniona.");
-                                // Można by odświeżyć listę lub pokazać komunikat
-                                // Najprościej: odświeżenie strony
-                                // location.reload();
-                                // Lub pokazanie komunikatu w miejscu strony
                                 page.innerHTML = '<p style="text-align:center; padding: 20px; color: #888;">Ta strona jest teraz pusta.</p>';
+                                // Proste odświeżenie listy stron i nawigacji może być konieczne
+                                // TODO: Zaimplementować aktualizację nawigacji po usunięciu strony
                             }
-                            // Opcjonalnie: Zaktualizuj liczbę stron w nawigacji, jeśli się zmieniła
-                            // To wymagałoby bardziej złożonej logiki śledzenia stanu
-
-                        }, 400); // Czas animacji
-
-                        // Nie używamy alertu, status jest widoczny przez usunięcie elementu
-                        // alert(`Klip "${clipName}" został usunięty.`);
+                            // TODO: Zaktualizować liczbę stron w nawigacji (jeśli cała strona została usunięta)
+                        }, 400);
 
                     } else {
-                        // Błąd zwrócony przez API
                         const errorMessage = response?.message || 'Nieznany błąd serwera.';
                         console.error(`Nie udało się usunąć klipu "${clipName}": ${errorMessage}`);
                         alert(`Nie udało się usunąć klipu: ${errorMessage}`);
-                        deleteButton.disabled = false; // Włącz przycisk ponownie
-                        deleteButton.innerHTML = originalButtonContent; // Przywróć ikonę i tekst
+                        deleteButton.disabled = false;
+                        deleteButton.innerHTML = originalButtonContent;
                     }
                 } catch (error) {
-                    // Błąd sieci lub inny błąd wykonania
                     console.error('Błąd podczas operacji usuwania:', error);
                     alert(`Wystąpił błąd sieci lub wykonania podczas usuwania: ${error.message}`);
-                    deleteButton.disabled = false; // Włącz przycisk ponownie
-                    deleteButton.innerHTML = originalButtonContent; // Przywróć ikonę i tekst
+                    deleteButton.disabled = false;
+                    deleteButton.innerHTML = originalButtonContent;
                 }
             } else {
                 console.log('Anulowano usuwanie klipu.');

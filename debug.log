@@ -455,3 +455,135 @@ content-security-policy: default-src 'none'; frame-ancestors 'none';
 HTTP Code: 200
 Response: {"message":"Successfully logged out."}
 
+2025-05-12 17:46:40 - Auth attempt for user: dam2452
+HTTP Code: 200
+Error: 
+Info: Array
+(
+    [url] => http://192.168.1.210:8077/api/v1/auth/login
+    [content_type] => application/json
+    [http_code] => 200
+    [header_size] => 669
+    [request_size] => 180
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.246549
+    [namelookup_time] => 6.5E-5
+    [connect_time] => 0.002015
+    [pretransfer_time] => 0.002429
+    [size_upload] => 53
+    [size_download] => 318
+    [speed_download] => 1289
+    [speed_upload] => 214
+    [download_content_length] => 318
+    [upload_content_length] => 53
+    [starttransfer_time] => 0.246481
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 192.168.1.210
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 8077
+    [local_ip] => 172.22.0.2
+    [local_port] => 56224
+    [http_version] => 2
+    [protocol] => 1
+    [ssl_verifyresult] => 0
+    [scheme] => http
+    [appconnect_time_us] => 0
+    [connect_time_us] => 2015
+    [namelookup_time_us] => 65
+    [pretransfer_time_us] => 2429
+    [redirect_time_us] => 0
+    [starttransfer_time_us] => 246481
+    [total_time_us] => 246549
+    [effective_method] => POST
+    [capath] => /etc/ssl/certs
+    [cainfo] => /etc/ssl/certs/ca-certificates.crt
+)
+
+Response: HTTP/1.1 200 OK
+date: Mon, 12 May 2025 17:46:40 GMT
+server: uvicorn
+content-length: 318
+content-type: application/json
+set-cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJleHAiOjE3NDk2NjQwMDEuNzk2NTA3LCJpYXQiOjE3NDcwNzIwMDEuNzk2NTA3LCJpc3MiOiJSYW5jaEJvdCIsImF1ZCI6IkNMSSJ9.ASAbbqhDTCl3J-kXR9iC9aSBo6M_m_jm-hlk45MQOII; HttpOnly; Path=/api/v1/auth; SameSite=strict
+x-content-type-options: nosniff
+x-frame-options: DENY
+referrer-policy: no-referrer
+cache-control: no-store, no-cache, must-revalidate, proxy-revalidate
+pragma: no-cache
+expires: 0
+content-security-policy: default-src 'none'; frame-ancestors 'none';
+
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY3NjgwMS43OTYzNywiaWF0IjoxNzQ3MDcyMDAxLjc5NjM3LCJpc3MiOiJSYW5jaEJvdCIsImF1ZCI6IkNMSSJ9.kY_xBxYRmwM0TZimYRA4sKX8jF-0XUwK4jBSVO8IvJY","token_type":"bearer"}
+
+2025-05-12 17:54:05 - Auth attempt for user: dam2452
+HTTP Code: 200
+Error: 
+Info: Array
+(
+    [url] => http://192.168.1.210:8077/api/v1/auth/login
+    [content_type] => application/json
+    [http_code] => 200
+    [header_size] => 669
+    [request_size] => 180
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.193956
+    [namelookup_time] => 3.1E-5
+    [connect_time] => 0.002376
+    [pretransfer_time] => 0.002499
+    [size_upload] => 53
+    [size_download] => 321
+    [speed_download] => 1655
+    [speed_upload] => 273
+    [download_content_length] => 321
+    [upload_content_length] => 53
+    [starttransfer_time] => 0.193883
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 192.168.1.210
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 8077
+    [local_ip] => 172.22.0.2
+    [local_port] => 47674
+    [http_version] => 2
+    [protocol] => 1
+    [ssl_verifyresult] => 0
+    [scheme] => http
+    [appconnect_time_us] => 0
+    [connect_time_us] => 2376
+    [namelookup_time_us] => 31
+    [pretransfer_time_us] => 2499
+    [redirect_time_us] => 0
+    [starttransfer_time_us] => 193883
+    [total_time_us] => 193956
+    [effective_method] => POST
+    [capath] => /etc/ssl/certs
+    [cainfo] => /etc/ssl/certs/ca-certificates.crt
+)
+
+Response: HTTP/1.1 200 OK
+date: Mon, 12 May 2025 17:54:06 GMT
+server: uvicorn
+content-length: 321
+content-type: application/json
+set-cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJleHAiOjE3NDk2NjQ0NDYuOTMyNjQ3LCJpYXQiOjE3NDcwNzI0NDYuOTMyNjQ3LCJpc3MiOiJSYW5jaEJvdCIsImF1ZCI6IkNMSSJ9.0e1ERss5vIjCcvGEh7u6MeiuUDBYt7lYDUJbBgaPH1E; HttpOnly; Path=/api/v1/auth; SameSite=strict
+x-content-type-options: nosniff
+x-frame-options: DENY
+referrer-policy: no-referrer
+cache-control: no-store, no-cache, must-revalidate, proxy-revalidate
+pragma: no-cache
+expires: 0
+content-security-policy: default-src 'none'; frame-ancestors 'none';
+
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY3NzI0Ni45MzI1MjcsImlhdCI6MTc0NzA3MjQ0Ni45MzI1MjcsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.eS1_pEeno_3cq10TWmkbQnjEFaT9MCF4Gd0BWcrRq6M","token_type":"bearer"}
+

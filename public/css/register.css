@@ -1,0 +1,130 @@
+/* css/register.css LUB css/static-page.css */
+
+/* Ustawienie domyślnego tła dla całej strony (jeśli nie jest ustawione globalnie) */
+body {
+    background-color: #f4f7f9; /* Jasnoszare tło */
+    margin: 0;
+    font-family: sans-serif; /* Ustaw domyślną czcionkę */
+    color: #333;
+}
+
+/* Kontener centrujący */
+.static-page {
+    display: flex;
+    flex-direction: column; /* Elementy w kolumnie */
+    justify-content: center; /* Wyśrodkuj w pionie */
+    align-items: center;    /* Wyśrodkuj w poziomie */
+    min-height: calc(100vh - 100px); /* Minimalna wysokość (okno - przybliżona wys. header/footer) */
+    padding: 40px 20px;      /* Odstępy */
+    box-sizing: border-box; /* Padding wliczony w wysokość/szerokość */
+}
+
+/* Pudełko z wiadomością - główny element estetyczny */
+.message-box {
+    background-color: #ffffff; /* Czyste białe tło */
+    padding: 40px 50px;       /* Większe odstępy wewnętrzne */
+    border-radius: 10px;      /* Bardziej zaokrąglone rogi */
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1); /* Wyraźniejszy, ale miękki cień */
+    max-width: 550px;        /* Nieco mniejsza szerokość dla lepszych proporcji */
+    width: 90%;              /* Szerokość na mniejszych ekranach */
+    text-align: center;
+    border: 1px solid #eaeaea; /* Bardzo delikatna ramka */
+    animation: fadeInScale 0.5s ease-out forwards; /* Animacja pojawienia się */
+}
+
+/* Nagłówek w pudełku */
+.message-box h1 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #2c3e50; /* Ciemnoniebieski/szary kolor */
+    font-size: 2.2em;
+    font-weight: 600;
+    border-bottom: 2px solid #eee; /* Delikatne podkreślenie */
+    padding-bottom: 15px; /* Odstęp pod podkreśleniem */
+}
+
+/* Standardowy paragraf */
+.message-box p {
+    color: #555;
+    line-height: 1.7; /* Zwiększony odstęp między liniami */
+    margin-bottom: 18px; /* Większy odstęp między paragrafami */
+    font-size: 1.05em; /* Lekko większa czcionka */
+}
+
+/* Specjalnie wyróżniona wiadomość */
+.message-box p.important-message {
+    font-weight: 500; /* Mniej agresywne pogrubienie */
+    font-size: 1.15em; /* Nieco większa */
+    color: #e74c3c; /* Kolor ostrzegawczy/informacyjny (np. czerwony) */
+    margin-top: 25px; /* Odstęp od nagłówka */
+    margin-bottom: 25px; /* Odstęp do następnego paragrafu */
+    padding: 10px;
+    background-color: rgba(231, 76, 60, 0.05); /* Bardzo delikatne tło dla wyróżnienia */
+    border-radius: 5px;
+}
+
+/* Kontener dla linku do logowania */
+.message-box p.login-link-container {
+    margin-top: 35px;
+    margin-bottom: 5px; /* Mniejszy odstęp przed przyciskiem */
+    font-size: 1em;
+    color: #666;
+}
+
+/* Przycisk akcji (link do logowania) */
+.action-button {
+    display: inline-block;
+    background: linear-gradient(145deg, #6a85b6, #4a6fa5); /* Gradient */
+    color: white;
+    padding: 12px 30px; /* Dopasowany padding */
+    border-radius: 25px; /* Zaokrąglony przycisk (pill shape) */
+    text-decoration: none;
+    font-weight: 600; /* Pogrubiony tekst */
+    font-size: 1em;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 4px 10px rgba(74, 111, 165, 0.3); /* Dopasowany cień */
+    border: none; /* Usuń domyślną ramkę linku */
+    cursor: pointer;
+}
+
+.action-button:hover,
+.action-button:focus {
+    background: linear-gradient(145deg, #7a95c6, #5a7fae); /* Jaśniejszy gradient */
+    transform: translateY(-3px); /* Wyraźniejsze uniesienie */
+    box-shadow: 0 6px 15px rgba(74, 111, 165, 0.4);
+    color: white; /* Upewnij się, że kolor tekstu nie zmienia się */
+    outline: none; /* Usuń domyślny outline przy fokusie */
+}
+
+/* Animacja dla pudełka */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Poprawki dla mniejszych ekranów (opcjonalnie) */
+@media (max-width: 600px) {
+    .message-box {
+        padding: 25px 20px;
+        width: 95%;
+    }
+    .message-box h1 {
+        font-size: 1.8em;
+    }
+    .message-box p {
+        font-size: 1em;
+    }
+    .message-box p.important-message {
+        font-size: 1.05em;
+    }
+    .action-button {
+        padding: 10px 25px;
+    }
+}

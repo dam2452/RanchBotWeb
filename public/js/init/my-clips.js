@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
         // Pobierz dane klipów bezpośrednio z API
         console.log('Pobieranie danych klipów z API...');
-        // Użyj fetch, jak było wcześniej, do dedykowanego endpointu
         const response = await fetch('/api/clips-api.php?action=get_clips');
 
         if (!response.ok) {
@@ -46,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 pageClips.forEach((clip, clipIndex) => {
                     if (!clip.id || !clip.name) {
                         console.error('Clip without ID or name:', clip);
-                        return; // Pomiń klip bez ID lub nazwy
+                        return;
                     }
                     const globalIndex = pageIndex * clipsPerPage + clipIndex + 1;
 
@@ -55,11 +54,9 @@ document.addEventListener('DOMContentLoaded', async function() {
                     const clipElement = document.createElement('div');
                     clipElement.className = 'clip-card';
                     clipElement.setAttribute('data-id', clip.id);
-                    // data-index może być przydatny, zostawiamy
                     clipElement.setAttribute('data-index', globalIndex);
                     clipElement.setAttribute('data-name', clip.name);
 
-                    // --- ZMIENIONO źródło wideo i usunięto fallback ---
                     clipElement.innerHTML = `
                         <div class="video-container" data-clip-id="${clip.id}" data-clip-index="${globalIndex}" data-clip-name="${clip.name}">
                             <video
@@ -76,7 +73,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                             Usuń
                         </button>
                     `;
-                    // --- KONIEC ZMIAN W HTML ---
 
                     pageElement.appendChild(clipElement);
                 });
@@ -84,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 clipsContainer.appendChild(pageElement);
             });
 
-            // Inicjalizuj nawigację i obsługę klipów (w tym przycisków usuwania)
+            // Inicjalizuj nawigację i obsługę klipów
             initializeClipsNavigationAndActions();
 
         } else {
@@ -100,13 +96,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Funkcja dodająca przycisk nawigacji do wyszukiwarki
     function addSearchNavigationButton() {
-        // Stwórz przycisk nawigacyjny
         const searchNavButton = document.createElement('a');
         searchNavButton.className = 'search-nav-button';
         searchNavButton.href = 'search.php';
         searchNavButton.title = 'Szukaj cytatów';
 
-        // Ikona wyszukiwania
         searchNavButton.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="11" cy="11" r="8"></circle>
@@ -115,17 +109,10 @@ document.addEventListener('DOMContentLoaded', async function() {
             <span>Szukaj cytatów</span>
         `;
 
-        // Dodaj do DOM
         document.querySelector('.my-clips-page').appendChild(searchNavButton);
 
-        // Animacja przy najechaniu
-        searchNavButton.addEventListener('mouseenter', () => {
-            searchNavButton.classList.add('hover');
-        });
-
-        searchNavButton.addEventListener('mouseleave', () => {
-            searchNavButton.classList.remove('hover');
-        });
+        searchNavButton.addEventListener('mouseenter', () => searchNavButton.classList.add('hover'));
+        searchNavButton.addEventListener('mouseleave', () => searchNavButton.classList.remove('hover'));
     }
 
     // Główna funkcja inicjalizująca nawigację i akcje
@@ -137,62 +124,52 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         let currentPage = 0;
         let activeVideoContainer = null;
-        let videoCompleting = false; // Flaga wskazująca, czy wideo ma się zatrzymać po zakończeniu pętli
-        let autoplayFailedOnce = false; // Zapamiętaj, czy autoplay zawiódł
+        let videoCompleting = false;
+        let autoplayFailedOnce = false;
 
-
-        // Funkcja do ładowania wideo (uproszczona, bez fallbacków)
+        // Funkcja do ładowania wideo (uproszczona)
         function loadVideo(video, videoContainer) {
-            // Jeśli wideo nie jest załadowane, załaduj je
             if (video.readyState === 0) {
-                video.load(); // Rozpocznij ładowanie
-
-                // Podstawowa obsługa błędu ładowania
+                video.load();
                 video.addEventListener('error', function onError(e) {
                     console.error('Błąd ładowania wideo:', video.error?.message || 'Nieznany błąd', 'dla źródła:', video.currentSrc, e);
-                    // Można tu dodać komunikat dla użytkownika w overlayu na wideo
                     const errorOverlay = document.createElement('div');
                     errorOverlay.className = 'video-error-overlay';
                     errorOverlay.textContent = 'Błąd ładowania';
-                    // Upewnij się, że nie dodajesz wielu overlayów
                     if (!videoContainer.querySelector('.video-error-overlay')) {
                         videoContainer.appendChild(errorOverlay);
                     }
-                    // Usunięcie nasłuchiwacza, aby uniknąć wielokrotnych błędów przy próbach
                     video.removeEventListener('error', onError);
-                }, { once: true }); // Użyj { once: true }, aby obsłużyć tylko pierwszy błąd
+                }, { once: true });
             }
         }
 
         // Funkcja do rozpoczęcia odtwarzania wideo
         function playVideo(videoContainer) {
             const video = videoContainer.querySelector('video');
-            // Usuń overlay błędu, jeśli istnieje
             videoContainer.querySelector('.video-error-overlay')?.remove();
 
             if (activeVideoContainer === videoContainer) {
-                videoCompleting = false; // Anuluj zatrzymanie
+                videoCompleting = false;
                 return;
             }
 
             if (activeVideoContainer) {
-                handleVideoLeave(activeVideoContainer, true); // Natychmiast zatrzymaj poprzednie
+                handleVideoLeave(activeVideoContainer, true);
             }
 
             videoContainer.classList.add('active');
             activeVideoContainer = videoContainer;
             videoCompleting = false;
 
-            loadVideo(video, videoContainer); // Upewnij się, że jest załadowane
+            loadVideo(video, videoContainer);
 
             if (video.paused) {
                 video.play().catch(err => {
                     console.error('Błąd autoplay:', err);
                     if (!autoplayFailedOnce) {
-                        // Pokaż komunikat tylko za pierwszym razem, jeśli chcesz
                         autoplayFailedOnce = true;
                     }
-                    // Dodaj wizualną wskazówkę, że trzeba kliknąć
                     const playMessage = document.createElement('div');
                     playMessage.className = 'play-message';
                     playMessage.textContent = 'Kliknij, aby odtworzyć';
@@ -203,8 +180,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
         }
 
-        // Funkcja do obsługi opuszczenia kontenera wideo (zatrzymuje wideo)
-        // Dodano opcjonalny parametr 'forceStop'
+        // Funkcja do obsługi opuszczenia kontenera wideo
         function handleVideoLeave(videoContainer, forceStop = false) {
             if (activeVideoContainer === videoContainer) {
                 if (forceStop) {
@@ -216,7 +192,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                     videoContainer.querySelector('.play-message')?.remove();
                     videoContainer.querySelector('.video-error-overlay')?.remove();
                 } else {
-                    // Zaznacz do zatrzymania po zakończeniu pętli
                     videoCompleting = true;
                 }
             }
@@ -225,10 +200,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Funkcja do zatrzymania wszystkich wideo
         function stopAllVideos() {
             document.querySelectorAll('.video-container.active').forEach(container => {
-                handleVideoLeave(container, true); // Użyj handleVideoLeave z forceStop
+                handleVideoLeave(container, true);
             });
         }
-
 
         // Dodaj obsługę najechania/opuszczenia i kliknięcia na wideo
         document.querySelectorAll('.video-container').forEach(container => {
@@ -236,42 +210,34 @@ document.addEventListener('DOMContentLoaded', async function() {
             container.addEventListener('mouseleave', () => handleVideoLeave(container));
             container.addEventListener('click', (e) => {
                 if (e.target.classList.contains('download-btn') || e.target.closest('.delete-clip-btn')) {
-                    return; // Ignoruj kliknięcia na przyciski pobierania/usuwania
+                    return;
                 }
 
                 const video = container.querySelector('video');
-                // Usuń komunikat o kliknięciu, jeśli istnieje
                 container.querySelector('.play-message')?.remove();
-                // Usuń overlay błędu, jeśli istnieje
                 container.querySelector('.video-error-overlay')?.remove();
-
 
                 if (activeVideoContainer === container) {
                     if (video.paused) {
                         video.play().catch(err => console.error("Błąd odtwarzania po kliknięciu:", err));
-                        container.classList.add('active'); // Upewnij się, że jest aktywny
+                        container.classList.add('active');
                     } else {
                         video.pause();
-                        // Nie usuwamy klasy 'active' od razu po pauzie,
-                        // bo użytkownik może chcieć wznowić
                     }
                 } else {
-                    playVideo(container); // Aktywuj i odtwórz, jeśli kliknięto nieaktywne
+                    playVideo(container);
                 }
             });
 
-            // Obsługa zdarzenia zakończenia wideo
             const video = container.querySelector('video');
             video.addEventListener('ended', function() {
                 if (videoCompleting && activeVideoContainer === container) {
-                    // Jeśli było zaznaczone do zatrzymania, zatrzymaj teraz
-                    handleVideoLeave(container, true); // Użyj forceStop
+                    handleVideoLeave(container, true);
                 }
-                // Jeśli nie było zaznaczone, po prostu zacznie od nowa (bo jest loop)
             });
         });
 
-        // Dodaj obsługę pobierania - używa teraz poprawnego URL
+        // Dodaj obsługę pobierania
         document.querySelectorAll('.download-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
@@ -289,32 +255,25 @@ document.addEventListener('DOMContentLoaded', async function() {
                 btn.style.pointerEvents = 'none';
 
                 try {
-                    // --- ZMIENIONO URL i usunięto fallback ---
                     const response = await fetch(`/debug-video.php?id=${encodeURIComponent(clipName)}`);
                     if (!response.ok) {
-                        // Spróbuj odczytać błąd JSON, jeśli serwer go wysłał
                         let errorDetails = `HTTP error! Status: ${response.status}`;
                         try {
                             const errorJson = await response.json();
                             errorDetails += ` - ${errorJson.error || 'Unknown server error'}`;
-                        } catch (jsonError) { /* Ignoruj, jeśli odpowiedź nie jest JSON */ }
+                        } catch (jsonError) { /* Ignoruj */ }
                         throw new Error(errorDetails);
                     }
 
                     const blob = await response.blob();
 
-                    // Sprawdź typ MIME - jeśli to nie wideo, coś jest nie tak
                     if (!blob.type.startsWith('video/')) {
-                        console.warn(`Pobrano nieoczekiwany typ MIME: ${blob.type} dla klipu ${clipName}. Oczekiwano wideo.`);
-                        // Mimo wszystko spróbujmy pobrać, może serwer źle ustawił nagłówek
-                        // ale poinformujmy użytkownika
-                        // alert(`Serwer zwrócił nieoczekiwany typ pliku (${blob.type}). Plik może nie działać poprawnie.`);
+                        console.warn(`Pobrano nieoczekiwany typ MIME: ${blob.type} dla klipu ${clipName}.`);
                     }
 
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    // Użyj bezpiecznej nazwy pliku
                     const safeFilename = clipName.replace(/[^a-zA-Z0-9_.-]/g, '_') + '.mp4';
                     a.download = safeFilename;
                     document.body.appendChild(a);
@@ -343,18 +302,16 @@ document.addEventListener('DOMContentLoaded', async function() {
             console.log(`Przewijanie do strony ${pageIndex + 1} z ${pages.length}`);
             currentPage = pageIndex;
 
-            stopAllVideos(); // Zatrzymaj wideo przed przewinięciem
+            stopAllVideos();
 
             const isMobileView = window.innerWidth <= 850;
             const container = document.querySelector('.clips-reel');
-
-            // Sprawdź, czy strona docelowa istnieje w DOM
             const targetPage = pages[pageIndex];
+
             if (!targetPage) {
                 console.error(`Strona o indeksie ${pageIndex} nie istnieje w DOM.`);
                 return;
             }
-
 
             if (isMobileView) {
                 container.scrollTo({
@@ -372,7 +329,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
 
         // Dodaj przyciski nawigacji stron
-        const navigationContainer = document.querySelector('.my-clips-page'); // Zakładamy, że chcemy je dodać do głównego kontenera
+        const navigationContainer = document.querySelector('.my-clips-page');
         const navigationButtons = document.createElement('div');
         navigationButtons.className = 'page-navigation';
         navigationButtons.innerHTML = `
@@ -381,11 +338,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             <button class="next-page" title="Następna strona">&#10095;</button>
         `;
 
-        // Dodaj nawigację pod kontenerem z klipami
+        // Dodaj nawigację POD kontenerem z klipami
         clipsContainer.parentNode.insertBefore(navigationButtons, clipsContainer.nextSibling);
-        // lub jeśli ma być na dole strony:
-        // navigationContainer.appendChild(navigationButtons);
-
 
         // Aktualizuj wskaźnik strony
         function updatePageIndicator() {
@@ -395,40 +349,45 @@ document.addEventListener('DOMContentLoaded', async function() {
 
             if(currentPageSpan) currentPageSpan.textContent = currentPage + 1;
             if(prevButton) prevButton.disabled = (currentPage === 0);
-            if(nextButton) nextButton.disabled = (currentPage >= pages.length - 1); // Użyj >= dla bezpieczeństwa
+            if(nextButton) nextButton.disabled = (currentPage >= pages.length - 1);
         }
 
         // Obsługa przycisków nawigacji
         document.querySelector('.prev-page')?.addEventListener('click', () => scrollToPage(currentPage - 1));
         document.querySelector('.next-page')?.addEventListener('click', () => scrollToPage(currentPage + 1));
 
-        // Obsługa kliknięć w obszar strony (poza klipami)
+        // --- ZMIENIONA OBSŁUGA KLIKNIĘĆ NA TLE ---
+        // Obsługa kliknięć w obszar strony (poza klipami i przyciskami)
         document.addEventListener('click', function(e) {
-            if (!e.target.closest('.clip-card') &&
-                !e.target.closest('.page-navigation') &&
-                !e.target.closest('.search-nav-button')) {
+            // Sprawdź, czy kliknięcie było poza elementami interaktywnymi karty ORAZ poza nawigacją
+            const clickedOnCard = e.target.closest('.clip-card');
+            const clickedOnNav = e.target.closest('.page-navigation');
+            const clickedOnSearchBtn = e.target.closest('.search-nav-button');
+
+            if (!clickedOnCard && !clickedOnNav && !clickedOnSearchBtn) {
+                // Jeśli kliknięto gdzie indziej, zatrzymaj wideo
                 stopAllVideos();
-            }
-        });
 
-        // Obsługa kliknięć w obszar strony do nawigacji (kliknięcie na tło)
-        clipsContainer.addEventListener('click', function(e) {
-            if (e.target === clipsContainer) {
-                const rect = clipsContainer.getBoundingClientRect();
-                const isMobileView = window.innerWidth <= 850;
-                const clickThreshold = 0.1; // 10% od krawędzi
+                // Sprawdź, czy kliknięcie było WEWNĄTRZ kontenera .clips-reel (ale nie na karcie)
+                const clipsReelContainer = document.querySelector('.clips-reel');
+                if (clipsReelContainer && clipsReelContainer.contains(e.target)) {
+                    // Kliknięto na tło wewnątrz kontenera
+                    const rect = clipsReelContainer.getBoundingClientRect();
+                    const isMobileView = window.innerWidth <= 850;
 
-                if (isMobileView) {
-                    const clickYRatio = (e.clientY - rect.top) / rect.height;
-                    if (clickYRatio < clickThreshold) scrollToPage(currentPage - 1);      // Góra
-                    else if (clickYRatio > 1 - clickThreshold) scrollToPage(currentPage + 1); // Dół
-                } else {
-                    const clickXRatio = (e.clientX - rect.left) / rect.width;
-                    if (clickXRatio < clickThreshold) scrollToPage(currentPage - 1);       // Lewo
-                    else if (clickXRatio > 1 - clickThreshold) scrollToPage(currentPage + 1); // Prawo
+                    if (isMobileView) {
+                        const clickY = e.clientY - rect.top;
+                        const goForward = clickY > rect.height / 2;
+                        scrollToPage(currentPage + (goForward ? 1 : -1));
+                    } else {
+                        const clickX = e.clientX - rect.left;
+                        const goForward = clickX > rect.width / 2;
+                        scrollToPage(currentPage + (goForward ? 1 : -1));
+                    }
                 }
             }
         });
+        // --- KONIEC ZMIENIONEJ OBSŁUGI KLIKNIĘĆ NA TLE ---
 
 
         // Obsługa klawiszy strzałek
@@ -439,15 +398,15 @@ document.addEventListener('DOMContentLoaded', async function() {
             let handled = false;
 
             if (isMobileView) {
-                if (e.key === 'ArrowDown') scrollToPage(currentPage + 1);
-                else if (e.key === 'ArrowUp') scrollToPage(currentPage - 1);
-                else return; // Ignoruj inne klawisze
+                if (e.key === 'ArrowDown') { handled = true; scrollToPage(currentPage + 1); }
+                else if (e.key === 'ArrowUp') { handled = true; scrollToPage(currentPage - 1); }
             } else {
-                if (e.key === 'ArrowRight') scrollToPage(currentPage + 1);
-                else if (e.key === 'ArrowLeft') scrollToPage(currentPage - 1);
-                else return; // Ignoruj inne klawisze
+                if (e.key === 'ArrowRight') { handled = true; scrollToPage(currentPage + 1); }
+                else if (e.key === 'ArrowLeft') { handled = true; scrollToPage(currentPage - 1); }
             }
-            e.preventDefault(); // Zapobiegaj standardowemu przewijaniu tylko jeśli obsłużyliśmy klawisz
+            if (handled) {
+                e.preventDefault();
+            }
         });
 
         // Obsługa zmiany rozmiaru okna
@@ -456,20 +415,21 @@ document.addEventListener('DOMContentLoaded', async function() {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 console.log("Window resized, adjusting scroll position.");
-                // Przewiń bez animacji, żeby było natychmiastowe
                 const targetPage = pages[currentPage];
                 if (targetPage) {
                     const isMobileView = window.innerWidth <= 850;
                     const container = document.querySelector('.clips-reel');
-                    if (isMobileView) container.scrollTop = targetPage.offsetTop - container.offsetTop;
-                    else container.scrollLeft = targetPage.offsetLeft;
+                    if(container){ // Dodatkowe sprawdzenie czy kontener istnieje
+                        if (isMobileView) container.scrollTop = targetPage.offsetTop - container.offsetTop;
+                        else container.scrollLeft = targetPage.offsetLeft;
+                    }
                 }
             }, 250);
         });
 
         // Aktywuj pierwszą stronę i zaktualizuj wskaźnik
-        scrollToPage(0); // Inicjalne przewinięcie
-        updatePageIndicator(); // Upewnij się, że wskaźnik jest poprawny na starcie
+        scrollToPage(0);
+        updatePageIndicator();
 
         // Ustaw nasłuchiwacze dla przycisków usuwania
         setupDeleteButtons();
@@ -477,7 +437,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Funkcja do obsługi przycisków usuwania
     function setupDeleteButtons() {
-        const clipsReelContainer = document.querySelector('.clips-reel'); // Zmieniono nazwę zmiennej dla jasności
+        const clipsReelContainer = document.querySelector('.clips-reel');
         if (!clipsReelContainer) return;
 
         console.log("Ustawianie nasłuchiwaczy dla przycisków usuwania...");
@@ -486,7 +446,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             const deleteButton = e.target.closest('.delete-clip-btn');
             if (!deleteButton) return;
 
-            e.stopPropagation(); // Ważne! Zatrzymaj propagację
+            e.stopPropagation();
 
             const clipCard = deleteButton.closest('.clip-card');
             const clipName = clipCard?.dataset.name;
@@ -504,7 +464,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                 deleteButton.innerHTML = 'Usuwanie...';
 
                 try {
-                    // Użyj zaimportowanej funkcji callApi
                     const response = await callApi('uk', [clipName]);
 
                     console.log('Odpowiedź API usuwania:', response);
@@ -522,10 +481,9 @@ document.addEventListener('DOMContentLoaded', async function() {
                             if (page && page.querySelectorAll('.clip-card').length === 0) {
                                 console.log("Strona została opróżniona.");
                                 page.innerHTML = '<p style="text-align:center; padding: 20px; color: #888;">Ta strona jest teraz pusta.</p>';
-                                // Proste odświeżenie listy stron i nawigacji może być konieczne
-                                // TODO: Zaimplementować aktualizację nawigacji po usunięciu strony
+                                // TODO: Aktualizacja nawigacji po usunięciu całej strony
                             }
-                            // TODO: Zaktualizować liczbę stron w nawigacji (jeśli cała strona została usunięta)
+                            // TODO: Aktualizacja liczby stron w nawigacji
                         }, 400);
 
                     } else {

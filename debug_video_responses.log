@@ -1,0 +1,1205 @@
+{
+    "time": "2025-05-12 12:07:58",
+    "clip_id": "1",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "video\/mp4",
+        "http_code": 200,
+        "header_size": 544,
+        "request_size": 438,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.237078,
+        "namelookup_time": 2.5e-5,
+        "connect_time": 0.002,
+        "pretransfer_time": 0.002097,
+        "size_upload": 14,
+        "size_download": 4296001,
+        "speed_download": 18120622,
+        "speed_upload": 59,
+        "download_content_length": 4296001,
+        "upload_content_length": 14,
+        "starttransfer_time": 0.129738,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 60912,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 2000,
+        "namelookup_time_us": 25,
+        "pretransfer_time_us": 2097,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 129738,
+        "total_time_us": 237078,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 4296001,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 14\r\n\r\n* upload completely sent off: 14 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:07:58 GMT\r\n< server: uvicorn\r\n< content-type: video\/mp4\r\n< accept-ranges: bytes\r\n< content-disposition: attachment; filename=\"szuja.mp4\"\r\n< content-length: 4296001\r\n< last-modified: Mon, 12 May 2025 12:07:59 GMT\r\n< etag: \"111ade4bb35d216761da4da4c23dc997\"\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:08:01",
+    "clip_id": "2",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "video\/mp4",
+        "http_code": 200,
+        "header_size": 557,
+        "request_size": 438,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.343465,
+        "namelookup_time": 2.2e-5,
+        "connect_time": 0.001712,
+        "pretransfer_time": 0.001764,
+        "size_upload": 14,
+        "size_download": 8709701,
+        "speed_download": 25358336,
+        "speed_upload": 40,
+        "download_content_length": 8709701,
+        "upload_content_length": 14,
+        "starttransfer_time": 0.133045,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 60922,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 1712,
+        "namelookup_time_us": 22,
+        "pretransfer_time_us": 1764,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 133045,
+        "total_time_us": 343465,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 8709701,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 14\r\n\r\n* upload completely sent off: 14 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:08:01 GMT\r\n< server: uvicorn\r\n< content-type: video\/mp4\r\n< accept-ranges: bytes\r\n< content-disposition: attachment; filename=\"tabun_dzikich_koni.mp4\"\r\n< content-length: 8709701\r\n< last-modified: Mon, 12 May 2025 12:08:01 GMT\r\n< etag: \"4774d7ec71e33165871d4e6f37ff2bba\"\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:08:03",
+    "clip_id": "3",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "video\/mp4",
+        "http_code": 200,
+        "header_size": 546,
+        "request_size": 438,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.260774,
+        "namelookup_time": 2.5e-5,
+        "connect_time": 0.001623,
+        "pretransfer_time": 0.001694,
+        "size_upload": 14,
+        "size_download": 5664647,
+        "speed_download": 21722437,
+        "speed_upload": 53,
+        "download_content_length": 5664647,
+        "upload_content_length": 14,
+        "starttransfer_time": 0.130991,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 48460,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 1623,
+        "namelookup_time_us": 25,
+        "pretransfer_time_us": 1694,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 130991,
+        "total_time_us": 260774,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 5664647,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 14\r\n\r\n* upload completely sent off: 14 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:08:03 GMT\r\n< server: uvicorn\r\n< content-type: video\/mp4\r\n< accept-ranges: bytes\r\n< content-disposition: attachment; filename=\"geniusz.mp4\"\r\n< content-length: 5664647\r\n< last-modified: Mon, 12 May 2025 12:08:04 GMT\r\n< etag: \"e42c4e207dbf681fc30701af1d162b26\"\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:08:05",
+    "clip_id": "4",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "video\/mp4",
+        "http_code": 200,
+        "header_size": 550,
+        "request_size": 438,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.170061,
+        "namelookup_time": 2.2e-5,
+        "connect_time": 0.00166,
+        "pretransfer_time": 0.001725,
+        "size_upload": 14,
+        "size_download": 1523833,
+        "speed_download": 8960508,
+        "speed_upload": 82,
+        "download_content_length": 1523833,
+        "upload_content_length": 14,
+        "starttransfer_time": 0.128926,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 48476,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 1660,
+        "namelookup_time_us": 22,
+        "pretransfer_time_us": 1725,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 128926,
+        "total_time_us": 170061,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 1523833,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 14\r\n\r\n* upload completely sent off: 14 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:08:05 GMT\r\n< server: uvicorn\r\n< content-type: video\/mp4\r\n< accept-ranges: bytes\r\n< content-disposition: attachment; filename=\"megalomania.mp4\"\r\n< content-length: 1523833\r\n< last-modified: Mon, 12 May 2025 12:08:06 GMT\r\n< etag: \"be274635a6d40c04a9b86c950f4c33f0\"\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:08:07",
+    "clip_id": "5",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "video\/mp4",
+        "http_code": 200,
+        "header_size": 579,
+        "request_size": 438,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.245886,
+        "namelookup_time": 2.3e-5,
+        "connect_time": 0.001806,
+        "pretransfer_time": 0.001865,
+        "size_upload": 14,
+        "size_download": 5137837,
+        "speed_download": 20895199,
+        "speed_upload": 56,
+        "download_content_length": 5137837,
+        "upload_content_length": 14,
+        "starttransfer_time": 0.126952,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 48482,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 1806,
+        "namelookup_time_us": 23,
+        "pretransfer_time_us": 1865,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 126952,
+        "total_time_us": 245886,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 5137837,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 14\r\n\r\n* upload completely sent off: 14 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:08:08 GMT\r\n< server: uvicorn\r\n< content-type: video\/mp4\r\n< accept-ranges: bytes\r\n< content-disposition: attachment; filename*=utf-8''warto_do%C5%9Bwiadczenie_mie%C4%87.mp4\r\n< content-length: 5137837\r\n< last-modified: Mon, 12 May 2025 12:08:08 GMT\r\n< etag: \"084cf8cac60acceb16be307f116dbd1f\"\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:08:44",
+    "clip_id": "8",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "video\/mp4",
+        "http_code": 200,
+        "header_size": 547,
+        "request_size": 438,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.148682,
+        "namelookup_time": 2.8e-5,
+        "connect_time": 0.002137,
+        "pretransfer_time": 0.002252,
+        "size_upload": 14,
+        "size_download": 644107,
+        "speed_download": 4332111,
+        "speed_upload": 94,
+        "download_content_length": 644107,
+        "upload_content_length": 14,
+        "starttransfer_time": 0.132083,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 47946,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 2137,
+        "namelookup_time_us": 28,
+        "pretransfer_time_us": 2252,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 132083,
+        "total_time_us": 148682,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 644107,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 14\r\n\r\n* upload completely sent off: 14 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:08:45 GMT\r\n< server: uvicorn\r\n< content-type: video\/mp4\r\n< accept-ranges: bytes\r\n< content-disposition: attachment; filename=\"dokladnie.mp4\"\r\n< content-length: 644107\r\n< last-modified: Mon, 12 May 2025 12:08:45 GMT\r\n< etag: \"d6981a1b80db6f1d9f439f89cac413de\"\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:08:46",
+    "clip_id": "13",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "application\/json",
+        "http_code": 200,
+        "header_size": 381,
+        "request_size": 439,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.067556,
+        "namelookup_time": 2.7e-5,
+        "connect_time": 0.001746,
+        "pretransfer_time": 0.001856,
+        "size_upload": 15,
+        "size_download": 73,
+        "speed_download": 1080,
+        "speed_upload": 222,
+        "download_content_length": 73,
+        "upload_content_length": 15,
+        "starttransfer_time": 0.067461,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 47958,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 1746,
+        "namelookup_time_us": 27,
+        "pretransfer_time_us": 1856,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 67461,
+        "total_time_us": 67556,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 73,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 15\r\n\r\n* upload completely sent off: 15 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:08:46 GMT\r\n< server: uvicorn\r\n< content-length: 73\r\n< content-type: application\/json\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:08:48",
+    "clip_id": "10",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "video\/mp4",
+        "http_code": 200,
+        "header_size": 546,
+        "request_size": 439,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.210818,
+        "namelookup_time": 2.7e-5,
+        "connect_time": 0.00175,
+        "pretransfer_time": 0.001885,
+        "size_upload": 15,
+        "size_download": 3527453,
+        "speed_download": 16732219,
+        "speed_upload": 71,
+        "download_content_length": 3527453,
+        "upload_content_length": 15,
+        "starttransfer_time": 0.128688,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 47970,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 1750,
+        "namelookup_time_us": 27,
+        "pretransfer_time_us": 1885,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 128688,
+        "total_time_us": 210818,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 3527453,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 15\r\n\r\n* upload completely sent off: 15 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:08:49 GMT\r\n< server: uvicorn\r\n< content-type: video\/mp4\r\n< accept-ranges: bytes\r\n< content-disposition: attachment; filename=\"kiepscy.mp4\"\r\n< content-length: 3527453\r\n< last-modified: Mon, 12 May 2025 12:08:49 GMT\r\n< etag: \"f65d2239d476af3a867b99307df4b543\"\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:08:50",
+    "clip_id": "11",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "application\/json",
+        "http_code": 200,
+        "header_size": 381,
+        "request_size": 439,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.068135,
+        "namelookup_time": 2.7e-5,
+        "connect_time": 0.001779,
+        "pretransfer_time": 0.001834,
+        "size_upload": 15,
+        "size_download": 73,
+        "speed_download": 1071,
+        "speed_upload": 220,
+        "download_content_length": 73,
+        "upload_content_length": 15,
+        "starttransfer_time": 0.068065,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 47984,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 1779,
+        "namelookup_time_us": 27,
+        "pretransfer_time_us": 1834,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 68065,
+        "total_time_us": 68135,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 73,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 15\r\n\r\n* upload completely sent off: 15 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:08:50 GMT\r\n< server: uvicorn\r\n< content-length: 73\r\n< content-type: application\/json\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:08:53",
+    "clip_id": "9",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "video\/mp4",
+        "http_code": 200,
+        "header_size": 546,
+        "request_size": 438,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.43784,
+        "namelookup_time": 2.6e-5,
+        "connect_time": 0.001987,
+        "pretransfer_time": 0.00212,
+        "size_upload": 14,
+        "size_download": 11882027,
+        "speed_download": 27137828,
+        "speed_upload": 31,
+        "download_content_length": 11882027,
+        "upload_content_length": 14,
+        "starttransfer_time": 0.132298,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 36592,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 1987,
+        "namelookup_time_us": 26,
+        "pretransfer_time_us": 2120,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 132298,
+        "total_time_us": 437840,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 11882027,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 14\r\n\r\n* upload completely sent off: 14 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:08:53 GMT\r\n< server: uvicorn\r\n< content-type: video\/mp4\r\n< accept-ranges: bytes\r\n< content-disposition: attachment; filename=\"krowaM.mp4\"\r\n< content-length: 11882027\r\n< last-modified: Mon, 12 May 2025 12:08:53 GMT\r\n< etag: \"2c55ff88117dad7867e1a7adb35a853e\"\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:08:54",
+    "clip_id": "39",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "application\/json",
+        "http_code": 200,
+        "header_size": 381,
+        "request_size": 439,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.068104,
+        "namelookup_time": 2.6e-5,
+        "connect_time": 0.002051,
+        "pretransfer_time": 0.002111,
+        "size_upload": 15,
+        "size_download": 73,
+        "speed_download": 1071,
+        "speed_upload": 220,
+        "download_content_length": 73,
+        "upload_content_length": 15,
+        "starttransfer_time": 0.068065,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 36596,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 2051,
+        "namelookup_time_us": 26,
+        "pretransfer_time_us": 2111,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 68065,
+        "total_time_us": 68104,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 73,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 15\r\n\r\n* upload completely sent off: 15 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:08:54 GMT\r\n< server: uvicorn\r\n< content-length: 73\r\n< content-type: application\/json\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:08:57",
+    "clip_id": "4",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "video\/mp4",
+        "http_code": 200,
+        "header_size": 550,
+        "request_size": 438,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.165386,
+        "namelookup_time": 2.1e-5,
+        "connect_time": 0.001637,
+        "pretransfer_time": 0.001752,
+        "size_upload": 14,
+        "size_download": 1523833,
+        "speed_download": 9213796,
+        "speed_upload": 84,
+        "download_content_length": 1523833,
+        "upload_content_length": 14,
+        "starttransfer_time": 0.132377,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 36604,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 1637,
+        "namelookup_time_us": 21,
+        "pretransfer_time_us": 1752,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 132377,
+        "total_time_us": 165386,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 1523833,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 14\r\n\r\n* upload completely sent off: 14 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:08:57 GMT\r\n< server: uvicorn\r\n< content-type: video\/mp4\r\n< accept-ranges: bytes\r\n< content-disposition: attachment; filename=\"megalomania.mp4\"\r\n< content-length: 1523833\r\n< last-modified: Mon, 12 May 2025 12:08:58 GMT\r\n< etag: \"db541fe8fff42010eca6dd63c9c6dd69\"\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:08:58",
+    "clip_id": "12",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "application\/json",
+        "http_code": 200,
+        "header_size": 381,
+        "request_size": 439,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.068406,
+        "namelookup_time": 2.5e-5,
+        "connect_time": 0.001714,
+        "pretransfer_time": 0.001783,
+        "size_upload": 15,
+        "size_download": 73,
+        "speed_download": 1067,
+        "speed_upload": 219,
+        "download_content_length": 73,
+        "upload_content_length": 15,
+        "starttransfer_time": 0.068337,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 36608,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 1714,
+        "namelookup_time_us": 25,
+        "pretransfer_time_us": 1783,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 68337,
+        "total_time_us": 68406,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 73,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 15\r\n\r\n* upload completely sent off: 15 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:08:58 GMT\r\n< server: uvicorn\r\n< content-length: 73\r\n< content-type: application\/json\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:08:59",
+    "clip_id": "18",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "application\/json",
+        "http_code": 200,
+        "header_size": 381,
+        "request_size": 439,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.069621,
+        "namelookup_time": 2.3e-5,
+        "connect_time": 0.001718,
+        "pretransfer_time": 0.001831,
+        "size_upload": 15,
+        "size_download": 73,
+        "speed_download": 1048,
+        "speed_upload": 215,
+        "download_content_length": 73,
+        "upload_content_length": 15,
+        "starttransfer_time": 0.069551,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 36614,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 1718,
+        "namelookup_time_us": 23,
+        "pretransfer_time_us": 1831,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 69551,
+        "total_time_us": 69621,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 73,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 15\r\n\r\n* upload completely sent off: 15 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:09:00 GMT\r\n< server: uvicorn\r\n< content-length: 73\r\n< content-type: application\/json\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:09:01",
+    "clip_id": "19",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "application\/json",
+        "http_code": 200,
+        "header_size": 381,
+        "request_size": 439,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.067919,
+        "namelookup_time": 2.6e-5,
+        "connect_time": 0.001682,
+        "pretransfer_time": 0.001736,
+        "size_upload": 15,
+        "size_download": 73,
+        "speed_download": 1074,
+        "speed_upload": 220,
+        "download_content_length": 73,
+        "upload_content_length": 15,
+        "starttransfer_time": 0.067887,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 41246,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 1682,
+        "namelookup_time_us": 26,
+        "pretransfer_time_us": 1736,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 67887,
+        "total_time_us": 67919,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 73,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 15\r\n\r\n* upload completely sent off: 15 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:09:01 GMT\r\n< server: uvicorn\r\n< content-length: 73\r\n< content-type: application\/json\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:10:59",
+    "clip_id": "11",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "application\/json",
+        "http_code": 200,
+        "header_size": 381,
+        "request_size": 439,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.069089,
+        "namelookup_time": 3.1e-5,
+        "connect_time": 0.002159,
+        "pretransfer_time": 0.002255,
+        "size_upload": 15,
+        "size_download": 73,
+        "speed_download": 1056,
+        "speed_upload": 217,
+        "download_content_length": 73,
+        "upload_content_length": 15,
+        "starttransfer_time": 0.069048,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 52142,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 2159,
+        "namelookup_time_us": 31,
+        "pretransfer_time_us": 2255,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 69048,
+        "total_time_us": 69089,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 73,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 15\r\n\r\n* upload completely sent off: 15 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:10:59 GMT\r\n< server: uvicorn\r\n< content-length: 73\r\n< content-type: application\/json\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:10:59",
+    "clip_id": "13",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "application\/json",
+        "http_code": 200,
+        "header_size": 381,
+        "request_size": 439,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.067414,
+        "namelookup_time": 3.3e-5,
+        "connect_time": 0.00223,
+        "pretransfer_time": 0.002375,
+        "size_upload": 15,
+        "size_download": 73,
+        "speed_download": 1082,
+        "speed_upload": 222,
+        "download_content_length": 73,
+        "upload_content_length": 15,
+        "starttransfer_time": 0.067381,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 52144,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 2230,
+        "namelookup_time_us": 33,
+        "pretransfer_time_us": 2375,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 67381,
+        "total_time_us": 67414,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 73,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 15\r\n\r\n* upload completely sent off: 15 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:11:00 GMT\r\n< server: uvicorn\r\n< content-length: 73\r\n< content-type: application\/json\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:10:59",
+    "clip_id": "39",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "application\/json",
+        "http_code": 200,
+        "header_size": 381,
+        "request_size": 439,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.074387,
+        "namelookup_time": 2.2e-5,
+        "connect_time": 0.001876,
+        "pretransfer_time": 0.001984,
+        "size_upload": 15,
+        "size_download": 73,
+        "speed_download": 981,
+        "speed_upload": 201,
+        "download_content_length": 73,
+        "upload_content_length": 15,
+        "starttransfer_time": 0.074361,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 52158,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 1876,
+        "namelookup_time_us": 22,
+        "pretransfer_time_us": 1984,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 74361,
+        "total_time_us": 74387,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 73,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 15\r\n\r\n* upload completely sent off: 15 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:11:00 GMT\r\n< server: uvicorn\r\n< content-length: 73\r\n< content-type: application\/json\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:11:00",
+    "clip_id": "19",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "application\/json",
+        "http_code": 200,
+        "header_size": 381,
+        "request_size": 439,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.080475,
+        "namelookup_time": 2.9e-5,
+        "connect_time": 0.001991,
+        "pretransfer_time": 0.002078,
+        "size_upload": 15,
+        "size_download": 73,
+        "speed_download": 907,
+        "speed_upload": 186,
+        "download_content_length": 73,
+        "upload_content_length": 15,
+        "starttransfer_time": 0.080449,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 52174,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 1991,
+        "namelookup_time_us": 29,
+        "pretransfer_time_us": 2078,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 80449,
+        "total_time_us": 80475,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 73,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 15\r\n\r\n* upload completely sent off: 15 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:11:00 GMT\r\n< server: uvicorn\r\n< content-length: 73\r\n< content-type: application\/json\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:11:00",
+    "clip_id": "18",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "application\/json",
+        "http_code": 200,
+        "header_size": 381,
+        "request_size": 439,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.069613,
+        "namelookup_time": 2.3e-5,
+        "connect_time": 0.002016,
+        "pretransfer_time": 0.00209,
+        "size_upload": 15,
+        "size_download": 73,
+        "speed_download": 1048,
+        "speed_upload": 215,
+        "download_content_length": 73,
+        "upload_content_length": 15,
+        "starttransfer_time": 0.069582,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 52182,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 2016,
+        "namelookup_time_us": 23,
+        "pretransfer_time_us": 2090,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 69582,
+        "total_time_us": 69613,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 73,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 15\r\n\r\n* upload completely sent off: 15 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:11:00 GMT\r\n< server: uvicorn\r\n< content-length: 73\r\n< content-type: application\/json\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{
+    "time": "2025-05-12 12:11:00",
+    "clip_id": "12",
+    "http_code": 200,
+    "curl_error": "",
+    "curl_info": {
+        "url": "http:\/\/192.168.1.210:8077\/api\/v1\/wys",
+        "content_type": "application\/json",
+        "http_code": 200,
+        "header_size": 381,
+        "request_size": 439,
+        "filetime": -1,
+        "ssl_verify_result": 0,
+        "redirect_count": 0,
+        "total_time": 0.07011,
+        "namelookup_time": 2.7e-5,
+        "connect_time": 0.002053,
+        "pretransfer_time": 0.002188,
+        "size_upload": 15,
+        "size_download": 73,
+        "speed_download": 1041,
+        "speed_upload": 213,
+        "download_content_length": 73,
+        "upload_content_length": 15,
+        "starttransfer_time": 0.07008,
+        "redirect_time": 0,
+        "redirect_url": "",
+        "primary_ip": "192.168.1.210",
+        "certinfo": [],
+        "primary_port": 8077,
+        "local_ip": "172.23.0.2",
+        "local_port": 52188,
+        "http_version": 2,
+        "protocol": 1,
+        "ssl_verifyresult": 0,
+        "scheme": "http",
+        "appconnect_time_us": 0,
+        "connect_time_us": 2053,
+        "namelookup_time_us": 27,
+        "pretransfer_time_us": 2188,
+        "redirect_time_us": 0,
+        "starttransfer_time_us": 70080,
+        "total_time_us": 70110,
+        "effective_method": "POST",
+        "capath": "\/etc\/ssl\/certs",
+        "cainfo": "\/etc\/ssl\/certs\/ca-certificates.crt"
+    },
+    "response_size": 73,
+    "verbose_log": "*   Trying 192.168.1.210:8077...\n* Connected to 192.168.1.210 (192.168.1.210) port 8077\n* using HTTP\/1.x\n> POST \/api\/v1\/wys HTTP\/1.1\r\nHost: 192.168.1.210:8077\r\nAccept: *\/*\r\nContent-Type: application\/json\r\nAuthorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg\r\nContent-Length: 15\r\n\r\n* upload completely sent off: 15 bytes\n< HTTP\/1.1 200 OK\r\n< date: Mon, 12 May 2025 12:11:00 GMT\r\n< server: uvicorn\r\n< content-length: 73\r\n< content-type: application\/json\r\n< x-content-type-options: nosniff\r\n< x-frame-options: DENY\r\n< referrer-policy: no-referrer\r\n< cache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\n< pragma: no-cache\r\n< expires: 0\r\n< content-security-policy: default-src 'none'; frame-ancestors 'none';\r\n< \r\n* Connection #0 to host 192.168.1.210 left intact\n"
+}
+{"time":"2025-05-12 12:14:41","clip_id":"8","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":644107}
+{"time":"2025-05-12 12:14:43","clip_id":"13","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:15","clip_id":"13","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:17","clip_id":"10","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":3527453}
+{"time":"2025-05-12 12:15:17","clip_id":"13","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:17","clip_id":"12","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:17","clip_id":"14","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:17","clip_id":"11","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:17","clip_id":"15","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:17","clip_id":"1","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":4296001}
+{"time":"2025-05-12 12:15:18","clip_id":"1","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":4296001}
+{"time":"2025-05-12 12:15:21","clip_id":"9","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":11882027}
+{"time":"2025-05-12 12:15:23","clip_id":"11","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:31","clip_id":"11","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:31","clip_id":"39","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:32","clip_id":"10","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":3527453}
+{"time":"2025-05-12 12:15:32","clip_id":"39","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:32","clip_id":"38","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:32","clip_id":"40","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:32","clip_id":"37","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:32","clip_id":"41","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:15:32","clip_id":"1","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":4296001}
+{"time":"2025-05-12 12:15:41","clip_id":"5","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":5137837}
+{"time":"2025-05-12 12:15:44","clip_id":"1","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":4296001}
+{"time":"2025-05-12 12:15:46","clip_id":"2","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":8709701}
+{"time":"2025-05-12 12:15:49","clip_id":"3","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":5664647}
+{"time":"2025-05-12 12:15:54","clip_id":"2","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":8709701}
+{"time":"2025-05-12 12:20:25","clip_id":"13","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:20:25","clip_id":14,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:25","clip_id":12,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:25","clip_id":15,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:25","clip_id":11,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:25","clip_id":1,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:25","clip_id":2,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:25","clip_id":3,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:25","clip_id":4,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:25","clip_id":5,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:29","clip_id":"9","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":11882027}
+{"time":"2025-05-12 12:20:36","clip_id":"10","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":3527453}
+{"time":"2025-05-12 12:20:37","clip_id":"8","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":644107}
+{"time":"2025-05-12 12:20:39","clip_id":"11","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:20:39","clip_id":12,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:39","clip_id":10,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:39","clip_id":13,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:39","clip_id":9,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:39","clip_id":1,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:39","clip_id":2,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:39","clip_id":3,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:39","clip_id":4,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:39","clip_id":5,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:53","clip_id":"13","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73}
+{"time":"2025-05-12 12:20:53","clip_id":14,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:53","clip_id":12,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:53","clip_id":15,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:53","clip_id":11,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:53","clip_id":1,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:53","clip_id":2,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:53","clip_id":3,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:53","clip_id":4,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:20:53","clip_id":5,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70}
+{"time":"2025-05-12 12:22:24","clip_id":"2","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":8709701,"is_json":false}
+{"time":"2025-05-12 12:22:54","clip_id":"13","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73,"is_json":true}
+{"time":"2025-05-12 12:22:54","clip_id":1,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:54","clip_id":2,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:54","clip_id":3,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:54","clip_id":4,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:54","clip_id":5,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:54","clip_id":14,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:54","clip_id":12,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:54","clip_id":15,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:54","clip_id":11,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:54","clip_id":16,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:54","clip_id":10,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:57","clip_id":"13","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73,"is_json":true}
+{"time":"2025-05-12 12:22:57","clip_id":1,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:57","clip_id":2,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:57","clip_id":3,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:57","clip_id":4,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:57","clip_id":5,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:57","clip_id":14,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:57","clip_id":12,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:57","clip_id":15,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:57","clip_id":11,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:57","clip_id":16,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:22:57","clip_id":10,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:45","clip_id":"13","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73,"is_json":true}
+{"time":"2025-05-12 12:24:45","clip_id":1,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:45","clip_id":2,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:46","clip_id":3,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:46","clip_id":4,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:46","clip_id":5,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:46","clip_id":14,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:46","clip_id":12,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:46","clip_id":15,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:46","clip_id":11,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:46","clip_id":16,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:46","clip_id":10,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:48","clip_id":"13","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73,"is_json":true}
+{"time":"2025-05-12 12:24:48","clip_id":1,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:48","clip_id":2,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:48","clip_id":3,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:48","clip_id":4,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:48","clip_id":5,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:48","clip_id":14,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:48","clip_id":12,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:48","clip_id":15,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:48","clip_id":11,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:48","clip_id":16,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:48","clip_id":10,"http_code":400,"curl_error":"","content_type":"application\/json","response_size":70,"is_json":true}
+{"time":"2025-05-12 12:24:48","clip_id":"8","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":644107,"is_json":false}
+{"time":"2025-05-12 12:26:57","clip_id":1,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":4296001,"is_json":false}
+{"time":"2025-05-12 12:27:00","clip_id":1,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":4296001,"is_json":false}
+{"time":"2025-05-12 12:27:03","clip_id":1,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":4296001,"is_json":false}
+{"time":"2025-05-12 12:27:08","clip_id":1,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":4296001,"is_json":false}
+{"time":"2025-05-12 12:27:10","clip_id":"4","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":1523833,"is_json":false}
+{"time":"2025-05-12 12:27:20","clip_id":"10","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":3527453,"is_json":false}
+{"time":"2025-05-12 12:28:16","clip_id":1,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":4296001,"is_json":false}
+{"time":"2025-05-12 12:29:05","clip_id":"11","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73,"is_json":true}
+{"time":"2025-05-12 12:29:05","clip_id":8,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":644107,"is_json":false}
+{"time":"2025-05-12 12:29:06","clip_id":"9","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":11882027,"is_json":false}
+{"time":"2025-05-12 12:29:08","clip_id":"39","http_code":200,"curl_error":"","content_type":"application\/json","response_size":73,"is_json":true}
+{"time":"2025-05-12 12:29:08","clip_id":8,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":644107,"is_json":false}
+{"time":"2025-05-12 12:30:06","clip_id":9,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":11882027,"is_json":false}
+{"time":"2025-05-12 12:30:09","clip_id":9,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":11882027,"is_json":false}
+{"time":"2025-05-12 12:30:12","clip_id":9,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":11882027,"is_json":false}
+{"time":"2025-05-12 12:30:14","clip_id":9,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":11882027,"is_json":false}
+{"time":"2025-05-12 12:31:39","clip_id":13,"http_code":200,"curl_error":"","content_type":"application\/json","response_size":73,"is_json":true}
+{"time":"2025-05-12 12:31:39","clip_id":8,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":644107,"is_json":false}
+{"time":"2025-05-12 12:31:41","clip_id":8,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":644107,"is_json":false}
+{"time":"2025-05-12 12:31:42","clip_id":11,"http_code":200,"curl_error":"","content_type":"application\/json","response_size":73,"is_json":true}
+{"time":"2025-05-12 12:31:42","clip_id":8,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":644107,"is_json":false}
+{"time":"2025-05-12 12:31:43","clip_id":9,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":11882027,"is_json":false}
+{"time":"2025-05-12 12:31:44","clip_id":39,"http_code":200,"curl_error":"","content_type":"application\/json","response_size":73,"is_json":true}
+{"time":"2025-05-12 12:31:44","clip_id":8,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":644107,"is_json":false}
+{"time":"2025-05-12 12:31:46","clip_id":10,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":3527453,"is_json":false}
+{"time":"2025-05-12 12:32:04","clip_id":4,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":1523833,"is_json":false}
+{"time":"2025-05-12 12:32:05","clip_id":12,"http_code":200,"curl_error":"","content_type":"application\/json","response_size":73,"is_json":true}
+{"time":"2025-05-12 12:32:05","clip_id":8,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":644107,"is_json":false}
+{"time":"2025-05-12 12:32:08","clip_id":19,"http_code":200,"curl_error":"","content_type":"application\/json","response_size":73,"is_json":true}
+{"time":"2025-05-12 12:32:08","clip_id":8,"http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":644107,"is_json":false}
+{"time":"2025-05-12 12:37:17","clip_parameter":"tabun_dzikich_koni","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":8709701,"is_json":false}
+{"time":"2025-05-12 12:38:22","clip_parameter":"tabun_dzikich_koni","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":8709701,"is_json":false}
+{"time":"2025-05-12 12:38:24","clip_parameter":"warto_do\u015bwiadczenie_mie\u0107","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":5137837,"is_json":false}
+{"time":"2025-05-12 12:38:25","clip_parameter":"geniusz","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":5664647,"is_json":false}
+{"time":"2025-05-12 12:38:26","clip_parameter":"17%","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":6939288,"is_json":false}
+{"time":"2025-05-12 12:38:28","clip_parameter":"megalomania","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":1523833,"is_json":false}
+{"time":"2025-05-12 12:38:29","clip_parameter":"szuja","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":4296001,"is_json":false}
+{"time":"2025-05-12 12:39:34","clip_parameter":"krowaM","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":11882027,"is_json":false}
+{"time":"2025-05-12 12:39:35","clip_parameter":"dokladnie","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":644107,"is_json":false}
+{"time":"2025-05-12 12:39:37","clip_parameter":"szuja-geniusz","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":9959667,"is_json":false}
+{"time":"2025-05-12 12:39:37","clip_parameter":"kiepscy","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":3527453,"is_json":false}
+{"time":"2025-05-12 12:39:38","clip_parameter":"lol lol","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":5527249,"is_json":false}
+{"time":"2025-05-12 12:41:33","clip_parameter":"17%","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":6939288,"is_json":false}
+{"time":"2025-05-12 12:48:06","clip_parameter":"17%","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":6939288,"is_json":false}
+{"time":"2025-05-12 12:55:18","clip_parameter":"lol lol","http_code":200,"curl_error":"","content_type":"video\/mp4","response_size":5527249,"is_json":false}

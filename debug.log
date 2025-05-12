@@ -1,0 +1,383 @@
+2025-05-12 11:11:49 - Auth attempt for user: dam2452
+HTTP Code: 500
+Error: 
+Info: Array
+(
+    [url] => http://192.168.1.210:8077/api/v1/auth/login
+    [content_type] => text/plain; charset=utf-8
+    [http_code] => 500
+    [header_size] => 153
+    [request_size] => 180
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.024729
+    [namelookup_time] => 2.4E-5
+    [connect_time] => 0.001696
+    [pretransfer_time] => 0.001751
+    [size_upload] => 53
+    [size_download] => 21
+    [speed_download] => 849
+    [speed_upload] => 2143
+    [download_content_length] => 21
+    [upload_content_length] => 53
+    [starttransfer_time] => 0.024707
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 192.168.1.210
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 8077
+    [local_ip] => 172.23.0.2
+    [local_port] => 40974
+    [http_version] => 2
+    [protocol] => 1
+    [ssl_verifyresult] => 0
+    [scheme] => http
+    [appconnect_time_us] => 0
+    [connect_time_us] => 1696
+    [namelookup_time_us] => 24
+    [pretransfer_time_us] => 1751
+    [redirect_time_us] => 0
+    [starttransfer_time_us] => 24707
+    [total_time_us] => 24729
+    [effective_method] => POST
+    [capath] => /etc/ssl/certs
+    [cainfo] => /etc/ssl/certs/ca-certificates.crt
+)
+
+Response: HTTP/1.1 500 Internal Server Error
+date: Mon, 12 May 2025 11:11:50 GMT
+server: uvicorn
+content-length: 21
+content-type: text/plain; charset=utf-8
+
+Internal Server Error
+
+2025-05-12 11:11:58 - Auth attempt for user: dam2452
+HTTP Code: 500
+Error: 
+Info: Array
+(
+    [url] => http://192.168.1.210:8077/api/v1/auth/login
+    [content_type] => text/plain; charset=utf-8
+    [http_code] => 500
+    [header_size] => 153
+    [request_size] => 180
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.005308
+    [namelookup_time] => 0.000145
+    [connect_time] => 0.001895
+    [pretransfer_time] => 0.001961
+    [size_upload] => 53
+    [size_download] => 21
+    [speed_download] => 3956
+    [speed_upload] => 9984
+    [download_content_length] => 21
+    [upload_content_length] => 53
+    [starttransfer_time] => 0.00529
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 192.168.1.210
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 8077
+    [local_ip] => 172.23.0.2
+    [local_port] => 36502
+    [http_version] => 2
+    [protocol] => 1
+    [ssl_verifyresult] => 0
+    [scheme] => http
+    [appconnect_time_us] => 0
+    [connect_time_us] => 1895
+    [namelookup_time_us] => 145
+    [pretransfer_time_us] => 1961
+    [redirect_time_us] => 0
+    [starttransfer_time_us] => 5290
+    [total_time_us] => 5308
+    [effective_method] => POST
+    [capath] => /etc/ssl/certs
+    [cainfo] => /etc/ssl/certs/ca-certificates.crt
+)
+
+Response: HTTP/1.1 500 Internal Server Error
+date: Mon, 12 May 2025 11:11:59 GMT
+server: uvicorn
+content-length: 21
+content-type: text/plain; charset=utf-8
+
+Internal Server Error
+
+2025-05-12 11:32:51 - Auth attempt for user: dam2452
+HTTP Code: 200
+Error: 
+Info: Array
+(
+    [url] => http://192.168.1.210:8077/api/v1/auth/login
+    [content_type] => application/json
+    [http_code] => 200
+    [header_size] => 669
+    [request_size] => 180
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.193595
+    [namelookup_time] => 2.7E-5
+    [connect_time] => 0.001959
+    [pretransfer_time] => 0.002033
+    [size_upload] => 53
+    [size_download] => 321
+    [speed_download] => 1658
+    [speed_upload] => 273
+    [download_content_length] => 321
+    [upload_content_length] => 53
+    [starttransfer_time] => 0.193567
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 192.168.1.210
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 8077
+    [local_ip] => 172.23.0.2
+    [local_port] => 35440
+    [http_version] => 2
+    [protocol] => 1
+    [ssl_verifyresult] => 0
+    [scheme] => http
+    [appconnect_time_us] => 0
+    [connect_time_us] => 1959
+    [namelookup_time_us] => 27
+    [pretransfer_time_us] => 2033
+    [redirect_time_us] => 0
+    [starttransfer_time_us] => 193567
+    [total_time_us] => 193595
+    [effective_method] => POST
+    [capath] => /etc/ssl/certs
+    [cainfo] => /etc/ssl/certs/ca-certificates.crt
+)
+
+Response: HTTP/1.1 200 OK
+date: Mon, 12 May 2025 11:32:52 GMT
+server: uvicorn
+content-length: 321
+content-type: application/json
+set-cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJleHAiOjE3NDk2NDE1NzMuMDI0MjEyLCJpYXQiOjE3NDcwNDk1NzMuMDI0MjEyLCJpc3MiOiJSYW5jaEJvdCIsImF1ZCI6IkNMSSJ9.bNRmatEIF79LXUzawtz5OhifCAhnORO_NpZreGUlQBg; HttpOnly; Path=/api/v1/auth; SameSite=strict
+x-content-type-options: nosniff
+x-frame-options: DENY
+referrer-policy: no-referrer
+cache-control: no-store, no-cache, must-revalidate, proxy-revalidate
+pragma: no-cache
+expires: 0
+content-security-policy: default-src 'none'; frame-ancestors 'none';
+
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NDM3My4wMjQwOTEsImlhdCI6MTc0NzA0OTU3My4wMjQwOTEsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.l5P3FhMd-rjcz3SMJcTB5EZHE5krPKvXcGWUj13X6SY","token_type":"bearer"}
+
+2025-05-12 11:41:37 - Auth attempt for user: dam2452
+HTTP Code: 422
+Error: 
+Info: Array
+(
+    [url] => http://192.168.1.210:8077/api/v1/auth/login
+    [content_type] => application/json
+    [http_code] => 422
+    [header_size] => 401
+    [request_size] => 166
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.005022
+    [namelookup_time] => 2.6E-5
+    [connect_time] => 0.001986
+    [pretransfer_time] => 0.002057
+    [size_upload] => 39
+    [size_download] => 152
+    [speed_download] => 30266
+    [speed_upload] => 7765
+    [download_content_length] => 152
+    [upload_content_length] => 39
+    [starttransfer_time] => 0.004872
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 192.168.1.210
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 8077
+    [local_ip] => 172.23.0.2
+    [local_port] => 53738
+    [http_version] => 2
+    [protocol] => 1
+    [ssl_verifyresult] => 0
+    [scheme] => http
+    [appconnect_time_us] => 0
+    [connect_time_us] => 1986
+    [namelookup_time_us] => 26
+    [pretransfer_time_us] => 2057
+    [redirect_time_us] => 0
+    [starttransfer_time_us] => 4872
+    [total_time_us] => 5022
+    [effective_method] => POST
+    [capath] => /etc/ssl/certs
+    [cainfo] => /etc/ssl/certs/ca-certificates.crt
+)
+
+Response: HTTP/1.1 422 Unprocessable Content
+date: Mon, 12 May 2025 11:41:37 GMT
+server: uvicorn
+content-length: 152
+content-type: application/json
+x-content-type-options: nosniff
+x-frame-options: DENY
+referrer-policy: no-referrer
+cache-control: no-store, no-cache, must-revalidate, proxy-revalidate
+pragma: no-cache
+expires: 0
+content-security-policy: default-src 'none'; frame-ancestors 'none';
+
+{"detail":[{"type":"string_too_short","loc":["body","password"],"msg":"String should have at least 8 characters","input":"asd","ctx":{"min_length":8}}]}
+
+2025-05-12 11:41:46 - Auth attempt for user: dam2452
+HTTP Code: 200
+Error: 
+Info: Array
+(
+    [url] => http://192.168.1.210:8077/api/v1/auth/login
+    [content_type] => application/json
+    [http_code] => 200
+    [header_size] => 669
+    [request_size] => 180
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.212542
+    [namelookup_time] => 0.000119
+    [connect_time] => 0.001999
+    [pretransfer_time] => 0.002047
+    [size_upload] => 53
+    [size_download] => 321
+    [speed_download] => 1510
+    [speed_upload] => 249
+    [download_content_length] => 321
+    [upload_content_length] => 53
+    [starttransfer_time] => 0.212504
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 192.168.1.210
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 8077
+    [local_ip] => 172.23.0.2
+    [local_port] => 41298
+    [http_version] => 2
+    [protocol] => 1
+    [ssl_verifyresult] => 0
+    [scheme] => http
+    [appconnect_time_us] => 0
+    [connect_time_us] => 1999
+    [namelookup_time_us] => 119
+    [pretransfer_time_us] => 2047
+    [redirect_time_us] => 0
+    [starttransfer_time_us] => 212504
+    [total_time_us] => 212542
+    [effective_method] => POST
+    [capath] => /etc/ssl/certs
+    [cainfo] => /etc/ssl/certs/ca-certificates.crt
+)
+
+Response: HTTP/1.1 200 OK
+date: Mon, 12 May 2025 11:41:45 GMT
+server: uvicorn
+content-length: 321
+content-type: application/json
+set-cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJleHAiOjE3NDk2NDIxMDcuMTIxMzU3LCJpYXQiOjE3NDcwNTAxMDcuMTIxMzU3LCJpc3MiOiJSYW5jaEJvdCIsImF1ZCI6IkNMSSJ9.ZkVoeEtLTv_eMKDwTAdyoq4A_OsGzEGsiCBoWfm1CYk; HttpOnly; Path=/api/v1/auth; SameSite=strict
+x-content-type-options: nosniff
+x-frame-options: DENY
+referrer-policy: no-referrer
+cache-control: no-store, no-cache, must-revalidate, proxy-revalidate
+pragma: no-cache
+expires: 0
+content-security-policy: default-src 'none'; frame-ancestors 'none';
+
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NDkwNy4xMjEyMzQsImlhdCI6MTc0NzA1MDEwNy4xMjEyMzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0._RWGk3UaGK6icYhwHbXsOc0m_XDHNftbKIJsxIYWXxw","token_type":"bearer"}
+
+2025-05-12 11:41:53 - Logout attempt
+HTTP Code: 200
+Response: {"message":"Successfully logged out."}
+
+2025-05-12 11:50:18 - Auth attempt for user: dam2452
+HTTP Code: 200
+Error: 
+Info: Array
+(
+    [url] => http://192.168.1.210:8077/api/v1/auth/login
+    [content_type] => application/json
+    [http_code] => 200
+    [header_size] => 669
+    [request_size] => 180
+    [filetime] => -1
+    [ssl_verify_result] => 0
+    [redirect_count] => 0
+    [total_time] => 0.194353
+    [namelookup_time] => 3.3E-5
+    [connect_time] => 0.002444
+    [pretransfer_time] => 0.002643
+    [size_upload] => 53
+    [size_download] => 321
+    [speed_download] => 1651
+    [speed_upload] => 272
+    [download_content_length] => 321
+    [upload_content_length] => 53
+    [starttransfer_time] => 0.194316
+    [redirect_time] => 0
+    [redirect_url] => 
+    [primary_ip] => 192.168.1.210
+    [certinfo] => Array
+        (
+        )
+
+    [primary_port] => 8077
+    [local_ip] => 172.23.0.2
+    [local_port] => 54928
+    [http_version] => 2
+    [protocol] => 1
+    [ssl_verifyresult] => 0
+    [scheme] => http
+    [appconnect_time_us] => 0
+    [connect_time_us] => 2444
+    [namelookup_time_us] => 33
+    [pretransfer_time_us] => 2643
+    [redirect_time_us] => 0
+    [starttransfer_time_us] => 194316
+    [total_time_us] => 194353
+    [effective_method] => POST
+    [capath] => /etc/ssl/certs
+    [cainfo] => /etc/ssl/certs/ca-certificates.crt
+)
+
+Response: HTTP/1.1 200 OK
+date: Mon, 12 May 2025 11:50:19 GMT
+server: uvicorn
+content-length: 321
+content-type: application/json
+set-cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJleHAiOjE3NDk2NDI2MTkuOTE3MjkzLCJpYXQiOjE3NDcwNTA2MTkuOTE3MjkzLCJpc3MiOiJSYW5jaEJvdCIsImF1ZCI6IkNMSSJ9.I0nytIG84fbKGmWTiRyBQUkfa3sdS02oaN79EetC1Ok; HttpOnly; Path=/api/v1/auth; SameSite=strict
+x-content-type-options: nosniff
+x-frame-options: DENY
+referrer-policy: no-referrer
+cache-control: no-store, no-cache, must-revalidate, proxy-revalidate
+pragma: no-cache
+expires: 0
+content-security-policy: default-src 'none'; frame-ancestors 'none';
+
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1NTQxOS45MTcxNzQsImlhdCI6MTc0NzA1MDYxOS45MTcxNzQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.yWggCVCk2RLAaPuNySiytVXV_feg06cQESXfXoBwgVg","token_type":"bearer"}
+

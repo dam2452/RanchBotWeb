@@ -341,7 +341,83 @@ body {
     color: #666;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
+/* public/css/my-clips.css lub w <style> w my-clips.php */
 
+.clip-card {
+    /* Upewnij się, że karta jest kontenerem flex, jeśli chcesz użyć align-self */
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Potrzebne dla pozycjonowania przycisków wewnątrz */
+}
+
+.clip-card .delete-clip-btn {
+    display: inline-flex; /* Użyj inline-flex, aby dopasować się do zawartości */
+    align-items: center;
+    justify-content: center; /* Wyśrodkuj zawartość */
+    gap: 5px; /* Odstęp między ikoną a tekstem */
+    background-color: #e74c3c; /* Czerwony kolor tła */
+    color: white;
+    border: none;
+    border-radius: 5px; /* Zaokrąglone rogi */
+    padding: 5px 8px; /* Mniejszy padding dla mniejszego przycisku */
+    font-size: 12px; /* Mniejsza czcionka */
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    margin-top: 8px; /* Odstęp od cytatu */
+    align-self: flex-end; /* Wyrównaj do prawej strony karty */
+    opacity: 0.7; /* Lekko przezroczysty domyślnie */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.clip-card:hover .delete-clip-btn,
+.clip-card .delete-clip-btn:hover,
+.clip-card .delete-clip-btn:focus {
+    opacity: 1; /* Pełna widoczność po najechaniu na kartę lub przycisk */
+}
+
+
+.clip-card .delete-clip-btn:hover {
+    background-color: #c0392b; /* Ciemniejszy czerwony */
+    transform: translateY(-1px); /* Lekkie uniesienie */
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+.clip-card .delete-clip-btn:disabled {
+    background-color: #cccccc; /* Szary dla wyłączonego */
+    color: #666666;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+}
+
+.clip-card .delete-clip-btn svg {
+    /* SVG dziedziczy kolor 'fill' z przycisku */
+    width: 14px; /* Dopasuj rozmiar ikony */
+    height: 14px;
+    vertical-align: middle; /* Lepsze wyrównanie z tekstem */
+}
+
+/* Dodaj też style dla przycisku pobierania dla spójności */
+.video-container .download-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 5; /* Upewnij się, że jest nad wideo */
+}
+
+.video-container:hover .download-btn {
+    opacity: 1;
+}
 @media screen and (max-width: 850px) {
     .my-clips-header {
         top: 60px;

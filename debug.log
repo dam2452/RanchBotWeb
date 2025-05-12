@@ -451,3 +451,7 @@ content-security-policy: default-src 'none'; frame-ancestors 'none';
 
 {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMDE1MzQ0OTUxLCJ1c2VybmFtZSI6ImRhbTI0NTIiLCJmdWxsX25hbWUiOiJEYW1pYW4gS290ZXJiYSIsImV4cCI6MTc0NzY1OTg1Ny43MzEyNTQsImlhdCI6MTc0NzA1NTA1Ny43MzEyNTQsImlzcyI6IlJhbmNoQm90IiwiYXVkIjoiQ0xJIn0.o5vQmO4la6RcgimStsAOUmHXJ6QfmxZN029ouKoPbfY","token_type":"bearer"}
 
+2025-05-12 17:23:19 - Logout attempt
+HTTP Code: 200
+Response: {"message":"Successfully logged out."}
+

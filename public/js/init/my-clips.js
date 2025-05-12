@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     console.log('Inicjalizacja strony My Clips');
 
+    // Dodaj przycisk nawigacyjny do wyszukiwarki
+    addSearchNavigationButton();
+
     // Pokaż wskaźnik ładowania
     if (loadingIndicator) loadingIndicator.style.display = 'block';
 
@@ -86,6 +89,36 @@ document.addEventListener('DOMContentLoaded', async function() {
     } finally {
         // Ukryj wskaźnik ładowania
         if (loadingIndicator) loadingIndicator.style.display = 'none';
+    }
+
+    // Funkcja dodająca przycisk nawigacji do wyszukiwarki
+    function addSearchNavigationButton() {
+        // Stwórz przycisk nawigacyjny
+        const searchNavButton = document.createElement('a');
+        searchNavButton.className = 'search-nav-button';
+        searchNavButton.href = 'search.php';
+        searchNavButton.title = 'Szukaj cytatów';
+
+        // Ikona wyszukiwania - w stylu podobnym do reszty aplikacji
+        searchNavButton.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span>Szukaj cytatów</span>
+        `;
+
+        // Dodaj do DOM
+        document.querySelector('.my-clips-page').appendChild(searchNavButton);
+
+        // Animacja przy najechaniu na przycisk - opcjonalnie
+        searchNavButton.addEventListener('mouseenter', () => {
+            searchNavButton.classList.add('hover');
+        });
+
+        searchNavButton.addEventListener('mouseleave', () => {
+            searchNavButton.classList.remove('hover');
+        });
     }
 
     // Funkcja do inicjalizacji nawigacji stron i obsługi odtwarzania klipów
@@ -359,15 +392,21 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Obsługa kliknięć w obszar strony (poza klipami)
         document.addEventListener('click', function(e) {
             // Sprawdź, czy kliknięcie było poza klipami
-            if (!e.target.closest('.clip-card') && !e.target.closest('.page-navigation') && !e.target.closest('.download-btn')) {
+            if (!e.target.closest('.clip-card') &&
+                !e.target.closest('.page-navigation') &&
+                !e.target.closest('.download-btn') &&
+                !e.target.closest('.search-nav-button')) {
                 stopAllVideos();
             }
         });
 
         // Obsługa kliknięć w obszar strony do nawigacji
         clipsContainer.addEventListener('click', function(e) {
-            // Ignoruj kliknięcia na karty klipów
-            if (e.target.closest('.clip-card') || e.target.closest('.video-container') || e.target.closest('.download-btn')) return;
+            // Ignoruj kliknięcia na karty klipów i interfejs
+            if (e.target.closest('.clip-card') ||
+                e.target.closest('.video-container') ||
+                e.target.closest('.download-btn') ||
+                e.target.closest('.search-nav-button')) return;
 
             const rect = clipsContainer.getBoundingClientRect();
             const isMobileView = window.innerWidth <= 850;

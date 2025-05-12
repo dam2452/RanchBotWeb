@@ -53,6 +53,51 @@ body {
     white-space: nowrap;
 }
 
+/* Przycisk nawigacji do wyszukiwarki */
+.search-nav-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    background: var(--color-title-bg);
+    color: var(--color-text-light);
+    padding: 8px 15px;
+    border-radius: var(--radius-l);
+    text-decoration: none;
+    box-shadow: 0 4px 8px var(--shadow);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+}
+
+.search-nav-button svg {
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+}
+
+.search-nav-button:hover {
+    background: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px var(--shadow-strong);
+}
+
+.search-nav-button:hover svg {
+    transform: rotate(90deg);
+}
+
+.search-nav-button.hover {
+    background: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px var(--shadow-strong);
+}
+
+.search-nav-button.hover svg {
+    transform: rotate(90deg);
+}
+
 .clips-reel {
     display: flex;
     flex-direction: row;
@@ -165,6 +210,28 @@ body {
     text-align: center;
     width: fit-content;
     max-width: 90%;
+}
+
+/* Komunikat o kliknięciu (gdy autoplay nie działa) */
+.play-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-size: 14px;
+    z-index: 10;
+    animation: pulse 1.5s infinite;
+    pointer-events: none;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
 }
 
 /* Styl dla przycisku pobierania */
@@ -285,6 +352,21 @@ body {
         padding: 6px 15px;
     }
 
+    .search-nav-button {
+        top: 15px;
+        right: 15px;
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+
+    .search-nav-button span {
+        display: none; /* Ukryj tekst na mobilnych urządzeniach, zostawiając tylko ikonę */
+    }
+
+    .search-nav-button svg {
+        margin-right: 0;
+    }
+
     .clips-reel {
         flex-direction: column;
         overflow-y: auto;
@@ -345,4 +427,3 @@ body {
     .page-indicator {
         font-size: 12px;
     }
-}

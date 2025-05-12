@@ -168,3 +168,8 @@ HTTP Code: 200
 Error: 
 Response: {"status":"success","code":"","message":"","data":{"clips":[{"id":8,"chat_id":2015344951,"user_id":2...
 
+2025-05-12 17:07:30 - GET CLIPS
+HTTP Code: 200
+Error: 
+Response: {"status":"success","code":"","message":"","data":{"clips":[{"id":8,"chat_id":2015344951,"user_id":2...
+

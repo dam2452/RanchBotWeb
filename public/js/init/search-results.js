@@ -1,12 +1,12 @@
 import { callApi, callApiForBlob } from '../modules/api-client.js';
 import { ReelNavigator } from '../modules/reel-navigator.js';
 
-let loadedClips = 0;     // Licznik załadowanych klipów z allResults
+let loadedClips = 0;
 let allResults = [];
 let observer;
 let loading = false;
 let done = false;
-let reelNavigatorInstance; // Zmienna do przechowywania instancji ReelNavigator
+let reelNavigatorInstance;
 
 async function loadNextClips(batchSize = 3) {
     if (loading || done) return;
@@ -15,26 +15,23 @@ async function loadNextClips(batchSize = 3) {
     const reel = document.querySelector('.video-reel');
     let itemsAddedInThisBatch = 0;
 
-    // Pętla iteruje tyle razy, ile wynosi batchSize, lub dopóki są elementy w allResults
     for (let i = 0; i < batchSize; i++) {
-        const currentOverallIndex = loadedClips + i; // Aktualny globalny indeks klipu
+        const currentOverallIndex = loadedClips + i;
 
         if (currentOverallIndex >= allResults.length) {
-            done = true; // Nie ma więcej klipów do załadowania z allResults
+            done = true;
             break;
         }
-        const itemData = allResults[currentOverallIndex]; // Dane dla klipu
+        const itemData = allResults[currentOverallIndex];
 
         try {
-            // API `w` oczekuje indeksu 1-based, a currentOverallIndex jest 0-based
             const blob = await callApiForBlob('w', [`${currentOverallIndex + 1}`]);
             const url = URL.createObjectURL(blob);
 
             const el = document.createElement('div');
             el.className = 'reel-item';
-            el.dataset.idx = currentOverallIndex; // Użyj globalnego indeksu
+            el.dataset.idx = currentOverallIndex;
 
-            // Usuwamy 'autoplay muted' stąd. ReelNavigator.activate() zarządza tym.
             el.innerHTML = `
                 <video loop preload="metadata">
                     <source src="${url}" type="video/mp4">
@@ -43,14 +40,13 @@ async function loadNextClips(batchSize = 3) {
             itemsAddedInThisBatch++;
         } catch (e) {
             console.error(`Error loading clip ${currentOverallIndex + 1}:`, e);
-            // Można rozważyć, czy błąd ładowania jednego klipu powinien zatrzymać ładowanie partii
         }
     }
 
-    loadedClips += itemsAddedInThisBatch; // Aktualizuj licznik na podstawie faktycznie dodanych klipów
+    loadedClips += itemsAddedInThisBatch;
 
     if (itemsAddedInThisBatch > 0 && reelNavigatorInstance) {
-        reelNavigatorInstance.refresh(); // Odśwież listę klipów w nawigatorze!
+        reelNavigatorInstance.refresh();
     }
 
     if (loadedClips >= allResults.length) {
@@ -58,9 +54,9 @@ async function loadNextClips(batchSize = 3) {
     }
 
     if (!done) {
-        setupIntersectionObserver(); // Resetuj obserwatora na ostatni klip
+        setupIntersectionObserver();
     } else if (observer) {
-        observer.disconnect(); // Jeśli wszystko załadowane, odłącz obserwatora
+        observer.disconnect();
     }
     loading = false;
 }
@@ -72,13 +68,12 @@ function setupIntersectionObserver() {
     const items = reel.querySelectorAll('.reel-item');
     const lastItem = items[items.length - 1];
 
-    if (!lastItem || done) { // Jeśli nie ma ostatniego elementu lub zakończono ładowanie
+    if (!lastItem || done) {
         if (observer) observer.disconnect();
         return;
     }
 
     observer = new IntersectionObserver(entries => {
-        // Dodatkowe sprawdzenie !loading, aby uniknąć wielokrotnych wywołań
         if (entries[0].isIntersecting && !loading) {
             loadNextClips();
         }
@@ -87,10 +82,50 @@ function setupIntersectionObserver() {
     observer.observe(lastItem);
 }
 
+// Funkcja do ustawienia wartości zapytania w polu wyszukiwania
+function setSearchQuery() {
+    const query = new URLSearchParams(location.search).get('query');
+    if (!query) return;
+
+    const queryInput = document.getElementById('query-input');
+    if (queryInput) {
+        queryInput.value = query;
+    }
+}
+
+// Funkcja do obsługi wysyłania formularza wyszukiwania
+function setupSearchForm() {
+    const queryInput = document.getElementById('query-input');
+    const searchBtn = document.querySelector('.search-icon-btn');
+
+    if (queryInput && searchBtn) {
+        searchBtn.addEventListener('click', () => {
+            const query = queryInput.value.trim();
+            if (query) {
+                window.location.href = `/search-results.php?query=${encodeURIComponent(query)}`;
+            }
+        });
+
+        queryInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = queryInput.value.trim();
+                if (query) {
+                    window.location.href = `/search-results.php?query=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+    // Ustaw wartość zapytania w polu wyszukiwania
+    setSearchQuery();
+
+    // Skonfiguruj obsługę formularza wyszukiwania
+    setupSearchForm();
+
     const query = new URLSearchParams(location.search).get('query');
     if (!query) {
-        // Opcjonalnie: wyświetl komunikat, jeśli brak zapytania
         return;
     }
 
@@ -101,11 +136,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Inicjalizuj ReelNavigator PRZED pierwszym ładowaniem, ale po upewnieniu się, że kontener jest pusty
-    // lub przekażemy mu wiedzę o tym, że będzie dynamicznie wypełniany.
-    // W tym przypadku, inicjujemy go po pierwszym załadowaniu, co jest OK,
-    // ale musimy przekazać instancję do loadNextClips (pośrednio przez reelNavigatorInstance).
-
     try {
         const { results } = await callApi('sz', [query]).then(d => d.data);
         allResults = results;
@@ -114,38 +144,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             reel.innerHTML = '<p>Brak wyników do wyświetlenia.</p>';
             done = true;
             if (observer) observer.disconnect();
-            // Jeśli ReelNavigator zostałby zainicjowany wcześniej na pustym kontenerze:
-            // if (reelNavigatorInstance) reelNavigatorInstance.refresh();
             return;
         }
 
-        reel.innerHTML = ''; // Usuń placeholdery
+        reel.innerHTML = '';
+        reelNavigatorInstance = new ReelNavigator(reelContainerSelector);
 
-        // WAŻNE: Utwórz instancję ReelNavigator TUTAJ, przed pierwszym `loadNextClips`,
-        // LUB po pierwszym `loadNextClips`, ale upewnij się, że `reelNavigatorInstance` jest ustawione.
-        // Prostsze jest utworzenie go PO pierwszym załadowaniu, jeśli `loadNextClips` nie zależy od niego
-        // przy pierwszym uruchomieniu. W naszym przypadku `loadNextClips` teraz wywołuje `refresh` na
-        // `reelNavigatorInstance`, więc musi być ono zdefiniowane.
+        await loadNextClips();
 
-        // Scenariusz 1: Tworzymy instancję, potem ładujemy i ona sama się odświeża.
-        reelNavigatorInstance = new ReelNavigator(reelContainerSelector); // Inicjalizuje z PUSTĄ listą items
-        // activate(0) w konstruktorze nic nie zrobi.
-
-        await loadNextClips(); // Załaduj pierwszą partię klipów.
-                               // Wewnątrz loadNextClips: reel.appendChild, a potem reelNavigatorInstance.refresh()
-                               // Po refresh(), reelNavigatorInstance.items będzie zawierać pierwszą partię.
-
-        // Po pierwszym załadowaniu i odświeżeniu, aktywuj pierwszy element, jeśli istnieje.
         if (reelNavigatorInstance && reelNavigatorInstance.items.length > 0) {
-            // Jeśli konstruktor ReelNavigator nie aktywuje (bo items było puste), zrób to tutaj.
-            // Metoda activate w ReelNavigator już ma logikę dla firstPlayedMuted.
             reelNavigatorInstance.activate(0);
         }
-        // setupIntersectionObserver jest już wołany na końcu loadNextClips.
 
     } catch (err) {
         console.error(err);
-        reel.innerHTML = `<p>${err.message}</p>`; // Poprawiony komunikat błędu
+        reel.innerHTML = `<p>${err.message}</p>`;
         done = true;
         if (observer) observer.disconnect();
     }

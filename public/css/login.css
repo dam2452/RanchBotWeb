@@ -150,8 +150,8 @@ main {
 .actions button {
     background: linear-gradient(to bottom right, var(--color-btn-green), var(--color-btn-green-dark));
     color: var(--color-text-light);
-    padding: var(--actions-pad-v) var(--actions-pad-h);
-    font-size: clamp(14px, 1.5vw, var(--font-actions-max));
+    padding: 10px 25px;  /* Mniejszy padding w pionie, większy w poziomie */
+    font-size: clamp(38px, 1.5vw, 40px);
     border: none;
     border-radius: var(--radius-m);
     cursor: pointer;
@@ -160,7 +160,8 @@ main {
     position: relative;
     z-index: 1;
     flex-grow: 1;
-    max-width: 250px;
+    max-width: 400px;
+    white-space: nowrap;  /* Zapobiega zawijaniu tekstu */
 }
 
 .actions button:hover {

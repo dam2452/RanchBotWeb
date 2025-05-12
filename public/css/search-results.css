@@ -93,7 +93,49 @@ body {
     border-radius: var(--radius-video);
 }
 
+.download-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 100;
+    background-color: var(--color-btn-bg);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md, 8px);
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.download-btn:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.reel-item:not(.active) .download-btn {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Make download button visible on hover for non-active items */
+.reel-item:not(.active):hover .download-btn {
+    opacity: 0.8;
+    pointer-events: auto;
+}
+
+/* Mobile adjustments */
 @media screen and (max-width: 850px) {
+    .download-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+        top: 10px;
+        right: 10px;
+    }
+
     .search-container {
         top: 75px;
         width: 70vw;

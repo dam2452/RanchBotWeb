@@ -8,6 +8,7 @@
             <img src="images/arrow-circle-right-svgrepo-com.svg" alt="Search" />
         </button>
         <button class="filter-btn">filters</button>
+
     </div>
 
     <div class="video-reel"></div>

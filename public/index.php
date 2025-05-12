@@ -10,7 +10,7 @@ include_once __DIR__ . '/../templates/header.php';
         </a>
         <h1>RanchBot</h1>
         <p class="tagline">Find, cut, and share your favorite Ranczo scene — in seconds.</p>
-        <button class="quote-btn" onclick="location.href=\'login.php\'">enter a quote</button>
+        <button class="quote-btn" onclick="location.href='search.php'">enter a quote</button>
     </div>
 
     <div class="arrow-wrapper">

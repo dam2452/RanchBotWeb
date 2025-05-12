@@ -3,11 +3,10 @@ export function isMobile() {
 }
 
 export function centerItem(container, item) {
-    // Dodajmy zabezpieczenie na wypadek, gdyby item był null lub undefined
     if (!item || !container) return;
 
     const rect = container.getBoundingClientRect();
-    const itemRect = item.getBoundingClientRect(); // Potrzebujemy też wymiarów item
+    const itemRect = item.getBoundingClientRect();
 
     const offset = isMobile()
         ? item.offsetTop - container.offsetTop - (rect.height - itemRect.height) / 2

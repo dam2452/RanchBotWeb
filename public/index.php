@@ -1,25 +1,27 @@
 <?php
-$customHead = '<link rel="stylesheet" href="css/home.css">';
-include_once __DIR__ . '/../templates/header.php';
-?>
+// public/index.php - Main entry point for all requests
+require_once __DIR__ . '/../includes/session.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/router.php';
 
-<main class="hero">
-    <div class="left-col">
-        <a href="index.php">
-            <img src="images/branding/logo.svg" class="logo-img" alt="RanchBot Logo" />
-        </a>
-        <h1>RanchBot</h1>
-        <p class="tagline">Find, cut, and share your favorite Ranczo scene — in seconds.</p>
-        <button class="quote-btn" onclick="location.href='search.php'">enter a quote</button>
-    </div>
+// Initialize the router
+$router = new Router();
 
-    <div class="arrow-wrapper">
-        <img src="images/ui/icons/arrow.svg" class="arrow-img" alt="Arrow">
-    </div>
-    <div class="right-col">
-        <img src="images/others/KusyDworek.png" class="preview-img" alt="Dworek Kusy">
-    </div>
-</main>
+// Define routes
+$router->get('/', 'HomeController@index');
+$router->get('/search', 'SearchController@index');
+$router->get('/search-results', 'SearchController@results');
+$router->get('/login', 'AuthController@loginForm');
+$router->post('/login', 'AuthController@login');
+$router->get('/logout', 'AuthController@logout');
+$router->get('/register', 'AuthController@registerForm');
+$router->get('/my-clips', 'ClipController@myClips', true); // true = requires authentication
+$router->get('/forgot-password', 'AuthController@forgotPasswordForm');
 
+// API routes
+$router->post('/api/clips', 'ApiController@clips');
+$router->post('/api/video', 'ApiController@video');
+$router->post('/api/json', 'ApiController@json');
 
-<?php include_once __DIR__ . '/../templates/footer.php'; ?>
+// Handle the current request
+$router->dispatch();

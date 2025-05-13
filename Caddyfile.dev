@@ -4,7 +4,6 @@
 }
 
 http://localhost {
-
     @api_matcher path /api/v1/*
     handle @api_matcher {
         reverse_proxy {$EXISTING_RANCHBOT_API_ADDRESS}
@@ -12,11 +11,23 @@ http://localhost {
 
     handle {
         root * /srv/php-app/public
-        try_files {path} {path}/ /index.php?{query}
 
+        # Try to serve static files first
+        @static {
+            file
+            path *.css *.js *.svg *.png *.jpg *.jpeg *.gif *.ico *.mp4
+        }
+        handle @static {
+            file_server
+        }
+
+        # Route everything else through index.php
         php_fastcgi php-dev:9000 {
             root /srv/php-app/public
         }
+
+        # If file doesn't exist, rewrite to index.php
+        try_files {path} /index.php?{query}
 
         file_server
     }

@@ -1,3 +1,5 @@
+// public/js/components/SubscriptionTooltip.js
+
 /**
  * Component for handling user subscription tooltip
  * Manages fetching subscription data and displaying/hiding the tooltip
@@ -125,9 +127,19 @@ class SubscriptionTooltip {
     }
 }
 
+/**
+ * Initialize subscription tooltip
+ * @returns {SubscriptionTooltip} New tooltip instance
+ */
+export function initSubscriptionTooltip() {
+    return new SubscriptionTooltip();
+}
+
 // Initialize tooltip when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new SubscriptionTooltip();
+    initSubscriptionTooltip();
 });
 
+// Export default and named class
+export { SubscriptionTooltip };
 export default SubscriptionTooltip;

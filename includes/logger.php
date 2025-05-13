@@ -25,9 +25,14 @@ class Logger {
      * Constructor
      */
     public function __construct() {
-        $this->logDir = config('logging.log_dir', __DIR__ . '/../');
+        $this->logDir = config('logging.log_dir', __DIR__ . '/../logs');
         $this->minLevel = config('logging.level', self::ERROR);
         $this->enabled = config('logging.enabled', true);
+
+        // Upewnij się, że katalog logów istnieje
+        if (!is_dir($this->logDir)) {
+            mkdir($this->logDir, 0777, true);
+        }
     }
 
     /**
@@ -110,8 +115,9 @@ class Logger {
     }
 }
 
-// Create global logger instance
-$logger = new Logger();
+// Tworzenie globalnej instancji loggera dostępnej przez funkcję logger()
+global $__logger_instance;
+$__logger_instance = new Logger();
 
 /**
  * Global function to access the logger
@@ -119,6 +125,6 @@ $logger = new Logger();
  * @return Logger The logger instance
  */
 function logger() {
-    global $logger;
-    return $logger;
+    global $__logger_instance;
+    return $__logger_instance;
 }

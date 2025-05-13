@@ -1,9 +1,0 @@
-{
-    "time": "2025-05-12 12:07:20",
-    "clip_id": "8",
-    "http_code": 200,
-    "error": "",
-    "headers": "HTTP\/1.1 200 OK\r\ndate: Mon, 12 May 2025 12:07:20 GMT\r\nserver: uvicorn\r\ncontent-type: video\/mp4\r\naccept-ranges: bytes\r\ncontent-disposition: attachment; filename=\"dokladnie.mp4\"\r\ncontent-length: 644107\r\nlast-modified: Mon, 12 May 2025 12:07:21 GMT\r\netag: \"f0d47d56002b7be7f45510da8bbe8eb1\"\r\nx-content-type-options: nosniff\r\nx-frame-options: DENY\r\nreferrer-policy: no-referrer\r\ncache-control: no-store, no-cache, must-revalidate, proxy-revalidate\r\npragma: no-cache\r\nexpires: 0\r\ncontent-security-policy: default-src 'none'; frame-ancestors 'none';\r\n\r\n",
-    "body_size": 644107,
-    "body_starts_with": "\u0000\u0000\u0000 ftypisom\u0000\u0000\u0002\u0000isom"
-}

@@ -12,7 +12,7 @@
     <form id="searchForm" class="search-container">
         <input type="text" id="quoteInput" name="query" placeholder="Enter a quote" class="search-input" required />
         <button type="submit" class="search-icon-btn" aria-label="Search">
-            <img src="images/arrow-circle-right-svgrepo-com.svg" alt="Search" />
+            <img src="images/arrow-circle-right.svg" alt="Search" />
         </button>
         <button type="button" class="filter-btn">Filters</button>
     </form>

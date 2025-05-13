@@ -6,7 +6,7 @@
         <div class="search-container">
             <input type="text" class="search-input" id="query-input" placeholder="enter a quote" />
             <button class="search-icon-btn" aria-label="Search">
-                <img src="images/arrow-circle-right.svg" alt="Search" />
+                <img src="images/ui/icons/arrow-circle-right.svg" alt="Search" />
             </button>
             <button class="filter-btn">filters</button>
         </div>

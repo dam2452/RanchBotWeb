@@ -2,3 +2,4 @@
 RANCZO-WIDEO
 .env
 .env.dev
+*.log

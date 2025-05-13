@@ -1,77 +1,90 @@
-// Poprawiony clip-inspector.js zgodny z oryginalnym API, z podglądem na żywo
-import { callApi, callApiForBlob } from '../modules/api-client.js';
+// public/js/modules/clip-inspector.js
 
+import { CLASSES, SELECTORS, MESSAGES, API, FILE_EXTENSIONS } from '../core/constants.js';
+import { createElement, downloadBlob, getSafeFilename } from '../core/dom-utils.js';
+import { callApiForBlob, adjustVideo, saveClip as apiSaveClip, getVideo } from './api-client.js';
+
+/**
+ * ClipInspector - Manages clip adjustment, preview, and saving
+ */
 export class ClipInspector {
     constructor() {
         console.log("Inicjalizacja ClipInspector (z podglądem)...");
+
+        // Clip state
         this.clipIndex = -1;
-        this.clipUrl = '';      // Może być original lub preview URL
-        this.originalClipUrl = ''; // URL oryginalnego klipu (zawsze ten sam)
+        this.clipUrl = '';
+        this.originalClipUrl = '';
         this.leftAdjust = 0;
         this.rightAdjust = 0;
 
-        // Stan podglądu na żywo
-        this.previewUpdateTimeout = null; // ID dla setTimeout debounce
-        this.currentPreviewUrl = null;    // URL aktualnego bloba podglądu (do zwolnienia)
-        this.isUpdatingPreview = false;   // Flaga zapobiegająca wielokrotnym aktualizacjom
-
+        // Preview state
+        this.previewUpdateTimeout = null;
+        this.currentPreviewUrl = null;
+        this.isUpdatingPreview = false;
         this.visible = false;
 
+        // Create UI
         this.createInspectorElement();
-        this.attachEvents(); // Dołączanie zdarzeń przeniesione po utworzeniu elementów
+        this.attachEvents();
 
         console.log("ClipInspector zainicjalizowany pomyślnie z obsługą podglądu");
     }
 
+    /**
+     * Create inspector DOM element
+     */
     createInspectorElement() {
         console.log("Tworzenie elementu inspektora...");
+
+        // Remove any existing inspector
         const existingInspector = document.querySelector('.clip-inspector');
         if (existingInspector) {
             console.log("Inspektor już istnieje, usuwanie...");
             existingInspector.remove();
         }
 
-        this.element = document.createElement('div');
-        this.element.className = 'clip-inspector';
-        this.element.innerHTML = `
-            <div class="inspector-overlay"></div>
-            <div class="inspector-container">
-                <div class="inspector-header">
-                    <div class="inspector-title">Dostosowanie klipu</div>
-                    <button class="close-inspector-btn">×</button>
-                </div>
-                <div class="inspector-video-container">
-                    <video controls loop>
-                        <source src="" type="video/mp4">
-                    </video>
-                </div>
-                <div class="inspector-controls">
-                    <div class="adjustment-controls">
-                        <div class="time-slider-container">
-                            <div class="time-slider-label">Lewa strona (+ rozszerza, - przycina): <span class="left-adjust-value">0.0s</span></div>
-                            <input type="range" class="time-slider left-adjust" min="-10" max="10" step="0.5" value="0">
-                        </div>
-                        <div class="time-slider-container">
-                            <div class="time-slider-label">Prawa strona (+ rozszerza, - przycina): <span class="right-adjust-value">0.0s</span></div>
-                            <input type="range" class="time-slider right-adjust" min="-10" max="10" step="0.5" value="0">
-                        </div>
-                    </div>
-                    <div class="save-controls">
-                        <button class="toggle-save-btn">Zapisz klip</button>
-                        <div class="save-form">
-                            <input type="text" class="clip-name-input" placeholder="Wprowadź nazwę klipu">
-                            <button class="save-clip-btn">Zapisz</button>
-                        </div>
-                    </div>
-                    <button class="download-adjusted-clip-btn">Pobierz dostosowany klip</button>
-                </div>
-                <div class="inspector-status"></div>
+        // Create inspector element
+        this.element = createElement('div', { className: 'clip-inspector' }, `
+      <div class="inspector-overlay"></div>
+      <div class="inspector-container">
+        <div class="inspector-header">
+          <div class="inspector-title">Dostosowanie klipu</div>
+          <button class="close-inspector-btn">×</button>
+        </div>
+        <div class="inspector-video-container">
+          <video controls loop>
+            <source src="" type="video/mp4">
+          </video>
+        </div>
+        <div class="inspector-controls">
+          <div class="adjustment-controls">
+            <div class="time-slider-container">
+              <div class="time-slider-label">Lewa strona (+ rozszerza, - przycina): <span class="left-adjust-value">0.0s</span></div>
+              <input type="range" class="time-slider left-adjust" min="-10" max="10" step="0.5" value="0">
             </div>
-        `;
+            <div class="time-slider-container">
+              <div class="time-slider-label">Prawa strona (+ rozszerza, - przycina): <span class="right-adjust-value">0.0s</span></div>
+              <input type="range" class="time-slider right-adjust" min="-10" max="10" step="0.5" value="0">
+            </div>
+          </div>
+          <div class="save-controls">
+            <button class="toggle-save-btn">Zapisz klip</button>
+            <div class="save-form">
+              <input type="text" class="clip-name-input" placeholder="Wprowadź nazwę klipu">
+              <button class="save-clip-btn">Zapisz</button>
+            </div>
+          </div>
+          <button class="download-adjusted-clip-btn">Pobierz dostosowany klip</button>
+        </div>
+        <div class="inspector-status"></div>
+      </div>
+    `);
+
         document.body.appendChild(this.element);
         console.log("Element inspektora utworzony i dodany do dokumentu");
 
-        // Referencje do elementów
+        // Store references to elements
         this.video = this.element.querySelector('video');
         this.leftSlider = this.element.querySelector('.left-adjust');
         this.rightSlider = this.element.querySelector('.right-adjust');
@@ -86,60 +99,55 @@ export class ClipInspector {
         this.statusEl = this.element.querySelector('.inspector-status');
     }
 
+    /**
+     * Attach event handlers
+     */
     attachEvents() {
         console.log("Dołączanie procedur obsługi zdarzeń (z podglądem)...");
 
-        // Funkcja pomocnicza do obsługi inputu suwaka
-        const handleSliderInput = (slider, valueProp, labelEl) => {
-            this[valueProp] = parseFloat(slider.value);
-            labelEl.textContent = `${this[valueProp].toFixed(1)}s`;
-            this.requestPreviewUpdate(); // Zaplanuj aktualizację podglądu
-        };
-
-        // Obsługa lewego suwaka
+        // Slider event handlers
         this.leftSlider.addEventListener('input', () => {
-            handleSliderInput(this.leftSlider, 'leftAdjust', this.leftValue);
+            this.handleSliderInput(this.leftSlider, 'leftAdjust', this.leftValue);
         });
 
-        // Obsługa prawego suwaka
         this.rightSlider.addEventListener('input', () => {
-            handleSliderInput(this.rightSlider, 'rightAdjust', this.rightValue);
+            this.handleSliderInput(this.rightSlider, 'rightAdjust', this.rightValue);
         });
 
-        // Przełącznik formularza zapisu
+        // Toggle save form button
         this.toggleSaveBtn.addEventListener('click', () => {
             console.log("Kliknięto przycisk Zapisz klip");
-            this.saveForm.classList.toggle('visible');
-            if (this.saveForm.classList.contains('visible')) {
+            this.saveForm.classList.toggle(CLASSES.VISIBLE);
+            if (this.saveForm.classList.contains(CLASSES.VISIBLE)) {
                 this.clipNameInput.focus();
             }
         });
 
-        // Przycisk zapisu klipu
+        // Save clip button
         this.saveClipBtn.addEventListener('click', () => {
             console.log("Kliknięto przycisk zapisywania");
             this.saveClip();
         });
 
-        // Przycisk pobierania
+        // Download button
         this.downloadBtn.addEventListener('click', () => {
             console.log("Kliknięto przycisk pobierania");
             this.downloadAdjustedClip();
         });
 
-        // Przycisk zamknięcia
+        // Close button
         this.closeBtn.addEventListener('click', () => {
             console.log("Kliknięto przycisk zamknięcia");
             this.hide();
         });
 
-        // Zamknięcie inspektora klikając w overlay
+        // Close on overlay click
         this.element.querySelector('.inspector-overlay').addEventListener('click', () => {
             console.log("Kliknięto overlay");
             this.hide();
         });
 
-        // Obsługa klawisza Enter w polu nazwy klipu
+        // Enter key in clip name input
         this.clipNameInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 console.log("Naciśnięto Enter w polu nazwy klipu");
@@ -150,88 +158,130 @@ export class ClipInspector {
         console.log("Procedury obsługi zdarzeń (z podglądem) dodane pomyślnie");
     }
 
+    /**
+     * Handle slider input
+     * @param {HTMLInputElement} slider - Slider element
+     * @param {string} valueProp - Property name to update
+     * @param {HTMLElement} labelEl - Label element to update
+     */
+    handleSliderInput(slider, valueProp, labelEl) {
+        this[valueProp] = parseFloat(slider.value);
+        labelEl.textContent = `${this[valueProp].toFixed(1)}s`;
+        this.requestPreviewUpdate();
+    }
+
+    /**
+     * Show the inspector for a clip
+     * @param {number} clipIndex - Index of the clip
+     * @param {string} clipUrl - URL of the clip
+     */
     show(clipIndex, clipUrl) {
         console.log(`Otwieranie inspektora dla klipu ${clipIndex}, URL: ${clipUrl.substring(0, 50)}`);
         this.clipIndex = clipIndex;
-        this.originalClipUrl = clipUrl; // Zapisz oryginalny URL
+        this.originalClipUrl = clipUrl;
 
-        // Resetuj stan podglądu
+        // Reset preview state
+        this.clearPreviewState();
+
+        // Set initial video source
+        this.video.src = this.originalClipUrl;
+        this.clipUrl = this.originalClipUrl;
+
+        // Reset sliders
+        this.resetSliders();
+
+        // Hide save form
+        this.saveForm.classList.remove(CLASSES.VISIBLE);
+        this.clipNameInput.value = '';
+
+        // Show inspector
+        this.element.classList.add(CLASSES.VISIBLE);
+        this.visible = true;
+
+        // Hide search container
+        this.hideSearchContainer();
+
+        // Play video when ready
+        this.setupPlayOnLoad();
+
+        this.updateStatus(`Klip ${clipIndex + 1} załadowany. Dostosuj używając suwaków.`);
+    }
+
+    /**
+     * Clear preview state
+     */
+    clearPreviewState() {
         clearTimeout(this.previewUpdateTimeout);
         if (this.currentPreviewUrl) {
             URL.revokeObjectURL(this.currentPreviewUrl);
             this.currentPreviewUrl = null;
         }
         this.isUpdatingPreview = false;
+    }
 
-        // Ustaw początkowe źródło wideo na oryginał
-        this.video.src = this.originalClipUrl;
-        this.clipUrl = this.originalClipUrl; // clipUrl wskazuje na aktualnie wyświetlane źródło
-
-        // Reset ustawień suwaków
+    /**
+     * Reset sliders to default values
+     */
+    resetSliders() {
         this.leftAdjust = 0;
         this.rightAdjust = 0;
         this.leftSlider.value = 0;
         this.rightSlider.value = 0;
         this.leftValue.textContent = '0.0s';
         this.rightValue.textContent = '0.0s';
+    }
 
-        // Ukrycie formularza zapisu
-        this.saveForm.classList.remove('visible');
-        this.clipNameInput.value = '';
-
-        // Pokazanie inspektora
-        this.element.classList.add('visible');
-        this.visible = true;
-
-        // Ukrycie paska wyszukiwania
-        const searchContainer = document.querySelector('.search-container');
+    /**
+     * Hide the search container
+     */
+    hideSearchContainer() {
+        const searchContainer = document.querySelector(SELECTORS.SEARCH_CONTAINER);
         if (searchContainer) {
-            searchContainer.classList.add('hidden');
+            searchContainer.classList.add(CLASSES.HIDDEN);
         }
+    }
 
-        // Odtworzenie wideo (z listenerem 'canplay')
-        // Usuń stary listener, jeśli istnieje, aby uniknąć wielokrotnego dodawania
+    /**
+     * Set up play on load logic
+     */
+    setupPlayOnLoad() {
+        // Remove previous listener if exists
         if (this.playVideoOnCanplay) {
             this.video.removeEventListener('canplay', this.playVideoOnCanplay);
         }
-        this.playVideoOnCanplay = () => { // Zapisz funkcję, aby móc ją usunąć
+
+        this.playVideoOnCanplay = () => {
             console.log("Wideo (oryginalne) gotowe do odtwarzania");
             this.video.play().catch(err => {
                 console.warn("Nie można odtworzyć wideo automatycznie:", err);
             });
         };
+
         this.video.addEventListener('canplay', this.playVideoOnCanplay, { once: true });
-
-
-        this.updateStatus(`Klip ${clipIndex + 1} załadowany. Dostosuj używając suwaków.`);
     }
 
+    /**
+     * Hide the inspector
+     */
     hide() {
         console.log("Zamykanie inspektora");
         this.video.pause();
-        clearTimeout(this.previewUpdateTimeout);
-        this.isUpdatingPreview = false;
+        this.clearPreviewState();
 
-        // Zwolnij URL bloba podglądu, jeśli istnieje
-        if (this.currentPreviewUrl) {
-            console.log("Zwalnianie URL podglądu przy zamykaniu:", this.currentPreviewUrl.substring(0, 50));
-            URL.revokeObjectURL(this.currentPreviewUrl);
-            this.currentPreviewUrl = null;
-        }
-
-        this.element.classList.remove('visible');
+        this.element.classList.remove(CLASSES.VISIBLE);
         this.visible = false;
 
-        // Pokazanie paska wyszukiwania
-        const searchContainer = document.querySelector('.search-container');
+        // Show search container
+        const searchContainer = document.querySelector(SELECTORS.SEARCH_CONTAINER);
         if (searchContainer) {
-            searchContainer.classList.remove('hidden');
+            searchContainer.classList.remove(CLASSES.HIDDEN);
         }
-        // Opcjonalnie: wyczyść src wideo
-        // this.video.src = '';
-        // this.video.load();
     }
 
+    /**
+     * Update status message
+     * @param {string} message - Message to display
+     */
     updateStatus(message) {
         if (this.statusEl) {
             console.log(`Status: ${message}`);
@@ -241,31 +291,34 @@ export class ClipInspector {
             if (this.statusTimer) clearTimeout(this.statusTimer);
             this.statusTimer = setTimeout(() => {
                 this.statusEl.classList.remove('status-visible');
-            }, 6000); // Ukryj status po 6 sekundach
+            }, 6000);
         }
     }
 
-    // --- Metody związane z podglądem na żywo ---
-
+    /**
+     * Request a preview update with debounce
+     */
     requestPreviewUpdate() {
         if (this.previewUpdateTimeout) {
             clearTimeout(this.previewUpdateTimeout);
         }
         this.previewUpdateTimeout = setTimeout(() => {
             this.updatePreview();
-        }, 1000); // Opóźnienie 1 sekunda
+        }, 1000);
     }
 
+    /**
+     * Update the preview with current adjustments
+     */
     async updatePreview() {
         if (this.isUpdatingPreview) {
             console.log("Aktualizacja podglądu już w toku, pomijanie.");
             return;
         }
 
-        // Jeśli nie ma żadnych dostosowań, przywróć oryginalny klip
+        // If no adjustments, restore original clip
         if (this.leftAdjust === 0 && this.rightAdjust === 0) {
-            // Tylko jeśli aktualnie nie jest wyświetlany oryginał
-            if(this.video.src !== this.originalClipUrl) {
+            if (this.video.src !== this.originalClipUrl) {
                 console.log("Brak dostosowań, przywracanie oryginalnego klipu w podglądzie.");
                 this.revertToOriginalPreview();
             } else {
@@ -280,14 +333,7 @@ export class ClipInspector {
 
         try {
             const clipIndexForApi = parseInt(this.clipIndex) + 1;
-            const params = [
-                clipIndexForApi.toString(),
-                this.leftAdjust.toString(),
-                this.rightAdjust.toString() // Bez negacji dla prawej strony
-            ];
-
-            console.log("Wywołanie /d dla podglądu z parametrami:", params);
-            const previewBlob = await callApiForBlob('d', params);
+            const previewBlob = await adjustVideo(clipIndexForApi, this.leftAdjust, this.rightAdjust);
 
             if (!previewBlob || previewBlob.size === 0) {
                 throw new Error("API /d zwróciło pusty blob dla podglądu.");
@@ -295,13 +341,13 @@ export class ClipInspector {
 
             console.log("Otrzymano blob podglądu, rozmiar:", previewBlob.size);
 
-            // Zwolnij poprzedni URL podglądu
+            // Release previous preview URL
             if (this.currentPreviewUrl) {
                 console.log("Zwalnianie poprzedniego URL podglądu:", this.currentPreviewUrl.substring(0, 50));
                 URL.revokeObjectURL(this.currentPreviewUrl);
             }
 
-            // Utwórz nowy URL
+            // Create new URL
             this.currentPreviewUrl = URL.createObjectURL(previewBlob);
             console.log("Utworzono nowy URL podglądu:", this.currentPreviewUrl.substring(0, 50));
 
@@ -309,19 +355,18 @@ export class ClipInspector {
             const isPaused = this.video.paused;
 
             this.video.src = this.currentPreviewUrl;
-            this.clipUrl = this.currentPreviewUrl; // Zaktualizuj clipUrl na nowy podgląd
+            this.clipUrl = this.currentPreviewUrl;
             this.video.load();
 
-            // Użyj 'loadeddata' aby upewnić się, że wideo jest gotowe
+            // Set up loadeddata handler
             this.video.addEventListener('loadeddata', () => {
                 console.log("Nowe dane wideo załadowane, przywracanie czasu:", currentTime);
-                // Czasami ustawienie currentTime od razu zawodzi, małe opóźnienie może pomóc
                 setTimeout(() => {
                     this.video.currentTime = currentTime;
                     if (!isPaused) {
                         this.video.play().catch(e => console.warn("Autoodtwarzanie po aktualizacji podglądu nie powiodło się:", e));
                     }
-                }, 50); // Małe opóźnienie
+                }, 50);
                 this.updateStatus('Podgląd zaktualizowany.');
                 this.isUpdatingPreview = false;
             }, { once: true });
@@ -337,25 +382,28 @@ export class ClipInspector {
             console.error('Błąd podczas aktualizacji podglądu:', error);
             this.updateStatus(`Błąd aktualizacji podglądu: ${error.message}`);
             this.isUpdatingPreview = false;
-            // Można rozważyć przywrócenie oryginału
-            // this.revertToOriginalPreview();
         }
     }
 
+    /**
+     * Revert to original video preview
+     */
     revertToOriginalPreview() {
-        console.log("Przywracanie oryginalnego URL w podglądzie:", this.originalClipUrl.substring(0,50));
-        // Zwolnij bieżący URL podglądu, jeśli istnieje i jest inny niż oryginalny
+        console.log("Przywracanie oryginalnego URL w podglądzie:", this.originalClipUrl.substring(0, 50));
+
+        // Release current preview URL if it exists and is different from original
         if (this.currentPreviewUrl && this.currentPreviewUrl !== this.originalClipUrl) {
             URL.revokeObjectURL(this.currentPreviewUrl);
             this.currentPreviewUrl = null;
         }
-        // Ustaw źródło z powrotem na oryginalne, tylko jeśli jest inne
-        if(this.video.src !== this.originalClipUrl){
+
+        // Set source back to original if different
+        if (this.video.src !== this.originalClipUrl) {
             const currentTime = this.video.currentTime;
             const isPaused = this.video.paused;
 
             this.video.src = this.originalClipUrl;
-            this.clipUrl = this.originalClipUrl; // Zaktualizuj clipUrl
+            this.clipUrl = this.originalClipUrl;
             this.video.load();
 
             this.video.addEventListener('loadeddata', () => {
@@ -378,84 +426,79 @@ export class ClipInspector {
         }
     }
 
-
-    // --- Metody zapisu i pobierania ---
-
+    /**
+     * Save the current clip
+     */
     async saveClip() {
         const clipName = this.clipNameInput.value.trim();
         if (!clipName) {
-            this.updateStatus('Proszę wprowadzić nazwę klipu');
-            // Używamy statusu zamiast alertu
-            // alert('Proszę wprowadzić nazwę klipu');
+            this.updateStatus(MESSAGES.CLIP_NAME_REQUIRED);
             return;
         }
 
         this.updateStatus('Przygotowywanie do zapisu...');
 
         try {
-            // Krok 1: Upewnij się, że serwer ma ostatnią wersję (wywołaj /d, jeśli były zmiany)
-            // adjustClip wywoła /d tylko jeśli leftAdjust lub rightAdjust != 0
-            // Wynik (blob) nie jest tu potrzebny, liczymy na stan serwera dla /z
-            await this.adjustClip(); // Ta funkcja teraz zwraca blob lub null
+            // Ensure server has latest version if adjustments were made
+            await this.adjustClip();
 
-            // Krok 2: Wywołaj API zapisu (/z)
+            // Call save API
             this.updateStatus('Zapisywanie klipu na serwerze...');
-            const response = await callApi('z', [clipName]);
+            const response = await apiSaveClip(clipName);
             console.log('Odpowiedź z API zapisu (/z):', response);
 
-            // Sprawdzenie odpowiedzi API zapisu
+            // Check save API response
             if (response && response.status === 'success') {
                 this.updateStatus(`Klip "${clipName}" został zapisany pomyślnie!`);
-                // alert(`Klip "${clipName}" został zapisany pomyślnie!`); // Zamiast alertu
-                this.saveForm.classList.remove('visible');
+                this.saveForm.classList.remove(CLASSES.VISIBLE);
                 this.clipNameInput.value = '';
             } else {
-                // Lepsza obsługa błędów z API
+                // Better error handling from API
                 const errorMessage = response?.message || 'Nieznany błąd zapisu.';
                 throw new Error(`Zapis nie powiódł się: ${errorMessage}`);
             }
-
         } catch (error) {
             console.error('Błąd podczas zapisywania klipu:', error);
             this.updateStatus(`Błąd zapisu: ${error.message}`);
-            // alert(`Błąd podczas zapisywania klipu: ${error.message}`); // Zamiast alertu
         }
     }
 
-    // Ta funkcja jest teraz głównie używana przez saveClip i downloadAdjustedClip
-    // aby uzyskać blob dostosowanego klipu LUB zasygnalizować brak dostosowań.
+    /**
+     * Adjust the clip based on slider values
+     * @returns {Promise<Blob|null>} Adjusted blob or null if no adjustments
+     */
     async adjustClip() {
         try {
             if (this.leftAdjust === 0 && this.rightAdjust === 0) {
                 console.log("Brak dostosowań, nie ma potrzeby wywoływania /d");
-                return null; // Sygnalizuje brak dostosowania
+                return null;
             }
 
             const adjustedClipIndex = parseInt(this.clipIndex) + 1;
             const params = [
                 adjustedClipIndex.toString(),
                 this.leftAdjust.toString(),
-                this.rightAdjust.toString() // Bez negacji dla prawej strony
+                this.rightAdjust.toString()
             ];
 
             console.log(`Wywołanie /d z parametrami:`, params);
-            // Nie aktualizujemy statusu tutaj, robią to funkcje nadrzędne
-
-            const adjustedBlob = await callApiForBlob('d', params);
+            const adjustedBlob = await adjustVideo(adjustedClipIndex, this.leftAdjust, this.rightAdjust);
 
             if (!adjustedBlob || adjustedBlob.size === 0) {
                 throw new Error("API /d zwróciło pusty blob podczas dostosowywania.")
             }
-            console.log("Otrzymano dostosowany blob z /d (w adjustClip), rozmiar:", adjustedBlob.size);
-            return adjustedBlob; // Zwróć pobrany blob
 
+            console.log("Otrzymano dostosowany blob z /d (w adjustClip), rozmiar:", adjustedBlob.size);
+            return adjustedBlob;
         } catch (error) {
             console.error('Błąd podczas dostosowywania klipu przez /d:', error);
-            // Rzuć błąd dalej, aby funkcja nadrzędna go obsłużyła
             throw error;
         }
     }
 
+    /**
+     * Download the adjusted clip
+     */
     async downloadAdjustedClip() {
         let blobToDownload;
         let fileName;
@@ -463,21 +506,22 @@ export class ClipInspector {
 
         try {
             if (this.leftAdjust === 0 && this.rightAdjust === 0) {
-                // Pobierz oryginalny klip
+                // Download original clip
                 this.updateStatus('Pobieranie oryginalnego klipu...');
                 console.log("Pobieranie oryginalnego klipu przez /w, index:", clipId);
-                blobToDownload = await callApiForBlob('w', [clipId.toString()]);
-                fileName = `klip_${clipId}.mp4`;
+                blobToDownload = await getVideo(clipId);
+                fileName = `klip_${clipId}${FILE_EXTENSIONS.VIDEO}`;
             } else {
-                // Dostosuj i pobierz dostosowany klip
+                // Download adjusted clip
                 this.updateStatus('Dostosowywanie klipu do pobrania...');
-                blobToDownload = await this.adjustClip(); // Pobierz dostosowany blob
+                blobToDownload = await this.adjustClip();
                 if (!blobToDownload) throw new Error("Nie udało się uzyskać dostosowanego klipu.");
 
                 this.updateStatus('Przygotowywanie dostosowanego klipu do pobrania...');
-                // Formatuj nazwę pliku z wartościami dostosowania
+
+                // Format filename with adjustment values
                 const formatAdjust = (val) => val >= 0 ? `+${val.toFixed(1)}` : `${val.toFixed(1)}`;
-                fileName = `klip_${clipId}_L${formatAdjust(this.leftAdjust)}_P${formatAdjust(this.rightAdjust)}.mp4`;
+                fileName = `klip_${clipId}_L${formatAdjust(this.leftAdjust)}_P${formatAdjust(this.rightAdjust)}${FILE_EXTENSIONS.VIDEO}`;
             }
 
             if (!blobToDownload || blobToDownload.size === 0) {
@@ -486,27 +530,13 @@ export class ClipInspector {
 
             console.log(`Przygotowywanie do pobrania bloba: ${fileName}, rozmiar: ${blobToDownload.size}`);
 
-            // Utwórz link do pobrania
-            const url = URL.createObjectURL(blobToDownload);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-
-            // Sprzątanie
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                console.log("Link pobierania usunięty, URL odwołany.");
-            }, 100);
-
+            // Download the blob
+            downloadBlob(blobToDownload, fileName);
             this.updateStatus('Klip został przygotowany do pobrania!');
 
         } catch (error) {
             console.error('Błąd podczas pobierania klipu:', error);
             this.updateStatus(`Błąd pobierania: ${error.message}`);
-            // alert(`Błąd podczas pobierania: ${error.message}`); // Zamiast alertu
         }
     }
 }

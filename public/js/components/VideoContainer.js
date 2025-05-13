@@ -1,5 +1,9 @@
 // public/js/components/VideoContainer.js
 
+import { MESSAGES, FILE_EXTENSIONS } from '../core/constants.js';
+import { getSafeFilename } from '../core/dom-utils.js';
+import { loadVideo, playVideo, removeVideoOverlays } from '../modules/video-utils.js';
+
 /**
  * VideoContainer - Manages video playback, interactions and errors
  */
@@ -36,57 +40,18 @@ export class VideoContainer {
         }
     }
 
-    loadVideo() {
-        if (this.video.readyState === 0) {
-            this.video.load();
-            this.video.addEventListener('error', this.handleVideoError.bind(this), { once: true });
-        }
-    }
+    async play() {
+        removeVideoOverlays(this.container);
 
-    handleVideoError(e) {
-        console.error('Błąd ładowania wideo:', this.video.error?.message || 'Nieznany błąd',
-            'dla źródła:', this.video.currentSrc, e);
-
-        this.showErrorOverlay();
-    }
-
-    showErrorOverlay() {
-        if (!this.container.querySelector('.video-error-overlay')) {
-            const errorOverlay = document.createElement('div');
-            errorOverlay.className = 'video-error-overlay';
-            errorOverlay.textContent = 'Błąd ładowania';
-            this.container.appendChild(errorOverlay);
-        }
-    }
-
-    removeOverlays() {
-        this.container.querySelector('.play-message')?.remove();
-        this.container.querySelector('.video-error-overlay')?.remove();
-    }
-
-    play() {
-        this.removeOverlays();
-        this.loadVideo();
+        await loadVideo(this.video, this.container);
 
         if (this.video.paused) {
-            this.video.play().catch(this.handlePlayError.bind(this));
+            await playVideo(this.video, this.container);
         }
 
         this.isActive = true;
         this.isCompleting = false;
         this.container.classList.add('active');
-    }
-
-    handlePlayError(err) {
-        console.error('Błąd odtwarzania:', err);
-
-        const playMessage = document.createElement('div');
-        playMessage.className = 'play-message';
-        playMessage.textContent = 'Kliknij, aby odtworzyć';
-
-        if (!this.container.querySelector('.play-message')) {
-            this.container.appendChild(playMessage);
-        }
     }
 
     pause() {
@@ -115,7 +80,7 @@ export class VideoContainer {
             return;
         }
 
-        this.removeOverlays();
+        removeVideoOverlays(this.container);
 
         if (this.isActive) {
             if (this.video.paused) {
@@ -163,7 +128,7 @@ export class VideoContainer {
 
         } catch (error) {
             console.error('Błąd podczas pobierania wideo:', error);
-            alert(`Przepraszamy, wystąpił błąd podczas pobierania wideo: ${error.message}`);
+            alert(`${MESSAGES.DOWNLOAD_ERROR} ${error.message}`);
         } finally {
             btn.textContent = 'Pobierz';
             btn.style.pointerEvents = 'auto';
@@ -174,7 +139,7 @@ export class VideoContainer {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        const safeFilename = this.clipName.replace(/[^a-zA-Z0-9_.-]/g, '_') + '.mp4';
+        const safeFilename = getSafeFilename(this.clipName) + FILE_EXTENSIONS.VIDEO;
         a.download = safeFilename;
         document.body.appendChild(a);
         a.click();

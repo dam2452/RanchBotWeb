@@ -1,12 +1,15 @@
 // public/js/components/PagedClipsNavigator.js
 
+import { CLASSES, SELECTORS, UI } from '../core/constants.js';
+import { isMobile, debounce } from '../core/dom-utils.js';
+
 /**
  * PagedClipsNavigator - Manages navigation between pages of clips
  */
 export class PagedClipsNavigator {
     constructor(options) {
         this.container = options.container;
-        this.pages = Array.from(this.container.querySelectorAll('.clips-page'));
+        this.pages = Array.from(this.container.querySelectorAll(SELECTORS.CLIPS_PAGE));
         this.currentPage = 0;
         this.isMobile = window.innerWidth <= 850;
         this.onPageChange = options.onPageChange || (() => {});
@@ -21,6 +24,9 @@ export class PagedClipsNavigator {
         this.scrollToPage(0);
     }
 
+    /**
+     * Create navigation UI elements
+     */
     createNavigation() {
         // Create navigation container
         this.navigationElement = document.createElement('div');
@@ -46,6 +52,9 @@ export class PagedClipsNavigator {
         this.nextButton.addEventListener('click', () => this.scrollToPage(this.currentPage + 1));
     }
 
+    /**
+     * Initialize all event listeners
+     */
     initEventListeners() {
         // Handle click events on the container's background
         this.container.addEventListener('click', this.handleContainerClick.bind(this));
@@ -54,16 +63,18 @@ export class PagedClipsNavigator {
         window.addEventListener('keydown', this.handleKeyNavigation.bind(this));
 
         // Handle window resize
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                this.isMobile = window.innerWidth <= 850;
-                this.adjustAfterResize();
-            }, 250);
-        });
+        const handleResize = debounce(() => {
+            this.isMobile = window.innerWidth <= 850;
+            this.adjustAfterResize();
+        }, UI.DEBOUNCE_DELAY);
+
+        window.addEventListener('resize', handleResize);
     }
 
+    /**
+     * Handle clicks on the container background
+     * @param {MouseEvent} e - Click event
+     */
     handleContainerClick(e) {
         // Only handle clicks directly on the container background, not on cards
         if (e.target === this.container || e.target.classList.contains('clips-reel')) {
@@ -81,6 +92,10 @@ export class PagedClipsNavigator {
         }
     }
 
+    /**
+     * Handle keyboard navigation
+     * @param {KeyboardEvent} e - Keyboard event
+     */
     handleKeyNavigation(e) {
         // Skip if focus is on input fields
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -110,6 +125,10 @@ export class PagedClipsNavigator {
         }
     }
 
+    /**
+     * Scroll to a specific page
+     * @param {number} pageIndex - Index of the page to scroll to
+     */
     scrollToPage(pageIndex) {
         // Validate page index
         if (pageIndex < 0 || pageIndex >= this.pages.length) return;
@@ -143,6 +162,9 @@ export class PagedClipsNavigator {
         this.updatePageIndicator();
     }
 
+    /**
+     * Update the page indicator display
+     */
     updatePageIndicator() {
         // Update page number and button states
         if (this.pageIndicator) {
@@ -158,6 +180,9 @@ export class PagedClipsNavigator {
         }
     }
 
+    /**
+     * Adjust scroll position after resize
+     */
     adjustAfterResize() {
         console.log("Window resized, adjusting scroll position.");
         const targetPage = this.pages[this.currentPage];

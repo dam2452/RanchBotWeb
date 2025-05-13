@@ -33,7 +33,6 @@ require_once __DIR__ . '/../includes/auth.php';
 
 <?php if (is_logged_in()): ?>
     <script type="module">
-        // Add any authentication-related JavaScript here
         import { initSubscriptionTooltip } from '/js/components/SubscriptionTooltip.js';
         document.addEventListener('DOMContentLoaded', () => {
             initSubscriptionTooltip();

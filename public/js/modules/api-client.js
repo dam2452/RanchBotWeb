@@ -1,15 +1,7 @@
-// public/js/modules/api-client.js
-
 import { API_URLS } from '../core/constants.js';
 
-/**
- * Call the JSON API
- * @param {string} endpoint - API endpoint
- * @param {Array} args - API arguments
- * @returns {Promise<Object>} API response
- */
 export async function callApi(endpoint, args = []) {
-    console.log(`Wywołanie API ${endpoint} z argumentami:`, args);
+    console.log(`API call ${endpoint} with arguments:`, args);
 
     try {
         const res = await fetch(API_URLS.JSON, {
@@ -19,33 +11,27 @@ export async function callApi(endpoint, args = []) {
         });
 
         const txt = await res.text();
-        console.log(`Odpowiedź API (${endpoint}):`, txt.substring(0, 200));
+        console.log(`API response (${endpoint}):`, txt.substring(0, 200));
 
         if (!res.ok) {
-            console.error(`Błąd HTTP ${res.status} dla ${endpoint}:`, txt);
+            console.error(`HTTP error ${res.status} for ${endpoint}:`, txt);
             throw new Error(`HTTP ${res.status}: ${txt}`);
         }
 
         try {
             return JSON.parse(txt);
         } catch (e) {
-            console.warn(`Odpowiedź ${endpoint} nie jest JSON:`, txt.substring(0, 200));
+            console.warn(`Response ${endpoint} is not JSON:`, txt.substring(0, 200));
             return { text: txt, isRawText: true };
         }
     } catch (error) {
-        console.error(`Błąd podczas wywołania ${endpoint}:`, error);
+        console.error(`Error during ${endpoint} call:`, error);
         throw error;
     }
 }
 
-/**
- * Call the Video API to get a blob
- * @param {string} endpoint - API endpoint
- * @param {Array} args - API arguments
- * @returns {Promise<Blob>} API response as blob
- */
 export async function callApiForBlob(endpoint, args = []) {
-    console.log(`Wywołanie API dla blob ${endpoint} z argumentami:`, args);
+    console.log(`API call for blob ${endpoint} with arguments:`, args);
 
     try {
         const res = await fetch(API_URLS.VIDEO, {
@@ -56,24 +42,20 @@ export async function callApiForBlob(endpoint, args = []) {
 
         if (!res.ok) {
             const errorText = await res.text();
-            console.error(`Błąd HTTP ${res.status} dla ${endpoint}:`, errorText.substring(0, 200));
+            console.error(`HTTP error ${res.status} for ${endpoint}:`, errorText.substring(0, 200));
             throw new Error(`HTTP ${res.status}: ${errorText}`);
         }
 
         const blob = await res.blob();
-        console.log(`Pobrano blob dla ${endpoint}, rozmiar:`, blob.size);
+        console.log(`Downloaded blob for ${endpoint}, size:`, blob.size);
 
         return blob;
     } catch (error) {
-        console.error(`Błąd podczas wywołania ${endpoint} dla blob:`, error);
+        console.error(`Error during ${endpoint} call for blob:`, error);
         throw error;
     }
 }
 
-/**
- * Get clips from the API
- * @returns {Promise<Array>} Array of clips
- */
 export async function getClips() {
     try {
         const response = await fetch(`${API_URLS.CLIPS}?action=get_clips`);
@@ -87,7 +69,7 @@ export async function getClips() {
         if (data.status === 'success' && data.clips && data.clips.length > 0) {
             return data.clips;
         } else {
-            console.log('Brak klipów lub błąd w danych:', data);
+            console.log('No clips or error in data:', data);
             return [];
         }
     } catch (error) {
@@ -96,20 +78,10 @@ export async function getClips() {
     }
 }
 
-/**
- * Delete a clip by name
- * @param {string} clipName - Name of the clip to delete
- * @returns {Promise<Object>} API response
- */
 export async function deleteClip(clipName) {
     return callApi('uk', [clipName]);
 }
 
-/**
- * Search for clips
- * @param {string} query - Search query
- * @returns {Promise<Array>} Search results
- */
 export async function searchClips(query) {
     const response = await callApi('sz', [query]);
     if (response && response.data && response.data.results) {
@@ -118,22 +90,10 @@ export async function searchClips(query) {
     return [];
 }
 
-/**
- * Get a video by index
- * @param {number} index - Video index
- * @returns {Promise<Blob>} Video blob
- */
 export async function getVideo(index) {
     return callApiForBlob('w', [index.toString()]);
 }
 
-/**
- * Adjust a video clip
- * @param {number} clipIndex - Clip index
- * @param {number} leftAdjust - Left adjustment in seconds
- * @param {number} rightAdjust - Right adjustment in seconds
- * @returns {Promise<Blob>} Adjusted video blob
- */
 export async function adjustVideo(clipIndex, leftAdjust, rightAdjust) {
     return callApiForBlob('d', [
         clipIndex.toString(),
@@ -142,19 +102,10 @@ export async function adjustVideo(clipIndex, leftAdjust, rightAdjust) {
     ]);
 }
 
-/**
- * Save a clip
- * @param {string} clipName - Name for the clip
- * @returns {Promise<Object>} API response
- */
 export async function saveClip(clipName) {
     return callApi('z', [clipName]);
 }
 
-/**
- * Get user clips
- * @returns {Promise<Array>} User clips
- */
 export async function getUserClips() {
     try {
         const response = await fetch('/api/clips?action=get_clips');
@@ -176,11 +127,6 @@ export async function getUserClips() {
     }
 }
 
-/**
- * Get video URL for clip
- * @param {string} clipId Clip ID
- * @returns {string} Video URL
- */
 export function getVideoUrl(clipId) {
     return `/api/video?endpoint=wys&id=${encodeURIComponent(clipId)}`;
 }

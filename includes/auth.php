@@ -1,32 +1,16 @@
 <?php
-/**
- * Auth functions for user authentication
- */
 require_once __DIR__ . '/session.php';
 
-/**
- * Check if a page is public (accessible without login)
- *
- * @param string $page Page path to check
- * @return bool True if page is public
- */
 function is_public_page_auth($page) {
     $publicPages = [
-        '/index.php',
-        '/register.php',
-        '/forgot-password.php',
-        // API endpoints for non-authenticated actions
-        '/api/api-json.php',
+        '/',
+        '/login',
+        '/register',
+        '/forgot-password'
     ];
-
     return in_array($page, $publicPages);
 }
 
-/**
- * Handle login attempt
- *
- * @return bool True if login successful
- */
 function handle_login_attempt() {
     if (empty($_POST['login']) || empty($_POST['password'])) {
         return false;
@@ -35,11 +19,9 @@ function handle_login_attempt() {
     $login = $_POST['login'];
     $password = $_POST['password'];
 
-    // Use API client to validate credentials
     $result = verify_credentials($login, $password);
 
     if ($result && isset($result['user_id'])) {
-        // Store user data in session
         session_set('user_id', $result['user_id']);
         session_set('username', $result['username']);
         session_set('jwt_token', $result['token']);
@@ -49,22 +31,12 @@ function handle_login_attempt() {
     return false;
 }
 
-/**
- * Verify user credentials using API
- *
- * @param string $login User login
- * @param string $password User password
- * @return array|false User data or false if invalid
- */
 function verify_credentials($login, $password) {
-    // API client should be properly initialized
     require_once __DIR__ . '/api-client.php';
 
-    // Call API to verify credentials
     $response = call_auth_api($login, $password);
 
     if ($response && isset($response['access_token'])) {
-        // Extracting user data from JWT if possible
         $token = $response['access_token'];
         $jwt_parts = explode('.', $token);
         $userData = [];
@@ -79,17 +51,15 @@ function verify_credentials($login, $password) {
                 ];
             } catch (Exception $e) {
                 error_log('Error decoding JWT: ' . $e->getMessage());
-                // Fallback to basic data if JWT parsing fails
                 $userData = [
-                    'user_id' => mt_rand(10000, 99999), // Placeholder ID
+                    'user_id' => mt_rand(10000, 99999),
                     'username' => $login,
                     'token' => $token
                 ];
             }
         } else {
-            // Basic data if JWT structure is invalid
             $userData = [
-                'user_id' => mt_rand(10000, 99999), // Placeholder ID
+                'user_id' => mt_rand(10000, 99999),
                 'username' => $login,
                 'token' => $token
             ];
@@ -101,17 +71,8 @@ function verify_credentials($login, $password) {
     return false;
 }
 
-/**
- * Call authentication API
- *
- * @param string $login User login
- * @param string $password User password
- * @return array|false API response or false on error
- */
 function call_auth_api($login, $password) {
-    // Właściwy endpoint i format dla autentykacji
     try {
-        // Używamy bezpośrednio cURL zamiast api_request, aby zapewnić właściwy format
         $baseUrl = config('api.base_url');
         $url = $baseUrl . '/auth/login';
 
@@ -136,7 +97,6 @@ function call_auth_api($login, $password) {
             return false;
         }
 
-        // Log successful response for debugging
         error_log("Auth response: " . substr($response, 0, 100) . "...");
 
         return json_decode($response, true);
@@ -146,11 +106,6 @@ function call_auth_api($login, $password) {
     }
 }
 
-/**
- * Logout current user
- *
- * This function replaces the logout_user in session.php
- */
 function logout_user_auth() {
     session_remove('user_id');
     session_remove('username');
@@ -158,22 +113,12 @@ function logout_user_auth() {
     session_destroy();
 }
 
-/**
- * Require login to access a page
- *
- * @param string $redirect_url URL to redirect to if not logged in
- */
 function require_login_auth($redirect_url = '/login.php') {
     if (!is_logged_in()) {
         redirect_auth($redirect_url);
     }
 }
 
-/**
- * Redirect to a URL
- *
- * @param string $url URL to redirect to
- */
 function redirect_auth($url) {
     header('Location: ' . $url);
     exit;

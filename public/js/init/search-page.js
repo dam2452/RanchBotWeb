@@ -1,20 +1,11 @@
-// public/js/init/search-page.js
-
 import { callApiForBlob } from '../modules/api-client.js';
 
-/**
- * Initialize search page
- */
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("[DEBUG] JS działa");
+    console.log("[DEBUG] JS is working");
 
-    // Set up search form handling
     initializeSearchForm();
 });
 
-/**
- * Initialize the search form
- */
 function initializeSearchForm() {
     const form = document.querySelector('#searchForm');
     const input = document.querySelector('#quoteInput');
@@ -27,16 +18,10 @@ function initializeSearchForm() {
         const query = input.value.trim();
         if (!query) return;
 
-        // Redirect to results page with query
         window.location.href = `search-results?query=${encodeURIComponent(query)}`;
     });
 }
 
-/**
- * Render search results
- * Note: This function is not currently used but kept for reference
- * @param {Array} results - Search results
- */
 function renderResults(results) {
     const resultsContainer = document.getElementById('resultsContainer');
     if (!resultsContainer) return;
@@ -44,7 +29,7 @@ function renderResults(results) {
     resultsContainer.innerHTML = '';
 
     if (!Array.isArray(results) || results.length === 0) {
-        resultsContainer.textContent = 'Brak wyników.';
+        resultsContainer.textContent = 'No results found.';
         return;
     }
 
@@ -54,7 +39,7 @@ function renderResults(results) {
         item.innerHTML = `
       <p>${idx + 1}. ${result.text} 
       <small>(S${result.episode_info.season}E${result.episode_info.episode_number})</small></p>
-      <button class="clip-btn" data-index="${idx + 1}">Wybierz</button>
+      <button class="clip-btn" data-index="${idx + 1}">Select</button>
     `;
         resultsContainer.appendChild(item);
     });
@@ -64,14 +49,9 @@ function renderResults(results) {
     );
 }
 
-/**
- * Handle clip selection
- * Note: This function is not currently used but kept for reference
- * @param {Event} e - Click event
- */
 async function selectClip(e) {
     const index = e.target.dataset.index;
-    console.log(`[DEBUG] Wybrano klip: ${index}`);
+    console.log(`[DEBUG] Selected clip: ${index}`);
 
     const videoContainer = document.getElementById('videoContainer');
     if (!videoContainer) return;
@@ -84,6 +64,6 @@ async function selectClip(e) {
       <video controls autoplay src="${url}" width="640"></video>
     `;
     } catch (error) {
-        alert("Błąd przy pobieraniu klipu: " + error.message);
+        alert("Error while fetching the clip: " + error.message);
     }
 }

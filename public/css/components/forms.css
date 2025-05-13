@@ -1,6 +1,3 @@
-/* public/css/components/forms.css (Updated) */
-
-/* Base input styles */
 .input-base {
     appearance: none;
     -webkit-appearance: none;
@@ -19,7 +16,6 @@
     box-shadow: 0 0 0 2px rgba(74, 105, 189, 0.2);
 }
 
-/* Search input styles */
 .search-input-wrapper {
     position: relative;
     width: 100%;
@@ -67,7 +63,6 @@
     transform: scale(1.15);
 }
 
-/* Login form styles */
 .form-overlay input {
     position: absolute;
     left: 12%;
@@ -129,7 +124,6 @@
     box-shadow: 0 3px 6px var(--shadow);
 }
 
-/* Clip inspector form */
 .save-form {
     display: none;
     flex-direction: row;
@@ -149,16 +143,13 @@
     font-size: 16px;
 }
 
-/* Search container */
 .search-container {
-    /* For search-results.php - absolute positioning */
     width: clamp(280px, 60vw, 720px);
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* For search-results.php - specific positioning */
 .search-results-page .search-container {
     position: absolute;
     top: 20px;
@@ -173,7 +164,6 @@
     transition: opacity 0.3s;
 }
 
-/* Mobile adjustments */
 @media screen and (max-width: 850px) {
     .search-results-page .search-container {
         top: 75px;

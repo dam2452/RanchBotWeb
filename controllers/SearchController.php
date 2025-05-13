@@ -1,17 +1,7 @@
 <?php
-/**
- * Search Controller
- *
- * Handles search functionality
- */
 require_once __DIR__ . '/Controller.php';
 
 class SearchController extends Controller {
-    /**
-     * Show the search page
-     *
-     * @return void
-     */
     public function index() {
         $this->view('search', [
             'customHead' => '<link rel="stylesheet" href="/css/search.css">',
@@ -19,11 +9,6 @@ class SearchController extends Controller {
         ]);
     }
 
-    /**
-     * Show search results
-     *
-     * @return void
-     */
     public function results() {
         $this->view('search-results', [
             'customHead' => '

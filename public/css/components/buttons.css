@@ -1,6 +1,3 @@
-/* public/css/components/buttons.css */
-
-/* Standard button */
 .btn {
     display: inline-block;
     padding: 10px 20px;
@@ -22,7 +19,6 @@
     box-shadow: 0 2px 4px var(--shadow);
 }
 
-/* Button variations */
 .btn-primary {
     background: linear-gradient(to bottom right, var(--color-btn-green), var(--color-btn-green-dark));
     color: var(--color-text-light);
@@ -51,7 +47,6 @@
     background-color: var(--color-btn-bg-hover);
 }
 
-/* Action button - used in registration, login, etc. */
 .action-button {
     display: inline-block;
     background: linear-gradient(145deg, #6a85b6, #4a6fa5);
@@ -77,7 +72,6 @@
     outline: none;
 }
 
-/* Header auth buttons */
 .auth-buttons {
     display: flex;
     gap: var(--header-gap);
@@ -106,7 +100,6 @@
     box-shadow: 0 2px 4px var(--shadow);
 }
 
-/* Quote button (homepage) */
 .quote-btn {
     background-color: var(--color-btn-bg);
     color: var(--color-text-light);
@@ -124,7 +117,6 @@
     box-shadow: 0 10px 20px var(--shadow-strong);
 }
 
-/* Filter button */
 .filter-btn {
     padding: clamp(10px, 1.5vw, 14px) clamp(16px, 2vw, 24px);
     font-size: clamp(1rem, 2.5vw, 1.6rem);
@@ -144,7 +136,6 @@
     background: var(--color-btn-bg-hover, #666);
 }
 
-/* Download button */
 .download-btn {
     position: absolute;
     bottom: 10px;
@@ -168,7 +159,6 @@
     background-color: rgba(0, 0, 0, 0.9);
 }
 
-/* Mobile adjustments */
 @media screen and (max-width: 850px) {
     .quote-btn {
         font-size: var(--btn-font-mobile);

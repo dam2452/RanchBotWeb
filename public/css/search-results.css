@@ -1,5 +1,3 @@
-/* public/css/search-results.css (Updated) */
-
 @import 'variables.css';
 @import 'components/layouts.css';
 @import 'components/forms.css';
@@ -8,7 +6,6 @@
 @import 'components/media.css';
 @import 'components/overlays.css';
 
-/* Search results specific styles */
 body {
     overflow: hidden;
 }

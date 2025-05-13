@@ -1,8 +1,15 @@
-// Przywrócona i rozszerzona wersja search-results.js
-import { callApi, callApiForBlob } from '../modules/api-client.js';
+// public/js/init/search-results.js
+
+import { SELECTORS, CLASSES, MESSAGES } from '../core/constants.js';
+import { createElement, downloadBlob } from '../core/dom-utils.js';
+import { searchClips, getVideo } from '../modules/api-client.js';
 import { ReelNavigator } from '../modules/reel-navigator.js';
 import { ClipInspector } from '../modules/clip-inspector.js';
 
+/**
+ * Search Results page initialization
+ */
+// State variables
 let loadedClips = 0;
 let allResults = [];
 let observer;
@@ -10,14 +17,17 @@ let loading = false;
 let done = false;
 let reelNavigatorInstance;
 let clipInspectorInstance;
-// Przechowuj odwołania do URL-i blob-ów wideo
-let videoCache = {};
+let videoCache = {};  // Cache for video URLs
 
+/**
+ * Load the next batch of clips
+ * @param {number} batchSize - Number of clips to load
+ */
 async function loadNextClips(batchSize = 3) {
     if (loading || done) return;
     loading = true;
 
-    const reel = document.querySelector('.video-reel');
+    const reel = document.querySelector(SELECTORS.VIDEO_REEL);
     let itemsAddedInThisBatch = 0;
 
     for (let i = 0; i < batchSize; i++) {
@@ -27,27 +37,28 @@ async function loadNextClips(batchSize = 3) {
             done = true;
             break;
         }
+
         const itemData = allResults[currentOverallIndex];
 
         try {
-            // WAŻNE: Używamy oryginalnego podejścia - pobieranie przez /w z indeksem
-            const blob = await callApiForBlob('w', [`${currentOverallIndex + 1}`]);
+            // Get video blob
+            const blob = await getVideo(currentOverallIndex + 1);
             const url = URL.createObjectURL(blob);
 
-            // Zapisz URL w pamięci podręcznej dla późniejszego użycia
+            // Cache URL for later use
             videoCache[currentOverallIndex] = url;
-
             console.log(`Zapisano URL dla klipu ${currentOverallIndex} w pamięci podręcznej`);
 
-            const el = document.createElement('div');
-            el.className = 'reel-item';
-            el.dataset.idx = currentOverallIndex;
+            // Create reel item
+            const el = createElement('div', {
+                className: 'reel-item',
+                dataset: { idx: currentOverallIndex }
+            }, `
+        <video loop preload="metadata">
+          <source src="${url}" type="video/mp4">
+        </video>
+      `);
 
-            // Dodajemy wideo
-            el.innerHTML = `
-                <video loop preload="metadata">
-                    <source src="${url}" type="video/mp4">
-                </video>`;
             reel.appendChild(el);
             itemsAddedInThisBatch++;
         } catch (e) {
@@ -59,47 +70,7 @@ async function loadNextClips(batchSize = 3) {
 
     if (itemsAddedInThisBatch > 0 && reelNavigatorInstance) {
         reelNavigatorInstance.refresh();
-
-        // Dodajemy przyciski inspekcji do każdego elementu
-        console.log("Dodawanie przycisków Dostosuj...");
-        document.querySelectorAll('.reel-item').forEach(item => {
-            // Sprawdź, czy przycisk już istnieje
-            if (!item.querySelector('.inspect-btn')) {
-                const inspectBtn = document.createElement('button');
-                inspectBtn.className = 'inspect-btn';
-                inspectBtn.textContent = 'Dostosuj';
-
-                inspectBtn.addEventListener('click', function(e) {
-                    e.stopPropagation(); // Zapobiegamy propagacji kliknięcia
-
-                    // Pobierz indeks klipu
-                    const clipIndex = parseInt(item.dataset.idx);
-                    if (isNaN(clipIndex)) {
-                        console.error("Nieprawidłowy indeks klipu!");
-                        return;
-                    }
-
-                    console.log(`Kliknięto przycisk Dostosuj dla klipu o indeksie ${clipIndex}`);
-
-                    // Użyj zapisanego URL z pamięci podręcznej
-                    if (videoCache[clipIndex]) {
-                        console.log(`Znaleziono URL w pamięci podręcznej: ${videoCache[clipIndex].substring(0, 50)}...`);
-                        clipInspectorInstance.show(clipIndex, videoCache[clipIndex]);
-                    } else {
-                        // Jeśli nie ma w pamięci podręcznej, spróbuj pobrać z DOM
-                        const video = item.querySelector('video');
-                        if (video && video.src) {
-                            console.log(`Pobrano URL z elementu wideo: ${video.src.substring(0, 50)}...`);
-                            clipInspectorInstance.show(clipIndex, video.src);
-                        } else {
-                            console.error("Nie znaleziono URL wideo w pamięci podręcznej ani w DOM!");
-                        }
-                    }
-                });
-
-                item.appendChild(inspectBtn);
-            }
-        });
+        addInspectButtons();
     }
 
     if (loadedClips >= allResults.length) {
@@ -111,14 +82,64 @@ async function loadNextClips(batchSize = 3) {
     } else if (observer) {
         observer.disconnect();
     }
+
     loading = false;
 }
 
+/**
+ * Add inspect buttons to reel items
+ */
+function addInspectButtons() {
+    console.log("Dodawanie przycisków Dostosuj...");
+
+    document.querySelectorAll(SELECTORS.REEL_ITEM).forEach(item => {
+        // Check if button already exists
+        if (!item.querySelector(SELECTORS.INSPECT_BUTTON)) {
+            const inspectBtn = createElement('button', {
+                className: 'inspect-btn'
+            }, 'Dostosuj');
+
+            inspectBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+
+                // Get clip index
+                const clipIndex = parseInt(item.dataset.idx);
+                if (isNaN(clipIndex)) {
+                    console.error(MESSAGES.CLIP_ID_NOT_FOUND);
+                    return;
+                }
+
+                console.log(`Kliknięto przycisk Dostosuj dla klipu o indeksie ${clipIndex}`);
+
+                // Use cached URL if available
+                if (videoCache[clipIndex]) {
+                    console.log(`Znaleziono URL w pamięci podręcznej: ${videoCache[clipIndex].substring(0, 50)}...`);
+                    clipInspectorInstance.show(clipIndex, videoCache[clipIndex]);
+                } else {
+                    // Try to get URL from DOM
+                    const video = item.querySelector('video');
+                    if (video && video.src) {
+                        console.log(`Pobrano URL z elementu wideo: ${video.src.substring(0, 50)}...`);
+                        clipInspectorInstance.show(clipIndex, video.src);
+                    } else {
+                        console.error("Nie znaleziono URL wideo w pamięci podręcznej ani w DOM!");
+                    }
+                }
+            });
+
+            item.appendChild(inspectBtn);
+        }
+    });
+}
+
+/**
+ * Set up intersection observer for lazy loading
+ */
 function setupIntersectionObserver() {
     if (observer) observer.disconnect();
 
-    const reel = document.querySelector('.video-reel');
-    const items = reel.querySelectorAll('.reel-item');
+    const reel = document.querySelector(SELECTORS.VIDEO_REEL);
+    const items = reel.querySelectorAll(SELECTORS.REEL_ITEM);
     const lastItem = items[items.length - 1];
 
     if (!lastItem || done) {
@@ -135,7 +156,9 @@ function setupIntersectionObserver() {
     observer.observe(lastItem);
 }
 
-// Funkcja do ustawienia wartości zapytania w polu wyszukiwania
+/**
+ * Set search query in input field
+ */
 function setSearchQuery() {
     const query = new URLSearchParams(location.search).get('query');
     if (!query) return;
@@ -146,7 +169,9 @@ function setSearchQuery() {
     }
 }
 
-// Funkcja do obsługi wysyłania formularza wyszukiwania
+/**
+ * Set up search form handling
+ */
 function setupSearchForm() {
     const queryInput = document.getElementById('query-input');
     const searchBtn = document.querySelector('.search-icon-btn');
@@ -170,11 +195,14 @@ function setupSearchForm() {
     }
 }
 
+/**
+ * Initialize the search results page
+ */
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Inicjalizacja strony wyników wyszukiwania...");
 
     try {
-        // Inicjalizacja inspektora klipów
+        // Initialize clip inspector
         console.log("Tworzenie instancji ClipInspector...");
         clipInspectorInstance = new ClipInspector();
         console.log("Instancja ClipInspector utworzona pomyślnie");
@@ -182,10 +210,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error("Błąd podczas inicjalizacji ClipInspector:", error);
     }
 
-    // Ustaw wartość zapytania w polu wyszukiwania
+    // Set up search form and query
     setSearchQuery();
-
-    // Skonfiguruj obsługę formularza wyszukiwania
     setupSearchForm();
 
     const query = new URLSearchParams(location.search).get('query');
@@ -193,20 +219,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    const reelContainerSelector = '.video-reel';
-    const reel = document.querySelector(reelContainerSelector);
+    const reel = document.querySelector(SELECTORS.VIDEO_REEL);
     if (!reel) {
-        console.error('Container .video-reel not found!');
+        console.error(`Container ${SELECTORS.VIDEO_REEL} not found!`);
         return;
     }
 
     try {
         console.log(`Wyszukiwanie: ${query}`);
-        // WAŻNE: Używamy dokładnie oryginalnego kodu do pobierania wyników wyszukiwania
-        const { results } = await callApi('sz', [query]).then(d => d.data);
-        allResults = results;
-
-        console.log("Wyniki wyszukiwania:", results);
+        allResults = await searchClips(query);
+        console.log("Wyniki wyszukiwania:", allResults);
 
         if (!allResults || allResults.length === 0) {
             reel.innerHTML = '<p>Brak wyników do wyświetlenia.</p>';
@@ -216,7 +238,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         reel.innerHTML = '';
-        reelNavigatorInstance = new ReelNavigator(reelContainerSelector);
+        reelNavigatorInstance = new ReelNavigator(SELECTORS.VIDEO_REEL);
 
         await loadNextClips();
 
@@ -231,7 +253,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (observer) observer.disconnect();
     }
 
-    // Obsługa klawisza Escape dla zamknięcia inspektora
+    // Handle Escape key to close inspector
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && clipInspectorInstance && clipInspectorInstance.visible) {
             clipInspectorInstance.hide();

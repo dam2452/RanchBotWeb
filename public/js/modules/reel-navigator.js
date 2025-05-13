@@ -1,80 +1,58 @@
-import { isMobile, centerItem } from '../core/dom-utils.js';
+// public/js/modules/reel-navigator.js
+
+import { isMobile, centerItem, downloadBlob } from '../core/dom-utils.js';
+import { CLASSES, SELECTORS, MESSAGES } from '../core/constants.js';
+import { getVideo } from './api-client.js';
+import { createDownloadButton } from './video-utils.js';
 
 export class ReelNavigator {
     constructor(containerSelector) {
         this.container = document.querySelector(containerSelector);
-        this.items = Array.from(this.container.querySelectorAll('.reel-item'));
+        this.items = Array.from(this.container.querySelectorAll(SELECTORS.REEL_ITEM));
         this.activeIndex = 0;
         this.firstPlayedMuted = true;
+        this.videoCache = {};
 
         this.attachListeners();
+        this.addDownloadButtons();
         this.activate(0);
+    }
 
-        // Add download buttons to each reel item
+    /**
+     * Add download buttons to all reel items
+     */
+    addDownloadButtons() {
         this.items.forEach(item => {
-            const downloadBtn = document.createElement('button');
-            downloadBtn.className = 'download-btn';
-            downloadBtn.textContent = 'Download';
-
-            downloadBtn.addEventListener('click', async (e) => {
-                e.stopPropagation();
-
-                const video = item.querySelector('video');
-                if (!video) return;
-
-                // Pobierz indeks klipu z atrybutu data-idx elementu rodzica
+            if (!item.querySelector(SELECTORS.DOWNLOAD_BUTTON)) {
                 const clipIndex = item.dataset.idx;
+                const downloadBtn = createDownloadButton(async () => {
+                    await this.handleDownload(clipIndex);
+                });
 
-                if (clipIndex === undefined) {
-                    console.error('Nie znaleziono indeksu klipu');
-                    return;
-                }
-
-                try {
-                    // Importujemy funkcję callApiForBlob z api-client.js
-                    const { callApiForBlob } = await import('../modules/api-client.js');
-
-                    // Pobieramy wideo bezpośrednio z API - tak samo jak w search-results.js
-                    const blob = await callApiForBlob('w', [`${parseInt(clipIndex) + 1}`]);
-
-                    // Tworzymy URL dla pobranego blob
-                    const url = URL.createObjectURL(blob);
-
-                    // Tworzymy link do pobrania
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `video_${parseInt(clipIndex) + 1}.mp4`;
-                    document.body.appendChild(a);
-                    a.click();
-
-                    // Sprzątamy
-                    setTimeout(() => {
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                    }, 100);
-
-                } catch (error) {
-                    console.error('Błąd podczas pobierania wideo:', error);
-                    alert('Przepraszamy, wystąpił błąd podczas pobierania wideo.');
-                }
-            });
-
-            item.appendChild(downloadBtn);
+                item.appendChild(downloadBtn);
+            }
         });
     }
 
+    /**
+     * Activate a specific item in the reel
+     * @param {number} idx - Index of the item to activate
+     */
     activate(idx) {
         if (idx < 0 || idx >= this.items.length) return;
-        const old = this.items[this.activeIndex];
+
+        // Deactivate current active item
+        const oldItem = this.items[this.activeIndex];
+        oldItem.classList.remove(CLASSES.ACTIVE);
+        oldItem.querySelector('video').pause();
+
+        // Activate new item
         const newItem = this.items[idx];
-
-        old.classList.remove('active');
-        old.querySelector('video').pause();
-
         const vid = newItem.querySelector('video');
-        newItem.classList.add('active');
+        newItem.classList.add(CLASSES.ACTIVE);
         this.activeIndex = idx;
 
+        // Handle first play (muted or unmuted)
         if (idx === 0 && this.firstPlayedMuted) {
             vid.muted = true;
             vid.play();
@@ -86,11 +64,16 @@ export class ReelNavigator {
             this.firstPlayedMuted = false;
         }
 
+        // Center the activated item
         centerItem(this.container, newItem);
     }
 
+    /**
+     * Handle click events on the reel
+     * @param {Event} e - Click event
+     */
     handleClick(e) {
-        const clicked = e.target.closest('.reel-item');
+        const clicked = e.target.closest(SELECTORS.REEL_ITEM);
         const rect = this.container.getBoundingClientRect();
 
         if (clicked) {
@@ -109,6 +92,7 @@ export class ReelNavigator {
                 this.activate(idx);
             }
         } else {
+            // Click on background - navigate to next or previous
             const y = e.clientY - rect.top;
             const x = e.clientX - rect.left;
             const next = isMobile() ? (y > rect.height / 2) : (x > rect.width / 2);
@@ -116,6 +100,10 @@ export class ReelNavigator {
         }
     }
 
+    /**
+     * Handle keyboard navigation
+     * @param {KeyboardEvent} e - Keyboard event
+     */
     handleKey(e) {
         if (!isMobile()) {
             if (e.key === 'ArrowRight') this.activate(this.activeIndex + 1);
@@ -126,126 +114,74 @@ export class ReelNavigator {
         }
     }
 
+    /**
+     * Attach event listeners
+     */
     attachListeners() {
         this.container.addEventListener('click', e => this.handleClick(e));
         window.addEventListener('keydown', e => this.handleKey(e));
-        window.matchMedia('(max-width:850px)').addEventListener('change', () => {
+        window.matchMedia(`(max-width:${850}px)`).addEventListener('change', () => {
             centerItem(this.container, this.items[this.activeIndex]);
         });
     }
 
+    /**
+     * Handle download for a specific clip
+     * @param {string} clipIndex - Index of the clip
+     */
+    async handleDownload(clipIndex) {
+        if (clipIndex === undefined) {
+            console.error(MESSAGES.CLIP_ID_NOT_FOUND);
+            return;
+        }
+
+        try {
+            // Get the video blob
+            const blob = await getVideo(parseInt(clipIndex) + 1);
+
+            // Download the blob
+            downloadBlob(blob, `video_${parseInt(clipIndex) + 1}.mp4`);
+        } catch (error) {
+            console.error('Błąd podczas pobierania wideo:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Refresh the reel navigator to include new items
+     */
     refresh() {
-        this.items = Array.from(this.container.querySelectorAll('.reel-item'));
-
-        // Add download buttons to each reel item
-        this.items.forEach(item => {
-            if (!item.querySelector('.download-btn')) {
-                const downloadBtn = document.createElement('button');
-                downloadBtn.className = 'download-btn';
-                downloadBtn.textContent = 'Download';
-
-                downloadBtn.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-
-                    const video = item.querySelector('video');
-                    if (!video) return;
-
-                    // Pobierz indeks klipu z atrybutu data-idx elementu rodzica
-                    const clipIndex = item.dataset.idx;
-
-                    if (clipIndex === undefined) {
-                        console.error('Nie znaleziono indeksu klipu');
-                        return;
-                    }
-
-                    try {
-                        // Importujemy funkcję callApiForBlob z api-client.js
-                        const { callApiForBlob } = await import('../modules/api-client.js');
-
-                        // Pobieramy wideo bezpośrednio z API - tak samo jak w search-results.js
-                        const blob = await callApiForBlob('w', [`${parseInt(clipIndex) + 1}`]);
-
-                        // Tworzymy URL dla pobranego blob
-                        const url = URL.createObjectURL(blob);
-
-                        // Tworzymy link do pobrania
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `video_${parseInt(clipIndex) + 1}.mp4`;
-                        document.body.appendChild(a);
-                        a.click();
-
-                        // Sprzątamy
-                        setTimeout(() => {
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(url);
-                        }, 100);
-
-                    } catch (error) {
-                        console.error('Błąd podczas pobierania wideo:', error);
-                        alert('Przepraszamy, wystąpił błąd podczas pobierania wideo.');
-                    }
-                });
-
-                item.appendChild(downloadBtn);
-            }
-        });
+        this.items = Array.from(this.container.querySelectorAll(SELECTORS.REEL_ITEM));
+        this.addDownloadButtons();
     }
 }
 
-// Pomocnicza funkcja do dodawania przycisków pobierania
+/**
+ * Add download buttons to all reel items
+ */
 export function addDownloadButtons() {
     // Find all reel items
-    const reelItems = document.querySelectorAll('.reel-item');
+    const reelItems = document.querySelectorAll(SELECTORS.REEL_ITEM);
 
     reelItems.forEach(item => {
         // Create download button if it doesn't exist yet
-        if (!item.querySelector('.download-btn')) {
-            const downloadBtn = document.createElement('button');
-            downloadBtn.className = 'download-btn';
-            downloadBtn.textContent = 'Download';
+        if (!item.querySelector(SELECTORS.DOWNLOAD_BUTTON)) {
+            const clipIndex = item.dataset.idx;
 
-            // Add download functionality
-            downloadBtn.addEventListener('click', async (e) => {
+            const downloadBtn = createDownloadButton(async (e) => {
                 e.stopPropagation();
 
-                const video = item.querySelector('video');
-                if (!video) return;
-
-                // Pobierz indeks klipu z atrybutu data-idx elementu rodzica
-                const clipIndex = item.dataset.idx;
-
                 if (clipIndex === undefined) {
-                    console.error('Nie znaleziono indeksu klipu');
+                    console.error(MESSAGES.CLIP_ID_NOT_FOUND);
                     return;
                 }
 
                 try {
-                    // Importujemy funkcję callApiForBlob z api-client.js
-                    const { callApiForBlob } = await import('../modules/api-client.js');
-
-                    // Pobieramy wideo bezpośrednio z API - tak samo jak w search-results.js
-                    const blob = await callApiForBlob('w', [`${parseInt(clipIndex) + 1}`]);
-
-                    // Tworzymy URL dla pobranego blob
-                    const url = URL.createObjectURL(blob);
-
-                    // Tworzymy link do pobrania
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `video_${parseInt(clipIndex) + 1}.mp4`;
-                    document.body.appendChild(a);
-                    a.click();
-
-                    // Sprzątamy
-                    setTimeout(() => {
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                    }, 100);
-
+                    const blob = await getVideo(parseInt(clipIndex) + 1);
+                    downloadBlob(blob, `video_${parseInt(clipIndex) + 1}.mp4`);
                 } catch (error) {
                     console.error('Błąd podczas pobierania wideo:', error);
-                    alert('Przepraszamy, wystąpił błąd podczas pobierania wideo.');
+                    throw error;
                 }
             });
 
@@ -255,27 +191,26 @@ export function addDownloadButtons() {
     });
 }
 
-// Funkcja do aktualizacji klasy ReelNavigator
+/**
+ * Patch the ReelNavigator class with additional functionality
+ */
 export function patchReelNavigator() {
-    // Find the original ReelNavigator class
+    // Store original methods
     const originalRefresh = ReelNavigator.prototype.refresh;
+    const originalConstructor = ReelNavigator.prototype.constructor;
 
-    // Patch the refresh method to add download buttons
+    // Patch the refresh method
     ReelNavigator.prototype.refresh = function() {
-        // Call the original refresh method first
+        // Call the original refresh method
         originalRefresh.call(this);
-
-        // Then add download buttons
+        // Add download buttons
         addDownloadButtons();
     };
 
-    // Also patch the constructor to add download buttons on initialization
-    const originalConstructor = ReelNavigator.prototype.constructor;
-
+    // Patch the constructor
     ReelNavigator.prototype.constructor = function(containerSelector) {
         // Call the original constructor
         originalConstructor.call(this, containerSelector);
-
         // Add download buttons
         addDownloadButtons();
     };

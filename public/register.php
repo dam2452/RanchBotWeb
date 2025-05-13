@@ -1,17 +1,10 @@
 <?php
-// Plik: public/register.php
 
-// NAJPIERW załaduj i wystartuj sesję!
-require_once __DIR__ . '/../includes/session.php'; // Upewnij się, że to jest PIERWSZA linia PHP
+require_once __DIR__ . '/../includes/session.php';
 
-// Reszta kodu PHP przed HTMLem
 $pageTitle = "Rejestracja - Niedostępna";
-// Upewnij się, że linkujesz poprawny plik CSS. Jeśli używasz stylów z register.css:
 $customHead = '<link rel="stylesheet" href="css/register.css">';
-// Jeśli style są w static-page.css:
-// $customHead = '<link rel="stylesheet" href="css/static-page.css">';
 
-// Dołącz nagłówek strony (on też może wołać session.php, ale require_once to obsłuży)
 include_once __DIR__ . '/../templates/header.php';
 ?>
 
@@ -32,6 +25,6 @@ include_once __DIR__ . '/../templates/header.php';
     </main>
 
 <?php
-// Dołącz stopkę strony
+
 include_once __DIR__ . '/../templates/footer.php';
 ?>

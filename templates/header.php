@@ -1,18 +1,11 @@
 <?php
-/**
- * Header template
- *
- * Common header for all pages
- */
+
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/response.php';
 
-// Check if current page is accessible without login
 $currentPage = $_SERVER['PHP_SELF'];
 
-// Użyj funkcji is_public_page z session.php lub is_public_page_auth z auth.php
-// Funkcja response.php zawiera funkcję redirect
 if ($currentPage !== '/login.php' && !is_public_page($currentPage) && !is_logged_in()) {
     session_set('return_to', $_SERVER['REQUEST_URI']);
     redirect('/login.php');
@@ -46,11 +39,8 @@ if ($currentPage !== '/login.php' && !is_public_page($currentPage) && !is_logged
     </div>
 </header>
 
-<!-- Load the subscription tooltip component only when user is logged in -->
 <?php if (is_logged_in()): ?>
     <script type="module">
-        import SubscriptionTooltip from '/js/components/SubscriptionTooltip.js';
-        // Component is initialized automatically via its DOMContentLoaded event handler
     </script>
 <?php endif; ?>
 </body>

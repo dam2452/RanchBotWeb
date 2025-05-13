@@ -1,23 +1,13 @@
-:root {
-    --color-btn-bg: #888;
-    --color-btn-bg-hover: #666;
+/* public/css/search.css (Fixed) */
 
-    --logo-max-width: 280px;
-    --logo-gap: 10px;
+@import 'variables.css';
+@import 'components/layouts.css';
+@import 'components/forms.css';
+@import 'components/buttons.css';
+@import 'components/typography.css';
+@import 'components/media.css';
 
-    --search-width: clamp(280px, 60vw, 720px);
-
-    --title-font-size: clamp(3rem, 6vw, 5rem);
-    --filter-btn-padding: 14px 24px;
-
-    --section-gap: 60px;
-    --page-padding: 60px 20px 40px;
-}
-
-body {
-
-}
-
+/* Search page specific styles */
 .search-page {
     display: flex;
     flex-direction: column;
@@ -29,34 +19,14 @@ body {
     min-height: 100vh;
 }
 
-.logo-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--logo-gap);
-}
-
-.logo-img {
-    width: clamp(185px, 18vw, var(--logo-max-width));
-}
-
-.title {
-    font-size: var(--title-font-size);
-    font-weight: bold;
-    margin: 0;
-}
-
-
+/* Fix for search container appearing above logo */
 .search-container {
+    position: relative; /* Changed from absolute to relative */
+    width: var(--search-width);
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: var(--search-width);
-    margin: 0 auto;
-    position: relative;
-}
-
-.search-icon-btn {
+    z-index: 100;
 }
 
 .filter-btn {
@@ -66,26 +36,12 @@ body {
 }
 
 @media screen and (max-width: 850px) {
-    .search-page {
-        padding: 40px 15px 30px;
-        gap: 40px;
-    }
-
-    .logo-img {
-        width: clamp(150px, 25vw, 200px);
-    }
-
-    .title {
-        font-size: clamp(2.5rem, 8vw, 3.5rem);
+    .filter-btn {
+        right: 8px;
+        bottom: -45px;
     }
 
     .search-container {
         width: 80vw;
-    }
-
-
-    .filter-btn {
-        right: 8px;
-        bottom: -45px;
     }
 }

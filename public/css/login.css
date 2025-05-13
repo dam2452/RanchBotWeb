@@ -1,144 +1,18 @@
-:root {
-    --color-form-bg: #ffe4b5;
-    --color-form-highlight: #fdda9f;
-    --color-form-focus: #ffe0a3;
-    --color-btn-green: #4CAF50;
-    --color-btn-green-dark: #45a049;
-    --color-btn-green-hover: #5ee271;
-    --color-btn-green-hover-dark: #35a33a;
+/* public/css/login.css (Refactored) */
 
-    --input-radius: var(--radius-s);
-    --form-btn-radius: var(--radius-m);
+@import 'variables.css';
+@import 'components/layouts.css';
+@import 'components/forms.css';
+@import 'components/buttons.css';
+@import 'components/typography.css';
+@import 'components/media.css';
 
-    --auth-pad-v: 1vh;
-    --auth-pad-h: 2.5vw;
-    --actions-pad-v: 1.5vh;
-    --actions-pad-h: 3vw;
-
-    --font-auth-min: 14px;
-    --font-auth-max: 16px;
-    --font-auth-range: 1.4vw;
-    --font-actions-max: 38px;
-}
-
+/* Login page specific styles */
 body {
     overflow: hidden;
 }
 
-
-main {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    align-items: center;
-    height: calc(100dvh - 70px);
-    padding: var(--main-gap);
-    padding-bottom: calc(var(--main-gap) + env(safe-area-inset-bottom));
-}
-
-.left {
-    text-align: center;
-    margin-bottom: var(--main-gap);
-}
-
-.logo-big {
-    width: clamp(180px, 25vw, 600px);
-    height: auto;
-}
-
-.left h1 {
-    margin-top: 20px;
-    font-size: clamp(3rem, 8vw, 5rem);
-    font-weight: bold;
-    color: var(--color-text-light);
-}
-
-.right {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.bench-container {
-    position: relative;
-    width: clamp(280px, 40vw, 900px);
-    aspect-ratio: 1 / 1;
-}
-
-.bench-image {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-.form-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.form-overlay input {
-    position: absolute;
-    left: 12%;
-    width: 76%;
-    height: 8%;
-    font-size: clamp(14px, 1.2vw, 18px);
-    border: none;
-    border-radius: var(--input-radius);
-    text-align: center;
-    background-color: var(--color-form-bg);
-    box-shadow: inset 0 0 3px var(--shadow-strong);
-}
-
-.form-overlay input[name="login"] {
-    top: 23.5%;
-    left: 15%;
-    width: 70%;
-    background-color: var(--color-form-highlight);
-}
-
-.form-overlay input[name="password"] {
-    top: 37%;
-    left: 15%;
-    width: 70%;
-    background-color: var(--color-form-highlight);
-}
-
-.form-overlay button {
-    position: absolute;
-    top: 53%;
-    left: 0;
-    width: 100%;
-    height: 5.5%;
-    font-size: clamp(14px, 1.2vw, 18px);
-    font-weight: bold;
-    background: linear-gradient(to right, #fdd99d, #dcae75);
-    border: 2px solid #aa9169;
-    border-radius: var(--form-btn-radius);
-    cursor: pointer;
-    color: #000;
-    box-shadow: 0 6px 12px var(--shadow-strong);
-    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
-}
-
-.form-overlay button:hover {
-    transform: scale(1.04);
-    background: linear-gradient(to right, #ffe0b3, #e0b88a);
-    box-shadow: 0 8px 20px var(--shadow-heavy);
-}
-
-.form-overlay button:active {
-    transform: scale(0.96);
-    box-shadow: 0 3px 6px var(--shadow);
-}
-
-.form-overlay input:focus {
-    outline: 2px solid #c58b4f;
-    background-color: var(--color-form-focus);
-}
-
+/* Actions buttons container */
 .actions {
     margin-top: 10px;
     display: flex;
@@ -150,7 +24,7 @@ main {
 .actions button {
     background: linear-gradient(to bottom right, var(--color-btn-green), var(--color-btn-green-dark));
     color: var(--color-text-light);
-    padding: 10px 25px;  /* Mniejszy padding w pionie, większy w poziomie */
+    padding: 10px 25px;
     font-size: clamp(38px, 1.5vw, 40px);
     border: none;
     border-radius: var(--radius-m);
@@ -161,7 +35,7 @@ main {
     z-index: 1;
     flex-grow: 1;
     max-width: 400px;
-    white-space: nowrap;  /* Zapobiega zawijaniu tekstu */
+    white-space: nowrap;
 }
 
 .actions button:hover {
@@ -174,6 +48,8 @@ main {
     transform: scale(0.97);
     box-shadow: 0 2px 6px var(--shadow);
 }
+
+/* Error message */
 .error-message {
     position: absolute;
     top: 10%;
@@ -188,70 +64,7 @@ main {
     font-size: 14px;
 }
 
-.user-welcome {
-    color: var(--color-text-light);
-    margin-right: 10px;
-    font-size: 14px;
-}
-@media screen and (max-width: 850px) {
-    main {
-        height: auto;
-        flex-direction: column;
-        padding-top: 15px;
-        padding-bottom: 80px;
-        justify-content: flex-start;
-    }
-
-    .left h1 {
-        font-size: clamp(2.5rem, 10vw, 3rem);
-    }
-
-    .bench-container {
-        width: clamp(250px, 70vw, 350px);
-        margin-bottom: 10px;
-    }
-
-    .form-overlay input {
-        font-size: 16px;
-        height: 9%;
-    }
-    .form-overlay input[name="login"],
-    .form-overlay input[name="password"] {
-        left: 10%;
-        width: 80%;
-    }
-
-    .form-overlay button {
-        height: 6%;
-        font-size: clamp(14px, 3vw, 18px);
-    }
-
-    .actions {
-        flex-direction: column;
-        gap: 15px;
-        width: 80%;
-        margin-top: 20px;
-        position: static;
-    }
-
-    .actions button {
-        width: 100%;
-        padding: 12px;
-        font-size: clamp(14px, 4vw, 18px);
-        max-width: none;
-    }
-}
-
 @media screen and (max-width: 600px) {
-    .logo-big {
-        width: clamp(150px, 40vw, 200px);
-    }
-    .left h1 {
-        font-size: clamp(2rem, 8vw, 2.5rem);
-    }
-    .bench-container {
-        width: clamp(220px, 80vw, 300px);
-    }
     .actions {
         width: 90%;
     }

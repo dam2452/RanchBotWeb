@@ -1,0 +1,199 @@
+/* public/css/components/buttons.css */
+
+/* Standard button */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: var(--radius-m);
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    box-shadow: 0 4px 10px var(--shadow);
+}
+
+.btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px var(--shadow-strong);
+}
+
+.btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px var(--shadow);
+}
+
+/* Button variations */
+.btn-primary {
+    background: linear-gradient(to bottom right, var(--color-btn-green), var(--color-btn-green-dark));
+    color: var(--color-text-light);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(to bottom right, var(--color-btn-green-hover), var(--color-btn-green-hover-dark));
+}
+
+.btn-secondary {
+    background: linear-gradient(to right, #ffffff, #d8ffd8);
+    color: var(--color-text-dark);
+    border: 1px solid #a0dba0;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(to right, #eaffea, #b0f7b0);
+}
+
+.btn-accent {
+    background-color: var(--color-btn-bg);
+    color: var(--color-text-light);
+}
+
+.btn-accent:hover {
+    background-color: var(--color-btn-bg-hover);
+}
+
+/* Action button - used in registration, login, etc. */
+.action-button {
+    display: inline-block;
+    background: linear-gradient(145deg, #6a85b6, #4a6fa5);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 4px 10px rgba(74, 111, 165, 0.3);
+    border: none;
+    cursor: pointer;
+}
+
+.action-button:hover,
+.action-button:focus {
+    background: linear-gradient(145deg, #7a95c6, #5a7fae);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(74, 111, 165, 0.4);
+    color: white;
+    outline: none;
+}
+
+/* Header auth buttons */
+.auth-buttons {
+    display: flex;
+    gap: var(--header-gap);
+}
+
+.auth-buttons button {
+    background: linear-gradient(to right, #ffffff, #d8ffd8);
+    color: var(--color-text-dark);
+    padding: var(--auth-pad-v, 1vh) var(--auth-pad-h, 2.5vw);
+    font-size: clamp(var(--font-auth-min, 14px), var(--font-auth-range, 1.4vw), var(--font-auth-max, 16px));
+    font-weight: bold;
+    border: 1px solid #a0dba0;
+    border-radius: var(--btn-radius-header);
+    box-shadow: 0 4px 10px var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+}
+
+.auth-buttons button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(to right, #eaffea, #b0f7b0);
+    box-shadow: 0 8px 16px var(--shadow-strong);
+}
+
+.auth-buttons button:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px var(--shadow);
+}
+
+/* Quote button (homepage) */
+.quote-btn {
+    background-color: var(--color-btn-bg);
+    color: var(--color-text-light);
+    font-size: var(--btn-font-desktop);
+    padding: var(--btn-padding-desktop);
+    border: none;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 6px 14px var(--shadow);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.quote-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px var(--shadow-strong);
+}
+
+/* Filter button */
+.filter-btn {
+    padding: clamp(10px, 1.5vw, 14px) clamp(16px, 2vw, 24px);
+    font-size: clamp(1rem, 2.5vw, 1.6rem);
+    font-weight: bold;
+    background: var(--color-btn-bg, #888);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-l);
+    cursor: pointer;
+    box-shadow: 0 8px 16px var(--shadow-strong);
+    transition: all 0.2s ease;
+    transform: rotate(5deg);
+}
+
+.filter-btn:hover {
+    transform: rotate(5deg) scale(1.08);
+    background: var(--color-btn-bg-hover, #666);
+}
+
+/* Download button */
+.download-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 5;
+}
+
+.video-container:hover .download-btn {
+    opacity: 1;
+}
+
+.download-btn:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+/* Mobile adjustments */
+@media screen and (max-width: 850px) {
+    .quote-btn {
+        font-size: var(--btn-font-mobile);
+        padding: var(--btn-padding-mobile);
+    }
+
+    .download-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+        top: 10px;
+        right: 10px;
+    }
+
+    .filter-btn {
+        right: 8px;
+        bottom: -45px;
+    }
+
+    .action-button {
+        padding: 10px 25px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .action-button {
+        padding: 10px 25px;
+    }
+}

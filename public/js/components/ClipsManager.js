@@ -1,8 +1,8 @@
-// public/js/components/ClipsManager.js
+// public/js/components/ClipsManager.js (Fixed)
 
 import { SELECTORS, CLASSES, MESSAGES, CLIP_SETTINGS } from '../core/constants.js';
 import { createElement } from '../core/dom-utils.js';
-import { deleteClip as apiDeleteClip, getClips } from '../modules/api-client.js';
+import { callApi } from '../modules/api-client.js';
 
 /**
  * ClipsManager - Handles clip data loading and deletion
@@ -27,8 +27,31 @@ export class ClipsManager {
         }
 
         try {
-            this.clips = await getClips();
-            return this.clips;
+            const response = await fetch('/api/clips-api.php?action=get_clips');
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Otrzymane dane:', data);
+
+            // FIX: Check for both data structures - the original and the refactored one
+            if (data.status === 'success') {
+                // Check if clips are nested in 'data' object or directly in 'clips'
+                if (data.clips && data.clips.length > 0) {
+                    // Original structure
+                    this.clips = data.clips;
+                    return this.clips;
+                } else if (data.data && data.data.clips && data.data.clips.length > 0) {
+                    // Nested structure that comes from the backend
+                    this.clips = data.data.clips;
+                    return this.clips;
+                }
+            }
+
+            console.log('Brak klipów lub błąd w danych:', data);
+            return [];
         } catch (error) {
             console.error('Error loading clips:', error);
             this.showError(`Wystąpił błąd podczas ładowania klipów: ${error.message}`);
@@ -47,7 +70,7 @@ export class ClipsManager {
      * @param {Number} clipsPerPage - Number of clips per page (default: 6)
      * @returns {Array} Array of pages with clips
      */
-    formatClipsIntoPages(clips, clipsPerPage = CLIP_SETTINGS.CLIPS_PER_PAGE.DESKTOP) {
+    formatClipsIntoPages(clips, clipsPerPage = 6) {
         const pages = [];
 
         for (let i = 0; i < clips.length; i += clipsPerPage) {
@@ -64,8 +87,9 @@ export class ClipsManager {
      * @param {Number} clipsPerPage - Number of clips per page (default: 6)
      * @returns {HTMLElement} Page element with clips
      */
-    generatePageElement(pageClips, pageIndex, clipsPerPage = CLIP_SETTINGS.CLIPS_PER_PAGE.DESKTOP) {
-        const pageElement = createElement('div', { className: 'clips-page' });
+    generatePageElement(pageClips, pageIndex, clipsPerPage = 6) {
+        const pageElement = document.createElement('div');
+        pageElement.className = 'clips-page';
 
         pageClips.forEach((clip, clipIndex) => {
             if (!clip.id || !clip.name) {
@@ -90,14 +114,13 @@ export class ClipsManager {
     createClipElement(clip, index) {
         console.log(`Tworzenie karty dla klipu - Indeks: ${index}, ID: ${clip.id}, nazwa: "${clip.name}"`);
 
-        return createElement('div', {
-            className: 'clip-card',
-            dataset: {
-                id: clip.id,
-                index: index,
-                name: clip.name
-            }
-        }, `
+        const clipElement = document.createElement('div');
+        clipElement.className = 'clip-card';
+        clipElement.setAttribute('data-id', clip.id);
+        clipElement.setAttribute('data-index', index);
+        clipElement.setAttribute('data-name', clip.name);
+
+        clipElement.innerHTML = `
       <div class="video-container" data-clip-id="${clip.id}" data-clip-index="${index}" data-clip-name="${clip.name}">
         <video loop preload="metadata" class="clip-video">
           <source src="/debug-video.php?id=${encodeURIComponent(clip.name)}" type="video/mp4">
@@ -111,19 +134,20 @@ export class ClipsManager {
         </svg>
         Usuń
       </button>
-    `);
+    `;
+
+        return clipElement;
     }
 
     /**
      * Render clips to the container
-     * @returns {NodeList|null} List of page elements or null if no container
      */
     renderClips() {
-        if (!this.container) return null;
+        if (!this.container) return;
 
         if (this.clips.length === 0) {
             this.showNoClipsMessage();
-            return null;
+            return;
         }
 
         // Format clips into pages
@@ -135,7 +159,7 @@ export class ClipsManager {
             this.container.appendChild(pageElement);
         });
 
-        return this.container.querySelectorAll(SELECTORS.CLIPS_PAGE);
+        return this.container.querySelectorAll('.clips-page');
     }
 
     /**
@@ -147,12 +171,12 @@ export class ClipsManager {
         console.log("Ustawianie nasłuchiwaczy dla przycisków usuwania...");
 
         this.container.addEventListener('click', async (e) => {
-            const deleteButton = e.target.closest(SELECTORS.DELETE_BUTTON);
+            const deleteButton = e.target.closest('.delete-clip-btn');
             if (!deleteButton) return;
 
             e.stopPropagation();
 
-            const clipCard = deleteButton.closest(SELECTORS.CLIP_CARD);
+            const clipCard = deleteButton.closest('.clip-card');
             const clipName = clipCard?.dataset.name;
 
             if (!clipName) {
@@ -172,7 +196,7 @@ export class ClipsManager {
      * @param {HTMLElement} deleteButton - Delete button element
      */
     async deleteClip(clipName, clipCard, deleteButton) {
-        if (!confirm(MESSAGES.DELETE_CONFIRM(clipName))) {
+        if (!confirm(`Czy na pewno chcesz usunąć klip "${clipName}"? Tej operacji nie można cofnąć.`)) {
             console.log('Anulowano usuwanie klipu.');
             return;
         }
@@ -183,7 +207,7 @@ export class ClipsManager {
         deleteButton.innerHTML = 'Usuwanie...';
 
         try {
-            const response = await apiDeleteClip(clipName);
+            const response = await callApi('uk', [clipName]);
 
             console.log('Odpowiedź API usuwania:', response);
 
@@ -193,7 +217,7 @@ export class ClipsManager {
             } else {
                 const errorMessage = response?.message || 'Nieznany błąd serwera.';
                 console.error(`Nie udało się usunąć klipu "${clipName}": ${errorMessage}`);
-                alert(`${MESSAGES.DELETE_ERROR} ${errorMessage}`);
+                alert(`Nie udało się usunąć klipu: ${errorMessage}`);
 
                 deleteButton.disabled = false;
                 deleteButton.innerHTML = originalButtonContent;
@@ -217,13 +241,13 @@ export class ClipsManager {
         clipCard.style.transform = 'scale(0.95) translateY(-10px)';
 
         setTimeout(() => {
-            const page = clipCard.closest(SELECTORS.CLIPS_PAGE);
+            const page = clipCard.closest('.clips-page');
             clipCard.remove();
 
             // Check if the page is now empty
-            if (page && page.querySelectorAll(SELECTORS.CLIP_CARD).length === 0) {
+            if (page && page.querySelectorAll('.clip-card').length === 0) {
                 console.log("Strona została opróżniona.");
-                page.innerHTML = `<p style="text-align:center; padding: 20px; color: #888;">${MESSAGES.EMPTY_PAGE}</p>`;
+                page.innerHTML = '<p style="text-align:center; padding: 20px; color: #888;">Ta strona jest teraz pusta.</p>';
             }
         }, 400);
     }
@@ -235,7 +259,7 @@ export class ClipsManager {
     showError(message) {
         if (!this.container) return;
 
-        this.container.innerHTML = `<div class="${CLASSES.ERROR}">${message}</div>`;
+        this.container.innerHTML = `<div class="error-message">${message}</div>`;
     }
 
     /**
@@ -245,8 +269,8 @@ export class ClipsManager {
         if (!this.container) return;
 
         this.container.innerHTML = `
-      <div class="${CLASSES.NO_CLIPS}">
-        ${MESSAGES.NO_CLIPS}
+      <div class="no-clips-message">
+        Nie masz jeszcze żadnych klipów. Użyj wyszukiwarki cytatów, aby stworzyć swoje pierwsze klipy!
       </div>
     `;
     }

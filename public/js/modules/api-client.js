@@ -111,8 +111,11 @@ export async function deleteClip(clipName) {
  * @returns {Promise<Array>} Search results
  */
 export async function searchClips(query) {
-    const { data } = await callApi('sz', [query]);
-    return data.results || [];
+    const response = await callApi('sz', [query]);
+    if (response && response.data && response.data.results) {
+        return response.data.results;
+    }
+    return [];
 }
 
 /**
@@ -146,4 +149,38 @@ export async function adjustVideo(clipIndex, leftAdjust, rightAdjust) {
  */
 export async function saveClip(clipName) {
     return callApi('z', [clipName]);
+}
+
+/**
+ * Get user clips
+ * @returns {Promise<Array>} User clips
+ */
+export async function getUserClips() {
+    try {
+        const response = await fetch('/api/clips?action=get_clips');
+
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.status !== 'success' || !data.clips) {
+            throw new Error('Invalid API response');
+        }
+
+        return data.clips;
+    } catch (error) {
+        console.error('Failed to get user clips:', error);
+        throw error;
+    }
+}
+
+/**
+ * Get video URL for clip
+ * @param {string} clipId Clip ID
+ * @returns {string} Video URL
+ */
+export function getVideoUrl(clipId) {
+    return `/api/video?endpoint=wys&id=${encodeURIComponent(clipId)}`;
 }

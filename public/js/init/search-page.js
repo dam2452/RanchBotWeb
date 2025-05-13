@@ -28,7 +28,7 @@ function initializeSearchForm() {
         if (!query) return;
 
         // Redirect to results page with query
-        window.location.href = `search-results.php?query=${encodeURIComponent(query)}`;
+        window.location.href = `search-results?query=${encodeURIComponent(query)}`;
     });
 }
 

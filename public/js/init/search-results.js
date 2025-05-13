@@ -180,7 +180,7 @@ function setupSearchForm() {
         searchBtn.addEventListener('click', () => {
             const query = queryInput.value.trim();
             if (query) {
-                window.location.href = `/search-results.php?query=${encodeURIComponent(query)}`;
+                window.location.href = `/search-results?query=${encodeURIComponent(query)}`;
             }
         });
 
@@ -188,7 +188,7 @@ function setupSearchForm() {
             if (e.key === 'Enter') {
                 const query = queryInput.value.trim();
                 if (query) {
-                    window.location.href = `/search-results.php?query=${encodeURIComponent(query)}`;
+                    window.location.href = `/search-results?query=${encodeURIComponent(query)}`;
                 }
             }
         });

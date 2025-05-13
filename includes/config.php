@@ -46,7 +46,7 @@ $config = [
     // Authentication settings
     'auth' => [
         'jwt_token' => getenv('DEV_JWT_TOKEN') ?: null,
-        'login_redirect' => '/search.php',
+        'login_redirect' => '/search', // Zaktualizowano z /search.php na /search
     ],
 
     // Logging configuration
@@ -58,12 +58,11 @@ $config = [
 
     // Public pages (accessible without login)
     'public_pages' => [
-        '/index.php',
-        '/',
-        '/login.php',
-        '/register.php',
-        '/test_login.php',
-        '/session_debug.php',
+        '/', // strona główna
+        '/login', // strona logowania
+        '/register', // strona rejestracji
+        '/test_login', // strona testowa logowania (jeśli istnieje)
+        '/session_debug', // strona debugowania sesji (jeśli istnieje)
     ],
 ];
 

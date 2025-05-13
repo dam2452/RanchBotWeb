@@ -1,6 +1,4 @@
 <?php
-
-
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/logger.php';
@@ -47,12 +45,18 @@ function api_request($endpoint, $args = [], $method = 'POST', $headers = [], $re
     $httpCode = $info['http_code'];
     curl_close($ch);
 
-    logger()->debug("API request to $url", 'api_requests.log', [
-        'method' => $method,
-        'args' => $args,
-        'http_code' => $httpCode,
-        'error' => $error
-    ]);
+    // Zamieniamy wywołanie loggera na warunkowe sprawdzenie czy funkcja logger() istnieje i zwraca obiekt
+    if (function_exists('logger') && is_object(logger())) {
+        logger()->debug("API request to $url", 'api_requests.log', [
+            'method' => $method,
+            'args' => $args,
+            'http_code' => $httpCode,
+            'error' => $error
+        ]);
+    } else {
+        // Alternatywne logowanie, jeśli logger nie jest dostępny
+        error_log("API request to $url - HTTP Code: $httpCode");
+    }
 
     if ($returnFullResponse) {
         return [
@@ -65,32 +69,40 @@ function api_request($endpoint, $args = [], $method = 'POST', $headers = [], $re
     }
 
     if ($httpCode !== 200) {
-        logger()->error("API request failed: $error", 'api_errors.log', [
-            'endpoint' => $endpoint,
-            'http_code' => $httpCode,
-            'response' => substr($response, 0, 200)
-        ]);
+        // Również zamieniamy drugie wywołanie loggera
+        if (function_exists('logger') && is_object(logger())) {
+            logger()->error("API request failed: $error", 'api_errors.log', [
+                'endpoint' => $endpoint,
+                'http_code' => $httpCode,
+                'response' => substr($response, 0, 200)
+            ]);
+        } else {
+            error_log("API request failed: $error - Endpoint: $endpoint - HTTP Code: $httpCode");
+        }
         return false;
     }
 
     $data = json_decode($response, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
-        logger()->warning("Invalid JSON response", 'api_errors.log', [
-            'endpoint' => $endpoint,
-            'json_error' => json_last_error_msg(),
-            'response' => substr($response, 0, 200)
-        ]);
+        // I trzecie wywołanie loggera
+        if (function_exists('logger') && is_object(logger())) {
+            logger()->warning("Invalid JSON response", 'api_errors.log', [
+                'endpoint' => $endpoint,
+                'json_error' => json_last_error_msg(),
+                'response' => substr($response, 0, 200)
+            ]);
+        } else {
+            error_log("Invalid JSON response - Endpoint: $endpoint - Error: " . json_last_error_msg());
+        }
         return $response;
     }
 
     return $data;
 }
 
-
 function api_request_raw($endpoint, $args = [], $returnFullResponse = true) {
     return api_request($endpoint, $args, 'POST', [], $returnFullResponse);
 }
-
 
 function get_video_by_name($name) {
     return api_request_raw('wys', [$name]);
@@ -120,11 +132,9 @@ function adjust_clip($clipId, $leftAdjust, $rightAdjust) {
     return api_request_raw('d', [$clipId, $leftAdjust, $rightAdjust]);
 }
 
-
 function save_clip($clipName) {
     return api_request('z', [$clipName]);
 }
-
 
 function delete_clip($clipName) {
     return api_request('uk', [$clipName]);

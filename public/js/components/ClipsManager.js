@@ -1,4 +1,4 @@
-// public/js/components/ClipsManager.js (Fixed)
+// public/js/components/ClipsManager.js (Update Video Source)
 
 import { SELECTORS, CLASSES, MESSAGES, CLIP_SETTINGS } from '../core/constants.js';
 import { createElement } from '../core/dom-utils.js';
@@ -120,10 +120,11 @@ export class ClipsManager {
         clipElement.setAttribute('data-index', index);
         clipElement.setAttribute('data-name', clip.name);
 
+        // Zmiana źródła wideo z debug-video.php na api-video.php
         clipElement.innerHTML = `
       <div class="video-container" data-clip-id="${clip.id}" data-clip-index="${index}" data-clip-name="${clip.name}">
         <video loop preload="metadata" class="clip-video">
-          <source src="/debug-video.php?id=${encodeURIComponent(clip.name)}" type="video/mp4">
+          <source src="/api/api-video.php?endpoint=wys&id=${encodeURIComponent(clip.name)}" type="video/mp4">
         </video>
         <div class="download-btn">Pobierz</div>
       </div>

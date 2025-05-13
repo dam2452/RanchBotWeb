@@ -6,11 +6,13 @@
  */
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/response.php';
 
 // Check if current page is accessible without login
 $currentPage = $_SERVER['PHP_SELF'];
 
-// Redirect to login page if user is not logged in and page is not public
+// Użyj funkcji is_public_page z session.php lub is_public_page_auth z auth.php
+// Funkcja response.php zawiera funkcję redirect
 if ($currentPage !== '/login.php' && !is_public_page($currentPage) && !is_logged_in()) {
     session_set('return_to', $_SERVER['REQUEST_URI']);
     redirect('/login.php');

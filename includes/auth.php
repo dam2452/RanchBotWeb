@@ -1,26 +1,33 @@
 <?php
 /**
- * Autentykacja użytkownika poprzez RanchBot API
+ * Authentication management
+ *
+ * Handles user authentication against the API backend
  */
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/session.php';
+require_once __DIR__ . '/logger.php';
+require_once __DIR__ . '/api-client.php';
 
 /**
- * Uwierzytelnia użytkownika przez API RanchBot
+ * Authenticate user via API
  *
- * @param string $username Nazwa użytkownika
- * @param string $password Hasło użytkownika
- * @return array|false Dane użytkownika w przypadku powodzenia, false w przypadku niepowodzenia
+ * @param string $username Username
+ * @param string $password Password
+ * @return array|false User data if authenticated, false otherwise
  */
 function authenticate_user($username, $password) {
-    // Przygotuj dane do zapytania
+    // Prepare authentication data
     $payload = json_encode([
         'username' => $username,
         'password' => $password
     ]);
 
-    // Inicjalizacja CURL
-    $ch = curl_init('http://192.168.1.210:8077/api/v1/auth/login');
+    // API URL
+    $apiUrl = config('api.base_url') . '/auth/login';
+
+    // Initialize cURL
+    $ch = curl_init($apiUrl);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
@@ -31,58 +38,48 @@ function authenticate_user($username, $password) {
         CURLOPT_HEADER => true
     ]);
 
-    // Wykonaj zapytanie
+    // Execute request
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-    // Zapisz informacje debugowania
     $error = curl_error($ch);
     $info = curl_getinfo($ch);
     curl_close($ch);
 
-    // Utwórz plik debug.log
-    file_put_contents(
-        __DIR__ . '/../debug.log',
-        date('Y-m-d H:i:s') . " - Auth attempt for user: $username\n" .
-        "HTTP Code: $httpCode\n" .
-        "Error: $error\n" .
-        "Info: " . print_r($info, true) . "\n" .
-        "Response: " . substr($response, 0, 1000) . "\n\n",
-        FILE_APPEND
-    );
+    // Log authentication attempt
+    logger()->info("Auth attempt for user: $username", 'auth.log', [
+        'http_code' => $httpCode,
+        'error' => $error
+    ]);
 
-    // Sprawdź odpowiedź
+    // Check response
     if ($httpCode !== 200) {
         return false;
     }
 
-    // Rozdziel nagłówki od treści odpowiedzi
+    // Split headers from response body
     list($headers, $body) = explode("\r\n\r\n", $response, 2);
 
-    // Parsuj JWT token
+    // Parse JWT token
     $data = json_decode($body, true);
     if (!isset($data['access_token'])) {
         return false;
     }
 
-    // Zdekoduj JWT aby uzyskać dane użytkownika
+    // Get token and decode payload
     $token = $data['access_token'];
     $tokenParts = explode('.', $token);
     if (count($tokenParts) !== 3) {
         return false;
     }
 
+    // Decode JWT payload
     $payload = base64_decode(str_replace(['-', '_'], ['+', '/'], $tokenParts[1]));
     $userData = json_decode($payload, true);
 
-    // Zapisz token JWT do globalnej zmiennej
-    global $JWT_TOKEN;
-    $JWT_TOKEN = $token;
+    // Save JWT token
+    set_jwt_token($token);
 
-    // Zapisz token do sesji
-    $_SESSION['jwt_token'] = $token;
-
-    // Szukaj cookie refresh_token w nagłówkach
+    // Extract refresh token from cookies if present
     preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $headers, $matches);
     $cookies = [];
     foreach($matches[1] as $cookie) {
@@ -90,64 +87,67 @@ function authenticate_user($username, $password) {
         $cookies[$parts[0]] = $parts[1];
     }
 
-    // Jeśli znaleziono refresh_token, zapisz go do sesji
+    // Save refresh token if found
     if (isset($cookies['refresh_token'])) {
-        $_SESSION['refresh_token'] = $cookies['refresh_token'];
+        session_set('refresh_token', $cookies['refresh_token']);
     }
 
     return $userData;
 }
 
 /**
- * Wylogowuje użytkownika z API
+ * Logout user from API
  *
- * @return bool True jeśli wylogowanie powiodło się, false w przeciwnym razie
+ * @return bool True if logout succeeded, false otherwise
  */
 function logout_from_api() {
-    // Jeśli nie ma tokena JWT, nie ma potrzeby wylogowywania z API
-    if (!isset($_SESSION['jwt_token'])) {
+    // Skip if no JWT token in session
+    if (!session_has('jwt_token')) {
         return true;
     }
 
-    // Utwórz cookies z refresh_token, jeśli jest w sesji
+    // Get tokens
+    $jwtToken = session_get('jwt_token');
+    $refreshToken = session_get('refresh_token', '');
+
+    // Set cookie header if refresh token exists
     $cookieHeader = '';
-    if (isset($_SESSION['refresh_token'])) {
-        $cookieHeader = "Cookie: refresh_token=" . $_SESSION['refresh_token'];
+    if ($refreshToken) {
+        $cookieHeader = "Cookie: refresh_token=$refreshToken";
     }
 
-    // Inicjalizacja CURL
-    $ch = curl_init('http://192.168.1.210:8077/api/v1/auth/logout');
+    // API URL
+    $apiUrl = config('api.base_url') . '/auth/logout';
+
+    // Initialize cURL
+    $ch = curl_init($apiUrl);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
         CURLOPT_HTTPHEADER => [
             'Content-Type: application/json',
-            "Authorization: Bearer " . $_SESSION['jwt_token'],
+            "Authorization: Bearer $jwtToken",
             $cookieHeader
         ]
     ]);
 
-    // Wykonaj zapytanie
+    // Execute request
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-    // Zapisz informacje debugowania
-    file_put_contents(
-        __DIR__ . '/../debug.log',
-        date('Y-m-d H:i:s') . " - Logout attempt\n" .
-        "HTTP Code: $httpCode\n" .
-        "Response: " . $response . "\n\n",
-        FILE_APPEND
-    );
+    // Log logout attempt
+    logger()->info("Logout attempt", 'auth.log', [
+        'http_code' => $httpCode
+    ]);
 
     return $httpCode === 200;
 }
 
 /**
- * Obsługa próby logowania
+ * Handle login attempt
  *
- * @return bool True jeśli logowanie zakończone sukcesem, false w przeciwnym razie
+ * @return bool True if login succeeded, false otherwise
  */
 function handle_login_attempt() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login']) && isset($_POST['password'])) {
@@ -159,94 +159,25 @@ function handle_login_attempt() {
         if ($user) {
             login_user($user);
 
-            // Jeśli jest strona powrotu, przekieruj do niej
-            if (isset($_SESSION['return_to'])) {
-                $returnTo = $_SESSION['return_to'];
-                unset($_SESSION['return_to']);
-                header("Location: $returnTo");
-            } else {
-                header('Location: /search.php');
-            }
+            // Redirect to return page or default
+            $returnTo = session_get('return_to', config('auth.login_redirect', '/search.php'));
+            session_remove('return_to');
+
+            header("Location: $returnTo");
             exit;
-        } else {
-            return false; // Nieudane logowanie
         }
+
+        return false;
     }
 
-    return false; // Nie było próby logowania
+    return false;
 }
 
 /**
- * Funkcja pomocnicza do wykonywania zapytań do API z tokenem JWT
+ * Get user subscription info
  *
- * @param string $endpoint Endpoint API
- * @param array|object|null $data Dane do wysłania (opcjonalne)
- * @param bool $emptyObject Czy wysłać pusty obiekt {} zamiast przekształconych danych
- * @return array|false Odpowiedź API lub false w przypadku błędu
+ * @return array|false Subscription info or false on error
  */
-function call_api_with_auth($endpoint, $data = null, $emptyObject = false) {
-    $token = $_SESSION['jwt_token'] ?? null;
-    if (!$token) {
-        error_log("Brak tokenu JWT w sesji");
-        return false;
-    }
-
-    $url = "http://192.168.1.210:8077/api/v1/$endpoint";
-    $ch = curl_init($url);
-
-    $headers = [
-        'Content-Type: application/json',
-        "Authorization: Bearer $token"
-    ];
-
-    $options = [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_HTTPHEADER => $headers
-    ];
-
-    // Ustaw dane do wysłania
-    if ($emptyObject) {
-        // Wyślij dokładnie {} - pusty obiekt JSON
-        $options[CURLOPT_POSTFIELDS] = '{}';
-    } else if ($data !== null) {
-        // Domyślna struktura API: {"args": [dane]}
-        if (is_array($data) && !isset($data['args'])) {
-            $postData = ['args' => $data];
-        } else {
-            $postData = $data;
-        }
-        $options[CURLOPT_POSTFIELDS] = json_encode($postData);
-    } else {
-        // Brak danych - wyślij pusty obiekt JSON
-        $options[CURLOPT_POSTFIELDS] = '{}';
-    }
-
-    curl_setopt_array($ch, $options);
-
-    // Wykonaj zapytanie
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $error = curl_error($ch);
-    curl_close($ch);
-
-    // Logowanie do debugowania
-    error_log("API call to $url with data: " . $options[CURLOPT_POSTFIELDS]);
-    error_log("HTTP Code: $httpCode");
-    if ($error) {
-        error_log("CURL Error: $error");
-    }
-
-    if ($httpCode !== 200) {
-        error_log("API call failed with HTTP code $httpCode: " . substr($response, 0, 500));
-        return false;
-    }
-
-    $decoded = json_decode($response, true);
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        error_log("Failed to decode JSON response: " . json_last_error_msg());
-        return false;
-    }
-
-    return $decoded;
+function get_subscription_info() {
+    return api_request('sub', []);
 }

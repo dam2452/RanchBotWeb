@@ -4,7 +4,7 @@
 <main class="search-page">
     <div class="logo-wrapper">
         <a href="index.php">
-            <img src="images/logo.svg" class="logo-img" alt="RanchBot Logo" />
+            <img src="images/branding/logo.svg" class="logo-img" alt="RanchBot Logo" />
         </a>
         <h1 class="title">RanchBot</h1>
     </div>
@@ -12,7 +12,7 @@
     <form id="searchForm" class="search-container">
         <input type="text" id="quoteInput" name="query" placeholder="Enter a quote" class="search-input" required />
         <button type="submit" class="search-icon-btn" aria-label="Search">
-            <img src="images/arrow-circle-right.svg" alt="Search" />
+            <img src="images/ui/icons/arrow-circle-right.svg" alt="Search" />
         </button>
         <button type="button" class="filter-btn">Filters</button>
     </form>

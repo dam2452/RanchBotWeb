@@ -6,7 +6,7 @@ include_once __DIR__ . '/../templates/header.php';
 <main class="hero">
     <div class="left-col">
         <a href="index.php">
-            <img src="images/logo.svg" class="logo-img" alt="RanchBot Logo" />
+            <img src="images/branding/logo.svg" class="logo-img" alt="RanchBot Logo" />
         </a>
         <h1>RanchBot</h1>
         <p class="tagline">Find, cut, and share your favorite Ranczo scene — in seconds.</p>
@@ -14,10 +14,10 @@ include_once __DIR__ . '/../templates/header.php';
     </div>
 
     <div class="arrow-wrapper">
-        <img src="images/arrow.svg" class="arrow-img" alt="Arrow">
+        <img src="images/ui/icons/arrow.svg" class="arrow-img" alt="Arrow">
     </div>
     <div class="right-col">
-        <img src="images/KusyDworek.png" class="preview-img" alt="Dworek Kusy">
+        <img src="images/others/KusyDworek.png" class="preview-img" alt="Dworek Kusy">
     </div>
 </main>
 

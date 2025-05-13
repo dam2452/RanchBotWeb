@@ -35,14 +35,14 @@ include_once __DIR__ . '/../templates/header.php';
     <main>
         <section class="left">
             <a href="index.php">
-                <img src="images/logo.svg" class="logo-img" alt="RanchBot Logo" />
+                <img src="images/branding/logo.svg" class="logo-img" alt="RanchBot Logo" />
             </a>
             <h1>RanchBot</h1>
         </section>
 
         <section class="right">
             <div class="bench-container">
-                <img src="images/bench.svg" alt="Bench Graphic" class="bench-image"/>
+                <img src="images/others/bench.svg" alt="Bench Graphic" class="bench-image"/>
                 <form class="form-overlay" action="login.php" method="POST">
                     <?php if (!empty($login_error)): ?>
                         <div class="error-message"><?= htmlspecialchars($login_error) ?></div>

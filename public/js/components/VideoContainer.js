@@ -107,7 +107,8 @@ export class VideoContainer {
         btn.style.pointerEvents = 'none';
 
         try {
-            const response = await fetch(`/debug-video.php?id=${encodeURIComponent(this.clipName)}`);
+            // Zmiana z /debug-video.php na /api/api-video.php
+            const response = await fetch(`/api/api-video.php?endpoint=wys&id=${encodeURIComponent(this.clipName)}`);
 
             if (!response.ok) {
                 let errorDetails = `HTTP error! Status: ${response.status}`;

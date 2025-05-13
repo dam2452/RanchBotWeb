@@ -1,0 +1,56 @@
+/* public/css/components/search-button.css */
+
+/* Search navigation button */
+.search-nav-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    background: var(--color-title-bg);
+    color: var(--color-text-light);
+    padding: 8px 15px;
+    border-radius: var(--radius-l);
+    text-decoration: none;
+    box-shadow: 0 4px 8px var(--shadow);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+}
+
+.search-nav-button svg {
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+}
+
+.search-nav-button:hover,
+.search-nav-button.hover {
+    background: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px var(--shadow-strong);
+}
+
+.search-nav-button:hover svg,
+.search-nav-button.hover svg {
+    transform: rotate(90deg);
+}
+
+/* Mobile adjustments */
+@media screen and (max-width: 850px) {
+    .search-nav-button {
+        top: 15px;
+        right: 15px;
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+
+    .search-nav-button span {
+        display: none; /* Hide text on mobile devices, leaving only the icon */
+    }
+
+    .search-nav-button svg {
+        margin-right: 0;
+    }
+}

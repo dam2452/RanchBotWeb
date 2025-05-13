@@ -1,48 +1,17 @@
-:root {
-    --color-btn-bg: #888;
-    --color-muted: #666;
+/* public/css/search-results.css (Updated) */
 
-    --video-height-desktop: 70vh;
-    --video-width-desktop: 70vw;
-    --video-height-mobile: 65vh;
-    --video-width-mobile: 90vw;
+@import 'variables.css';
+@import 'components/layouts.css';
+@import 'components/forms.css';
+@import 'components/buttons.css';
+@import 'components/typography.css';
+@import 'components/media.css';
+@import 'components/overlays.css';
 
-    --gap-desktop: 60px;
-    --gap-mobile: 40px;
-
-    --padding-desktop: 100px 40px 40px;
-    --padding-mobile: 160px 20px 20px;
-
-    --radius-video: var(--radius-lg);
-}
-
+/* Search results specific styles */
 body {
     overflow: hidden;
 }
-
-.search-results-page {
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-    position: relative;
-}
-
-.search-container {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-    width: clamp(280px, 60vw, 720px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-
-.search-icon-btn {
-}
-
 
 .filter-btn {
     position: absolute;
@@ -50,117 +19,9 @@ body {
     right: 8px;
 }
 
-.video-reel {
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    height: 100vh;
-    scroll-behavior: smooth;
-    gap: var(--gap-desktop);
-    padding: var(--padding-desktop);
-    box-sizing: border-box;
-    scroll-snap-type: x mandatory;
-    align-items: center;
-}
-
-.reel-item {
-    flex: 0 0 auto;
-    width: var(--video-width-desktop);
-    height: var(--video-height-desktop);
-    border-radius: var(--radius-video);
-    overflow: hidden;
-    box-shadow: 0 10px 30px var(--shadow-strong);
-    scroll-snap-align: center;
-    opacity: 0.5;
-    transform: scale(0.85);
-    transition: all 0.4s ease;
-    cursor: pointer;
-    position: relative;
-}
-
-.reel-item.active {
-    opacity: 1;
-    transform: scale(1);
-    z-index: 10;
-}
-
-.reel-item video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    border-radius: var(--radius-video);
-}
-
-.download-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    z-index: 100;
-    background-color: var(--color-btn-bg);
-    color: white;
-    border: none;
-    border-radius: var(--radius-md, 8px);
-    padding: 8px 12px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    opacity: 0.8;
-    transition: opacity 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.download-btn:hover {
-    opacity: 1;
-    transform: scale(1.05);
-}
-
-.reel-item:not(.active) .download-btn {
-    opacity: 0;
-    pointer-events: none;
-}
-
-/* Make download button visible on hover for non-active items */
-.reel-item:not(.active):hover .download-btn {
-    opacity: 0.8;
-    pointer-events: auto;
-}
-
-/* Mobile adjustments */
 @media screen and (max-width: 850px) {
-    .download-btn {
-        padding: 6px 10px;
-        font-size: 12px;
-        top: 10px;
-        right: 10px;
-    }
-
-    .search-container {
-        top: 75px;
-        width: 70vw;
-    }
-
-
     .filter-btn {
         right: 8px;
         bottom: -45px;
-    }
-
-    .video-reel {
-        flex-direction: column;
-        overflow-y: auto;
-        overflow-x: hidden;
-        scroll-snap-type: y mandatory;
-        padding: var(--padding-mobile);
-        gap: var(--gap-mobile);
-        align-items: center;
-    }
-
-    .reel-item {
-        width: var(--video-width-mobile);
-        height: var(--video-height-mobile);
-        margin: 0 auto;
-        scroll-snap-align: center;
     }
 }

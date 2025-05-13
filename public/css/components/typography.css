@@ -1,0 +1,150 @@
+/* public/css/components/typography.css */
+
+/* Common typography */
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    font-weight: bold;
+    color: inherit;
+}
+
+p {
+    margin: 0 0 1em;
+    line-height: 1.5;
+}
+
+/* Page titles */
+.title {
+    font-size: var(--title-size-desktop);
+    font-weight: bold;
+    margin: 0;
+    text-align: center;
+}
+
+/* Header specific styles */
+.my-clips-header {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.my-clips-header h1 {
+    font-size: var(--font-size-title-desktop);
+    background: var(--color-title-bg);
+    color: var(--color-text-light);
+    padding: 6px 20px;
+    border-radius: var(--radius-title);
+    box-shadow: 0 6px 12px var(--shadow-strong);
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Login page typography */
+.left h1 {
+    margin-top: 20px;
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: bold;
+    color: var(--color-text-light);
+}
+
+/* Homepage typography */
+h1.homepage-title {
+    font-size: var(--title-size-desktop);
+    margin-top: 0;
+    text-align: center;
+}
+
+.tagline {
+    font-size: var(--tagline-size-desktop);
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* Common quote text */
+.quote {
+    background: var(--color-quote-bg);
+    color: var(--color-quote-text);
+    font-weight: bold;
+    font-size: var(--font-size-quote);
+    padding: 6px 12px;
+    margin-top: 10px;
+    border-radius: var(--radius-l);
+    box-shadow: 0 4px 10px var(--shadow);
+    text-align: center;
+    width: fit-content;
+    max-width: 90%;
+}
+
+/* Status messages */
+.inspector-status {
+    padding: 12px;
+    background-color: #f5f5f5;
+    color: #333;
+    font-size: 14px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-top: 1px solid #ddd;
+}
+
+.inspector-status.status-visible {
+    opacity: 1;
+}
+
+.user-welcome {
+    color: var(--color-text-light);
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+/* Inspector title */
+.inspector-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Time slider label */
+.time-slider-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Mobile adjustments */
+@media screen and (max-width: 850px) {
+    .my-clips-header {
+        top: 60px;
+    }
+
+    .my-clips-header h1 {
+        font-size: var(--font-size-title-mobile);
+        padding: 6px 15px;
+    }
+
+    .left h1 {
+        font-size: clamp(2.5rem, 10vw, 3rem);
+    }
+
+    h1.homepage-title {
+        font-size: var(--title-size-mobile);
+    }
+
+    .tagline {
+        font-size: var(--tagline-size-mobile);
+    }
+
+    .quote {
+        margin-top: 8px;
+        font-size: var(--font-size-quote-mobile);
+        padding: 6px 16px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .left h1 {
+        font-size: clamp(2rem, 8vw, 2.5rem);
+    }
+}

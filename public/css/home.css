@@ -1,35 +1,12 @@
-:root {
-    --color-btn-bg: #78a36f;
+/* public/css/home.css (Refactored) */
 
-    --radius-img: var(--radius-l);
+@import 'variables.css';
+@import 'components/layouts.css';
+@import 'components/buttons.css';
+@import 'components/typography.css';
+@import 'components/media.css';
 
-    --gap-hero-desktop: 60px;
-    --gap-hero-mobile: 20px;
-
-    --hero-padding-desktop: 40px;
-    --hero-padding-mobile: 40px 20px;
-
-    --logo-width-desktop: clamp(140px, 18vw, 240px);
-    --logo-width-mobile: clamp(100px, 14vw, 180px);
-
-    --title-size-desktop: clamp(3rem, 6vw, 5rem);
-    --title-size-mobile: clamp(2.2rem, 5vw, 4rem);
-
-    --tagline-size-desktop: clamp(1.5rem, 3vw, 2.2rem);
-    --tagline-size-mobile: clamp(1.1rem, 2.5vw, 1.8rem);
-
-    --btn-font-desktop: clamp(1.2rem, 2vw, 2rem);
-    --btn-font-mobile: clamp(1rem, 2vw, 1.6rem);
-    --btn-padding-desktop: 20px 40px;
-    --btn-padding-mobile: 16px 32px;
-
-    --arrow-width: clamp(80px, 6vw, 120px);
-    --arrow-gap: clamp(100px, 6vw, 150px);
-
-    --preview-max-width: 1080px;
-    --preview-aspect: 16 / 9;
-}
-
+/* Home page specific styles */
 body {
     overflow: hidden;
 }
@@ -41,84 +18,6 @@ main {
     padding: 0 20px;
 }
 
-.hero {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100vh;
-    padding: var(--hero-padding-desktop);
-    gap: var(--gap-hero-desktop);
-    box-sizing: border-box;
-    max-width: none;
-}
-
-.left-col, .right-col {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.logo-img {
-    width: var(--logo-width-desktop);
-    margin-bottom: 15px;
-}
-
-h1 {
-    font-size: var(--title-size-desktop);
-    margin-top: 0;
-    text-align: center;
-}
-
-.tagline {
-    font-size: var(--tagline-size-desktop);
-    text-align: center;
-    margin: 20px 0;
-}
-
-.quote-btn {
-    background-color: var(--color-btn-bg);
-    color: var(--color-text-light);
-    font-size: var(--btn-font-desktop);
-    padding: var(--btn-padding-desktop);
-    border: none;
-    border-radius: var(--radius-xl);
-    box-shadow: 0 6px 14px var(--shadow);
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.quote-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 10px 20px var(--shadow-strong);
-}
-
-.arrow-img {
-    width: var(--arrow-width);
-    aspect-ratio: 260 / 116;
-    transition: transform 0.3s ease;
-}
-
-.arrow-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: var(--arrow-gap);
-    padding: 0 10px;
-}
-
-.preview-img {
-    width: 100%;
-    max-width: var(--preview-max-width);
-    height: auto;
-    aspect-ratio: var(--preview-aspect);
-    object-fit: cover;
-    border-radius: var(--radius-img);
-    box-shadow: 0 10px 20px var(--shadow);
-}
-
 @media (min-width: 851px) {
     .hero {
         flex-direction: row;
@@ -126,63 +25,5 @@ h1 {
 
     .arrow-img {
         animation: bounce 1.5s infinite;
-    }
-
-    @keyframes bounce {
-        0%, 100% { transform: translateX(0); }
-        50% { transform: translateX(10px); }
-    }
-}
-
-@media (max-width: 850px) {
-    .hero {
-        margin-top: -20px;
-        flex-direction: column;
-        text-align: center;
-        height: auto;
-        padding: var(--hero-padding-mobile);
-        gap: var(--gap-hero-mobile);
-    }
-
-    .logo-img {
-        width: var(--logo-width-mobile);
-    }
-
-    h1 {
-        font-size: var(--title-size-mobile);
-    }
-
-    .tagline {
-        font-size: var(--tagline-size-mobile);
-    }
-
-    .quote-btn {
-        font-size: var(--btn-font-mobile);
-        padding: var(--btn-padding-mobile);
-    }
-
-    .arrow-img {
-        transform: rotate(90deg);
-        margin-top: 20px;
-        animation: bounce-rotated 1.5s infinite;
-    }
-
-    .arrow-wrapper {
-        min-width: auto;
-        padding: 0;
-        width: 100%;
-        margin-top: 20px;
-    }
-
-
-    @keyframes bounce-rotated {
-        0%, 100% { transform: rotate(90deg) translateX(0); }
-        50% { transform: rotate(90deg) translateX(10px); }
-    }
-
-    .preview-img {
-        margin-top: 30px;
-        width: 100%;
-        max-width: 100%;
     }
 }

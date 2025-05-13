@@ -1,11 +1,6 @@
-// public/js/components/PagedClipsNavigator.js
-
 import { CLASSES, SELECTORS, UI } from '../core/constants.js';
 import { isMobile, debounce } from '../core/dom-utils.js';
 
-/**
- * PagedClipsNavigator - Manages navigation between pages of clips
- */
 export class PagedClipsNavigator {
     constructor(options) {
         this.container = options.container;
@@ -14,55 +9,35 @@ export class PagedClipsNavigator {
         this.isMobile = window.innerWidth <= 850;
         this.onPageChange = options.onPageChange || (() => {});
 
-        // Create navigation UI
         this.createNavigation();
-
-        // Initialize event listeners
         this.initEventListeners();
-
-        // Show first page
         this.scrollToPage(0);
     }
 
-    /**
-     * Create navigation UI elements
-     */
     createNavigation() {
-        // Create navigation container
         this.navigationElement = document.createElement('div');
         this.navigationElement.className = 'page-navigation';
 
-        // Add navigation buttons and indicator
         this.navigationElement.innerHTML = `
-      <button class="prev-page" title="Poprzednia strona">&#10094;</button>
-      <span class="page-indicator">Strona <span class="current-page">1</span> z ${this.pages.length}</span>
-      <button class="next-page" title="Następna strona">&#10095;</button>
+      <button class="prev-page" title="Previous page">&#10094;</button>
+      <span class="page-indicator">Page <span class="current-page">1</span> of ${this.pages.length}</span>
+      <button class="next-page" title="Next page">&#10095;</button>
     `;
 
-        // Add navigation below the clips container
         this.container.parentNode.insertBefore(this.navigationElement, this.container.nextSibling);
 
-        // Store references to elements
         this.prevButton = this.navigationElement.querySelector('.prev-page');
         this.nextButton = this.navigationElement.querySelector('.next-page');
         this.pageIndicator = this.navigationElement.querySelector('.current-page');
 
-        // Add navigation button event listeners
         this.prevButton.addEventListener('click', () => this.scrollToPage(this.currentPage - 1));
         this.nextButton.addEventListener('click', () => this.scrollToPage(this.currentPage + 1));
     }
 
-    /**
-     * Initialize all event listeners
-     */
     initEventListeners() {
-        // Handle click events on the container's background
         this.container.addEventListener('click', this.handleContainerClick.bind(this));
-
-        // Handle keyboard navigation
         window.addEventListener('keydown', this.handleKeyNavigation.bind(this));
 
-        // Handle window resize
         const handleResize = debounce(() => {
             this.isMobile = window.innerWidth <= 850;
             this.adjustAfterResize();
@@ -71,12 +46,7 @@ export class PagedClipsNavigator {
         window.addEventListener('resize', handleResize);
     }
 
-    /**
-     * Handle clicks on the container background
-     * @param {MouseEvent} e - Click event
-     */
     handleContainerClick(e) {
-        // Only handle clicks directly on the container background, not on cards
         if (e.target === this.container || e.target.classList.contains('clips-reel')) {
             const rect = this.container.getBoundingClientRect();
 
@@ -92,12 +62,7 @@ export class PagedClipsNavigator {
         }
     }
 
-    /**
-     * Handle keyboard navigation
-     * @param {KeyboardEvent} e - Keyboard event
-     */
     handleKeyNavigation(e) {
-        // Skip if focus is on input fields
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
         let handled = false;
@@ -125,27 +90,20 @@ export class PagedClipsNavigator {
         }
     }
 
-    /**
-     * Scroll to a specific page
-     * @param {number} pageIndex - Index of the page to scroll to
-     */
     scrollToPage(pageIndex) {
-        // Validate page index
         if (pageIndex < 0 || pageIndex >= this.pages.length) return;
 
-        console.log(`Przewijanie do strony ${pageIndex + 1} z ${this.pages.length}`);
+        console.log(`Scrolling to page ${pageIndex + 1} of ${this.pages.length}`);
         this.currentPage = pageIndex;
 
-        // Call the page change callback
         this.onPageChange();
 
         const targetPage = this.pages[pageIndex];
         if (!targetPage) {
-            console.error(`Strona o indeksie ${pageIndex} nie istnieje w DOM.`);
+            console.error(`Page with index ${pageIndex} does not exist in DOM.`);
             return;
         }
 
-        // Scroll to the target page with appropriate axis
         if (this.isMobile) {
             this.container.scrollTo({
                 top: targetPage.offsetTop - this.container.offsetTop,
@@ -158,15 +116,10 @@ export class PagedClipsNavigator {
             });
         }
 
-        // Update page indicator
         this.updatePageIndicator();
     }
 
-    /**
-     * Update the page indicator display
-     */
     updatePageIndicator() {
-        // Update page number and button states
         if (this.pageIndicator) {
             this.pageIndicator.textContent = this.currentPage + 1;
         }
@@ -180,9 +133,6 @@ export class PagedClipsNavigator {
         }
     }
 
-    /**
-     * Adjust scroll position after resize
-     */
     adjustAfterResize() {
         console.log("Window resized, adjusting scroll position.");
         const targetPage = this.pages[this.currentPage];

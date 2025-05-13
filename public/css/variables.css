@@ -1,7 +1,4 @@
-/* public/css/variables.css (Expanded) */
-
 :root {
-    /* Main colors */
     --color-bg-start: #1aa899;
     --color-bg-end: #f2a94c;
     --color-text-light: #fff;
@@ -10,7 +7,6 @@
     --color-muted: #666;
     --color-white: #fff;
 
-    /* UI colors */
     --color-btn-bg: #888;
     --color-btn-bg-hover: #666;
     --color-btn-green: #4CAF50;
@@ -22,17 +18,14 @@
     --color-title-bg: #888;
     --color-accent: #4a69bd;
 
-    /* Form colors */
     --color-form-bg: #ffe4b5;
     --color-form-highlight: #fdda9f;
     --color-form-focus: #ffe0a3;
 
-    /* Shadows */
     --shadow: rgba(0, 0, 0, 0.1);
     --shadow-strong: rgba(0, 0, 0, 0.3);
     --shadow-heavy: rgba(0, 0, 0, 0.4);
 
-    /* Border radius */
     --radius-s: 8px;
     --radius-m: 10px;
     --radius-l: 20px;
@@ -43,7 +36,6 @@
     --form-btn-radius: var(--radius-m);
     --btn-radius-header: 0.6vw;
 
-    /* Typography */
     --font-main: 'Verdana', sans-serif;
     --font-size-title-desktop: clamp(1.5rem, 5vw, 2.4rem);
     --font-size-title-mobile: 1.2rem;
@@ -54,7 +46,6 @@
     --tagline-size-desktop: clamp(1.5rem, 3vw, 2.2rem);
     --tagline-size-mobile: clamp(1.1rem, 2.5vw, 1.8rem);
 
-    /* Layout */
     --header-padding: 15px;
     --header-gap: 10px;
     --main-gap: 20px;
@@ -75,7 +66,6 @@
     --section-gap: 60px;
     --page-padding: 60px 20px 40px;
 
-    /* Auth inputs */
     --auth-pad-v: 1vh;
     --auth-pad-h: 2.5vw;
     --actions-pad-v: 1.5vh;
@@ -85,7 +75,6 @@
     --font-auth-range: 1.4vw;
     --font-actions-max: 38px;
 
-    /* Component-specific */
     --search-btn-size: 42px;
     --clip-height-mobile: 28vh;
     --page-height-mobile: 88vh;
@@ -108,7 +97,6 @@
     --filter-btn-padding: 14px 24px;
 }
 
-/* Global resets and base styles */
 * {
     margin: 0;
     padding: 0;
@@ -133,7 +121,7 @@ body {
     overscroll-behavior: none;
 }
 
-/* Common animations */
+
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
@@ -155,7 +143,6 @@ body {
     100% { opacity: 0.7; }
 }
 
-/* Common elements */
 button {
     cursor: pointer;
     border: none;
@@ -174,7 +161,6 @@ input, select, textarea {
     font-family: inherit;
 }
 
-/* Dark mode adjustment */
 @media (prefers-color-scheme: dark) {
     body {
         background: linear-gradient(to bottom, var(--color-bg-start), var(--color-bg-end)) !important;

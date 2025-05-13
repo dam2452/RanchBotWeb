@@ -1,18 +1,13 @@
-# Enable rewrite engine
 RewriteEngine On
 
-# Set the base directory
 RewriteBase /
 
-# Allow direct access to existing files and directories
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Handle API requests explicitly
 RewriteRule ^api/clips api/clips-api.php [L]
 RewriteRule ^api/video api/api-video.php [L]
 RewriteRule ^api/json api/api-json.php [L]
 
-# Send everything else to index.php
 RewriteRule ^(.*)$ index.php [QSA,L]

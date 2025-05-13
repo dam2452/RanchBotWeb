@@ -45,7 +45,6 @@ function api_request($endpoint, $args = [], $method = 'POST', $headers = [], $re
     $httpCode = $info['http_code'];
     curl_close($ch);
 
-    // Zamieniamy wywołanie loggera na warunkowe sprawdzenie czy funkcja logger() istnieje i zwraca obiekt
     if (function_exists('logger') && is_object(logger())) {
         logger()->debug("API request to $url", 'api_requests.log', [
             'method' => $method,
@@ -54,7 +53,6 @@ function api_request($endpoint, $args = [], $method = 'POST', $headers = [], $re
             'error' => $error
         ]);
     } else {
-        // Alternatywne logowanie, jeśli logger nie jest dostępny
         error_log("API request to $url - HTTP Code: $httpCode");
     }
 
@@ -69,7 +67,6 @@ function api_request($endpoint, $args = [], $method = 'POST', $headers = [], $re
     }
 
     if ($httpCode !== 200) {
-        // Również zamieniamy drugie wywołanie loggera
         if (function_exists('logger') && is_object(logger())) {
             logger()->error("API request failed: $error", 'api_errors.log', [
                 'endpoint' => $endpoint,
@@ -84,7 +81,6 @@ function api_request($endpoint, $args = [], $method = 'POST', $headers = [], $re
 
     $data = json_decode($response, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
-        // I trzecie wywołanie loggera
         if (function_exists('logger') && is_object(logger())) {
             logger()->warning("Invalid JSON response", 'api_errors.log', [
                 'endpoint' => $endpoint,

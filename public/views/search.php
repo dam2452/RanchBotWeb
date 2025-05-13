@@ -14,7 +14,7 @@
         <button type="button" class="filter-btn">Filters</button>
     </form>
 
-    <!-- AJAX wyniki -->
+
     <div id="resultsContainer" class="results-container"></div>
     <div id="videoContainer" class="video-container" style="margin-top: 20px;"></div>
 </main>

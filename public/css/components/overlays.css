@@ -1,6 +1,3 @@
-/* public/css/components/overlays.css */
-
-/* Clip inspector */
 .clip-inspector {
     position: fixed;
     top: 0;
@@ -149,7 +146,6 @@
     background-color: #888;
 }
 
-/* Inspect button */
 .inspect-btn {
     position: absolute;
     top: 15px;
@@ -173,7 +169,6 @@
     transform: scale(1.05);
 }
 
-/* Error message */
 .error-message {
     position: fixed;
     top: 150px;
@@ -189,7 +184,6 @@
     text-align: center;
 }
 
-/* Mobile adjustments */
 @media screen and (max-width: 850px) {
     .inspector-container {
         width: 95vw;

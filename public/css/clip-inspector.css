@@ -1,11 +1,8 @@
-/* public/css/clip-inspector.css (Refactored) */
-
 @import 'variables.css';
 @import 'components/overlays.css';
 @import 'components/forms.css';
 @import 'components/buttons.css';
 
-/* Additional styles specific to clip inspector that aren't covered in components */
 .download-adjusted-clip-btn {
     width: 100%;
     background-color: #22aa22;

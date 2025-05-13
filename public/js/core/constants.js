@@ -1,37 +1,26 @@
-// public/js/core/constants.js
-
-/**
- * Application-wide constants
- */
-
-// Media query breakpoints
 export const BREAKPOINTS = {
-    MOBILE: 850, // Mobile breakpoint in pixels
+    MOBILE: 850,
 };
 
-// UI-related constants
 export const UI = {
-    ANIMATION_DURATION: 400, // Standard animation duration in ms
-    DEBOUNCE_DELAY: 250,    // Default debounce delay for resize events
+    ANIMATION_DURATION: 400,
+    DEBOUNCE_DELAY: 250,
 };
 
-// API endpoints
 export const API = {
-    SEARCH: 'sz',           // Search endpoint
-    GET_VIDEO: 'w',         // Get video endpoint
-    ADJUST_VIDEO: 'd',      // Adjust video endpoint
-    SAVE_CLIP: 'z',         // Save clip endpoint
-    DELETE_CLIP: 'uk',      // Delete clip endpoint
+    SEARCH: 'sz',
+    GET_VIDEO: 'w',
+    ADJUST_VIDEO: 'd',
+    SAVE_CLIP: 'z',
+    DELETE_CLIP: 'uk',
 };
 
-// API URLs
 export const API_URLS = {
     JSON: '/api/api-json.php',
     VIDEO: '/api/api-video.php',
     CLIPS: '/api/clips-api.php',
 };
 
-// Element selectors
 export const SELECTORS = {
     VIDEO_REEL: '.video-reel',
     CLIPS_REEL: '.clips-reel',
@@ -47,7 +36,6 @@ export const SELECTORS = {
     INSPECT_BUTTON: '.inspect-btn',
 };
 
-// CSS classes
 export const CLASSES = {
     ACTIVE: 'active',
     VISIBLE: 'visible',
@@ -57,26 +45,23 @@ export const CLASSES = {
     HOVER: 'hover',
 };
 
-// Messages
 export const MESSAGES = {
-    NO_CLIPS: 'Nie masz jeszcze żadnych klipów. Użyj wyszukiwarki cytatów, aby stworzyć swoje pierwsze klipy!',
-    EMPTY_PAGE: 'Ta strona jest teraz pusta.',
-    DELETE_CONFIRM: (name) => `Czy na pewno chcesz usunąć klip "${name}"? Tej operacji nie można cofnąć.`,
-    DELETE_ERROR: 'Nie udało się usunąć klipu:',
-    DOWNLOAD_ERROR: 'Przepraszamy, wystąpił błąd podczas pobierania wideo:',
-    LOADING_ERROR: 'Błąd ładowania',
-    CLIP_NAME_REQUIRED: 'Proszę wprowadzić nazwę klipu',
-    CLIP_ID_NOT_FOUND: 'Nie znaleziono indeksu klipu',
-    LOADING_CLIPS: 'Ładowanie klipów...',
-    PLAY_MESSAGE: 'Kliknij, aby odtworzyć',
+    NO_CLIPS: 'You don’t have any clips yet. Use the quote search to create your first clips!',
+    EMPTY_PAGE: 'This page is currently empty.',
+    DELETE_CONFIRM: (name) => `Are you sure you want to delete the clip "${name}"? This action cannot be undone.`,
+    DELETE_ERROR: 'Failed to delete clip:',
+    DOWNLOAD_ERROR: 'Sorry, an error occurred while downloading the video:',
+    LOADING_ERROR: 'Loading error',
+    CLIP_NAME_REQUIRED: 'Please enter a clip name',
+    CLIP_ID_NOT_FOUND: 'Clip index not found',
+    LOADING_CLIPS: 'Loading clips...',
+    PLAY_MESSAGE: 'Click to play',
 };
 
-// File extensions
 export const FILE_EXTENSIONS = {
     VIDEO: '.mp4',
 };
 
-// Clipping settings
 export const CLIP_SETTINGS = {
     CLIPS_PER_PAGE: {
         MOBILE: 3,

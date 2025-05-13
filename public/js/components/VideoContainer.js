@@ -1,12 +1,7 @@
-// public/js/components/VideoContainer.js
-
 import { MESSAGES, FILE_EXTENSIONS } from '../core/constants.js';
 import { getSafeFilename } from '../core/dom-utils.js';
 import { loadVideo, playVideo, removeVideoOverlays } from '../modules/video-utils.js';
 
-/**
- * VideoContainer - Manages video playback, interactions and errors
- */
 export class VideoContainer {
     constructor(container) {
         this.container = container;
@@ -20,20 +15,16 @@ export class VideoContainer {
     }
 
     init() {
-        // Attach event listeners
         this.attachEventListeners();
     }
 
     attachEventListeners() {
-        // Video event listeners
         this.video.addEventListener('ended', this.handleVideoEnd.bind(this));
 
-        // Container event listeners
         this.container.addEventListener('mouseenter', this.handleMouseEnter.bind(this));
         this.container.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
         this.container.addEventListener('click', this.handleClick.bind(this));
 
-        // Download button listener
         const downloadBtn = this.container.querySelector('.download-btn');
         if (downloadBtn) {
             downloadBtn.addEventListener('click', this.handleDownload.bind(this));
@@ -75,7 +66,6 @@ export class VideoContainer {
     }
 
     handleClick(e) {
-        // Ignore clicks on download or delete buttons
         if (e.target.classList.contains('download-btn') || e.target.closest('.delete-clip-btn')) {
             return;
         }
@@ -98,16 +88,15 @@ export class VideoContainer {
         e.preventDefault();
 
         if (!this.clipName) {
-            alert("Nie można zidentyfikować nazwy klipu do pobrania.");
+            alert("Clip name cannot be identified for download.");
             return;
         }
 
         const btn = e.target;
-        btn.textContent = 'Pobieranie...';
+        btn.textContent = 'Downloading...';
         btn.style.pointerEvents = 'none';
 
         try {
-            // Zmiana z /debug-video.php na /api/api-video.php
             const response = await fetch(`/api/api-video.php?endpoint=wys&id=${encodeURIComponent(this.clipName)}`);
 
             if (!response.ok) {
@@ -115,23 +104,23 @@ export class VideoContainer {
                 try {
                     const errorJson = await response.json();
                     errorDetails += ` - ${errorJson.error || 'Unknown server error'}`;
-                } catch (jsonError) { /* Ignore */ }
+                } catch (jsonError) { }
                 throw new Error(errorDetails);
             }
 
             const blob = await response.blob();
 
             if (!blob.type.startsWith('video/')) {
-                console.warn(`Pobrano nieoczekiwany typ MIME: ${blob.type} dla klipu ${this.clipName}.`);
+                console.warn(`Downloaded unexpected MIME type: ${blob.type} for clip ${this.clipName}.`);
             }
 
             this.downloadBlob(blob);
 
         } catch (error) {
-            console.error('Błąd podczas pobierania wideo:', error);
+            console.error('Error during video download:', error);
             alert(`${MESSAGES.DOWNLOAD_ERROR} ${error.message}`);
         } finally {
-            btn.textContent = 'Pobierz';
+            btn.textContent = 'Download';
             btn.style.pointerEvents = 'auto';
         }
     }
@@ -152,9 +141,6 @@ export class VideoContainer {
     }
 }
 
-/**
- * Create and manage all video containers on the page
- */
 export function initializeVideoContainers() {
     const containers = document.querySelectorAll('.video-container');
     const videoContainers = [];
@@ -164,7 +150,6 @@ export function initializeVideoContainers() {
         const videoContainer = new VideoContainer(container);
         videoContainers.push(videoContainer);
 
-        // Override methods to manage active state globally
         const originalPlay = videoContainer.play;
         videoContainer.play = function() {
             if (activeContainer && activeContainer !== videoContainer) {

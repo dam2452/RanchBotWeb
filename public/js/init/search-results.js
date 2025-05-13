@@ -1,15 +1,9 @@
-// public/js/init/search-results.js
-
 import { SELECTORS, CLASSES, MESSAGES } from '../core/constants.js';
 import { createElement, downloadBlob } from '../core/dom-utils.js';
 import { searchClips, getVideo } from '../modules/api-client.js';
 import { ReelNavigator } from '../modules/reel-navigator.js';
 import { ClipInspector } from '../modules/clip-inspector.js';
 
-/**
- * Search Results page initialization
- */
-// State variables
 let loadedClips = 0;
 let allResults = [];
 let observer;
@@ -17,12 +11,8 @@ let loading = false;
 let done = false;
 let reelNavigatorInstance;
 let clipInspectorInstance;
-let videoCache = {};  // Cache for video URLs
+let videoCache = {};
 
-/**
- * Load the next batch of clips
- * @param {number} batchSize - Number of clips to load
- */
 async function loadNextClips(batchSize = 3) {
     if (loading || done) return;
     loading = true;
@@ -41,15 +31,12 @@ async function loadNextClips(batchSize = 3) {
         const itemData = allResults[currentOverallIndex];
 
         try {
-            // Get video blob
             const blob = await getVideo(currentOverallIndex + 1);
             const url = URL.createObjectURL(blob);
 
-            // Cache URL for later use
             videoCache[currentOverallIndex] = url;
-            console.log(`Zapisano URL dla klipu ${currentOverallIndex} w pamięci podręcznej`);
+            console.log(`Saved URL for clip ${currentOverallIndex} in cache`);
 
-            // Create reel item
             const el = createElement('div', {
                 className: 'reel-item',
                 dataset: { idx: currentOverallIndex }
@@ -86,43 +73,36 @@ async function loadNextClips(batchSize = 3) {
     loading = false;
 }
 
-/**
- * Add inspect buttons to reel items
- */
 function addInspectButtons() {
-    console.log("Dodawanie przycisków Dostosuj...");
+    console.log("Adding Inspect buttons...");
 
     document.querySelectorAll(SELECTORS.REEL_ITEM).forEach(item => {
-        // Check if button already exists
         if (!item.querySelector(SELECTORS.INSPECT_BUTTON)) {
             const inspectBtn = createElement('button', {
                 className: 'inspect-btn'
-            }, 'Dostosuj');
+            }, 'Adjust');
 
             inspectBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
 
-                // Get clip index
                 const clipIndex = parseInt(item.dataset.idx);
                 if (isNaN(clipIndex)) {
                     console.error(MESSAGES.CLIP_ID_NOT_FOUND);
                     return;
                 }
 
-                console.log(`Kliknięto przycisk Dostosuj dla klipu o indeksie ${clipIndex}`);
+                console.log(`Adjust button clicked for clip index ${clipIndex}`);
 
-                // Use cached URL if available
                 if (videoCache[clipIndex]) {
-                    console.log(`Znaleziono URL w pamięci podręcznej: ${videoCache[clipIndex].substring(0, 50)}...`);
+                    console.log(`Found URL in cache: ${videoCache[clipIndex].substring(0, 50)}...`);
                     clipInspectorInstance.show(clipIndex, videoCache[clipIndex]);
                 } else {
-                    // Try to get URL from DOM
                     const video = item.querySelector('video');
                     if (video && video.src) {
-                        console.log(`Pobrano URL z elementu wideo: ${video.src.substring(0, 50)}...`);
+                        console.log(`Fetched URL from video element: ${video.src.substring(0, 50)}...`);
                         clipInspectorInstance.show(clipIndex, video.src);
                     } else {
-                        console.error("Nie znaleziono URL wideo w pamięci podręcznej ani w DOM!");
+                        console.error("No video URL found in cache or DOM!");
                     }
                 }
             });
@@ -132,9 +112,6 @@ function addInspectButtons() {
     });
 }
 
-/**
- * Set up intersection observer for lazy loading
- */
 function setupIntersectionObserver() {
     if (observer) observer.disconnect();
 
@@ -156,9 +133,6 @@ function setupIntersectionObserver() {
     observer.observe(lastItem);
 }
 
-/**
- * Set search query in input field
- */
 function setSearchQuery() {
     const query = new URLSearchParams(location.search).get('query');
     if (!query) return;
@@ -169,9 +143,6 @@ function setSearchQuery() {
     }
 }
 
-/**
- * Set up search form handling
- */
 function setupSearchForm() {
     const queryInput = document.getElementById('query-input');
     const searchBtn = document.querySelector('.search-icon-btn');
@@ -195,22 +166,17 @@ function setupSearchForm() {
     }
 }
 
-/**
- * Initialize the search results page
- */
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("Inicjalizacja strony wyników wyszukiwania...");
+    console.log("Initializing search results page...");
 
     try {
-        // Initialize clip inspector
-        console.log("Tworzenie instancji ClipInspector...");
+        console.log("Creating ClipInspector instance...");
         clipInspectorInstance = new ClipInspector();
-        console.log("Instancja ClipInspector utworzona pomyślnie");
+        console.log("ClipInspector instance created successfully");
     } catch (error) {
-        console.error("Błąd podczas inicjalizacji ClipInspector:", error);
+        console.error("Error initializing ClipInspector:", error);
     }
 
-    // Set up search form and query
     setSearchQuery();
     setupSearchForm();
 
@@ -226,12 +192,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-        console.log(`Wyszukiwanie: ${query}`);
+        console.log(`Searching: ${query}`);
         allResults = await searchClips(query);
-        console.log("Wyniki wyszukiwania:", allResults);
+        console.log("Search results:", allResults);
 
         if (!allResults || allResults.length === 0) {
-            reel.innerHTML = '<p>Brak wyników do wyświetlenia.</p>';
+            reel.innerHTML = '<p>No results to display.</p>';
             done = true;
             if (observer) observer.disconnect();
             return;
@@ -247,13 +213,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
     } catch (err) {
-        console.error("Błąd podczas wyszukiwania:", err);
+        console.error("Error during search:", err);
         reel.innerHTML = `<p>${err.message}</p>`;
         done = true;
         if (observer) observer.disconnect();
     }
 
-    // Handle Escape key to close inspector
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && clipInspectorInstance && clipInspectorInstance.visible) {
             clipInspectorInstance.hide();

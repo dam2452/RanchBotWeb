@@ -1,15 +1,15 @@
 <main class="page-container static-page">
     <div class="message-box info-box">
-        <h1>Odzyskiwanie hasła</h1>
+        <h1>Password Recovery</h1>
         <p class="important-message">
-            Funkcja odzyskiwania hasła jest obecnie wyłączona.
+            The password recovery feature is currently disabled.
         </p>
         <p>
-            Trwa zamknięta beta aplikacji. Aby zresetować hasło, prosimy o kontakt z administratorem.
+            The application is in closed beta. To reset your password, please contact the administrator.
         </p>
         <p class="login-link-container">
-            Pamiętasz swoje hasło?
+            Remember your password?
         </p>
-        <a href="/login" class="action-button">Zaloguj się</a>
+        <a href="/login" class="action-button">Log in</a>
     </div>
 </main>

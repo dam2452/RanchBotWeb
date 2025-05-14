@@ -1,7 +1,17 @@
+/* =====================================================
+   home.css – RanchBot / hero
+   ===================================================== */
 @import '../pages/main.css';
 
-body {
-    overflow: hidden;
+/* ---------- BASE ---------- */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;      /* blokada pozioma */
+    overflow-y: auto;        /* pion przewijalny */
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;  /* Bezpośrednie kolory z !important */
+    color: white;
 }
 
 main {
@@ -9,14 +19,256 @@ main {
     flex-direction: column;
     align-items: center;
     padding: 0 20px;
+    min-height: 100vh;
 }
 
-@media (min-width: 851px) {
+/* animacje (bez zmian) */
+.hero,.logo-img,.left-col h1,
+.preview-img,.arrow-img,.arrow-wrapper,
+.left-col,.right-col{
+    transition:all .7s ease;
+}
+
+/* =====================================================
+   DESKTOP  ≥1200 px - układ poziomy (strzałka w środku)
+   ===================================================== */
+.hero{
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:space-between;
+    gap:100px; /* Jeszcze bardziej zwiększony odstęp między kolumnami */
+    width:100%;
+    max-width:1600px;
+    margin:0 auto;
+    position:relative;
+}
+
+.left-col,.right-col{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+/* Pozycjonowanie strzałki w układzie poziomym - po prostu odsunięta */
+.arrow-wrapper{
+    position: absolute;
+    left: calc(50% - 75px); /* Przesunięta bardziej w lewo */
+    top: 50%;
+    transform: translateY(-50%); /* Tylko wyrównanie w pionie */
+    width: 80px;
+    flex: 0 0 auto;
+    z-index: 10;
+}
+
+.arrow-img{
+    width: 80px;
+    transform: none; /* bez rotacji w układzie poziomym */
+    animation: bounce 1.5s infinite;
+}
+
+/* obrazek 16:9 */
+.preview-img{
+    width:100%;
+    max-width:700px;
+    aspect-ratio:1.77;
+    object-fit:cover;
+    border-radius:min(30px,8%);
+    box-shadow:var(--box-shadow-hover);
+}
+
+/* logo + nagłówek */
+.logo-img{
+    width:clamp(200px,20vw,300px);
+    min-width:160px;
+    margin-top:30px;
+}
+.left-col h1{
+    font-size:clamp(3.5rem,6vw,7rem);
+    margin:20px 0;
+    text-align:center;
+}
+
+/* przycisk */
+.quote-btn{
+    margin-bottom:30px;
+    position:relative;
+    z-index:5;
+}
+
+/* =====================================================
+   MOBILE / TABLET  <1200 px - układ pionowy
+   ===================================================== */
+@media(max-width:1199px){
+    /* ----- elastyczny odstęp między sekcjami ----- */
+    .hero{
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        padding: 20px 0;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        height: auto;
+        overflow-x: hidden;
+    }
+
+    .left-col{
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: 600px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        order: 1;
+    }
+
+    .right-col{
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: 800px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        order: 3; /* Ważne: umieść pod strzałką */
+        margin-top: 30px; /* Odstęp od strzałki */
+    }
+
+    /* Reset stylów strzałki z desktopa */
+    .arrow-wrapper{
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        margin: 20px auto;
+        width: 60px;
+        z-index: 10;
+        order: 2; /* Ważne: umieść między left-col i right-col */
+    }
+
+    /* Strzałka w dół w mobilce */
+    .arrow-img{
+        width: 60px;
+        transform: rotate(90deg);
+        animation: bounce-rotated 1.5s infinite;
+    }
+
+    /* ----- Dostosowania odstępów ----- */
+    .quote-btn{
+        margin-bottom: 10px;
+    }
+
+    .preview-img{
+        width: 90%;
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
+    /* ----- LOGO + H1 (nie ruszamy rozmiaru, tylko margines) ----- */
+    .logo-img{width: clamp(160px, 40vw, 240px);}
+    .left-col h1{margin: 20px 0 10px;}
+}
+
+/* =====================================================
+   BREAKPOINT DLA ŚREDNICH EKRANÓW (TABLETY/ŚREDNIE TELEFONY)
+   ===================================================== */
+@media(min-width: 500px) and (max-width: 1199px) {
     .hero {
-        flex-direction: row;
+        /* Wymuszenie układu kolumnowego */
+        flex-direction: column !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
     }
 
-    .arrow-img {
-        animation: bounce 1.5s infinite;
+    .left-col, .right-col {
+        /* Wymuszenie pełnej szerokości i odstępów */
+        width: 90% !important;
+        margin: 0 auto !important;
+    }
+
+    .right-col {
+        /* Dodatkowy odstęp od góry */
+        margin-top: -20px !important;
+        order: 3 !important;
+    }
+
+    .arrow-wrapper {
+        order: 2 !important;
+        width: 60px !important;
+        margin: 20px auto !important;
+    }
+
+    .preview-img {
+        margin-top: -60px !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 }
+
+/* =====================================================
+   BREAKPOINT DLA MAŁYCH EKRANÓW (TELEFONY)
+   ===================================================== */
+@media(max-width: 480px) {
+    .arrow-wrapper {
+        margin: 8px auto !important;     /* mniej niż 20px */
+    }
+
+    .quote-btn {
+        margin-bottom: 6px !important;   /* był 10px → redukcja */
+        margin-left: 15px !important;
+        margin-right: 15px !important;
+    }
+
+    .right-col {
+        margin-top: 16px !important;     /* obrazek bliżej strzałki */
+    }
+
+    .preview-img {
+        margin-top: -80px !important;
+        width: 95vw !important;          /* pełniejsza szerokość */
+        max-width: 95vw !important;
+    }
+
+    .hero {
+        padding: 10px 0 !important;      /* mniej góra/dół */
+    }
+
+    .left-col {
+        padding: 0 15px !important;      /* marginesy z boków */
+    }
+
+    .left-col h1 {
+        font-size: clamp(2.2rem, 8vw, 5rem) !important; /* mniejszy title na małych ekranach */
+        margin: 0 15px 5px 15px !important; /* góra prawo dół lewo */
+    }
+
+    .tagline {
+        margin: 0 15px 10px 15px !important;
+        text-align: center;
+    }
+}
+
+/* =====================================================
+   DUŻE EKRANY  ≥1800 px
+   ===================================================== */
+@media (min-width: 1800px) {
+    .hero {
+        max-width: 1800px;
+    }
+
+    .logo-img {
+        width: clamp(250px, 15vw, 350px);
+    }
+
+    .left-col h1 {
+        font-size: clamp(4rem, 5vw, 8rem);
+    }
+
+    .preview-img {
+        max-width: 800px;
+    }
+}
+/* ===================================================== */

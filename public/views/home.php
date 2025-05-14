@@ -6,11 +6,12 @@
         <h1>RanchBot</h1>
         <p class="tagline">Find, cut, and share your favorite Ranczo scene — in seconds.</p>
         <button class="quote-btn" onclick="location.href='/search'">enter a quote</button>
+        <!-- Strzałka przeniesiona do left-col - będzie wychodziła z przycisku -->
+        <div class="arrow-wrapper">
+            <img src="/images/ui/icons/arrow.svg" class="arrow-img" alt="Arrow">
+        </div>
     </div>
 
-    <div class="arrow-wrapper">
-        <img src="/images/ui/icons/arrow.svg" class="arrow-img" alt="Arrow">
-    </div>
     <div class="right-col">
         <img src="/images/others/KusyDworek.png" class="preview-img" alt="Dworek Kusy">
     </div>

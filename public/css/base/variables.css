@@ -153,4 +153,18 @@
     --breakpoint-sm: 600px;
     --breakpoint-md: 850px;
     --breakpoint-lg: 1200px;
+
+    --home-hero-max-width: 1600px;
+    --home-hero-gap: 100px;
+    --home-arrow-size: 80px;
+    --home-preview-max-width: 700px;
+    --home-arrow-size-mobile: 60px;
+    --home-logo-width: clamp(200px, 20vw, 300px);
+    --home-logo-width-mobile: clamp(160px, 40vw, 240px);
+    --home-heading-size: clamp(3.5rem, 6vw, 7rem);
+    --home-heading-size-mobile: clamp(2.2rem, 8vw, 5rem);
+    --home-xxl-breakpoint: 1800px;
+    --home-sm-breakpoint: 500px;
+    --home-xs-breakpoint: 480px;
+
 }

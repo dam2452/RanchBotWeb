@@ -5,93 +5,97 @@ html, body {
     padding: 0;
     overflow: hidden;
     height: 100%;
-    background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;
-    color: white;
+    background: linear-gradient(to bottom, var(--color-bg-start), var(--color-bg-end)) !important;
+    color: var(--color-text-light);
 }
-
 
 main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 20px;
+    padding: 0 var(--space-l);
     min-height: 100vh;
 }
 
-.hero,.logo-img,.left-col h1,
-.preview-img,.arrow-img,.arrow-wrapper,
-.left-col,.right-col{
-    transition:all .7s ease;
+.hero,
+.logo-img,
+.left-col h1,
+.preview-img,
+.arrow-img,
+.arrow-wrapper,
+.left-col,
+.right-col {
+    transition: var(--transition-smooth);
 }
 
-.hero{
-    display:flex;
-    flex-direction:row;
-    align-items:center;
-    justify-content:space-between;
-    gap:100px;
-    width:100%;
-    max-width:1600px;
-    margin:0 auto;
-    position:relative;
+.hero {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--home-hero-gap);
+    width: 100%;
+    max-width: var(--home-hero-max-width);
+    margin: 0 auto;
+    position: relative;
 }
 
-.left-col,.right-col{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
+.left-col, .right-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.arrow-wrapper{
+.arrow-wrapper {
     position: absolute;
     left: calc(50% - 75px);
     top: 50%;
     transform: translateY(-50%);
-    width: 80px;
+    width: var(--home-arrow-size);
     flex: 0 0 auto;
     z-index: 10;
 }
 
-.arrow-img{
-    width: 80px;
+.arrow-img {
+    width: var(--home-arrow-size);
     transform: none;
     animation: bounce 1.5s infinite;
 }
 
-.preview-img{
-    width:100%;
-    max-width:700px;
-    aspect-ratio:1.77;
-    object-fit:cover;
-    border-radius:min(30px,8%);
-    box-shadow:var(--box-shadow-hover);
+.preview-img {
+    width: 100%;
+    max-width: var(--home-preview-max-width);
+    aspect-ratio: var(--preview-aspect);
+    object-fit: cover;
+    border-radius: min(30px, 8%);
+    box-shadow: var(--box-shadow-hover);
 }
 
-.logo-img{
-    width:clamp(200px,20vw,300px);
-    min-width:160px;
-    margin-top:30px;
+.logo-img {
+    width: var(--home-logo-width);
+    min-width: 160px;
+    margin-top: var(--space-xl);
 }
 
-.left-col h1{
-    font-size:clamp(3.5rem,6vw,7rem);
-    margin:20px 0;
-    text-align:center;
+.left-col h1 {
+    font-size: var(--home-heading-size);
+    margin: var(--space-l) 0;
+    text-align: center;
 }
 
-.quote-btn{
-    margin-bottom:30px;
-    position:relative;
-    z-index:5;
+.quote-btn {
+    margin-bottom: var(--space-xl);
+    position: relative;
+    z-index: 5;
 }
 
-@media(max-width:1199px){
-    .hero{
+@media(max-width: 1199px) {
+    .hero {
         display: flex;
         flex-direction: column;
         flex-wrap: nowrap;
-        padding: 20px 0;
+        padding: var(--space-l) 0;
         align-items: center;
         justify-content: flex-start;
         width: 100%;
@@ -99,7 +103,7 @@ main {
         overflow-x: hidden;
     }
 
-    .left-col{
+    .left-col {
         flex: 0 0 auto;
         width: 100%;
         max-width: 600px;
@@ -110,7 +114,7 @@ main {
         order: 1;
     }
 
-    .right-col{
+    .right-col {
         flex: 0 0 auto;
         width: 100%;
         max-width: 800px;
@@ -119,38 +123,38 @@ main {
         align-items: center;
         position: relative;
         order: 3;
-        margin-top: 30px;
+        margin-top: var(--space-xl);
     }
 
-    .arrow-wrapper{
+    .arrow-wrapper {
         position: relative;
         top: auto;
         left: auto;
         transform: none;
-        margin: 20px auto;
-        width: 60px;
+        margin: var(--space-l) auto;
+        width: var(--home-arrow-size-mobile);
         z-index: 10;
         order: 2;
     }
 
-    .arrow-img{
-        width: 60px;
+    .arrow-img {
+        width: var(--home-arrow-size-mobile);
         transform: rotate(90deg);
         animation: bounce-rotated 1.5s infinite;
     }
 
-    .quote-btn{
-        margin-bottom: 10px;
+    .quote-btn {
+        margin-bottom: var(--space-s);
     }
 
-    .preview-img{
+    .preview-img {
         width: 90%;
         max-width: 720px;
         margin: 0 auto;
     }
 
-    .logo-img{width: clamp(160px, 40vw, 240px);}
-    .left-col h1{margin: 20px 0 10px;}
+    .logo-img { width: var(--home-logo-width-mobile); }
+    .left-col h1 { margin: var(--space-l) 0 var(--space-s); }
 }
 
 @media(min-width: 500px) and (max-width: 1199px) {
@@ -172,8 +176,8 @@ main {
 
     .arrow-wrapper {
         order: 2 !important;
-        width: 60px !important;
-        margin: 20px auto !important;
+        width: var(--home-arrow-size-mobile) !important;
+        margin: var(--space-l) auto !important;
     }
 
     .preview-img {
@@ -185,17 +189,17 @@ main {
 
 @media(max-width: 480px) {
     .arrow-wrapper {
-        margin: 8px auto !important;
+        margin: var(--space-s) auto !important;
     }
 
     .quote-btn {
-        margin-bottom: 6px !important;
-        margin-left: 15px !important;
-        margin-right: 15px !important;
+        margin-bottom: var(--space-xs) !important;
+        margin-left: var(--space-m) !important;
+        margin-right: var(--space-m) !important;
     }
 
     .right-col {
-        margin-top: 16px !important;
+        margin-top: var(--space-m) !important;
     }
 
     .preview-img {
@@ -205,20 +209,20 @@ main {
     }
 
     .hero {
-        padding: 10px 0 !important;
+        padding: var(--space-s) 0 !important;
     }
 
     .left-col {
-        padding: 0 15px !important;
+        padding: 0 var(--space-m) !important;
     }
 
     .left-col h1 {
-        font-size: clamp(2.2rem, 8vw, 5rem) !important;
-        margin: 0 15px 5px 15px !important;
+        font-size: var(--home-heading-size-mobile) !important;
+        margin: 0 var(--space-m) var(--space-xs) var(--space-m) !important;
     }
 
     .tagline {
-        margin: 0 15px 10px 15px !important;
+        margin: 0 var(--space-m) var(--space-s) var(--space-m) !important;
         text-align: center;
     }
 }

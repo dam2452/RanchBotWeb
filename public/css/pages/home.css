@@ -3,12 +3,12 @@
 html, body {
     margin: 0;
     padding: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
-    min-height: 100vh;
+    overflow: hidden;
+    height: 100%;
     background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;
     color: white;
 }
+
 
 main {
     display: flex;

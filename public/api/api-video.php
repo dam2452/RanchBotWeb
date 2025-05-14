@@ -10,8 +10,8 @@ if (!$token) {
     exit;
 }
 
-ini_set('display_errors', 1);
-ini_set('log_errors', 1);
+ini_set('display_errors', '1');
+ini_set('log_errors', '1');
 ini_set('error_log', __DIR__ . '/../../api_video_errors.log');
 
 $log_data = [
@@ -23,14 +23,15 @@ $log_data = [
 ];
 file_put_contents(__DIR__ . '/../../api_video_requests.log', json_encode($log_data) . "\n", FILE_APPEND);
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['endpoint']) && $_GET['endpoint'] === 'wys' && isset($_GET['id'])) {
-    $clipId = $_GET['id'];
+$apiBaseUrl = rtrim(config('api.base_url'), '/');
 
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && ($_GET['endpoint'] ?? '') === 'wys' && isset($_GET['id'])) {
+    $clipId = $_GET['id'];
     $postData = json_encode(['args' => [$clipId]]);
 
     file_put_contents(__DIR__ . '/../../api_video_debug.log', "Prepared request: $postData\n", FILE_APPEND);
 
-    $ch = curl_init("http://192.168.1.210:8077/api/v1/wys");
+    $ch = curl_init("$apiBaseUrl/wys");
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
@@ -46,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['endpoint']) && $_GET['e
     $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $error = curl_error($ch);
     $info = curl_getinfo($ch);
+    curl_close($ch);
 
     $response_log = [
         'time' => date('Y-m-d H:i:s'),
@@ -58,12 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['endpoint']) && $_GET['e
     ];
     file_put_contents(__DIR__ . '/../../api_video_responses.log', json_encode($response_log, JSON_PRETTY_PRINT) . "\n", FILE_APPEND);
 
-    curl_close($ch);
-
     if ($code !== 200) {
-        $responsePreview = substr($response, 0, 500);
         file_put_contents(__DIR__ . '/../../api_video_errors.log',
-            "Error for clip $clipId: HTTP $code\nResponse: $responsePreview\n", FILE_APPEND);
+            "Error for clip $clipId: HTTP $code\nResponse: " . substr($response, 0, 500) . "\n", FILE_APPEND);
 
         http_response_code($code);
         header('Content-Type: application/json');
@@ -76,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['endpoint']) && $_GET['e
         exit;
     }
 
-    if (strpos($response, '{') === 0) {
+    if (str_starts_with($response, '{')) {
         file_put_contents(__DIR__ . '/../../api_video_errors.log',
             "JSON response instead of video for clip $clipId: $response\n", FILE_APPEND);
 
@@ -101,7 +100,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['endpoint']) && $_GET['e
     header('Content-Disposition: inline; filename="clip_' . $clipId . '.mp4"');
     echo $response;
     exit;
-} else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     $args = $input['args'] ?? null;
     $endpoint = $input['endpoint'] ?? 'w';
@@ -112,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['endpoint']) && $_GET['e
         exit;
     }
 
-    $ch = curl_init("http://192.168.1.210:8077/api/v1/$endpoint");
+    $ch = curl_init("$apiBaseUrl/$endpoint");
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
@@ -130,8 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['endpoint']) && $_GET['e
     http_response_code($code);
     echo $response;
     exit;
-} else {
-    http_response_code(400);
-    echo json_encode(['error' => 'Invalid request method or missing parameters']);
-    exit;
 }
+
+http_response_code(400);
+echo json_encode(['error' => 'Invalid request method or missing parameters']);
+exit;

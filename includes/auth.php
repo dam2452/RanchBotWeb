@@ -1,17 +1,17 @@
 <?php
 require_once __DIR__ . '/session.php';
 
-function is_public_page_auth($page) {
+function is_public_page_auth(string $page): bool {
     $publicPages = [
         '/',
         '/login',
         '/register',
         '/forgot-password'
     ];
-    return in_array($page, $publicPages);
+    return in_array($page, $publicPages, true);
 }
 
-function handle_login_attempt() {
+function handle_login_attempt(): bool {
     if (empty($_POST['login']) || empty($_POST['password'])) {
         return false;
     }
@@ -31,7 +31,7 @@ function handle_login_attempt() {
     return false;
 }
 
-function verify_credentials($login, $password) {
+function verify_credentials(string $login, string $password): array|false {
     require_once __DIR__ . '/api-client.php';
 
     $response = call_auth_api($login, $password);
@@ -71,7 +71,7 @@ function verify_credentials($login, $password) {
     return false;
 }
 
-function call_auth_api($login, $password) {
+function call_auth_api(string $login, string $password): array|false {
     try {
         $baseUrl = config('api.base_url');
         $url = $baseUrl . '/auth/login';
@@ -97,7 +97,7 @@ function call_auth_api($login, $password) {
             return false;
         }
 
-        error_log("Auth response: " . substr($response, 0, 100) . "...");
+        error_log("Auth response: " . substr((string)$response, 0, 100) . "...");
 
         return json_decode($response, true);
     } catch (Exception $e) {
@@ -106,20 +106,20 @@ function call_auth_api($login, $password) {
     }
 }
 
-function logout_user_auth() {
+function logout_user_auth(): void {
     session_remove('user_id');
     session_remove('username');
     session_remove('jwt_token');
     session_destroy();
 }
 
-function require_login_auth($redirect_url = '/login.php') {
+function require_login_auth(string $redirect_url = '/login.php'): void {
     if (!is_logged_in()) {
         redirect_auth($redirect_url);
     }
 }
 
-function redirect_auth($url) {
+function redirect_auth(string $url): never {
     header('Location: ' . $url);
     exit;
 }

@@ -1,6 +1,6 @@
 <?php
 
-function json_response($data, $statusCode = 200, $exit = true) {
+function json_response(mixed $data, int $statusCode = 200, bool $exit = true): void {
     header('Content-Type: application/json');
     http_response_code($statusCode);
     echo json_encode($data);
@@ -10,7 +10,7 @@ function json_response($data, $statusCode = 200, $exit = true) {
     }
 }
 
-function error_response($message, $statusCode = 400, $additionalData = [], $exit = true) {
+function error_response(string $message, int $statusCode = 400, array $additionalData = [], bool $exit = true): void {
     $response = array_merge([
         'status' => 'error',
         'message' => $message
@@ -19,7 +19,7 @@ function error_response($message, $statusCode = 400, $additionalData = [], $exit
     json_response($response, $statusCode, $exit);
 }
 
-function success_response($data = null, $message = null, $exit = true) {
+function success_response(mixed $data = null, ?string $message = null, bool $exit = true): void {
     $response = [
         'status' => 'success'
     ];
@@ -35,7 +35,7 @@ function success_response($data = null, $message = null, $exit = true) {
     json_response($response, 200, $exit);
 }
 
-function redirect($url, $exit = true) {
+function redirect(string $url, bool $exit = true): void {
     header("Location: $url");
 
     if ($exit) {
@@ -43,7 +43,7 @@ function redirect($url, $exit = true) {
     }
 }
 
-function file_response($content, $filename, $contentType = 'application/octet-stream', $exit = true) {
+function file_response(string $content, string $filename, string $contentType = 'application/octet-stream', bool $exit = true): void {
     if (ob_get_level()) {
         ob_end_clean();
     }
@@ -62,7 +62,7 @@ function file_response($content, $filename, $contentType = 'application/octet-st
     }
 }
 
-function video_response($content, $filename, $contentType = 'video/mp4', $exit = true) {
+function video_response(string $content, string $filename, string $contentType = 'video/mp4', bool $exit = true): void {
     if (ob_get_level()) {
         ob_end_clean();
     }

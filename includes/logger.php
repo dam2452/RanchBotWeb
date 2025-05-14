@@ -1,16 +1,16 @@
 <?php
 
 class Logger {
-    const DEBUG = 'debug';
-    const INFO = 'info';
-    const WARNING = 'warning';
-    const ERROR = 'error';
+    public const string DEBUG   = 'debug';
+    public const string INFO    = 'info';
+    public const string WARNING = 'warning';
+    public const string ERROR   = 'error';
 
     private string $logDir;
     private string $minLevel;
     private bool $enabled;
 
-    private static $levelPriority = [
+    private static array $levelPriority = [
         self::DEBUG => 0,
         self::INFO => 1,
         self::WARNING => 2,
@@ -27,7 +27,7 @@ class Logger {
         }
     }
 
-    public function log($message, $level = self::INFO, $file = 'debug.log', $context = []) {
+    public function log(string $message, string $level = self::INFO, string $file = 'debug.log', array $context = []): bool {
         if (!$this->enabled || !$this->shouldLog($level)) {
             return false;
         }
@@ -39,23 +39,23 @@ class Logger {
         return file_put_contents($this->logDir . '/' . $file, $entry, FILE_APPEND) !== false;
     }
 
-    public function debug($message, $file = 'debug.log', $context = []) {
+    public function debug(string $message, string $file = 'debug.log', array $context = []): bool {
         return $this->log($message, self::DEBUG, $file, $context);
     }
 
-    public function info($message, $file = 'debug.log', $context = []) {
+    public function info(string $message, string $file = 'debug.log', array $context = []): bool {
         return $this->log($message, self::INFO, $file, $context);
     }
 
-    public function warning($message, $file = 'debug.log', $context = []) {
+    public function warning(string $message, string $file = 'debug.log', array $context = []): bool {
         return $this->log($message, self::WARNING, $file, $context);
     }
 
-    public function error($message, $file = 'debug.log', $context = []) {
+    public function error(string $message, string $file = 'debug.log', array $context = []): bool {
         return $this->log($message, self::ERROR, $file, $context);
     }
 
-    private function shouldLog($level) {
+    private function shouldLog(string $level): bool {
         return self::$levelPriority[$level] >= self::$levelPriority[$this->minLevel];
     }
 }
@@ -63,7 +63,7 @@ class Logger {
 global $__logger_instance;
 $__logger_instance = new Logger();
 
-function logger() {
+function logger(): Logger {
     global $__logger_instance;
     return $__logger_instance;
 }

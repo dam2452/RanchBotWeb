@@ -3,7 +3,7 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/logger.php';
 
-function api_request($endpoint, $args = [], $method = 'POST', $headers = [], $returnFullResponse = false) {
+function api_request(string $endpoint, array $args = [], string $method = 'POST', array $headers = [], bool $returnFullResponse = false): array|string|false {
     $baseUrl = config('api.base_url');
     $url = $baseUrl . '/' . ltrim($endpoint, '/');
 
@@ -96,42 +96,38 @@ function api_request($endpoint, $args = [], $method = 'POST', $headers = [], $re
     return $data;
 }
 
-function api_request_raw($endpoint, $args = [], $returnFullResponse = true) {
+function api_request_raw(string $endpoint, array $args = [], bool $returnFullResponse = true): array|string|false {
     return api_request($endpoint, $args, 'POST', [], $returnFullResponse);
 }
 
-function get_video_by_name($name) {
+function get_video_by_name(string $name): array|string|false {
     return api_request_raw('wys', [$name]);
 }
 
-function get_user_clips() {
+function get_user_clips(): array|false {
     $response = api_request('mk', []);
-
     if ($response && isset($response['status']) && $response['status'] === 'success' && isset($response['data']['clips'])) {
         return $response['data']['clips'];
     }
-
     return false;
 }
 
-function search_clips($query) {
+function search_clips(string $query): array|false {
     $response = api_request('sz', [$query]);
-
     if ($response && isset($response['status']) && $response['status'] === 'success' && isset($response['data']['results'])) {
         return $response['data']['results'];
     }
-
     return false;
 }
 
-function adjust_clip($clipId, $leftAdjust, $rightAdjust) {
+function adjust_clip(string|int $clipId, int|float $leftAdjust, int|float $rightAdjust): array|string|false {
     return api_request_raw('d', [$clipId, $leftAdjust, $rightAdjust]);
 }
 
-function save_clip($clipName) {
+function save_clip(string $clipName): array|string|false {
     return api_request('z', [$clipName]);
 }
 
-function delete_clip($clipName) {
+function delete_clip(string $clipName): array|string|false {
     return api_request('uk', [$clipName]);
 }

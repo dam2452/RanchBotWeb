@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/session.php';
+require_once __DIR__ . '/../../includes/config.php';
 
 if (!is_logged_in()) {
     header('Content-Type: application/json');
@@ -21,7 +22,10 @@ if ($action === 'get_clips') {
             throw new Exception('Missing JWT token in session');
         }
 
-        $ch = curl_init('http://192.168.1.210:8077/api/v1/mk');
+        $apiBaseUrl = rtrim(config('api.base_url'), '/');
+        $url = "$apiBaseUrl/mk";
+
+        $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
@@ -29,7 +33,8 @@ if ($action === 'get_clips') {
                 'Content-Type: application/json',
                 "Authorization: Bearer $token"
             ],
-            CURLOPT_POSTFIELDS => '{}'
+            CURLOPT_POSTFIELDS => '{}',
+            CURLOPT_TIMEOUT => 30
         ]);
 
         $response = curl_exec($ch);
@@ -39,6 +44,7 @@ if ($action === 'get_clips') {
 
         file_put_contents(__DIR__ . '/../../clips_api.log',
             date('Y-m-d H:i:s') . " - GET CLIPS\n" .
+            "URL: $url\n" .
             "HTTP Code: $httpCode\n" .
             "Error: $error\n" .
             "Response: " . substr($response, 0, 100) . "...\n\n",
@@ -55,7 +61,7 @@ if ($action === 'get_clips') {
             throw new Exception('Invalid JSON response: ' . json_last_error_msg());
         }
 
-        if ($data['status'] !== 'success' || !isset($data['data']['clips'])) {
+        if (($data['status'] ?? '') !== 'success' || !isset($data['data']['clips'])) {
             throw new Exception('Invalid API response structure');
         }
 

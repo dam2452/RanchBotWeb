@@ -3,7 +3,7 @@
 const PROJECT_ROOT = __DIR__ . '/..';
 const ENV_FILE = PROJECT_ROOT . '/.env.dev';
 
-function loadEnvironmentVars() {
+function loadEnvironmentVars(): void {
     if (file_exists(ENV_FILE)) {
         $lines = file(ENV_FILE, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
@@ -24,7 +24,7 @@ loadEnvironmentVars();
 
 $config = [
     'api' => [
-        'base_url' => 'http://192.168.1.210:8077/api/v1',
+        'base_url' => rtrim(getenv('EXISTING_RANCHBOT_API_ADDRESS'), '/') . '/api/v1',
         'timeout' => 60,
     ],
 
@@ -48,13 +48,14 @@ $config = [
     ],
 ];
 
+
 $JWT_TOKEN = $config['auth']['jwt_token'];
 
 if (!$JWT_TOKEN) {
     error_log('[config] DEV_JWT_TOKEN not set – API calls will be rejected.');
 }
 
-function config($key, $default = null) {
+function config(string $key, mixed $default = null): mixed {
     global $config;
 
     $keys = explode('.', $key);

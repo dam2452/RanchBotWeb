@@ -19,7 +19,7 @@ require_once __DIR__ . '/../includes/auth.php';
         <div class="auth-buttons">
             <?php if (is_logged_in()): ?>
                 <span class="user-welcome" id="user-welcome-link" title="Kliknij, aby sprawdzić subskrypcję">
-                Witaj, <?= htmlspecialchars(session_get('username')) ?>
+                Hello, <?= htmlspecialchars(session_get('username')) ?>
             </span>
                 <div id="subscription-tooltip" class="subscription-tooltip"></div>
                 <button onclick="location.href='/my-clips'">My Clips</button>

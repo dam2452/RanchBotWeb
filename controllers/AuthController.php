@@ -4,7 +4,7 @@ require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/session.php';
 
 class AuthController extends Controller {
-    public function loginForm() {
+    public function loginForm(): void {
         if (is_logged_in()) {
             $redirect_url = session_get('return_to', '/search');
             session_remove('return_to');
@@ -18,7 +18,7 @@ class AuthController extends Controller {
         ]);
     }
 
-    public function login() {
+    public function login(): void {
         $login_error = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -38,19 +38,19 @@ class AuthController extends Controller {
         ]);
     }
 
-    public function registerForm() {
+    public function registerForm(): void {
         $this->view('register', [
             'customHead' => '<link rel="stylesheet" href="/css/register.css">',
             'pageTitle' => 'Registration - RanchBot'
         ]);
     }
 
-    public function logout() {
+    public function logout(): void {
         logout_user();
         $this->redirect('/');
     }
 
-    public function forgotPasswordForm() {
+    public function forgotPasswordForm(): void {
         $this->view('forgot-password', [
             'customHead' => '<link rel="stylesheet" href="/css/register.css">',
             'pageTitle' => 'Recover Password - RanchBot'

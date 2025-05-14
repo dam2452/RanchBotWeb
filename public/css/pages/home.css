@@ -1,16 +1,12 @@
-/* =====================================================
-   home.css – RanchBot / hero
-   ===================================================== */
 @import '../pages/main.css';
 
-/* ---------- BASE ---------- */
 html, body {
     margin: 0;
     padding: 0;
-    overflow-x: hidden;      /* blokada pozioma */
-    overflow-y: auto;        /* pion przewijalny */
+    overflow-x: hidden;
+    overflow-y: auto;
     min-height: 100vh;
-    background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;  /* Bezpośrednie kolory z !important */
+    background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;
     color: white;
 }
 
@@ -22,22 +18,18 @@ main {
     min-height: 100vh;
 }
 
-/* animacje (bez zmian) */
 .hero,.logo-img,.left-col h1,
 .preview-img,.arrow-img,.arrow-wrapper,
 .left-col,.right-col{
     transition:all .7s ease;
 }
 
-/* =====================================================
-   DESKTOP  ≥1200 px - układ poziomy (strzałka w środku)
-   ===================================================== */
 .hero{
     display:flex;
     flex-direction:row;
     align-items:center;
     justify-content:space-between;
-    gap:100px; /* Jeszcze bardziej zwiększony odstęp między kolumnami */
+    gap:100px;
     width:100%;
     max-width:1600px;
     margin:0 auto;
@@ -51,12 +43,11 @@ main {
     align-items:center;
 }
 
-/* Pozycjonowanie strzałki w układzie poziomym - po prostu odsunięta */
 .arrow-wrapper{
     position: absolute;
-    left: calc(50% - 75px); /* Przesunięta bardziej w lewo */
+    left: calc(50% - 75px);
     top: 50%;
-    transform: translateY(-50%); /* Tylko wyrównanie w pionie */
+    transform: translateY(-50%);
     width: 80px;
     flex: 0 0 auto;
     z-index: 10;
@@ -64,11 +55,10 @@ main {
 
 .arrow-img{
     width: 80px;
-    transform: none; /* bez rotacji w układzie poziomym */
+    transform: none;
     animation: bounce 1.5s infinite;
 }
 
-/* obrazek 16:9 */
 .preview-img{
     width:100%;
     max-width:700px;
@@ -78,30 +68,25 @@ main {
     box-shadow:var(--box-shadow-hover);
 }
 
-/* logo + nagłówek */
 .logo-img{
     width:clamp(200px,20vw,300px);
     min-width:160px;
     margin-top:30px;
 }
+
 .left-col h1{
     font-size:clamp(3.5rem,6vw,7rem);
     margin:20px 0;
     text-align:center;
 }
 
-/* przycisk */
 .quote-btn{
     margin-bottom:30px;
     position:relative;
     z-index:5;
 }
 
-/* =====================================================
-   MOBILE / TABLET  <1200 px - układ pionowy
-   ===================================================== */
 @media(max-width:1199px){
-    /* ----- elastyczny odstęp między sekcjami ----- */
     .hero{
         display: flex;
         flex-direction: column;
@@ -133,11 +118,10 @@ main {
         flex-direction: column;
         align-items: center;
         position: relative;
-        order: 3; /* Ważne: umieść pod strzałką */
-        margin-top: 30px; /* Odstęp od strzałki */
+        order: 3;
+        margin-top: 30px;
     }
 
-    /* Reset stylów strzałki z desktopa */
     .arrow-wrapper{
         position: relative;
         top: auto;
@@ -146,17 +130,15 @@ main {
         margin: 20px auto;
         width: 60px;
         z-index: 10;
-        order: 2; /* Ważne: umieść między left-col i right-col */
+        order: 2;
     }
 
-    /* Strzałka w dół w mobilce */
     .arrow-img{
         width: 60px;
         transform: rotate(90deg);
         animation: bounce-rotated 1.5s infinite;
     }
 
-    /* ----- Dostosowania odstępów ----- */
     .quote-btn{
         margin-bottom: 10px;
     }
@@ -167,30 +149,23 @@ main {
         margin: 0 auto;
     }
 
-    /* ----- LOGO + H1 (nie ruszamy rozmiaru, tylko margines) ----- */
     .logo-img{width: clamp(160px, 40vw, 240px);}
     .left-col h1{margin: 20px 0 10px;}
 }
 
-/* =====================================================
-   BREAKPOINT DLA ŚREDNICH EKRANÓW (TABLETY/ŚREDNIE TELEFONY)
-   ===================================================== */
 @media(min-width: 500px) and (max-width: 1199px) {
     .hero {
-        /* Wymuszenie układu kolumnowego */
         flex-direction: column !important;
         flex-wrap: nowrap !important;
         align-items: center !important;
     }
 
     .left-col, .right-col {
-        /* Wymuszenie pełnej szerokości i odstępów */
         width: 90% !important;
         margin: 0 auto !important;
     }
 
     .right-col {
-        /* Dodatkowy odstęp od góry */
         margin-top: -20px !important;
         order: 3 !important;
     }
@@ -208,41 +183,38 @@ main {
     }
 }
 
-/* =====================================================
-   BREAKPOINT DLA MAŁYCH EKRANÓW (TELEFONY)
-   ===================================================== */
 @media(max-width: 480px) {
     .arrow-wrapper {
-        margin: 8px auto !important;     /* mniej niż 20px */
+        margin: 8px auto !important;
     }
 
     .quote-btn {
-        margin-bottom: 6px !important;   /* był 10px → redukcja */
+        margin-bottom: 6px !important;
         margin-left: 15px !important;
         margin-right: 15px !important;
     }
 
     .right-col {
-        margin-top: 16px !important;     /* obrazek bliżej strzałki */
+        margin-top: 16px !important;
     }
 
     .preview-img {
         margin-top: -80px !important;
-        width: 95vw !important;          /* pełniejsza szerokość */
+        width: 95vw !important;
         max-width: 95vw !important;
     }
 
     .hero {
-        padding: 10px 0 !important;      /* mniej góra/dół */
+        padding: 10px 0 !important;
     }
 
     .left-col {
-        padding: 0 15px !important;      /* marginesy z boków */
+        padding: 0 15px !important;
     }
 
     .left-col h1 {
-        font-size: clamp(2.2rem, 8vw, 5rem) !important; /* mniejszy title na małych ekranach */
-        margin: 0 15px 5px 15px !important; /* góra prawo dół lewo */
+        font-size: clamp(2.2rem, 8vw, 5rem) !important;
+        margin: 0 15px 5px 15px !important;
     }
 
     .tagline {
@@ -251,9 +223,6 @@ main {
     }
 }
 
-/* =====================================================
-   DUŻE EKRANY  ≥1800 px
-   ===================================================== */
 @media (min-width: 1800px) {
     .hero {
         max-width: 1800px;
@@ -271,4 +240,3 @@ main {
         max-width: 800px;
     }
 }
-/* ===================================================== */

@@ -39,33 +39,25 @@ function verify_credentials(string $login, string $password): array|false {
     if ($response && isset($response['access_token'])) {
         $token = $response['access_token'];
         $jwt_parts = explode('.', $token);
-        $userData = [];
 
         if (count($jwt_parts) >= 2) {
             try {
                 $payload = json_decode(base64_decode($jwt_parts[1]), true);
-                $userData = [
+                return [
                     'user_id' => $payload['user_id'] ?? null,
                     'username' => $payload['username'] ?? $login,
                     'token' => $token
                 ];
             } catch (Exception $e) {
                 error_log('Error decoding JWT: ' . $e->getMessage());
-                $userData = [
-                    'user_id' => mt_rand(10000, 99999),
-                    'username' => $login,
-                    'token' => $token
-                ];
             }
-        } else {
-            $userData = [
-                'user_id' => mt_rand(10000, 99999),
-                'username' => $login,
-                'token' => $token
-            ];
         }
 
-        return $userData;
+        return [
+            'user_id' => mt_rand(10000, 99999),
+            'username' => $login,
+            'token' => $token
+        ];
     }
 
     return false;

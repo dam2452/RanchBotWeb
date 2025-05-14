@@ -34,7 +34,7 @@ class Logger {
 
         $timestamp = date('Y-m-d H:i:s');
         $formattedContext = empty($context) ? '' : ' - ' . json_encode($context);
-        $entry = "[{$timestamp}] [{$level}] {$message}{$formattedContext}\n";
+        $entry = "[$timestamp] [$level] $message$formattedContext\n";
 
         return file_put_contents($this->logDir . '/' . $file, $entry, FILE_APPEND) !== false;
     }

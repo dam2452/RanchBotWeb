@@ -21,7 +21,15 @@
     aspect-ratio: var(--preview-aspect);
     object-fit: cover;
     border-radius: var(--radius-img);
-    box-shadow: 0 10px 20px var(--shadow);
+    box-shadow: var(--box-shadow-strong);
+}
+
+.media-container {
+    position: relative;
+    width: 100%;
+    border-radius: var(--radius-video);
+    overflow: hidden;
+    box-shadow: var(--box-shadow-strong);
 }
 
 .video-reel {
@@ -44,7 +52,7 @@
     height: var(--video-height-desktop);
     border-radius: var(--radius-video);
     overflow: hidden;
-    box-shadow: 0 10px 30px var(--shadow-strong);
+    box-shadow: var(--box-shadow-hover);
     scroll-snap-align: center;
     opacity: 0.5;
     transform: scale(0.85);
@@ -99,11 +107,6 @@
     .arrow-img {
         animation: bounce 1.5s infinite;
     }
-
-    @keyframes bounce {
-        0%, 100% { transform: translateX(0); }
-        50% { transform: translateX(10px); }
-    }
 }
 
 @media screen and (max-width: 850px) {
@@ -119,11 +122,6 @@
         transform: rotate(90deg);
         margin-top: 20px;
         animation: bounce-rotated 1.5s infinite;
-    }
-
-    @keyframes bounce-rotated {
-        0%, 100% { transform: rotate(90deg) translateX(0); }
-        50% { transform: rotate(90deg) translateX(10px); }
     }
 
     .preview-img {

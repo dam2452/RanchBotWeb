@@ -12,7 +12,7 @@ class AuthController extends Controller {
         }
 
         $this->view('login', [
-            'customHead' => '<link rel="stylesheet" href="/css/login.css">',
+            'customHead' => '<link rel="stylesheet" href="/css/pages/login.css">',
             'pageTitle' => 'Login - RanchBot',
             'login_error' => ''
         ]);
@@ -32,7 +32,7 @@ class AuthController extends Controller {
         }
 
         $this->view('login', [
-            'customHead' => '<link rel="stylesheet" href="/css/login.css">',
+            'customHead' => '<link rel="stylesheet" href="/css/pages/login.css">',
             'pageTitle' => 'Login - RanchBot',
             'login_error' => $login_error
         ]);
@@ -40,7 +40,7 @@ class AuthController extends Controller {
 
     public function registerForm(): void {
         $this->view('register', [
-            'customHead' => '<link rel="stylesheet" href="/css/register.css">',
+            'customHead' => '<link rel="stylesheet" href="/css/pages/register.css">',
             'pageTitle' => 'Registration - RanchBot'
         ]);
     }
@@ -52,7 +52,7 @@ class AuthController extends Controller {
 
     public function forgotPasswordForm(): void {
         $this->view('forgot-password', [
-            'customHead' => '<link rel="stylesheet" href="/css/register.css">',
+            'customHead' => '<link rel="stylesheet" href="/css/pages/register.css">',
             'pageTitle' => 'Recover Password - RanchBot'
         ]);
     }

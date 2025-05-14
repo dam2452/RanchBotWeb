@@ -1,0 +1,156 @@
+:root {
+    --color-primary: #4a69bd;
+    --color-secondary: #4CAF50;
+    --color-accent: var(--color-primary);
+
+    --color-primary-light: #5a79cd;
+    --color-primary-dark: #3a59ad;
+    --color-secondary-light: #5ee271;
+    --color-secondary-dark: #45a049;
+    --color-secondary-dark-hover: #35a33a;
+
+    --color-bg-start: #1aa899;
+    --color-bg-end: #f2a94c;
+
+    --color-text-light: #fff;
+    --color-text-dark: #0c7730;
+    --color-dark: #333;
+    --color-muted: #666;
+    --color-white: #fff;
+
+    --color-success: #22aa22;
+    --color-warning: #ffb142;
+    --color-error: #e74c3c;
+    --color-info: #3498db;
+
+    --color-btn-bg: #888;
+    --color-btn-bg-hover: #666;
+    --color-btn-green: var(--color-secondary);
+    --color-btn-green-dark: var(--color-secondary-dark);
+    --color-btn-green-hover: var(--color-secondary-light);
+    --color-btn-green-hover-dark: var(--color-secondary-dark-hover);
+    --color-quote-bg: #fff;
+    --color-quote-text: #222;
+    --color-title-bg: #888;
+    --color-form-bg: #ffe4b5;
+    --color-form-highlight: #fdda9f;
+    --color-form-focus: #ffe0a3;
+
+    --gradient-primary: linear-gradient(to bottom right, var(--color-btn-green), var(--color-btn-green-dark));
+    --gradient-primary-hover: linear-gradient(to bottom right, var(--color-btn-green-hover), var(--color-btn-green-hover-dark));
+    --gradient-secondary: linear-gradient(to right, #ffffff, #d8ffd8);
+    --gradient-secondary-hover: linear-gradient(to right, #eaffea, #b0f7b0);
+    --gradient-action: linear-gradient(145deg, #6a85b6, #4a6fa5);
+    --gradient-action-hover: linear-gradient(145deg, #7a95c6, #5a7fae);
+    --gradient-form-btn: linear-gradient(to right, #fdd99d, #dcae75);
+    --gradient-form-btn-hover: linear-gradient(to right, #ffe0b3, #e0b88a);
+
+    --shadow: rgba(0, 0, 0, 0.1);
+    --shadow-strong: rgba(0, 0, 0, 0.3);
+    --shadow-heavy: rgba(0, 0, 0, 0.4);
+
+    --box-shadow-standard: 0 4px 10px var(--shadow);
+    --box-shadow-hover: 0 8px 16px var(--shadow-strong);
+    --box-shadow-active: 0 2px 4px var(--shadow);
+    --box-shadow-strong: 0 6px 14px var(--shadow);
+
+    --transition-standard: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    --transition-hover: all 0.3s ease;
+    --transition-smooth: all 0.4s ease;
+
+    --space-xs: 5px;
+    --space-s: 10px;
+    --space-m: 15px;
+    --space-l: 20px;
+    --space-xl: 30px;
+    --space-xxl: 40px;
+
+    --header-padding: var(--space-m);
+    --header-gap: var(--space-s);
+    --main-gap: var(--space-l);
+    --padding-page: 10px 5vw;
+    --padding-mobile: 60px 0 12vh;
+    --gap-video-cols: 8px;
+    --gap-video-rows: 100px;
+    --gap-mobile-videos: 2vh;
+    --gap-desktop: 60px;
+    --gap-mobile: 40px;
+    --padding-desktop: 100px 40px 40px;
+    --padding-mobile: 160px 20px 20px;
+    --gap-hero-desktop: 60px;
+    --gap-hero-mobile: 20px;
+    --hero-padding-desktop: 40px;
+    --hero-padding-mobile: 40px 20px;
+    --section-gap: 60px;
+    --page-padding: 60px 20px 40px;
+    --logo-gap: 10px;
+
+    --radius-s: 8px;
+    --radius-m: 10px;
+    --radius-l: 20px;
+    --radius-xl: 40px;
+    --radius-full: 9999px;
+
+    --radius-video: var(--radius-l);
+    --radius-title: var(--radius-xl);
+    --input-radius: var(--radius-s);
+    --form-btn-radius: var(--radius-m);
+    --btn-radius-header: 0.6vw;
+
+    --font-main: 'Verdana', sans-serif;
+
+    --font-size-xs: 0.75rem;
+    --font-size-s: 0.875rem;
+    --font-size-m: 1rem;
+    --font-size-l: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-xxl: 1.5rem;
+
+    --font-size-title-desktop: clamp(1.5rem, 5vw, 2.4rem);
+    --font-size-title-mobile: 1.2rem;
+    --font-size-quote: 1rem;
+    --font-size-quote-mobile: 0.95rem;
+    --title-size-desktop: clamp(3rem, 6vw, 5rem);
+    --title-size-mobile: clamp(2.2rem, 5vw, 4rem);
+    --tagline-size-desktop: clamp(1.5rem, 3vw, 2.2rem);
+    --tagline-size-mobile: clamp(1.1rem, 2.5vw, 1.8rem);
+    --font-size-button: clamp(1.2rem, 2vw, 2rem);
+    --font-size-button-mobile: clamp(1rem, 2vw, 1.6rem);
+
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --btn-padding-desktop: 20px 40px;
+    --btn-padding-mobile: 16px 32px;
+    --auth-pad-v: 1vh;
+    --auth-pad-h: 2.5vw;
+    --actions-pad-v: 1.5vh;
+    --actions-pad-h: 3vw;
+    --font-auth-min: 14px;
+    --font-auth-max: 16px;
+    --font-auth-range: 1.4vw;
+    --font-actions-max: 38px;
+
+    --search-btn-size: 42px;
+    --clip-height-mobile: 28vh;
+    --page-height-mobile: 88vh;
+    --video-height-desktop: 70vh;
+    --video-width-desktop: 70vw;
+    --video-height-mobile: 65vh;
+    --video-width-mobile: 90vw;
+    --logo-max-width: 280px;
+    --logo-width-desktop: clamp(140px, 18vw, 240px);
+    --logo-width-mobile: clamp(100px, 14vw, 180px);
+    --arrow-width: clamp(80px, 6vw, 120px);
+    --arrow-gap: clamp(100px, 6vw, 150px);
+    --preview-max-width: 1080px;
+    --preview-aspect: 16 / 9;
+    --filter-btn-padding: 14px 24px;
+    --search-width: clamp(280px, 60vw, 720px);
+
+    --breakpoint-sm: 600px;
+    --breakpoint-md: 850px;
+    --breakpoint-lg: 1200px;
+}

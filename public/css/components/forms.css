@@ -109,19 +109,19 @@
     border-radius: var(--form-btn-radius);
     cursor: pointer;
     color: #000;
-    box-shadow: 0 6px 12px var(--shadow-strong);
-    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    box-shadow: var(--box-shadow-strong);
+    transition: var(--transition-standard);
 }
 
 .form-overlay button:hover {
     transform: scale(1.04);
     background: linear-gradient(to right, #ffe0b3, #e0b88a);
-    box-shadow: 0 8px 20px var(--shadow-heavy);
+    box-shadow: var(--box-shadow-hover);
 }
 
 .form-overlay button:active {
     transform: scale(0.96);
-    box-shadow: 0 3px 6px var(--shadow);
+    box-shadow: var(--box-shadow-active);
 }
 
 .save-form {

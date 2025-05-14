@@ -1,3 +1,24 @@
+.btn-base {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: var(--radius-m);
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    transition: var(--transition-standard);
+    box-shadow: var(--box-shadow-standard);
+}
+
+.btn-base:hover {
+    transform: scale(1.05);
+    box-shadow: var(--box-shadow-hover);
+}
+
+.btn-base:active {
+    transform: scale(0.95);
+    box-shadow: var(--box-shadow-active);
+}
+
 .btn {
     display: inline-block;
     padding: 10px 20px;
@@ -5,18 +26,18 @@
     font-weight: bold;
     cursor: pointer;
     text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
-    box-shadow: 0 4px 10px var(--shadow);
+    transition: var(--transition-standard);
+    box-shadow: var(--box-shadow-standard);
 }
 
 .btn:hover {
     transform: scale(1.05);
-    box-shadow: 0 8px 16px var(--shadow-strong);
+    box-shadow: var(--box-shadow-hover);
 }
 
 .btn:active {
     transform: scale(0.95);
-    box-shadow: 0 2px 4px var(--shadow);
+    box-shadow: var(--box-shadow-active);
 }
 
 .btn-primary {
@@ -58,7 +79,7 @@
     font-size: 1em;
     transition: all 0.3s ease;
     margin-top: 10px;
-    box-shadow: 0 4px 10px rgba(74, 111, 165, 0.3);
+    box-shadow: var(--box-shadow-standard);
     border: none;
     cursor: pointer;
 }
@@ -67,7 +88,7 @@
 .action-button:focus {
     background: linear-gradient(145deg, #7a95c6, #5a7fae);
     transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(74, 111, 165, 0.4);
+    box-shadow: var(--box-shadow-hover);
     color: white;
     outline: none;
 }
@@ -85,36 +106,36 @@
     font-weight: bold;
     border: 1px solid #a0dba0;
     border-radius: var(--btn-radius-header);
-    box-shadow: 0 4px 10px var(--shadow);
-    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    box-shadow: var(--box-shadow-standard);
+    transition: var(--transition-standard);
 }
 
 .auth-buttons button:hover {
     transform: scale(1.05);
     background: linear-gradient(to right, #eaffea, #b0f7b0);
-    box-shadow: 0 8px 16px var(--shadow-strong);
+    box-shadow: var(--box-shadow-hover);
 }
 
 .auth-buttons button:active {
     transform: scale(0.95);
-    box-shadow: 0 2px 4px var(--shadow);
+    box-shadow: var(--box-shadow-active);
 }
 
 .quote-btn {
     background-color: var(--color-btn-bg);
     color: var(--color-text-light);
-    font-size: var(--btn-font-desktop);
+    font-size: var(--font-size-button);
     padding: var(--btn-padding-desktop);
     border: none;
     border-radius: var(--radius-xl);
-    box-shadow: 0 6px 14px var(--shadow);
+    box-shadow: var(--box-shadow-strong);
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .quote-btn:hover {
     transform: scale(1.05);
-    box-shadow: 0 10px 20px var(--shadow-strong);
+    box-shadow: var(--box-shadow-hover);
 }
 
 .filter-btn {
@@ -126,14 +147,53 @@
     border: none;
     border-radius: var(--radius-l);
     cursor: pointer;
-    box-shadow: 0 8px 16px var(--shadow-strong);
+    box-shadow: var(--box-shadow-hover);
     transition: all 0.2s ease;
     transform: rotate(5deg);
+    position: absolute;
+    bottom: -50px;
+    right: 8px;
 }
 
 .filter-btn:hover {
     transform: rotate(5deg) scale(1.08);
     background: var(--color-btn-bg-hover, #666);
+}
+
+.search-nav-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    background: var(--color-title-bg);
+    color: var(--color-text-light);
+    padding: 8px 15px;
+    border-radius: var(--radius-l);
+    text-decoration: none;
+    box-shadow: 0 4px 8px var(--shadow);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+}
+
+.search-nav-button svg {
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+}
+
+.search-nav-button:hover,
+.search-nav-button.hover {
+    background: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px var(--shadow-strong);
+}
+
+.search-nav-button:hover svg,
+.search-nav-button.hover svg {
+    transform: rotate(90deg);
 }
 
 .download-btn {
@@ -159,9 +219,109 @@
     background-color: rgba(0, 0, 0, 0.9);
 }
 
+.inspect-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 100;
+    background-color: #2266aa;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.inspect-btn:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.delete-clip-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background-color: var(--color-error);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    margin-top: 8px;
+    align-self: flex-end;
+    opacity: 0.7;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.clip-card:hover .delete-clip-btn,
+.clip-card .delete-clip-btn:hover,
+.clip-card .delete-clip-btn:focus {
+    opacity: 1;
+}
+
+.delete-clip-btn:hover {
+    background-color: #c0392b;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+.delete-clip-btn:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+}
+
+.download-adjusted-clip-btn,
+.save-clip-btn,
+.toggle-save-btn {
+    width: 100%;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.download-adjusted-clip-btn {
+    background-color: #22aa22;
+}
+
+.save-clip-btn {
+    background-color: #2266aa;
+}
+
+.toggle-save-btn {
+    background-color: #666;
+}
+
+.download-adjusted-clip-btn:hover,
+.save-clip-btn:hover,
+.toggle-save-btn:hover {
+    opacity: 0.9;
+}
+
+.toggle-save-btn:hover {
+    background-color: #888;
+}
+
 @media screen and (max-width: 850px) {
     .quote-btn {
-        font-size: var(--btn-font-mobile);
+        font-size: var(--font-size-button-mobile);
         padding: var(--btn-padding-mobile);
     }
 
@@ -179,6 +339,28 @@
 
     .action-button {
         padding: 10px 25px;
+    }
+
+    .search-nav-button {
+        top: 15px;
+        right: 15px;
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+
+    .search-nav-button span {
+        display: none;
+    }
+
+    .search-nav-button svg {
+        margin-right: 0;
+    }
+
+    .inspect-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+        top: 10px;
+        left: 10px;
     }
 }
 

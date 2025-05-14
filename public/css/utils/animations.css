@@ -1,0 +1,270 @@
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeOutScale {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+@keyframes pulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(10px); }
+}
+
+@keyframes bounceVertical {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(10px); }
+}
+
+@keyframes bounce-rotated {
+    0%, 100% { transform: rotate(90deg) translateX(0); }
+    50% { transform: rotate(90deg) translateX(10px); }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+.fade-out {
+    animation: fadeOut 0.3s ease forwards;
+}
+
+.fade-in-scale {
+    animation: fadeInScale 0.5s ease-out forwards;
+}
+
+.fade-out-scale {
+    animation: fadeOutScale 0.5s ease-out forwards;
+}
+
+.pulse {
+    animation: pulse 1.5s infinite;
+}
+
+.bounce {
+    animation: bounce 1.5s infinite;
+}
+
+.bounce-vertical {
+    animation: bounceVertical 1.5s infinite;
+}
+
+.bounce-rotated {
+    animation: bounce-rotated 1.5s infinite;
+}
+
+.spin {
+    animation: spin 0.8s linear infinite;
+}
+
+.spin-slow {
+    animation: spin 2s linear infinite;
+}
+
+.slide-in-up {
+    animation: slideInUp 0.5s ease forwards;
+}
+
+.slide-in-down {
+    animation: slideInDown 0.5s ease forwards;
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.5s ease forwards;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.5s ease forwards;
+}
+
+.anim-duration-300 {
+    animation-duration: 300ms;
+}
+
+.anim-duration-500 {
+    animation-duration: 500ms;
+}
+
+.anim-duration-1000 {
+    animation-duration: 1000ms;
+}
+
+.anim-duration-1500 {
+    animation-duration: 1500ms;
+}
+
+.anim-duration-2000 {
+    animation-duration: 2000ms;
+}
+
+.anim-delay-100 {
+    animation-delay: 100ms;
+}
+
+.anim-delay-300 {
+    animation-delay: 300ms;
+}
+
+.anim-delay-500 {
+    animation-delay: 500ms;
+}
+
+.anim-delay-700 {
+    animation-delay: 700ms;
+}
+
+.anim-delay-1000 {
+    animation-delay: 1000ms;
+}
+
+.anim-fill-forwards {
+    animation-fill-mode: forwards;
+}
+
+.anim-fill-backwards {
+    animation-fill-mode: backwards;
+}
+
+.anim-fill-both {
+    animation-fill-mode: both;
+}
+
+.anim-ease {
+    animation-timing-function: ease;
+}
+
+.anim-linear {
+    animation-timing-function: linear;
+}
+
+.anim-ease-in {
+    animation-timing-function: ease-in;
+}
+
+.anim-ease-out {
+    animation-timing-function: ease-out;
+}
+
+.anim-ease-in-out {
+    animation-timing-function: ease-in-out;
+}
+
+.anim-infinite {
+    animation-iteration-count: infinite;
+}
+
+.anim-once {
+    animation-iteration-count: 1;
+}
+
+.anim-twice {
+    animation-iteration-count: 2;
+}
+
+.anim-alternate {
+    animation-direction: alternate;
+}
+
+.anim-reverse {
+    animation-direction: reverse;
+}
+
+.anim-paused {
+    animation-play-state: paused;
+}
+
+.anim-running {
+    animation-play-state: running;
+}
+
+@media (min-width: 851px) {
+    .arrow-img {
+        animation: bounce 1.5s infinite;
+    }
+}
+
+@media (max-width: 850px) {
+    .arrow-img {
+        transform: rotate(90deg);
+        margin-top: 20px;
+        animation: bounce-rotated 1.5s infinite;
+    }
+}

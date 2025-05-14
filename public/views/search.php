@@ -14,9 +14,7 @@
         <button type="button" class="filter-btn">Filters</button>
     </form>
 
-
     <div id="resultsContainer" class="results-container"></div>
-    <div id="videoContainer" class="video-container" style="margin-top: 20px;"></div>
 </main>
 
 <script type="module" src="/js/init/search-page.js"></script><?php

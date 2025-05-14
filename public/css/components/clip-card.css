@@ -27,52 +27,6 @@
     max-width: 90%;
 }
 
-.clip-card .delete-clip-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 8px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-    margin-top: 8px;
-    align-self: flex-end;
-    opacity: 0.7;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.clip-card:hover .delete-clip-btn,
-.clip-card .delete-clip-btn:hover,
-.clip-card .delete-clip-btn:focus {
-    opacity: 1;
-}
-
-.clip-card .delete-clip-btn:hover {
-    background-color: #c0392b;
-    transform: translateY(-1px);
-    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-}
-
-.clip-card .delete-clip-btn:disabled {
-    background-color: #cccccc;
-    color: #666666;
-    cursor: not-allowed;
-    opacity: 0.6;
-    transform: none;
-    box-shadow: none;
-}
-
-.clip-card .delete-clip-btn svg {
-    width: 14px;
-    height: 14px;
-    vertical-align: middle;
-}
 
 @media screen and (max-width: 850px) {
     .clip-card {

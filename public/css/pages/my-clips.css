@@ -1,9 +1,4 @@
-@import 'variables.css';
-@import 'components/video-container.css';
-@import 'components/clip-card.css';
-@import 'components/clips-navigation.css';
-@import 'components/search-button.css';
-@import 'components/messages.css';
+@import '../pages/main.css';
 
 body {
     overflow: hidden;

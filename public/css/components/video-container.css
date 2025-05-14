@@ -9,7 +9,7 @@
 }
 
 .video-container.active {
-    box-shadow: 0 0 0 3px var(--color-accent), 0 8px 20px var(--shadow-strong);
+    box-shadow: 0 0 0 3px var(--color-accent), var(--box-shadow-hover);
 }
 
 .clip-video {
@@ -47,12 +47,6 @@
     z-index: 10;
     animation: pulse 1.5s infinite;
     pointer-events: none;
-}
-
-@keyframes pulse {
-    0% { opacity: 0.7; }
-    50% { opacity: 1; }
-    100% { opacity: 0.7; }
 }
 
 .video-error-overlay {

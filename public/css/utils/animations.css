@@ -268,3 +268,35 @@
         animation: bounce-rotated 1.5s infinite;
     }
 }
+@keyframes home-bounce {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(10px); }
+}
+
+@keyframes home-bounce-rotated {
+    0%, 100% { transform: rotate(90deg) translateX(0); }
+    50% { transform: rotate(90deg) translateX(10px); }
+}
+
+.arrow-standard {
+    animation: bounce 1.5s infinite;
+}
+
+.arrow-rotated {
+    transform: rotate(90deg);
+    animation: bounce-rotated 1.5s infinite;
+}
+
+@media (min-width: 851px) {
+    .home-arrow {
+        animation: bounce 1.5s infinite;
+    }
+}
+
+@media (max-width: 850px) {
+    .home-arrow {
+        transform: rotate(90deg);
+        margin-top: var(--space-l);
+        animation: bounce-rotated 1.5s infinite;
+    }
+}

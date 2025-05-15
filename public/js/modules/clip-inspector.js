@@ -1,4 +1,4 @@
-import { CLASSES, SELECTORS, MESSAGES, API, FILE_EXTENSIONS } from '../core/constants.js';
+import { SELECTORS, CLASSES, MESSAGES, API, FILE_EXTENSIONS } from '../core/constants.js';
 import { createElement, downloadBlob, getSafeFilename } from '../core/dom-utils.js';
 import { callApiForBlob, adjustVideo, saveClip as apiSaveClip, getVideo } from './api-client.js';
 

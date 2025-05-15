@@ -57,7 +57,7 @@ async function loadNextClips(batchSize = 3) {
 
     if (itemsAddedInThisBatch > 0 && reelNavigatorInstance) {
         reelNavigatorInstance.refresh();
-        addInspectButtons();
+        addControlButtons();
     }
 
     if (loadedClips >= allResults.length) {
@@ -73,8 +73,8 @@ async function loadNextClips(batchSize = 3) {
     loading = false;
 }
 
-function addInspectButtons() {
-    console.log("Adding Inspect buttons...");
+function addControlButtons() {
+    console.log("Adding control buttons...");
 
     document.querySelectorAll(SELECTORS.REEL_ITEM).forEach(item => {
         if (!item.querySelector(SELECTORS.INSPECT_BUTTON)) {
@@ -108,6 +108,39 @@ function addInspectButtons() {
             });
 
             item.appendChild(inspectBtn);
+        }
+
+        if (!item.querySelector('.top-download-btn')) {
+            const clipIndex = parseInt(item.dataset.idx);
+            const topDownloadBtn = createElement('button', {
+                className: 'top-download-btn'
+            }, 'Download');
+
+            topDownloadBtn.addEventListener('click', async function(e) {
+                e.stopPropagation();
+
+                if (isNaN(clipIndex)) {
+                    console.error(MESSAGES.CLIP_ID_NOT_FOUND);
+                    return;
+                }
+
+                try {
+                    topDownloadBtn.textContent = 'Downloading...';
+                    topDownloadBtn.disabled = true;
+
+                    const blob = await getVideo(clipIndex + 1);
+                    downloadBlob(blob, `video_${clipIndex + 1}.mp4`);
+
+                } catch (error) {
+                    console.error('Error during download:', error);
+                    alert('Download failed: ' + error.message);
+                } finally {
+                    topDownloadBtn.textContent = 'Download';
+                    topDownloadBtn.disabled = false;
+                }
+            });
+
+            item.appendChild(topDownloadBtn);
         }
     });
 }

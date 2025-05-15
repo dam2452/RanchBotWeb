@@ -8,8 +8,15 @@ export class ReelNavigator {
         this.container = document.querySelector(containerSelector);
         this.items = Array.from(this.container.querySelectorAll(SELECTORS.REEL_ITEM));
         this.activeIndex = 0;
-        this.firstPlayedMuted = true;
         this.videoCache = {};
+        this.scrollDebounceTimeout = null;
+        this.keyDebounceTimeout = null;
+        this.keyLocked = false;
+        this.isScrolling = false;
+        this.scrollAnimationDuration = 600;
+        this.lastKeyPressTime = 0;
+        this.blockingOverlay = null;
+        this.setupBlockingOverlay();
 
         this.attachListeners();
         this.addDownloadButtons();
@@ -23,8 +30,91 @@ export class ReelNavigator {
                 const downloadBtn = createDownloadButton(async () => {
                     await this.handleDownload(clipIndex);
                 });
-
                 item.appendChild(downloadBtn);
+            }
+        });
+    }
+
+    attachListeners() {
+        this.container.addEventListener('scroll', () => {
+            clearTimeout(this.scrollDebounceTimeout);
+            this.scrollDebounceTimeout = setTimeout(() => {
+                const idx = this.getMostCenteredItemIndex();
+                if (idx !== this.activeIndex) {
+                    this.activate(idx);
+                }
+            }, 100);
+        });
+
+        this.container.addEventListener('click', e => this.handleClick(e));
+        this.container.addEventListener('wheel', this.handleWheel.bind(this), { passive: false });
+        window.addEventListener('keydown', e => this.handleKey(e));
+        window.addEventListener('resize', () => this.centerActiveItem());
+    }
+
+    getMostCenteredItemIndex() {
+        const centerX = this.container.getBoundingClientRect().left + this.container.offsetWidth / 2;
+
+        let minDist = Infinity;
+        let bestIdx = 0;
+
+        this.items.forEach((item, i) => {
+            const box = item.getBoundingClientRect();
+            const itemCenter = box.left + box.width / 2;
+            const dist = Math.abs(centerX - itemCenter);
+            if (dist < minDist) {
+                minDist = dist;
+                bestIdx = i;
+            }
+        });
+
+        return bestIdx;
+    }
+
+
+    setupBlockingOverlay() {
+        this.blockingOverlay = document.createElement('div');
+        this.blockingOverlay.className = 'video-interaction-blocker';
+        this.blockingOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        display: none;
+        cursor: auto;
+    `;
+        document.body.appendChild(this.blockingOverlay);
+    }
+
+    navigate(delta) {
+        const newIndex = this.activeIndex + delta;
+        if (newIndex < 0 || newIndex >= this.items.length) return;
+
+        this.enableInteractionBlock();
+        this.isScrolling = true;
+        this.activate(newIndex);
+    }
+
+    enableInteractionBlock() {
+        this.blockingOverlay.style.display = 'block';
+
+        this.items.forEach(item => {
+            const vid = item.querySelector('video');
+            if (vid) {
+                vid.style.pointerEvents = 'none';
+            }
+        });
+    }
+
+    disableInteractionBlock() {
+        this.blockingOverlay.style.display = 'none';
+
+        this.items.forEach(item => {
+            const vid = item.querySelector('video');
+            if (vid) {
+                vid.style.pointerEvents = 'auto';
             }
         });
     }
@@ -32,72 +122,126 @@ export class ReelNavigator {
     activate(idx) {
         if (idx < 0 || idx >= this.items.length) return;
 
-        const oldItem = this.items[this.activeIndex];
-        oldItem.classList.remove(CLASSES.ACTIVE);
-        oldItem.querySelector('video').pause();
+        this.enableInteractionBlock();
+        this.isScrolling = true;
 
-        const newItem = this.items[idx];
-        const vid = newItem.querySelector('video');
-        newItem.classList.add(CLASSES.ACTIVE);
+        this.items.forEach(item => {
+            const vid = item.querySelector('video');
+            item.classList.remove(CLASSES.ACTIVE);
+            if (vid) {
+                vid.pause();
+                vid.muted = true;
+            }
+        });
+
+        const item = this.items[idx];
+        const vid = item.querySelector('video');
+        item.classList.add(CLASSES.ACTIVE);
         this.activeIndex = idx;
 
-        if (idx === 0 && this.firstPlayedMuted) {
-            vid.muted = true;
-            vid.play();
-        } else {
-            vid.muted = false;
-            vid.volume = 1;
-            vid.currentTime = 0;
-            vid.play();
-            this.firstPlayedMuted = false;
-        }
+        this.centerActiveItem();
 
-        centerItem(this.container, newItem);
+        clearTimeout(this.scrollAnimationTimeout);
+        this.scrollAnimationTimeout = setTimeout(() => {
+            this.isScrolling = false;
+            this.disableInteractionBlock();
+
+            if (vid) {
+                vid.muted = false;
+                vid.volume = 1;
+                vid.currentTime = 0;
+                vid.play().catch(() => {
+                    vid.muted = true;
+                    vid.play().catch(() => {});
+                });
+            }
+        }, this.scrollAnimationDuration);
+    }
+    centerActiveItem() {
+        const activeItem = this.items[this.activeIndex];
+        if (!activeItem) return;
+        centerItem(this.container, activeItem);
+    }
+
+    isItemCentered(item) {
+        const containerRect = this.container.getBoundingClientRect();
+        const itemRect = item.getBoundingClientRect();
+
+        const containerCenter = containerRect.left + containerRect.width / 2;
+        const itemCenter = itemRect.left + itemRect.width / 2;
+
+        const tolerance = 20;
+
+        return Math.abs(containerCenter - itemCenter) < tolerance;
     }
 
     handleClick(e) {
         const clicked = e.target.closest(SELECTORS.REEL_ITEM);
+
+        if (this.isScrolling) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
         const rect = this.container.getBoundingClientRect();
 
         if (clicked) {
             const idx = this.items.indexOf(clicked);
-            const vid = clicked.querySelector('video');
 
-            if (idx === this.activeIndex) {
-                if (this.activeIndex === 0 && vid.muted) {
+            const isActiveAndCentered =
+                idx === this.activeIndex &&
+                this.isItemCentered(clicked);
+
+            if (!isActiveAndCentered) {
+                this.isScrolling = true;
+                this.activate(idx);
+            } else {
+                const vid = clicked.querySelector('video');
+                if (vid.muted) {
                     vid.muted = false;
                     vid.volume = 1;
-                    this.firstPlayedMuted = false;
+                    if (vid.paused) vid.play();
                 } else {
                     vid.paused ? vid.play() : vid.pause();
                 }
-            } else {
-                this.activate(idx);
             }
         } else {
             const y = e.clientY - rect.top;
             const x = e.clientX - rect.left;
             const next = isMobile() ? (y > rect.height / 2) : (x > rect.width / 2);
-            this.activate(this.activeIndex + (next ? 1 : -1));
+            this.navigate(next ? 1 : -1);
         }
     }
+
 
     handleKey(e) {
+        const now = Date.now();
+        if (now - this.lastKeyPressTime < 500) return;
+
+        this.lastKeyPressTime = now;
+        this.keyLocked = true;
+
+        clearTimeout(this.keyDebounceTimeout);
+        this.keyDebounceTimeout = setTimeout(() => {
+            this.keyLocked = false;
+        }, 500);
+
         if (!isMobile()) {
-            if (e.key === 'ArrowRight') this.activate(this.activeIndex + 1);
-            if (e.key === 'ArrowLeft')  this.activate(this.activeIndex - 1);
+            if (e.key === 'ArrowRight') this.navigate(1);
+            if (e.key === 'ArrowLeft')  this.navigate(-1);
         } else {
-            if (e.key === 'ArrowDown') this.activate(this.activeIndex + 1);
-            if (e.key === 'ArrowUp')   this.activate(this.activeIndex - 1);
+            if (e.key === 'ArrowDown') this.navigate(1);
+            if (e.key === 'ArrowUp')   this.navigate(-1);
         }
     }
 
-    attachListeners() {
-        this.container.addEventListener('click', e => this.handleClick(e));
-        window.addEventListener('keydown', e => this.handleKey(e));
-        window.matchMedia(`(max-width:${850}px)`).addEventListener('change', () => {
-            centerItem(this.container, this.items[this.activeIndex]);
-        });
+    handleWheel(e) {
+        e.preventDefault();
+        const delta = e.deltaY || e.deltaX;
+        if (Math.abs(delta) < 20) return;
+        const direction = delta > 0 ? 1 : -1;
+        this.navigate(direction);
     }
 
     async handleDownload(clipIndex) {
@@ -111,56 +255,12 @@ export class ReelNavigator {
             downloadBlob(blob, `video_${parseInt(clipIndex) + 1}.mp4`);
         } catch (error) {
             console.error('Error during video download:', error);
-            throw error;
         }
     }
 
     refresh() {
         this.items = Array.from(this.container.querySelectorAll(SELECTORS.REEL_ITEM));
         this.addDownloadButtons();
+        this.centerActiveItem();
     }
-}
-
-export function addDownloadButtons() {
-    const reelItems = document.querySelectorAll(SELECTORS.REEL_ITEM);
-
-    reelItems.forEach(item => {
-        if (!item.querySelector(SELECTORS.DOWNLOAD_BUTTON)) {
-            const clipIndex = item.dataset.idx;
-
-            const downloadBtn = createDownloadButton(async (e) => {
-                e.stopPropagation();
-
-                if (clipIndex === undefined) {
-                    console.error(MESSAGES.CLIP_ID_NOT_FOUND);
-                    return;
-                }
-
-                try {
-                    const blob = await getVideo(parseInt(clipIndex) + 1);
-                    downloadBlob(blob, `video_${parseInt(clipIndex) + 1}.mp4`);
-                } catch (error) {
-                    console.error('Error during video download:', error);
-                    throw error;
-                }
-            });
-
-            item.appendChild(downloadBtn);
-        }
-    });
-}
-
-export function patchReelNavigator() {
-    const originalRefresh = ReelNavigator.prototype.refresh;
-    const originalConstructor = ReelNavigator.prototype.constructor;
-
-    ReelNavigator.prototype.refresh = function() {
-        originalRefresh.call(this);
-        addDownloadButtons();
-    };
-
-    ReelNavigator.prototype.constructor = function(containerSelector) {
-        originalConstructor.call(this, containerSelector);
-        addDownloadButtons();
-    };
 }

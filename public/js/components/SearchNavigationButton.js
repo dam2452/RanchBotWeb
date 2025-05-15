@@ -1,35 +1,55 @@
 import { CLASSES } from '../core/constants.js';
 import { createElement } from '../core/dom-utils.js';
+import { getIconPath } from '../core/icon-utils.js';
 
 export class SearchNavigationButton {
+    #container;
+    #button;
+
     constructor(container) {
-        this.container = container;
-        this.button = this.createButton();
-        this.addToContainer();
-        this.setupEventListeners();
+        this.#container = container;
+        this.#button = this.#createButton();
+        this.#initialize();
     }
 
-    createButton() {
-        return createElement('a', {
+    get button() {
+        return this.#button;
+    }
+
+    #initialize() {
+        this.#addToContainer();
+        this.#setupEventListeners();
+    }
+
+    #createButton() {
+        const button = createElement('a', {
             className: 'search-nav-button',
             href: 'search',
             title: 'Search for quotes'
-        }, `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"></circle>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-      </svg>
-      <span>Search for quotes</span>
-    `);
+        });
+
+        const searchIconPath = getIconPath('SEARCH');
+        const iconImg = createElement('img', {
+            src: searchIconPath,
+            alt: 'Search icon',
+            className: 'search-icon'
+        });
+
+        const textSpan = createElement('span', {}, 'Search for quotes');
+
+        button.appendChild(iconImg);
+        button.appendChild(textSpan);
+
+        return button;
     }
 
-    addToContainer() {
-        this.container.appendChild(this.button);
+    #addToContainer() {
+        this.#container.appendChild(this.#button);
     }
 
-    setupEventListeners() {
-        this.button.addEventListener('mouseenter', () => this.button.classList.add(CLASSES.HOVER));
-        this.button.addEventListener('mouseleave', () => this.button.classList.remove(CLASSES.HOVER));
+    #setupEventListeners() {
+        this.#button.addEventListener('mouseenter', () => this.#button.classList.add(CLASSES.HOVER));
+        this.#button.addEventListener('mouseleave', () => this.#button.classList.remove(CLASSES.HOVER));
     }
 }
 

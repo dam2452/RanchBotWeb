@@ -3,24 +3,44 @@ import { createElement, downloadBlob, getSafeFilename } from '../core/dom-utils.
 import { callApiForBlob, adjustVideo, saveClip as apiSaveClip, getVideo } from './api-client.js';
 
 export class ClipInspector {
+    #element;
+    #video;
+    #leftSlider;
+    #rightSlider;
+    #leftValue;
+    #rightValue;
+    #clipNameInput;
+    #saveForm;
+    #toggleSaveBtn;
+    #saveClipBtn;
+    #downloadBtn;
+    #closeBtn;
+    #statusEl;
+
+    #clipIndex = -1;
+    #clipUrl = '';
+    #originalClipUrl = '';
+    #leftAdjust = 0;
+    #rightAdjust = 0;
+
+    #previewUpdateTimeout = null;
+    #currentPreviewUrl = null;
+    #isUpdatingPreview = false;
+    #statusTimer = null;
+    #playVideoOnCanplay = null;
+    #visible = false;
+
     constructor() {
         console.log("Initializing ClipInspector (with preview)...");
-
-        this.clipIndex = -1;
-        this.clipUrl = '';
-        this.originalClipUrl = '';
-        this.leftAdjust = 0;
-        this.rightAdjust = 0;
-
-        this.previewUpdateTimeout = null;
-        this.currentPreviewUrl = null;
-        this.isUpdatingPreview = false;
-        this.visible = false;
 
         this.createInspectorElement();
         this.attachEvents();
 
         console.log("ClipInspector initialized successfully with preview handling");
+    }
+
+    get visible() {
+        return this.#visible;
     }
 
     createInspectorElement() {
@@ -32,7 +52,7 @@ export class ClipInspector {
             existingInspector.remove();
         }
 
-        this.element = createElement('div', { className: 'clip-inspector' }, `
+        this.#element = createElement('div', { className: 'clip-inspector' }, `
       <div class="inspector-overlay"></div>
       <div class="inspector-container">
         <div class="inspector-header">
@@ -68,63 +88,63 @@ export class ClipInspector {
       </div>
     `);
 
-        document.body.appendChild(this.element);
+        document.body.appendChild(this.#element);
         console.log("Inspector element created and added to document");
 
-        this.video = this.element.querySelector('video');
-        this.leftSlider = this.element.querySelector('.left-adjust');
-        this.rightSlider = this.element.querySelector('.right-adjust');
-        this.leftValue = this.element.querySelector('.left-adjust-value');
-        this.rightValue = this.element.querySelector('.right-adjust-value');
-        this.clipNameInput = this.element.querySelector('.clip-name-input');
-        this.saveForm = this.element.querySelector('.save-form');
-        this.toggleSaveBtn = this.element.querySelector('.toggle-save-btn');
-        this.saveClipBtn = this.element.querySelector('.save-clip-btn');
-        this.downloadBtn = this.element.querySelector('.download-adjusted-clip-btn');
-        this.closeBtn = this.element.querySelector('.close-inspector-btn');
-        this.statusEl = this.element.querySelector('.inspector-status');
+        this.#video = this.#element.querySelector('video');
+        this.#leftSlider = this.#element.querySelector('.left-adjust');
+        this.#rightSlider = this.#element.querySelector('.right-adjust');
+        this.#leftValue = this.#element.querySelector('.left-adjust-value');
+        this.#rightValue = this.#element.querySelector('.right-adjust-value');
+        this.#clipNameInput = this.#element.querySelector('.clip-name-input');
+        this.#saveForm = this.#element.querySelector('.save-form');
+        this.#toggleSaveBtn = this.#element.querySelector('.toggle-save-btn');
+        this.#saveClipBtn = this.#element.querySelector('.save-clip-btn');
+        this.#downloadBtn = this.#element.querySelector('.download-adjusted-clip-btn');
+        this.#closeBtn = this.#element.querySelector('.close-inspector-btn');
+        this.#statusEl = this.#element.querySelector('.inspector-status');
     }
 
     attachEvents() {
         console.log("Attaching event handlers (with preview)...");
 
-        this.leftSlider.addEventListener('input', () => {
-            this.handleSliderInput(this.leftSlider, 'leftAdjust', this.leftValue);
+        this.#leftSlider.addEventListener('input', () => {
+            this.handleSliderInput(this.#leftSlider, 'leftAdjust', this.#leftValue);
         });
 
-        this.rightSlider.addEventListener('input', () => {
-            this.handleSliderInput(this.rightSlider, 'rightAdjust', this.rightValue);
+        this.#rightSlider.addEventListener('input', () => {
+            this.handleSliderInput(this.#rightSlider, 'rightAdjust', this.#rightValue);
         });
 
-        this.toggleSaveBtn.addEventListener('click', () => {
+        this.#toggleSaveBtn.addEventListener('click', () => {
             console.log("Save clip button clicked");
-            this.saveForm.classList.toggle(CLASSES.VISIBLE);
-            if (this.saveForm.classList.contains(CLASSES.VISIBLE)) {
-                this.clipNameInput.focus();
+            this.#saveForm.classList.toggle(CLASSES.VISIBLE);
+            if (this.#saveForm.classList.contains(CLASSES.VISIBLE)) {
+                this.#clipNameInput.focus();
             }
         });
 
-        this.saveClipBtn.addEventListener('click', () => {
+        this.#saveClipBtn.addEventListener('click', () => {
             console.log("Save button clicked");
             this.saveClip();
         });
 
-        this.downloadBtn.addEventListener('click', () => {
+        this.#downloadBtn.addEventListener('click', () => {
             console.log("Download button clicked");
             this.downloadAdjustedClip();
         });
 
-        this.closeBtn.addEventListener('click', () => {
+        this.#closeBtn.addEventListener('click', () => {
             console.log("Close button clicked");
             this.hide();
         });
 
-        this.element.querySelector('.inspector-overlay').addEventListener('click', () => {
+        this.#element.querySelector('.inspector-overlay').addEventListener('click', () => {
             console.log("Overlay clicked");
             this.hide();
         });
 
-        this.clipNameInput.addEventListener('keypress', (e) => {
+        this.#clipNameInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 console.log("Enter key pressed in clip name input");
                 this.saveClip();
@@ -135,28 +155,33 @@ export class ClipInspector {
     }
 
     handleSliderInput(slider, valueProp, labelEl) {
-        this[valueProp] = parseFloat(slider.value);
-        labelEl.textContent = `${this[valueProp].toFixed(1)}s`;
+        if (valueProp === 'leftAdjust') {
+            this.#leftAdjust = parseFloat(slider.value);
+            labelEl.textContent = `${this.#leftAdjust.toFixed(1)}s`;
+        } else if (valueProp === 'rightAdjust') {
+            this.#rightAdjust = parseFloat(slider.value);
+            labelEl.textContent = `${this.#rightAdjust.toFixed(1)}s`;
+        }
         this.requestPreviewUpdate();
     }
 
     show(clipIndex, clipUrl) {
         console.log(`Opening inspector for clip ${clipIndex}, URL: ${clipUrl.substring(0, 50)}`);
-        this.clipIndex = clipIndex;
-        this.originalClipUrl = clipUrl;
+        this.#clipIndex = clipIndex;
+        this.#originalClipUrl = clipUrl;
 
         this.clearPreviewState();
 
-        this.video.src = this.originalClipUrl;
-        this.clipUrl = this.originalClipUrl;
+        this.#video.src = this.#originalClipUrl;
+        this.#clipUrl = this.#originalClipUrl;
 
         this.resetSliders();
 
-        this.saveForm.classList.remove(CLASSES.VISIBLE);
-        this.clipNameInput.value = '';
+        this.#saveForm.classList.remove(CLASSES.VISIBLE);
+        this.#clipNameInput.value = '';
 
-        this.element.classList.add(CLASSES.VISIBLE);
-        this.visible = true;
+        this.#element.classList.add(CLASSES.VISIBLE);
+        this.#visible = true;
 
         this.hideSearchContainer();
 
@@ -166,21 +191,21 @@ export class ClipInspector {
     }
 
     clearPreviewState() {
-        clearTimeout(this.previewUpdateTimeout);
-        if (this.currentPreviewUrl) {
-            URL.revokeObjectURL(this.currentPreviewUrl);
-            this.currentPreviewUrl = null;
+        clearTimeout(this.#previewUpdateTimeout);
+        if (this.#currentPreviewUrl) {
+            URL.revokeObjectURL(this.#currentPreviewUrl);
+            this.#currentPreviewUrl = null;
         }
-        this.isUpdatingPreview = false;
+        this.#isUpdatingPreview = false;
     }
 
     resetSliders() {
-        this.leftAdjust = 0;
-        this.rightAdjust = 0;
-        this.leftSlider.value = 0;
-        this.rightSlider.value = 0;
-        this.leftValue.textContent = '0.0s';
-        this.rightValue.textContent = '0.0s';
+        this.#leftAdjust = 0;
+        this.#rightAdjust = 0;
+        this.#leftSlider.value = 0;
+        this.#rightSlider.value = 0;
+        this.#leftValue.textContent = '0.0s';
+        this.#rightValue.textContent = '0.0s';
     }
 
     hideSearchContainer() {
@@ -191,27 +216,27 @@ export class ClipInspector {
     }
 
     setupPlayOnLoad() {
-        if (this.playVideoOnCanplay) {
-            this.video.removeEventListener('canplay', this.playVideoOnCanplay);
+        if (this.#playVideoOnCanplay) {
+            this.#video.removeEventListener('canplay', this.#playVideoOnCanplay);
         }
 
-        this.playVideoOnCanplay = () => {
+        this.#playVideoOnCanplay = () => {
             console.log("Video (original) ready to play");
-            this.video.play().catch(err => {
+            this.#video.play().catch(err => {
                 console.warn("Could not auto-play video:", err);
             });
         };
 
-        this.video.addEventListener('canplay', this.playVideoOnCanplay, { once: true });
+        this.#video.addEventListener('canplay', this.#playVideoOnCanplay, { once: true });
     }
 
     hide() {
         console.log("Closing inspector");
-        this.video.pause();
+        this.#video.pause();
         this.clearPreviewState();
 
-        this.element.classList.remove(CLASSES.VISIBLE);
-        this.visible = false;
+        this.#element.classList.remove(CLASSES.VISIBLE);
+        this.#visible = false;
 
         const searchContainer = document.querySelector(SELECTORS.SEARCH_CONTAINER);
         if (searchContainer) {
@@ -220,35 +245,35 @@ export class ClipInspector {
     }
 
     updateStatus(message) {
-        if (this.statusEl) {
+        if (this.#statusEl) {
             console.log(`Status: ${message}`);
-            this.statusEl.textContent = message;
-            this.statusEl.classList.add('status-visible');
+            this.#statusEl.textContent = message;
+            this.#statusEl.classList.add('status-visible');
 
-            if (this.statusTimer) clearTimeout(this.statusTimer);
-            this.statusTimer = setTimeout(() => {
-                this.statusEl.classList.remove('status-visible');
+            if (this.#statusTimer) clearTimeout(this.#statusTimer);
+            this.#statusTimer = setTimeout(() => {
+                this.#statusEl.classList.remove('status-visible');
             }, 6000);
         }
     }
 
     requestPreviewUpdate() {
-        if (this.previewUpdateTimeout) {
-            clearTimeout(this.previewUpdateTimeout);
+        if (this.#previewUpdateTimeout) {
+            clearTimeout(this.#previewUpdateTimeout);
         }
-        this.previewUpdateTimeout = setTimeout(() => {
+        this.#previewUpdateTimeout = setTimeout(() => {
             this.updatePreview();
         }, 1000);
     }
 
     async updatePreview() {
-        if (this.isUpdatingPreview) {
+        if (this.#isUpdatingPreview) {
             console.log("Preview update already in progress, skipping.");
             return;
         }
 
-        if (this.leftAdjust === 0 && this.rightAdjust === 0) {
-            if (this.video.src !== this.originalClipUrl) {
+        if (this.#leftAdjust === 0 && this.#rightAdjust === 0) {
+            if (this.#video.src !== this.#originalClipUrl) {
                 console.log("No adjustments, restoring original clip in preview.");
                 this.revertToOriginalPreview();
             } else {
@@ -257,13 +282,13 @@ export class ClipInspector {
             return;
         }
 
-        this.isUpdatingPreview = true;
+        this.#isUpdatingPreview = true;
         this.updateStatus('Updating preview...');
-        console.log(`Starting preview update for L:${this.leftAdjust}, R:${this.rightAdjust}`);
+        console.log(`Starting preview update for L:${this.#leftAdjust}, R:${this.#rightAdjust}`);
 
         try {
-            const clipIndexForApi = parseInt(this.clipIndex) + 1;
-            const previewBlob = await adjustVideo(clipIndexForApi, this.leftAdjust, this.rightAdjust);
+            const clipIndexForApi = parseInt(this.#clipIndex) + 1;
+            const previewBlob = await adjustVideo(clipIndexForApi, this.#leftAdjust, this.#rightAdjust);
 
             if (!previewBlob || previewBlob.size === 0) {
                 throw new Error("API /d returned empty blob for preview.");
@@ -271,75 +296,75 @@ export class ClipInspector {
 
             console.log("Received preview blob, size:", previewBlob.size);
 
-            if (this.currentPreviewUrl) {
-                console.log("Releasing previous preview URL:", this.currentPreviewUrl.substring(0, 50));
-                URL.revokeObjectURL(this.currentPreviewUrl);
+            if (this.#currentPreviewUrl) {
+                console.log("Releasing previous preview URL:", this.#currentPreviewUrl.substring(0, 50));
+                URL.revokeObjectURL(this.#currentPreviewUrl);
             }
 
-            this.currentPreviewUrl = URL.createObjectURL(previewBlob);
-            console.log("Created new preview URL:", this.currentPreviewUrl.substring(0, 50));
+            this.#currentPreviewUrl = URL.createObjectURL(previewBlob);
+            console.log("Created new preview URL:", this.#currentPreviewUrl.substring(0, 50));
 
-            const currentTime = this.video.currentTime;
-            const isPaused = this.video.paused;
+            const currentTime = this.#video.currentTime;
+            const isPaused = this.#video.paused;
 
-            this.video.src = this.currentPreviewUrl;
-            this.clipUrl = this.currentPreviewUrl;
-            this.video.load();
+            this.#video.src = this.#currentPreviewUrl;
+            this.#clipUrl = this.#currentPreviewUrl;
+            this.#video.load();
 
-            this.video.addEventListener('loadeddata', () => {
+            this.#video.addEventListener('loadeddata', () => {
                 console.log("New video data loaded, restoring time:", currentTime);
                 setTimeout(() => {
-                    this.video.currentTime = currentTime;
+                    this.#video.currentTime = currentTime;
                     if (!isPaused) {
-                        this.video.play().catch(e => console.warn("Autoplay failed after preview update:", e));
+                        this.#video.play().catch(e => console.warn("Autoplay failed after preview update:", e));
                     }
                 }, 50);
                 this.updateStatus('Preview updated.');
-                this.isUpdatingPreview = false;
+                this.#isUpdatingPreview = false;
             }, { once: true });
 
-            this.video.addEventListener('error', (e) => {
+            this.#video.addEventListener('error', (e) => {
                 console.error("Error loading new preview video source:", e);
                 this.updateStatus('Error loading preview.');
                 this.revertToOriginalPreview();
-                this.isUpdatingPreview = false;
+                this.#isUpdatingPreview = false;
             }, { once: true });
 
         } catch (error) {
             console.error('Error during preview update:', error);
             this.updateStatus(`Preview update error: ${error.message}`);
-            this.isUpdatingPreview = false;
+            this.#isUpdatingPreview = false;
         }
     }
 
     revertToOriginalPreview() {
-        console.log("Reverting to original preview URL:", this.originalClipUrl.substring(0, 50));
+        console.log("Reverting to original preview URL:", this.#originalClipUrl.substring(0, 50));
 
-        if (this.currentPreviewUrl && this.currentPreviewUrl !== this.originalClipUrl) {
-            URL.revokeObjectURL(this.currentPreviewUrl);
-            this.currentPreviewUrl = null;
+        if (this.#currentPreviewUrl && this.#currentPreviewUrl !== this.#originalClipUrl) {
+            URL.revokeObjectURL(this.#currentPreviewUrl);
+            this.#currentPreviewUrl = null;
         }
 
-        if (this.video.src !== this.originalClipUrl) {
-            const currentTime = this.video.currentTime;
-            const isPaused = this.video.paused;
+        if (this.#video.src !== this.#originalClipUrl) {
+            const currentTime = this.#video.currentTime;
+            const isPaused = this.#video.paused;
 
-            this.video.src = this.originalClipUrl;
-            this.clipUrl = this.originalClipUrl;
-            this.video.load();
+            this.#video.src = this.#originalClipUrl;
+            this.#clipUrl = this.#originalClipUrl;
+            this.#video.load();
 
-            this.video.addEventListener('loadeddata', () => {
+            this.#video.addEventListener('loadeddata', () => {
                 console.log("Original video data loaded, restoring time:", currentTime);
                 setTimeout(() => {
-                    this.video.currentTime = currentTime;
+                    this.#video.currentTime = currentTime;
                     if (!isPaused) {
-                        this.video.play().catch(e => console.warn("Autoplay failed after restoring original:", e));
+                        this.#video.play().catch(e => console.warn("Autoplay failed after restoring original:", e));
                     }
                 }, 50);
                 this.updateStatus('Original clip restored.');
             }, { once: true });
 
-            this.video.addEventListener('error', (e) => {
+            this.#video.addEventListener('error', (e) => {
                 console.error("Error loading original video source:", e);
                 this.updateStatus('Error loading original clip.');
             }, { once: true });
@@ -349,7 +374,7 @@ export class ClipInspector {
     }
 
     async saveClip() {
-        const clipName = this.clipNameInput.value.trim();
+        const clipName = this.#clipNameInput.value.trim();
         if (!clipName) {
             this.updateStatus(MESSAGES.CLIP_NAME_REQUIRED);
             return;
@@ -366,8 +391,8 @@ export class ClipInspector {
 
             if (response && response.status === 'success') {
                 this.updateStatus(`Clip "${clipName}" saved successfully!`);
-                this.saveForm.classList.remove(CLASSES.VISIBLE);
-                this.clipNameInput.value = '';
+                this.#saveForm.classList.remove(CLASSES.VISIBLE);
+                this.#clipNameInput.value = '';
             } else {
                 const errorMessage = response?.message || 'Unknown save error.';
                 throw new Error(`Save failed: ${errorMessage}`);
@@ -380,20 +405,20 @@ export class ClipInspector {
 
     async adjustClip() {
         try {
-            if (this.leftAdjust === 0 && this.rightAdjust === 0) {
+            if (this.#leftAdjust === 0 && this.#rightAdjust === 0) {
                 console.log("No adjustments, no need to call /d");
                 return null;
             }
 
-            const adjustedClipIndex = parseInt(this.clipIndex) + 1;
+            const adjustedClipIndex = parseInt(this.#clipIndex) + 1;
             const params = [
                 adjustedClipIndex.toString(),
-                this.leftAdjust.toString(),
-                this.rightAdjust.toString()
+                this.#leftAdjust.toString(),
+                this.#rightAdjust.toString()
             ];
 
             console.log(`Calling /d with parameters:`, params);
-            const adjustedBlob = await adjustVideo(adjustedClipIndex, this.leftAdjust, this.rightAdjust);
+            const adjustedBlob = await adjustVideo(adjustedClipIndex, this.#leftAdjust, this.#rightAdjust);
 
             if (!adjustedBlob || adjustedBlob.size === 0) {
                 throw new Error("API /d returned empty blob during adjustment.")
@@ -410,10 +435,10 @@ export class ClipInspector {
     async downloadAdjustedClip() {
         let blobToDownload;
         let fileName;
-        const clipId = parseInt(this.clipIndex) + 1;
+        const clipId = parseInt(this.#clipIndex) + 1;
 
         try {
-            if (this.leftAdjust === 0 && this.rightAdjust === 0) {
+            if (this.#leftAdjust === 0 && this.#rightAdjust === 0) {
                 this.updateStatus('Downloading original clip...');
                 console.log("Downloading original clip via /w, index:", clipId);
                 blobToDownload = await getVideo(clipId);
@@ -426,7 +451,7 @@ export class ClipInspector {
                 this.updateStatus('Preparing adjusted clip for download...');
 
                 const formatAdjust = (val) => val >= 0 ? `+${val.toFixed(1)}` : `${val.toFixed(1)}`;
-                fileName = `clip_${clipId}_L${formatAdjust(this.leftAdjust)}_P${formatAdjust(this.rightAdjust)}${FILE_EXTENSIONS.VIDEO}`;
+                fileName = `clip_${clipId}_L${formatAdjust(this.#leftAdjust)}_P${formatAdjust(this.#rightAdjust)}${FILE_EXTENSIONS.VIDEO}`;
             }
 
             if (!blobToDownload || blobToDownload.size === 0) {

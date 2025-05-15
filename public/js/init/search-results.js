@@ -4,257 +4,303 @@ import { searchClips, getVideo } from '../modules/api-client.js';
 import { ReelNavigator } from '../modules/reel-navigator.js';
 import { ClipInspector } from '../modules/clip-inspector.js';
 
-let loadedClips = 0;
-let allResults = [];
-let observer;
-let loading = false;
-let done = false;
-let reelNavigatorInstance;
-let clipInspectorInstance;
-let videoCache = {};
+class SearchResultsManager {
+    #loadedClips = 0;
+    #allResults = [];
+    #observer = null;
+    #loading = false;
+    #done = false;
+    #reelNavigatorInstance = null;
+    #clipInspectorInstance = null;
+    #videoCache = {};
+    #reel = null;
 
-async function loadNextClips(batchSize = 3) {
-    if (loading || done) return;
-    loading = true;
+    constructor() {
+        this.#reel = document.querySelector(SELECTORS.VIDEO_REEL);
+    }
 
-    const reel = document.querySelector(SELECTORS.VIDEO_REEL);
-    let itemsAddedInThisBatch = 0;
-
-    for (let i = 0; i < batchSize; i++) {
-        const currentOverallIndex = loadedClips + i;
-
-        if (currentOverallIndex >= allResults.length) {
-            done = true;
-            break;
-        }
-
-        const itemData = allResults[currentOverallIndex];
+    async initialize() {
+        console.log("Initializing search results page...");
 
         try {
-            const blob = await getVideo(currentOverallIndex + 1);
-            const url = URL.createObjectURL(blob);
+            this.#initializeClipInspector();
+            this.#setSearchQuery();
+            this.#setupSearchForm();
+            await this.#loadSearchResults();
+        } catch (error) {
+            console.error("Error during initialization:", error);
+        }
 
-            videoCache[currentOverallIndex] = url;
-            console.log(`Saved URL for clip ${currentOverallIndex} in cache`);
+        this.#setupKeyboardHandlers();
+    }
 
-            const el = createElement('div', {
-                className: 'reel-item',
-                dataset: { idx: currentOverallIndex }
-            }, `
-        <video loop preload="metadata">
-          <source src="${url}" type="video/mp4">
-        </video>
-      `);
-
-            reel.appendChild(el);
-            itemsAddedInThisBatch++;
-        } catch (e) {
-            console.error(`Error loading clip ${currentOverallIndex + 1}:`, e);
+    #initializeClipInspector() {
+        console.log("Creating ClipInspector instance...");
+        try {
+            this.#clipInspectorInstance = new ClipInspector();
+            console.log("ClipInspector instance created successfully");
+        } catch (error) {
+            console.error("Error initializing ClipInspector:", error);
         }
     }
 
-    loadedClips += itemsAddedInThisBatch;
+    #setSearchQuery() {
+        const query = new URLSearchParams(location.search).get('query');
+        if (!query) return;
 
-    if (itemsAddedInThisBatch > 0 && reelNavigatorInstance) {
-        reelNavigatorInstance.refresh();
-        addControlButtons();
+        const queryInput = document.getElementById('query-input');
+        if (queryInput) {
+            queryInput.value = query;
+        }
     }
 
-    if (loadedClips >= allResults.length) {
-        done = true;
+    #setupSearchForm() {
+        const queryInput = document.getElementById('query-input');
+        const searchBtn = document.querySelector('.search-icon-btn');
+
+        if (queryInput && searchBtn) {
+            searchBtn.addEventListener('click', () => this.#handleSearch(queryInput));
+            queryInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.#handleSearch(queryInput);
+                }
+            });
+        }
     }
 
-    if (!done) {
-        setupIntersectionObserver();
-    } else if (observer) {
-        observer.disconnect();
+    #handleSearch(queryInput) {
+        const query = queryInput.value.trim();
+        if (query) {
+            window.location.href = `/search-results?query=${encodeURIComponent(query)}`;
+        }
     }
 
-    loading = false;
-}
+    #setupKeyboardHandlers() {
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.#clipInspectorInstance && this.#clipInspectorInstance.visible) {
+                this.#clipInspectorInstance.hide();
+            }
+        });
+    }
 
-function addControlButtons() {
-    console.log("Adding control buttons...");
+    async #loadSearchResults() {
+        const query = new URLSearchParams(location.search).get('query');
+        if (!query) return;
 
-    document.querySelectorAll(SELECTORS.REEL_ITEM).forEach(item => {
+        if (!this.#reel) {
+            console.error(`Container ${SELECTORS.VIDEO_REEL} not found!`);
+            return;
+        }
+
+        try {
+            console.log(`Searching: ${query}`);
+            this.#allResults = await searchClips(query);
+            console.log("Search results:", this.#allResults);
+
+            if (!this.#allResults || this.#allResults.length === 0) {
+                this.#showNoResultsMessage();
+                return;
+            }
+
+            this.#reel.innerHTML = '';
+            this.#reelNavigatorInstance = new ReelNavigator(SELECTORS.VIDEO_REEL);
+
+            await this.#loadNextClips();
+
+            if (this.#reelNavigatorInstance && this.#reelNavigatorInstance.items.length > 0) {
+                this.#reelNavigatorInstance.activate(0);
+            }
+        } catch (err) {
+            console.error("Error during search:", err);
+            this.#showErrorMessage(err.message);
+        }
+    }
+
+    #showNoResultsMessage() {
+        this.#reel.innerHTML = '<p>No results to display.</p>';
+        this.#done = true;
+        if (this.#observer) this.#observer.disconnect();
+    }
+
+    #showErrorMessage(message) {
+        this.#reel.innerHTML = `<p>${message}</p>`;
+        this.#done = true;
+        if (this.#observer) this.#observer.disconnect();
+    }
+
+    async #loadNextClips(batchSize = 3) {
+        if (this.#loading || this.#done) return;
+        this.#loading = true;
+
+        let itemsAddedInThisBatch = 0;
+
+        for (let i = 0; i < batchSize; i++) {
+            const currentOverallIndex = this.#loadedClips + i;
+
+            if (currentOverallIndex >= this.#allResults.length) {
+                this.#done = true;
+                break;
+            }
+
+            try {
+                await this.#loadAndAddClip(currentOverallIndex);
+                itemsAddedInThisBatch++;
+            } catch (e) {
+                console.error(`Error loading clip ${currentOverallIndex + 1}:`, e);
+            }
+        }
+
+        this.#loadedClips += itemsAddedInThisBatch;
+        this.#updateAfterClipsLoaded(itemsAddedInThisBatch);
+    }
+
+    async #loadAndAddClip(index) {
+        const itemData = this.#allResults[index];
+        const blob = await getVideo(index + 1);
+        const url = URL.createObjectURL(blob);
+
+        this.#videoCache[index] = url;
+        console.log(`Saved URL for clip ${index} in cache`);
+
+        const el = this.#createClipElement(index, url);
+        this.#reel.appendChild(el);
+    }
+
+    #createClipElement(index, url) {
+        return createElement('div', {
+            className: 'reel-item',
+            dataset: { idx: index }
+        }, `
+            <video loop preload="metadata">
+                <source src="${url}" type="video/mp4">
+            </video>
+        `);
+    }
+
+    #updateAfterClipsLoaded(itemsAdded) {
+        if (itemsAdded > 0 && this.#reelNavigatorInstance) {
+            this.#reelNavigatorInstance.refresh();
+            this.#addControlButtons();
+        }
+
+        this.#checkIfAllLoaded();
+        this.#loading = false;
+    }
+
+    #checkIfAllLoaded() {
+        if (this.#loadedClips >= this.#allResults.length) {
+            this.#done = true;
+            if (this.#observer) {
+                this.#observer.disconnect();
+            }
+        } else if (!this.#done) {
+            this.#setupIntersectionObserver();
+        }
+    }
+
+    #setupIntersectionObserver() {
+        if (this.#observer) this.#observer.disconnect();
+
+        const items = this.#reel.querySelectorAll(SELECTORS.REEL_ITEM);
+        const lastItem = items[items.length - 1];
+
+        if (!lastItem || this.#done) {
+            if (this.#observer) this.#observer.disconnect();
+            return;
+        }
+
+        this.#observer = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && !this.#loading) {
+                this.#loadNextClips();
+            }
+        }, { rootMargin: '100px' });
+
+        this.#observer.observe(lastItem);
+    }
+
+    #addControlButtons() {
+        console.log("Adding control buttons...");
+
+        document.querySelectorAll(SELECTORS.REEL_ITEM).forEach(item => {
+            this.#addInspectButton(item);
+            this.#addDownloadButton(item);
+        });
+    }
+
+    #addInspectButton(item) {
         if (!item.querySelector(SELECTORS.INSPECT_BUTTON)) {
             const inspectBtn = createElement('button', {
                 className: 'inspect-btn'
             }, 'Adjust');
 
-            inspectBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-
-                const clipIndex = parseInt(item.dataset.idx);
-                if (isNaN(clipIndex)) {
-                    console.error(MESSAGES.CLIP_ID_NOT_FOUND);
-                    return;
-                }
-
-                console.log(`Adjust button clicked for clip index ${clipIndex}`);
-
-                if (videoCache[clipIndex]) {
-                    console.log(`Found URL in cache: ${videoCache[clipIndex].substring(0, 50)}...`);
-                    clipInspectorInstance.show(clipIndex, videoCache[clipIndex]);
-                } else {
-                    const video = item.querySelector('video');
-                    if (video && video.src) {
-                        console.log(`Fetched URL from video element: ${video.src.substring(0, 50)}...`);
-                        clipInspectorInstance.show(clipIndex, video.src);
-                    } else {
-                        console.error("No video URL found in cache or DOM!");
-                    }
-                }
-            });
-
+            inspectBtn.addEventListener('click', (e) => this.#handleInspectButtonClick(e, item));
             item.appendChild(inspectBtn);
         }
+    }
 
+    #handleInspectButtonClick(e, item) {
+        e.stopPropagation();
+
+        const clipIndex = parseInt(item.dataset.idx);
+        if (isNaN(clipIndex)) {
+            console.error(MESSAGES.CLIP_ID_NOT_FOUND);
+            return;
+        }
+
+        console.log(`Adjust button clicked for clip index ${clipIndex}`);
+
+        if (this.#videoCache[clipIndex]) {
+            console.log(`Found URL in cache: ${this.#videoCache[clipIndex].substring(0, 50)}...`);
+            this.#clipInspectorInstance.show(clipIndex, this.#videoCache[clipIndex]);
+        } else {
+            const video = item.querySelector('video');
+            if (video && video.src) {
+                console.log(`Fetched URL from video element: ${video.src.substring(0, 50)}...`);
+                this.#clipInspectorInstance.show(clipIndex, video.src);
+            } else {
+                console.error("No video URL found in cache or DOM!");
+            }
+        }
+    }
+
+    #addDownloadButton(item) {
         if (!item.querySelector('.top-download-btn')) {
             const clipIndex = parseInt(item.dataset.idx);
             const topDownloadBtn = createElement('button', {
                 className: 'top-download-btn'
             }, 'Download');
 
-            topDownloadBtn.addEventListener('click', async function(e) {
-                e.stopPropagation();
-
-                if (isNaN(clipIndex)) {
-                    console.error(MESSAGES.CLIP_ID_NOT_FOUND);
-                    return;
-                }
-
-                try {
-                    topDownloadBtn.textContent = 'Downloading...';
-                    topDownloadBtn.disabled = true;
-
-                    const blob = await getVideo(clipIndex + 1);
-                    downloadBlob(blob, `video_${clipIndex + 1}.mp4`);
-
-                } catch (error) {
-                    console.error('Error during download:', error);
-                    alert('Download failed: ' + error.message);
-                } finally {
-                    topDownloadBtn.textContent = 'Download';
-                    topDownloadBtn.disabled = false;
-                }
-            });
-
+            topDownloadBtn.addEventListener('click', (e) => this.#handleDownloadButtonClick(e, clipIndex, topDownloadBtn));
             item.appendChild(topDownloadBtn);
         }
-    });
-}
-
-function setupIntersectionObserver() {
-    if (observer) observer.disconnect();
-
-    const reel = document.querySelector(SELECTORS.VIDEO_REEL);
-    const items = reel.querySelectorAll(SELECTORS.REEL_ITEM);
-    const lastItem = items[items.length - 1];
-
-    if (!lastItem || done) {
-        if (observer) observer.disconnect();
-        return;
     }
 
-    observer = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting && !loading) {
-            loadNextClips();
+    async #handleDownloadButtonClick(e, clipIndex, button) {
+        e.stopPropagation();
+
+        if (isNaN(clipIndex)) {
+            console.error(MESSAGES.CLIP_ID_NOT_FOUND);
+            return;
         }
-    }, { rootMargin: '100px' });
 
-    observer.observe(lastItem);
-}
+        try {
+            button.textContent = 'Downloading...';
+            button.disabled = true;
 
-function setSearchQuery() {
-    const query = new URLSearchParams(location.search).get('query');
-    if (!query) return;
+            const blob = await getVideo(clipIndex + 1);
+            downloadBlob(blob, `video_${clipIndex + 1}.mp4`);
 
-    const queryInput = document.getElementById('query-input');
-    if (queryInput) {
-        queryInput.value = query;
-    }
-}
-
-function setupSearchForm() {
-    const queryInput = document.getElementById('query-input');
-    const searchBtn = document.querySelector('.search-icon-btn');
-
-    if (queryInput && searchBtn) {
-        searchBtn.addEventListener('click', () => {
-            const query = queryInput.value.trim();
-            if (query) {
-                window.location.href = `/search-results?query=${encodeURIComponent(query)}`;
-            }
-        });
-
-        queryInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const query = queryInput.value.trim();
-                if (query) {
-                    window.location.href = `/search-results?query=${encodeURIComponent(query)}`;
-                }
-            }
-        });
+        } catch (error) {
+            console.error('Error during download:', error);
+            alert('Download failed: ' + error.message);
+        } finally {
+            button.textContent = 'Download';
+            button.disabled = false;
+        }
     }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("Initializing search results page...");
-
-    try {
-        console.log("Creating ClipInspector instance...");
-        clipInspectorInstance = new ClipInspector();
-        console.log("ClipInspector instance created successfully");
-    } catch (error) {
-        console.error("Error initializing ClipInspector:", error);
-    }
-
-    setSearchQuery();
-    setupSearchForm();
-
-    const query = new URLSearchParams(location.search).get('query');
-    if (!query) {
-        return;
-    }
-
-    const reel = document.querySelector(SELECTORS.VIDEO_REEL);
-    if (!reel) {
-        console.error(`Container ${SELECTORS.VIDEO_REEL} not found!`);
-        return;
-    }
-
-    try {
-        console.log(`Searching: ${query}`);
-        allResults = await searchClips(query);
-        console.log("Search results:", allResults);
-
-        if (!allResults || allResults.length === 0) {
-            reel.innerHTML = '<p>No results to display.</p>';
-            done = true;
-            if (observer) observer.disconnect();
-            return;
-        }
-
-        reel.innerHTML = '';
-        reelNavigatorInstance = new ReelNavigator(SELECTORS.VIDEO_REEL);
-
-        await loadNextClips();
-
-        if (reelNavigatorInstance && reelNavigatorInstance.items.length > 0) {
-            reelNavigatorInstance.activate(0);
-        }
-
-    } catch (err) {
-        console.error("Error during search:", err);
-        reel.innerHTML = `<p>${err.message}</p>`;
-        done = true;
-        if (observer) observer.disconnect();
-    }
-
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && clipInspectorInstance && clipInspectorInstance.visible) {
-            clipInspectorInstance.hide();
-        }
-    });
+    const searchResults = new SearchResultsManager();
+    await searchResults.initialize();
 });

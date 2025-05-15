@@ -1,68 +1,114 @@
 import { callApi } from '../modules/api-client.js';
 
-class SubscriptionTooltip {
-    constructor() {
-        this.welcomeLink = document.getElementById('user-welcome-link');
-        this.tooltip = document.getElementById('subscription-tooltip');
-        this.isTooltipVisible = false;
-        this.isLoading = false;
+export class SubscriptionTooltip {
+    #welcomeLink;
+    #tooltip;
+    #isTooltipVisible = false;
+    #isLoading = false;
 
-        this.init();
+    constructor() {
+        this.#welcomeLink = document.getElementById('user-welcome-link');
+        this.#tooltip = document.getElementById('subscription-tooltip');
+
+        this.#initialize();
     }
 
-    init() {
-        if (!this.welcomeLink || !this.tooltip) {
+    get isVisible() {
+        return this.#isTooltipVisible;
+    }
+
+    get isLoading() {
+        return this.#isLoading;
+    }
+
+    hideTooltip() {
+        this.#tooltip.classList.remove('visible');
+        this.#isTooltipVisible = false;
+    }
+
+    async showTooltip() {
+        this.#isLoading = true;
+        this.#showLoadingState();
+
+        try {
+            const response = await callApi('sub', []);
+            this.#processResponse(response);
+        } catch (error) {
+            this.#handleError(error);
+        } finally {
+            this.#isLoading = false;
+        }
+    }
+
+    #initialize() {
+        if (!this.#welcomeLink || !this.#tooltip) {
             return;
         }
 
-        this.welcomeLink.addEventListener('click', this.handleClick.bind(this));
-
-        document.addEventListener('click', this.handleOutsideClick.bind(this));
+        this.#attachEventListeners();
     }
 
-    async handleClick(e) {
+    #attachEventListeners() {
+        this.#welcomeLink.addEventListener('click', this.#handleClick.bind(this));
+        document.addEventListener('click', this.#handleOutsideClick.bind(this));
+    }
+
+    async #handleClick(e) {
         e.stopPropagation();
 
-        if (this.isLoading) return;
+        if (this.#isLoading) return;
 
-        if (this.isTooltipVisible) {
+        if (this.#isTooltipVisible) {
             this.hideTooltip();
         } else {
             await this.showTooltip();
         }
     }
 
-    hideTooltip() {
-        this.tooltip.classList.remove('visible');
-        this.isTooltipVisible = false;
-    }
-
-    async showTooltip() {
-        this.isLoading = true;
-        this.tooltip.innerHTML = '<div class="spinner"></div> Checking subscription...';
-        this.tooltip.classList.add('visible');
-        this.isTooltipVisible = true;
-
-        try {
-            const response = await callApi('sub', []);
-
-            if (response && response.status === 'success' && response.data) {
-                this.updateTooltipContent(response.data);
-            } else {
-                const errorMsg = response?.message || 'Failed to fetch subscription data.';
-                this.tooltip.innerHTML = `<div class="error">Error: ${errorMsg}</div>`;
-            }
-        } catch (error) {
-            console.error("Error fetching subscription data:", error);
-            this.tooltip.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-        } finally {
-            this.isLoading = false;
+    #handleOutsideClick(e) {
+        if (this.#isTooltipVisible && !this.#tooltip.contains(e.target) && e.target !== this.#welcomeLink) {
+            this.hideTooltip();
         }
     }
 
-    updateTooltipContent(data) {
+    #showLoadingState() {
+        this.#tooltip.innerHTML = '<div class="spinner"></div> Checking subscription...';
+        this.#tooltip.classList.add('visible');
+        this.#isTooltipVisible = true;
+    }
+
+    #processResponse(response) {
+        if (response && response.status === 'success' && response.data) {
+            this.#updateTooltipContent(response.data);
+        } else {
+            const errorMsg = response?.message || 'Failed to fetch subscription data.';
+            this.#showError(errorMsg);
+        }
+    }
+
+    #handleError(error) {
+        console.error("Error fetching subscription data:", error);
+        this.#showError(error.message);
+    }
+
+    #showError(message) {
+        this.#tooltip.innerHTML = `<div class="error">Error: ${message}</div>`;
+    }
+
+    #updateTooltipContent(data) {
         const endDate = data.subscription_end || 'No data';
         const daysLeft = data.days_remaining;
+
+        const { daysText, daysClass } = this.#formatDaysRemaining(daysLeft);
+        const formattedEndDate = this.#formatEndDate(endDate);
+
+        this.#tooltip.innerHTML = `
+            <div>Subscription active until: <strong>${formattedEndDate}</strong></div>
+            <div class="days-remaining ${daysClass}">${daysText}</div>
+        `;
+    }
+
+    #formatDaysRemaining(daysLeft) {
         let daysText = 'Unknown';
         let daysClass = '';
 
@@ -84,6 +130,10 @@ class SubscriptionTooltip {
             daysText = '(No information about remaining days)';
         }
 
+        return { daysText, daysClass };
+    }
+
+    #formatEndDate(endDate) {
         let formattedEndDate = endDate;
         try {
             const dateObj = new Date(endDate);
@@ -97,17 +147,7 @@ class SubscriptionTooltip {
         } catch (dateError) {
             console.warn("Unable to format date:", endDate);
         }
-
-        this.tooltip.innerHTML = `
-            <div>Subscription active until: <strong>${formattedEndDate}</strong></div>
-            <div class="days-remaining ${daysClass}">${daysText}</div>
-        `;
-    }
-
-    handleOutsideClick(e) {
-        if (this.isTooltipVisible && !this.tooltip.contains(e.target) && e.target !== this.welcomeLink) {
-            this.hideTooltip();
-        }
+        return formattedEndDate;
     }
 }
 
@@ -119,5 +159,4 @@ document.addEventListener('DOMContentLoaded', () => {
     initSubscriptionTooltip();
 });
 
-export { SubscriptionTooltip };
 export default SubscriptionTooltip;

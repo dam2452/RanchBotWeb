@@ -3,31 +3,64 @@ import { ClipsManager } from '../components/ClipsManager.js';
 import { PagedClipsNavigator } from '../components/PagedClipsNavigator.js';
 import { initializeVideoContainers } from '../components/VideoContainer.js';
 
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log('Initializing My Clips page');
+class MyClipsPageManager {
+    #pageContainer;
+    #clipsManager;
+    #navigator;
+    #videoManager;
 
-    const pageContainer = document.querySelector('.my-clips-page');
+    async initialize() {
+        console.log('Initializing My Clips page');
 
-    addSearchNavigationButton(pageContainer);
-
-    const clipsManager = new ClipsManager();
-
-    try {
-        await clipsManager.loadClips();
-
-        const pages = clipsManager.renderClips();
-
-        if (pages && pages.length > 0) {
-            const videoManager = initializeVideoContainers();
-
-            const navigator = new PagedClipsNavigator({
-                container: document.querySelector('.clips-reel'),
-                onPageChange: () => videoManager.stopAll()
-            });
-
-            clipsManager.setupDeleteButtons();
+        this.#pageContainer = document.querySelector('.my-clips-page');
+        if (!this.#pageContainer) {
+            console.error('Page container not found');
+            return;
         }
-    } catch (error) {
-        console.error('Error initializing My Clips page:', error);
+
+        this.#setupUI();
+        await this.#loadAndRenderClips();
     }
+
+    #setupUI() {
+        addSearchNavigationButton(this.#pageContainer);
+        this.#clipsManager = new ClipsManager();
+    }
+
+    async #loadAndRenderClips() {
+        try {
+            await this.#clipsManager.loadClips();
+
+            const pages = this.#clipsManager.renderClips();
+
+            if (pages && pages.length > 0) {
+                this.#initializeNavigationAndVideo();
+                this.#clipsManager.setupDeleteButtons();
+            }
+        } catch (error) {
+            console.error('Error initializing My Clips page:', error);
+            this.#showErrorMessage(error);
+        }
+    }
+
+    #initializeNavigationAndVideo() {
+        this.#videoManager = initializeVideoContainers();
+
+        this.#navigator = new PagedClipsNavigator({
+            container: document.querySelector('.clips-reel'),
+            onPageChange: () => this.#videoManager.stopAll()
+        });
+    }
+
+    #showErrorMessage(error) {
+        const container = document.querySelector('.clips-reel');
+        if (container) {
+            container.innerHTML = `<div class="error-message">Error loading clips: ${error.message}</div>`;
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+    const myClipsPage = new MyClipsPageManager();
+    await myClipsPage.initialize();
 });

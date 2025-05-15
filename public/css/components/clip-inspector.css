@@ -1,17 +1,15 @@
-/* Naprawiony clip-inspector.css - gwarantowana widoczność panelu */
+@import './variables.css';
+@import './helpers.css';
+@import './media-queries.css';
 
-/* Backdrop that blocks interaction with other elements */
 .clip-editor-backdrop {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    inset: 0;
+    background: rgba(0,0,0,0.5);
     z-index: 900;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transition: opacity 0.3s, visibility 0.3s;
 }
 
 .clip-editor-backdrop.visible {
@@ -19,50 +17,52 @@
     visibility: visible;
 }
 
-/* Style dla klipu w trybie edycji - SPRAWDZONA TRANSFORMACJA */
 .reel-item.editing-mode {
     transform-origin: center;
-    transition: all 0.3s ease;
-    transform: scale(1.05) translate(1%, -19.599%); /* Minimalna, bezpieczna transformacja */
+    transition: all 0.3s;
+    transform: scale(1.05) translate(1%, -20%);
     z-index: 1000;
     position: relative;
-    border-radius: 12px;
+    border-radius: var(--radius-l, 12px);
+    box-shadow: var(--box-shadow-strong, 0 5px 20px rgba(0,0,0,0.3));
     overflow: visible !important;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-    max-height: none !important; /* Usunięcie ograniczenia wysokości */
-    margin-bottom: 30px; /* Dodatkowe miejsce na dole */
+    max-height: none !important;
+    margin-bottom: var(--space-xl, 30px);
 }
 
 .reel-item.editing-mode video {
-    border-radius: 12px 12px 0 0;
+    border-radius: var(--radius-l, 12px) var(--radius-l, 12px) 0 0;
     width: 100%;
-    height: auto;
     max-height: 60vh;
+    object-fit: cover;
 }
 
-/* Panel kontrolny z gwarantowaną widocznością */
+.reel-item.editing-mode .inspect-btn,
+.reel-item.editing-mode .top-download-btn {
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
 .clip-controls-container {
-    background-color: #f8f8f8;
-    border-radius: 0 0 12px 12px;
-    padding: 12px;
+    background: var(--color-bg-panel, #f8f8f8);
+    border-radius: 0 0 var(--radius-l, 12px) var(--radius-l, 12px);
+    padding: var(--space-m, 12px);
+    border-top: 1px solid var(--color-border, #e0e0e0);
+    box-sizing: border-box;
     opacity: 0;
     max-height: 0;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.3s;
     width: 100%;
     position: relative;
-    box-sizing: border-box;
-    border-top: 1px solid #e0e0e0;
 }
 
 .reel-item.editing-mode .clip-controls-container {
     opacity: 1;
-    max-height: 500px !important; /* Wymuszenie wysokości */
+    max-height: 500px !important;
     overflow: visible !important;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--box-shadow-standard, 0 5px 15px rgba(0,0,0,0.1));
     display: block !important;
-    position: relative !important; /* Wymuszenie względnego pozycjonowania */
-    bottom: auto !important; /* Blokowanie automatycznego pozycjonowania na dole */
     visibility: visible !important;
 }
 
@@ -70,22 +70,22 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #eaeaea;
+    margin-bottom: var(--space-s, 10px);
+    border-bottom: 1px solid var(--color-border, #eaeaea);
     padding-bottom: 6px;
 }
 
 .clip-editor-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
+    font-size: var(--font-size-m, 16px);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--color-text-dark, #333);
 }
 
 .close-editor-btn {
-    background: #f0f0f0;
+    background: var(--color-bg-panel, #f0f0f0);
     border: none;
     font-size: 18px;
-    color: #555;
+    color: var(--color-text-dark, #555);
     cursor: pointer;
     width: 26px;
     height: 26px;
@@ -93,23 +93,22 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    transition: background-color 0.2s ease;
+    transition: background 0.2s;
 }
-
 .close-editor-btn:hover {
-    background-color: #e0e0e0;
-    color: #333;
+    background: var(--color-bg-panel-hover, #e0e0e0);
+    color: var(--color-text-dark, #333);
 }
 
 .adjustment-controls {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 12px;
-    background: white;
-    padding: 10px;
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    gap: var(--space-s, 10px);
+    margin-bottom: var(--space-m, 12px);
+    background: var(--color-bg-default, #fff);
+    padding: var(--space-s, 10px);
+    border-radius: var(--radius-s, 6px);
+    box-shadow: var(--box-shadow-active, 0 1px 3px rgba(0,0,0,0.05));
 }
 
 .time-slider-container {
@@ -117,10 +116,9 @@
     flex-direction: column;
     gap: 4px;
 }
-
 .time-slider-label {
-    font-size: 14px;
-    color: #333;
+    font-size: var(--font-size-s, 14px);
+    color: var(--color-text-dark, #333);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -128,8 +126,8 @@
 
 .left-adjust-value,
 .right-adjust-value {
-    font-weight: 600;
-    color: #e09340;
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--color-primary, #e09340);
     min-width: 40px;
     text-align: right;
 }
@@ -138,110 +136,89 @@
     width: 100%;
     height: 5px;
     -webkit-appearance: none;
-    background: #e0e0e0;
-    border-radius: 4px;
-    outline: none;
+    background: var(--color-border, #e0e0e0);
+    border-radius: var(--radius-s, 4px);
     margin: 3px 0;
 }
-
 .time-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
+    width: 16px; height: 16px; border-radius: 50%;
     background: var(--color-primary, #e09340);
     cursor: pointer;
 }
-
 .time-slider::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
+    width: 16px; height: 16px; border-radius: 50%;
     background: var(--color-primary, #e09340);
-    cursor: pointer;
-    border: none;
+    cursor: pointer; border: none;
 }
 
 .save-controls {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-m, 12px);
 }
-
 .toggle-save-btn {
-    background-color: var(--color-primary, #e09340);
-    color: white;
+    background: var(--color-primary, #e09340);
+    color: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-s, 6px);
     padding: 8px 12px;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--font-size-s, 14px);
+    font-weight: var(--font-weight-medium, 500);
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background 0.2s;
 }
-
 .toggle-save-btn:hover {
-    background-color: var(--color-primary-dark, #c17a30);
+    background: var(--color-primary-dark, #c17a30);
 }
-
 .save-form {
     display: none;
     flex-direction: row;
     gap: 6px;
     align-items: center;
 }
-
-.save-form.visible {
-    display: flex;
-}
-
+.save-form.visible { display: flex; }
 .clip-name-input {
     flex: 1;
     padding: 6px 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 1px solid var(--color-border, #ccc);
+    border-radius: var(--radius-xs, 4px);
     font-size: 13px;
 }
-
 .clip-name-input:focus {
-    border-color: #e09340;
+    border-color: var(--color-primary, #e09340);
     outline: none;
 }
-
 .save-clip-btn {
-    background-color: var(--color-primary, #e09340);
-    color: white;
+    background: var(--color-primary, #e09340);
+    color: #fff;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-xs, 4px);
     padding: 6px 12px;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium, 500);
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background 0.2s;
     white-space: nowrap;
 }
-
 .save-clip-btn:hover {
-    background-color: var(--color-primary-dark, #c17a30);
+    background: var(--color-primary-dark, #c17a30);
 }
-
 .download-adjusted-clip-btn {
-    background-color: #4a4a4a;
-    color: white;
+    background: #4a4a4a;
+    color: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-s, 6px);
     padding: 8px 12px;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--font-size-s, 14px);
+    font-weight: var(--font-weight-medium, 500);
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background 0.2s;
 }
-
 .download-adjusted-clip-btn:hover {
-    background-color: #333;
+    background: #333;
 }
-
 .clip-editor-status {
     font-size: 13px;
     color: #555;
@@ -249,21 +226,10 @@
     margin-top: 6px;
     height: 16px;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s;
 }
+.clip-editor-status.status-visible { opacity: 1; }
 
-.clip-editor-status.status-visible {
-    opacity: 1;
-}
-
-/* Ukryj przyciski w trybie edycji */
-.reel-item.editing-mode .inspect-btn,
-.reel-item.editing-mode .top-download-btn {
-    opacity: 0 !important;
-    pointer-events: none;
-}
-
-/* Dodatkowa przestrzeń na dole */
 .reel-item.editing-mode::after {
     content: "";
     display: block;
@@ -271,54 +237,18 @@
     width: 100%;
 }
 
-/* Zapewnienie, że panel kontrolny będzie widoczny */
-.reel-item {
-    position: relative;
-}
+.reel-item { position: relative; }
 
-/* Responsywność dla różnych urządzeń - BEZPIECZNE WARTOŚCI */
 @media screen and (max-width: 767px) {
-    .reel-item.editing-mode {
-        transform: scale(1.02) translate(0, -2%);
-    }
-
-    .clip-editor-title {
-        font-size: 14px;
-    }
-
-    .time-slider-label {
-        font-size: 13px;
-    }
-
-    .clip-controls-container {
-        padding: 8px;
-    }
+    .reel-item.editing-mode { transform: scale(1.02) translate(0, -2%); }
+    .clip-editor-title { font-size: var(--font-size-s, 14px); }
+    .time-slider-label { font-size: var(--font-size-xs, 13px); }
+    .clip-controls-container { padding: var(--space-xs, 8px); }
 }
-
-/* Bardzo małe urządzenia */
 @media screen and (max-width: 480px) {
-    .reel-item.editing-mode {
-        transform: scale(1) translate(-4%, 0); /* Bez transformacji */
-        margin-top: 10px;
-        margin-bottom: 40px;
-    }
-
-    .clip-controls-container {
-        padding: 6px;
-    }
-
-    .adjustment-controls {
-        gap: 6px;
-        padding: 6px;
-    }
-
-    .time-slider-label {
-        font-size: 12px;
-    }
-
-    .toggle-save-btn,
-    .download-adjusted-clip-btn {
-        padding: 6px 8px;
-        font-size: 12px;
-    }
+    .reel-item.editing-mode { transform: scale(1) translate(-4%, 0); margin-top: 10px; margin-bottom: 40px; }
+    .clip-controls-container { padding: var(--space-xxs, 6px); }
+    .adjustment-controls { gap: 6px; padding: 6px; }
+    .time-slider-label { font-size: 12px; }
+    .toggle-save-btn, .download-adjusted-clip-btn { padding: 6px 8px; font-size: 12px; }
 }

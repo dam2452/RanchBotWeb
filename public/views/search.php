@@ -6,8 +6,15 @@
         <h1 class="title">RanchBot</h1>
     </div>
 
-    <form id="searchForm" class="search-container">
-        <input type="text" id="quoteInput" name="query" placeholder="Enter a quote" class="search-input" required />
+    <form id="searchForm" class="search-container" autocomplete="off">
+        <input type="text"
+               id="quoteInput"
+               name="query"
+               placeholder="Enter a quote"
+               class="search-input"
+               required
+               autocomplete="off"
+               autofill="off" />
         <button type="submit" class="search-icon-btn" aria-label="Search">
             <img src="/images/ui/icons/arrow-circle-right.svg" alt="Search" />
         </button>

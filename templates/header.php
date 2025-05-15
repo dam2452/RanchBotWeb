@@ -11,17 +11,20 @@ require_once __DIR__ . '/../includes/auth.php';
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <meta name="color-scheme" content="only light">
         <title><?= $pageTitle ?? 'RanchBot' ?></title>
-        <link rel="stylesheet" href="/css/header.css">
+        <link rel="stylesheet" href="/css/pages/header.css">
+        <link rel="stylesheet" href="/css/components/user-button.css">
         <?= $customHead ?? '' ?>
     </head>
 <body>
     <header>
         <div class="auth-buttons">
             <?php if (is_logged_in()): ?>
-                <span class="user-welcome" id="user-welcome-link" title="Kliknij, aby sprawdzić subskrypcję">
-                Hello, <?= htmlspecialchars(session_get('username')) ?>
-            </span>
-                <div id="subscription-tooltip" class="subscription-tooltip"></div>
+                <div class="tooltip-container">
+                    <button id="user-welcome-link" title="Click to check your subscription">
+                        Hi, <?= htmlspecialchars(session_get('username')) ?>
+                    </button>
+                    <div id="subscription-tooltip" class="subscription-tooltip"></div>
+                </div>
                 <button onclick="location.href='/my-clips'">My Clips</button>
                 <button onclick="location.href='/logout'">Logout</button>
             <?php else: ?>
@@ -29,6 +32,7 @@ require_once __DIR__ . '/../includes/auth.php';
                 <button onclick="location.href='/register'">Register</button>
             <?php endif; ?>
         </div>
+
     </header>
 
 <?php if (is_logged_in()): ?>

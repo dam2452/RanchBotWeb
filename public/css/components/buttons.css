@@ -99,12 +99,12 @@
 }
 
 .auth-buttons button {
-    background: linear-gradient(to right, #ffffff, #d8ffd8);
-    color: var(--color-text-dark);
+    background: var(--gradient-auth-btn);
+    color: var(--color-text-light);
     padding: var(--auth-pad-v, 1vh) var(--auth-pad-h, 2.5vw);
     font-size: clamp(var(--font-auth-min, 14px), var(--font-auth-range, 1.4vw), var(--font-auth-max, 16px));
     font-weight: bold;
-    border: 1px solid #a0dba0;
+    border: none;
     border-radius: var(--radius-s);
     box-shadow: var(--box-shadow-standard);
     transition: var(--transition-standard);
@@ -112,11 +112,34 @@
 
 .auth-buttons button:hover {
     transform: scale(1.05);
-    background: linear-gradient(to right, #eaffea, #b0f7b0);
+    background: var(--gradient-auth-btn-hover);
     box-shadow: var(--box-shadow-hover);
 }
 
 .auth-buttons button:active {
+    transform: scale(0.95);
+    box-shadow: var(--box-shadow-active);
+}
+
+#user-welcome-link,
+.auth-buttons #user-welcome-link {
+    background: var(--gradient-user-btn);
+    color: var(--color-text-light);
+    border: none;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+#user-welcome-link:hover,
+.auth-buttons #user-welcome-link:hover,
+#user-welcome-link:focus-visible,
+.auth-buttons #user-welcome-link:focus-visible {
+    background: var(--gradient-user-btn-hover);
+    transform: scale(1.05);
+    box-shadow: var(--box-shadow-hover);
+}
+
+#user-welcome-link:active,
+.auth-buttons #user-welcome-link:active {
     transform: scale(0.95);
     box-shadow: var(--box-shadow-active);
 }

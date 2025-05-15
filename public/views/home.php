@@ -13,6 +13,8 @@
     </div>
 
     <div class="right-col">
-        <img src="/images/others/KusyDworek.png" class="preview-img" alt="Dworek Kusy">
+        <a href="/search" class="preview-link">
+            <img src="/images/others/KusyDworek.png" class="preview-img" alt="Dworek Kusy">
+        </a>
     </div>
 </main>

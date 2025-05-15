@@ -1,15 +1,33 @@
-.user-welcome {
-    color: var(--color-text-light);
-    margin-right: 10px;
-    font-size: 14px;
+.tooltip-container {
+    position: relative;
+    display: inline-block;
 }
 
 #user-welcome-link {
     cursor: pointer;
-    text-decoration: underline;
-    text-decoration-style: dotted;
     position: relative;
     display: inline-block;
+}
+
+.user-button {
+    background: linear-gradient(to right, #e8e8e8, #d0d0d0);
+    color: #444444;
+    padding: var(--auth-pad-v, 1vh) var(--auth-pad-h, 2.5vw);
+    font-size: clamp(var(--font-auth-min, 14px), var(--font-auth-range, 1.4vw), var(--font-auth-max, 16px));
+    font-weight: bold;
+    border: 1px solid #c0c0c0;
+    border-radius: var(--radius-s);
+    box-shadow: var(--box-shadow-standard);
+    transition: var(--transition-standard);
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.user-button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(to right, #f0f0f0, #e0e0e0);
+    box-shadow: var(--box-shadow-hover);
 }
 
 .subscription-tooltip {
@@ -27,15 +45,16 @@
     transition: opacity 0.3s ease, visibility 0s linear 0.3s;
     font-size: 0.9em;
     line-height: 1.4;
-    bottom: -10px;
+    top: 100%;
     left: 50%;
-    transform: translate(-50%, 100%);
+    transform: translateX(-50%);
+    margin-top: 8px;
 }
 
 .subscription-tooltip::after {
     content: "";
     position: absolute;
-    bottom: 100%;
+    top: -12px;
     left: 50%;
     margin-left: -6px;
     border-width: 6px;
@@ -68,12 +87,19 @@
 }
 
 @media screen and (max-width: 850px) {
-    .user-welcome {
-        font-size: 12px;
+    .user-button {
+        padding: var(--space-s) var(--space-l);
+        font-size: var(--font-auth-min);
     }
 
     .subscription-tooltip {
         min-width: 200px;
         font-size: 0.85em;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .user-button {
+        padding: var(--space-xs) var(--space-m);
     }
 }

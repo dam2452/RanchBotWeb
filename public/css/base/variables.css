@@ -12,6 +12,13 @@
     --color-bg-start: #1aa899;
     --color-bg-end: #f2a94c;
 
+    --color-user-btn: var(--color-bg-end);
+    --color-user-btn-dark: #e09340;
+    --color-user-btn-hover: #ffb85c;
+    --color-auth-btn: #aaaaaa;
+    --color-auth-btn-dark: #999999;
+    --color-auth-btn-hover: #bbbbbb;
+
     --color-text-light: #fff;
     --color-text-dark: #0c7730;
     --color-dark: #333;
@@ -44,6 +51,11 @@
     --gradient-action-hover: linear-gradient(145deg, #7a95c6, #5a7fae);
     --gradient-form-btn: linear-gradient(to right, #fdd99d, #dcae75);
     --gradient-form-btn-hover: linear-gradient(to right, #ffe0b3, #e0b88a);
+
+    --gradient-user-btn: linear-gradient(145deg, var(--color-user-btn), var(--color-user-btn-dark));
+    --gradient-user-btn-hover: linear-gradient(145deg, var(--color-user-btn-hover), var(--color-user-btn));
+    --gradient-auth-btn: linear-gradient(145deg, var(--color-auth-btn), var(--color-auth-btn-dark));
+    --gradient-auth-btn-hover: linear-gradient(145deg, var(--color-auth-btn-hover), var(--color-auth-btn));
 
     --shadow: rgba(0, 0, 0, 0.1);
     --shadow-strong: rgba(0, 0, 0, 0.3);
@@ -166,5 +178,4 @@
     --home-xxl-breakpoint: 1800px;
     --home-sm-breakpoint: 500px;
     --home-xs-breakpoint: 480px;
-
 }

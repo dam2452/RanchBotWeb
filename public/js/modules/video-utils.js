@@ -87,7 +87,6 @@ export async function downloadVideoFromUrl(url, filename) {
     }
 }
 
-
 export function createDownloadButton(downloadHandler) {
     const downloadBtn = document.createElement('button');
     downloadBtn.className = 'download-btn';

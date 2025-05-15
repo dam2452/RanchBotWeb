@@ -4,27 +4,93 @@ import { getVideo } from './api-client.js';
 import { createDownloadButton } from './video-utils.js';
 
 export class ReelNavigator {
-    constructor(containerSelector) {
-        this.container = document.querySelector(containerSelector);
-        this.items = Array.from(this.container.querySelectorAll(SELECTORS.REEL_ITEM));
-        this.activeIndex = 0;
-        this.videoCache = {};
-        this.scrollDebounceTimeout = null;
-        this.keyDebounceTimeout = null;
-        this.keyLocked = false;
-        this.isScrolling = false;
-        this.scrollAnimationDuration = 600;
-        this.lastKeyPressTime = 0;
-        this.blockingOverlay = null;
-        this.setupBlockingOverlay();
+    #container;
+    #items;
+    #activeIndex;
+    #videoCache;
+    #scrollDebounceTimeout;
+    #keyDebounceTimeout;
+    #scrollAnimationTimeout;
+    #lastKeyPressTime;
+    #keyLocked;
+    #isScrolling;
+    #scrollAnimationDuration;
+    #blockingOverlay;
 
+    constructor(containerSelector) {
+        this.#container = document.querySelector(containerSelector);
+        this.#items = Array.from(this.#container.querySelectorAll(SELECTORS.REEL_ITEM));
+        this.#activeIndex = 0;
+        this.#videoCache = {};
+
+        this.#scrollDebounceTimeout = null;
+        this.#keyDebounceTimeout = null;
+        this.#scrollAnimationTimeout = null;
+        this.#lastKeyPressTime = 0;
+        this.#keyLocked = false;
+        this.#isScrolling = false;
+        this.#scrollAnimationDuration = 600;
+
+        this.#blockingOverlay = null;
+
+        this.setupBlockingOverlay();
         this.attachListeners();
         this.addDownloadButtons();
         this.activate(0);
     }
 
+    // Public API
+    get items() {
+        return this.#items;
+    }
+
+    get container() {
+        return this.#container;
+    }
+
+    get activeIndex() {
+        return this.#activeIndex;
+    }
+
+    get isScrolling() {
+        return this.#isScrolling;
+    }
+
+    setupBlockingOverlay() {
+        this.#blockingOverlay = document.createElement('div');
+        this.#blockingOverlay.className = 'video-interaction-blocker';
+        this.#blockingOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            display: none;
+            cursor: auto;
+        `;
+        document.body.appendChild(this.#blockingOverlay);
+    }
+
+    attachListeners() {
+        this.#container.addEventListener('scroll', () => {
+            clearTimeout(this.#scrollDebounceTimeout);
+            this.#scrollDebounceTimeout = setTimeout(() => {
+                const idx = this.getMostCenteredItemIndex();
+                if (idx !== this.#activeIndex) {
+                    this.activate(idx);
+                }
+            }, 100);
+        });
+
+        this.#container.addEventListener('click', e => this.handleClick(e));
+        this.#container.addEventListener('wheel', this.handleWheel.bind(this), { passive: false });
+        window.addEventListener('keydown', e => this.handleKey(e));
+        window.addEventListener('resize', () => this.centerActiveItem());
+    }
+
     addDownloadButtons() {
-        this.items.forEach(item => {
+        this.#items.forEach(item => {
             if (!item.querySelector(SELECTORS.DOWNLOAD_BUTTON)) {
                 const clipIndex = item.dataset.idx;
                 const downloadBtn = createDownloadButton(async () => {
@@ -35,30 +101,12 @@ export class ReelNavigator {
         });
     }
 
-    attachListeners() {
-        this.container.addEventListener('scroll', () => {
-            clearTimeout(this.scrollDebounceTimeout);
-            this.scrollDebounceTimeout = setTimeout(() => {
-                const idx = this.getMostCenteredItemIndex();
-                if (idx !== this.activeIndex) {
-                    this.activate(idx);
-                }
-            }, 100);
-        });
-
-        this.container.addEventListener('click', e => this.handleClick(e));
-        this.container.addEventListener('wheel', this.handleWheel.bind(this), { passive: false });
-        window.addEventListener('keydown', e => this.handleKey(e));
-        window.addEventListener('resize', () => this.centerActiveItem());
-    }
-
     getMostCenteredItemIndex() {
-        const centerX = this.container.getBoundingClientRect().left + this.container.offsetWidth / 2;
-
+        const centerX = this.#container.getBoundingClientRect().left + this.#container.offsetWidth / 2;
         let minDist = Infinity;
         let bestIdx = 0;
 
-        this.items.forEach((item, i) => {
+        this.#items.forEach((item, i) => {
             const box = item.getBoundingClientRect();
             const itemCenter = box.left + box.width / 2;
             const dist = Math.abs(centerX - itemCenter);
@@ -71,36 +119,18 @@ export class ReelNavigator {
         return bestIdx;
     }
 
-
-    setupBlockingOverlay() {
-        this.blockingOverlay = document.createElement('div');
-        this.blockingOverlay.className = 'video-interaction-blocker';
-        this.blockingOverlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 9999;
-        display: none;
-        cursor: auto;
-    `;
-        document.body.appendChild(this.blockingOverlay);
-    }
-
     navigate(delta) {
-        const newIndex = this.activeIndex + delta;
-        if (newIndex < 0 || newIndex >= this.items.length) return;
+        const newIndex = this.#activeIndex + delta;
+        if (newIndex < 0 || newIndex >= this.#items.length) return;
 
         this.enableInteractionBlock();
-        this.isScrolling = true;
+        this.#isScrolling = true;
         this.activate(newIndex);
     }
 
     enableInteractionBlock() {
-        this.blockingOverlay.style.display = 'block';
-
-        this.items.forEach(item => {
+        this.#blockingOverlay.style.display = 'block';
+        this.#items.forEach(item => {
             const vid = item.querySelector('video');
             if (vid) {
                 vid.style.pointerEvents = 'none';
@@ -109,9 +139,8 @@ export class ReelNavigator {
     }
 
     disableInteractionBlock() {
-        this.blockingOverlay.style.display = 'none';
-
-        this.items.forEach(item => {
+        this.#blockingOverlay.style.display = 'none';
+        this.#items.forEach(item => {
             const vid = item.querySelector('video');
             if (vid) {
                 vid.style.pointerEvents = 'auto';
@@ -120,12 +149,12 @@ export class ReelNavigator {
     }
 
     activate(idx) {
-        if (idx < 0 || idx >= this.items.length) return;
+        if (idx < 0 || idx >= this.#items.length) return;
 
         this.enableInteractionBlock();
-        this.isScrolling = true;
+        this.#isScrolling = true;
 
-        this.items.forEach(item => {
+        this.#items.forEach(item => {
             const vid = item.querySelector('video');
             item.classList.remove(CLASSES.ACTIVE);
             if (vid) {
@@ -134,16 +163,16 @@ export class ReelNavigator {
             }
         });
 
-        const item = this.items[idx];
+        const item = this.#items[idx];
         const vid = item.querySelector('video');
         item.classList.add(CLASSES.ACTIVE);
-        this.activeIndex = idx;
+        this.#activeIndex = idx;
 
         this.centerActiveItem();
 
-        clearTimeout(this.scrollAnimationTimeout);
-        this.scrollAnimationTimeout = setTimeout(() => {
-            this.isScrolling = false;
+        clearTimeout(this.#scrollAnimationTimeout);
+        this.#scrollAnimationTimeout = setTimeout(() => {
+            this.#isScrolling = false;
             this.disableInteractionBlock();
 
             if (vid) {
@@ -155,16 +184,17 @@ export class ReelNavigator {
                     vid.play().catch(() => {});
                 });
             }
-        }, this.scrollAnimationDuration);
+        }, this.#scrollAnimationDuration);
     }
+
     centerActiveItem() {
-        const activeItem = this.items[this.activeIndex];
+        const activeItem = this.#items[this.#activeIndex];
         if (!activeItem) return;
-        centerItem(this.container, activeItem);
+        centerItem(this.#container, activeItem);
     }
 
     isItemCentered(item) {
-        const containerRect = this.container.getBoundingClientRect();
+        const containerRect = this.#container.getBoundingClientRect();
         const itemRect = item.getBoundingClientRect();
 
         const containerCenter = containerRect.left + containerRect.width / 2;
@@ -178,23 +208,23 @@ export class ReelNavigator {
     handleClick(e) {
         const clicked = e.target.closest(SELECTORS.REEL_ITEM);
 
-        if (this.isScrolling) {
+        if (this.#isScrolling) {
             e.preventDefault();
             e.stopPropagation();
             return;
         }
 
-        const rect = this.container.getBoundingClientRect();
+        const rect = this.#container.getBoundingClientRect();
 
         if (clicked) {
-            const idx = this.items.indexOf(clicked);
+            const idx = this.#items.indexOf(clicked);
 
             const isActiveAndCentered =
-                idx === this.activeIndex &&
+                idx === this.#activeIndex &&
                 this.isItemCentered(clicked);
 
             if (!isActiveAndCentered) {
-                this.isScrolling = true;
+                this.#isScrolling = true;
                 this.activate(idx);
             } else {
                 const vid = clicked.querySelector('video');
@@ -214,17 +244,16 @@ export class ReelNavigator {
         }
     }
 
-
     handleKey(e) {
         const now = Date.now();
-        if (now - this.lastKeyPressTime < 500) return;
+        if (now - this.#lastKeyPressTime < 500) return;
 
-        this.lastKeyPressTime = now;
-        this.keyLocked = true;
+        this.#lastKeyPressTime = now;
+        this.#keyLocked = true;
 
-        clearTimeout(this.keyDebounceTimeout);
-        this.keyDebounceTimeout = setTimeout(() => {
-            this.keyLocked = false;
+        clearTimeout(this.#keyDebounceTimeout);
+        this.#keyDebounceTimeout = setTimeout(() => {
+            this.#keyLocked = false;
         }, 500);
 
         if (!isMobile()) {
@@ -259,7 +288,7 @@ export class ReelNavigator {
     }
 
     refresh() {
-        this.items = Array.from(this.container.querySelectorAll(SELECTORS.REEL_ITEM));
+        this.#items = Array.from(this.#container.querySelectorAll(SELECTORS.REEL_ITEM));
         this.addDownloadButtons();
         this.centerActiveItem();
     }

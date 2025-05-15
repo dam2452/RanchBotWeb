@@ -9,6 +9,7 @@
     gap: var(--section-gap);
     text-align: center;
     min-height: 100vh;
+    transition: padding 0.4s ease;
 }
 
 .search-container {
@@ -18,10 +19,114 @@
     flex-direction: column;
     align-items: center;
     z-index: 100;
+    transition: width 0.4s ease, margin 0.4s ease;
+}
+
+.filter-btn {
+    padding: clamp(10px, 1.5vw, 14px) clamp(16px, 2vw, 24px);
+    font-size: clamp(1rem, 2.5vw, 1.6rem);
+    font-weight: bold;
+    background: var(--color-btn-bg, #888);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-l);
+    cursor: pointer;
+    box-shadow: var(--box-shadow-hover);
+    transition: all 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    transform: rotate(5deg);
+    position: absolute;
+    bottom: -50px;
+    right: 8px;
+}
+
+.filter-btn:hover {
+    transform: rotate(5deg) scale(1.08);
+    background: var(--color-btn-bg-hover, #666);
+}
+
+.filter-btn:active {
+    transform: rotate(5deg) scale(0.95);
+    box-shadow: var(--box-shadow-active);
+}
+
+.search-icon-btn {
+    transition: transform 0.2s ease;
+}
+
+.search-icon-btn:active {
+    transform: scale(0.95);
+}
+
+.search-icon-btn:active img {
+    transform: scale(0.95);
+}
+
+.logo-wrapper {
+    transition: transform 0.4s ease;
+}
+
+.search-page .logo-img {
+    width: clamp(180px, 22vw, 260px);
+    margin-bottom: 15px;
+    transition: transform 0.3s ease;
+}
+
+.search-page .title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: 20px;
+    transition: font-size 0.4s ease, margin 0.4s ease;
+}
+
+.search-page .logo-wrapper a:active .logo-img {
+    transform: scale(0.95);
+}
+
+.search-input {
+    transition: width 0.4s ease, padding 0.4s ease;
 }
 
 @media screen and (max-width: 850px) {
     .search-container {
-        width: 80vw;
+        width: 85vw;
+        max-width: 500px;
+    }
+
+    .search-page .logo-img {
+        width: clamp(160px, 35vw, 220px);
+    }
+
+    .search-page .title {
+        font-size: clamp(2.2rem, 7vw, 3rem);
+    }
+
+    .filter-btn {
+        bottom: -40px;
+        transform: rotate(5deg) translateY(-5px);
+    }
+
+    .search-input {
+        width: 100%;
+        padding-right: 60px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .search-container {
+        width: 85vw;
+        margin: 0 auto;
+    }
+
+    .search-page .logo-img {
+        width: clamp(140px, 40vw, 180px);
+    }
+
+    .search-page {
+        padding-top: 40px;
+    }
+
+    .filter-btn {
+        bottom: -35px;
+        padding: 8px 16px;
+        font-size: 1rem;
     }
 }

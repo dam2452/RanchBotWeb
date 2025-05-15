@@ -90,6 +90,11 @@ main {
     z-index: 5;
 }
 
+.quote-btn:active {
+    transform: scale(0.95);
+    box-shadow: var(--box-shadow-active);
+}
+
 @media(max-width: 1199px) {
     .hero {
         display: flex;
@@ -254,6 +259,11 @@ main {
 
 .preview-link:hover {
     transform: scale(1.02);
+}
+
+.preview-link:active {
+    transform: scale(0.95);
+    box-shadow: var(--box-shadow-active);
 }
 
 .preview-link:hover .preview-img {

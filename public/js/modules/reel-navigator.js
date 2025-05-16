@@ -32,7 +32,7 @@ export class ReelNavigator {
         this.#lastKeyPressTime = 0;
         this.#keyLocked = false;
         this.#isScrolling = false;
-        this.#scrollAnimationDuration = 600; 
+        this.#scrollAnimationDuration = 600;
         this.#blockingOverlay = null;
 
         this.#setupBlockingOverlay();

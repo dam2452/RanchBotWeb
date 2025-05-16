@@ -34,69 +34,62 @@
     right: 8px;
 }
 
-.top-download-btn {
+.top-download-btn,
+.inspect-btn {
     position: absolute;
-    top: 15px;
-    right: 15px;
     z-index: 100;
-    background-color: rgba(170, 170, 170, 0.8);
-    color: white;
     border: none;
     border-radius: 8px;
-    padding: 8px 12px;
     font-size: 14px;
     font-weight: 500;
-    cursor: pointer;
+    cursor: default;
     opacity: 0;
     transition: opacity 0.3s ease, transform 0.2s ease;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
 }
 
-.reel-item:hover .top-download-btn,
-.reel-item.active .top-download-btn {
-    opacity: 0.8;
-}
-
-.top-download-btn:hover {
-    opacity: 1 !important;
-    transform: scale(1.05);
-}
-
-.top-download-btn:active {
-    transform: scale(0.95);
-    box-shadow: var(--box-shadow-active);
+.top-download-btn {
+    top: 15px;
+    right: 15px;
+    background-color: rgba(170, 170, 170, 0.8);
+    color: white;
+    padding: 8px 12px;
 }
 
 .inspect-btn {
-    position: absolute;
     top: 15px;
     left: 15px;
-    z-index: 100;
     background: linear-gradient(145deg, var(--color-bg-end), #e09340);
     color: white;
-    border: none;
-    border-radius: 8px;
     padding: 8px 12px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.reel-item:hover .inspect-btn,
+.reel-item:not(.active):hover .top-download-btn,
+.reel-item:not(.active):hover .inspect-btn {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.reel-item.active .top-download-btn,
 .reel-item.active .inspect-btn {
     opacity: 0.8;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
-.inspect-btn:hover {
+.reel-item.active .top-download-btn:hover,
+.reel-item.active .inspect-btn:hover {
     opacity: 1 !important;
     transform: scale(1.05);
+}
+
+.reel-item.active .inspect-btn:hover {
     background: linear-gradient(145deg, #ffb85c, var(--color-bg-end));
 }
 
-.inspect-btn:active {
+.reel-item.active .top-download-btn:active,
+.reel-item.active .inspect-btn:active {
     transform: scale(0.95);
     box-shadow: var(--box-shadow-active);
 }

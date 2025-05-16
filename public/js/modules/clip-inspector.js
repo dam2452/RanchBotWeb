@@ -35,10 +35,10 @@ export class ClipInspector {
     #resizeObserver = null;
 
     constructor() {
-        console.log("Inicjalizacja ClipInspector (transformacja w miejscu)...");
+        console.log("Initializing ClipInspector (in-place transformation)...");
         this.#createBackdrop();
         this.#setupResizeObserver();
-        console.log("Inicjalizacja ClipInspector zakończona pomyślnie");
+        console.log("ClipInspector initialization completed successfully");
     }
 
     get visible() {
@@ -50,14 +50,11 @@ export class ClipInspector {
     }
 
     #createBackdrop() {
-        // Tworzenie przyciemnionego tła, które blokuje interakcje
         this.#backdrop = createElement('div', {
             className: 'clip-editor-backdrop'
         });
 
-        // Dodaj obsługę kliknięcia na tło, aby zamknąć edytor
         this.#backdrop.addEventListener('click', (e) => {
-            // Prevent clicks on the backdrop from closing if they're actually on the controls
             if (e.target === this.#backdrop) {
                 this.hide();
             }
@@ -67,10 +64,8 @@ export class ClipInspector {
     }
 
     #setupResizeObserver() {
-        // Create a resize observer to ensure controls remain visible when window is resized
         this.#resizeObserver = new ResizeObserver(entries => {
             if (this.#visible && this.#targetClipElement) {
-                // Ensure the clip is fully visible within the viewport
                 this.#ensureVisibility();
             }
         });
@@ -79,47 +74,39 @@ export class ClipInspector {
     #ensureVisibility() {
         if (!this.#targetClipElement) return;
 
-        // Make sure the editing clip and its controls are visible in the viewport
         const rect = this.#targetClipElement.getBoundingClientRect();
         const windowHeight = window.innerHeight;
 
-        // If the clip extends beyond the bottom of the viewport, scroll it into view
         if (rect.bottom > windowHeight) {
-            const scrollAdjustment = rect.bottom - windowHeight + 20; // add padding
+            const scrollAdjustment = rect.bottom - windowHeight + 20;
             window.scrollBy({
                 top: scrollAdjustment,
                 behavior: 'smooth'
             });
         }
 
-        // If the controls container exists, ensure it's visible
         if (this.#controlsContainer) {
-            // Force display to ensure visibility
             this.#controlsContainer.style.display = 'block';
             this.#controlsContainer.style.opacity = '1';
         }
     }
 
     show(clipIndex, clipUrl, clipElement) {
-        console.log(`Otwieranie edytora dla klipu ${clipIndex}, URL: ${clipUrl.substring(0, 50)}`);
+        console.log(`Opening editor for clip ${clipIndex}, URL: ${clipUrl.substring(0, 50)}`);
         this.#clipIndex = clipIndex;
         this.#originalClipUrl = clipUrl;
         this.#targetClipElement = clipElement;
 
-        // Dodawanie klasy do klipu, aby go powiększyć
         this.#targetClipElement.classList.add('editing-mode');
 
-        // Znajdź wideo element
         this.#video = this.#targetClipElement.querySelector('video');
         if (this.#video) {
             this.#clipUrl = this.#video.src;
-            // Zapewniamy, że wideo jest odtwarzane
             this.#video.play().catch(err => {
-                console.warn("Nie można automatycznie odtworzyć wideo:", err);
+                console.warn("Unable to autoplay video:", err);
             });
         }
 
-        // Jeśli już istnieje kontener kontrolek, usuń go
         if (this.#controlsContainer) {
             if (this.#targetClipElement.contains(this.#controlsContainer)) {
                 this.#targetClipElement.removeChild(this.#controlsContainer);
@@ -127,19 +114,14 @@ export class ClipInspector {
             this.#controlsContainer = null;
         }
 
-        // Dodaj kontrolki edycji do klipu
         this.#createControlsContainer();
         this.#targetClipElement.appendChild(this.#controlsContainer);
 
-        // Start observing for resize events
         this.#resizeObserver.observe(document.body);
 
-        // Pokaż przyciemnione tło, które blokuje interakcje
         this.#backdrop.classList.add('visible');
 
-        // Jeśli mamy referencję do ReelNavigator
         if (this.#reelNavigatorInstance) {
-            // Wyłączamy nawigację, aby nie kolidowała z edycją
             if (this.#reelNavigatorInstance.disableNavigation) {
                 this.#reelNavigatorInstance.disableNavigation();
             }
@@ -156,26 +138,23 @@ export class ClipInspector {
         }
 
         this.#visible = true;
-        this.updateStatus(`Klip ${clipIndex + 1} załadowany. Dostosuj za pomocą suwaków.`);
+        this.updateStatus(`Clip ${clipIndex + 1} loaded. Adjust with sliders.`);
 
-        // Ensure the clip and controls are visible
         setTimeout(() => this.#ensureVisibility(), 100);
     }
 
     #createControlsContainer() {
-        // Utwórz kontener kontrolek
         this.#controlsContainer = createElement('div', {
             className: 'clip-controls-container'
         });
 
-        // Dodaj nagłówek z przyciskiem zamknięcia
         const header = createElement('div', {
             className: 'clip-editor-header'
         });
 
         const title = createElement('div', {
             className: 'clip-editor-title'
-        }, 'Dostosowanie klipu');
+        }, 'Clip Adjustment');
 
         this.#closeBtn = createElement('button', {
             className: 'close-editor-btn'
@@ -185,19 +164,17 @@ export class ClipInspector {
         header.appendChild(this.#closeBtn);
         this.#controlsContainer.appendChild(header);
 
-        // Dodaj kontrolki dostosowania
         const adjustmentControls = createElement('div', {
             className: 'adjustment-controls'
         });
 
-        // Lewy suwak
         const leftSliderContainer = createElement('div', {
             className: 'time-slider-container'
         });
 
         const leftLabel = createElement('div', {
             className: 'time-slider-label'
-        }, 'Lewa strona (+ rozszerz, - przytnij): ');
+        }, 'Left side (+ extend, - trim): ');
 
         this.#leftValue = createElement('span', {
             className: 'left-adjust-value'
@@ -218,14 +195,13 @@ export class ClipInspector {
         leftSliderContainer.appendChild(this.#leftSlider);
         adjustmentControls.appendChild(leftSliderContainer);
 
-        // Prawy suwak
         const rightSliderContainer = createElement('div', {
             className: 'time-slider-container'
         });
 
         const rightLabel = createElement('div', {
             className: 'time-slider-label'
-        }, 'Prawa strona (+ rozszerz, - przytnij): ');
+        }, 'Right side (+ extend, - trim): ');
 
         this.#rightValue = createElement('span', {
             className: 'right-adjust-value'
@@ -248,14 +224,13 @@ export class ClipInspector {
 
         this.#controlsContainer.appendChild(adjustmentControls);
 
-        // Dodaj kontrolki zapisywania
         const saveControls = createElement('div', {
             className: 'save-controls'
         });
 
         this.#toggleSaveBtn = createElement('button', {
             className: 'toggle-save-btn'
-        }, 'Zapisz klip');
+        }, 'Save clip');
 
         this.#saveForm = createElement('div', {
             className: 'save-form'
@@ -264,12 +239,12 @@ export class ClipInspector {
         this.#clipNameInput = createElement('input', {
             type: 'text',
             className: 'clip-name-input',
-            placeholder: 'Podaj nazwę klipu'
+            placeholder: 'Enter clip name'
         });
 
         this.#saveClipBtn = createElement('button', {
             className: 'save-clip-btn'
-        }, 'Zapisz');
+        }, 'Save');
 
         this.#saveForm.appendChild(this.#clipNameInput);
         this.#saveForm.appendChild(this.#saveClipBtn);
@@ -278,24 +253,20 @@ export class ClipInspector {
         saveControls.appendChild(this.#saveForm);
         this.#controlsContainer.appendChild(saveControls);
 
-        // Dodaj przycisk pobierania
         this.#downloadBtn = createElement('button', {
             className: 'download-adjusted-clip-btn'
-        }, 'Pobierz dostosowany klip');
+        }, 'Download adjusted clip');
 
         this.#controlsContainer.appendChild(this.#downloadBtn);
 
-        // Dodaj element statusu
         this.#statusEl = createElement('div', {
             className: 'clip-editor-status'
         });
 
         this.#controlsContainer.appendChild(this.#statusEl);
 
-        // Dodaj nasłuchiwanie zdarzeń
         this.attachEvents();
 
-        // Force initial visibility
         setTimeout(() => {
             if (this.#controlsContainer) {
                 this.#controlsContainer.style.opacity = '1';
@@ -319,7 +290,7 @@ export class ClipInspector {
 
         if (this.#toggleSaveBtn) {
             this.#toggleSaveBtn.addEventListener('click', () => {
-                console.log("Przycisk zapisu klipu naciśnięty");
+                console.log("Save clip button pressed");
                 this.#saveForm.classList.toggle(CLASSES.VISIBLE);
                 if (this.#saveForm.classList.contains(CLASSES.VISIBLE)) {
                     this.#clipNameInput.focus();
@@ -329,21 +300,21 @@ export class ClipInspector {
 
         if (this.#saveClipBtn) {
             this.#saveClipBtn.addEventListener('click', () => {
-                console.log("Przycisk zapisu naciśnięty");
+                console.log("Save button pressed");
                 this.saveClip();
             });
         }
 
         if (this.#downloadBtn) {
             this.#downloadBtn.addEventListener('click', () => {
-                console.log("Przycisk pobierania naciśnięty");
+                console.log("Download button pressed");
                 this.downloadAdjustedClip();
             });
         }
 
         if (this.#closeBtn) {
             this.#closeBtn.addEventListener('click', () => {
-                console.log("Przycisk zamknięcia naciśnięty");
+                console.log("Close button pressed");
                 this.hide();
             });
         }
@@ -351,13 +322,12 @@ export class ClipInspector {
         if (this.#clipNameInput) {
             this.#clipNameInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
-                    console.log("Naciśnięto Enter w polu nazwy klipu");
+                    console.log("Enter pressed in clip name input");
                     this.saveClip();
                 }
             });
         }
 
-        // Dodaj obsługę klawisza Escape do zamknięcia
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.#visible) {
                 this.hide();
@@ -407,33 +377,26 @@ export class ClipInspector {
     }
 
     hide() {
-        console.log("Zamykanie edytora klipu");
+        console.log("Closing clip editor");
 
-        // Stop observing resize events
         this.#resizeObserver.disconnect();
 
         if (this.#video) {
-            // Pozostawiamy odtwarzanie wideo, ponieważ to będzie znów normalny klip
         }
 
         this.clearPreviewState();
 
-        // Ukryj backdrop
         this.#backdrop.classList.remove('visible');
 
-        // Usuń tryb edycji
         if (this.#targetClipElement) {
             this.#targetClipElement.classList.remove('editing-mode');
 
-            // Usuń kontener kontrolek, jeśli istnieje
             if (this.#controlsContainer && this.#targetClipElement.contains(this.#controlsContainer)) {
                 this.#targetClipElement.removeChild(this.#controlsContainer);
             }
         }
 
-        // Jeśli mamy referencję do ReelNavigator
         if (this.#reelNavigatorInstance) {
-            // Włączamy z powrotem nawigację
             if (this.#reelNavigatorInstance.enableNavigation) {
                 this.#reelNavigatorInstance.enableNavigation();
             }
@@ -466,41 +429,41 @@ export class ClipInspector {
 
     async updatePreview() {
         if (this.#isUpdatingPreview || !this.#video) {
-            console.log("Aktualizacja podglądu już w toku lub brak wideo, pomijanie.");
+            console.log("Preview update already in progress or no video, skipping.");
             return;
         }
 
         if (this.#leftAdjust === 0 && this.#rightAdjust === 0) {
             if (this.#video.src !== this.#originalClipUrl) {
-                console.log("Brak dostosowań, przywracanie oryginalnego klipu w podglądzie.");
+                console.log("No adjustments, reverting to original clip preview.");
                 this.revertToOriginalPreview();
             } else {
-                console.log("Brak dostosowań, oryginał już wyświetlony.");
+                console.log("No adjustments, original already shown.");
             }
             return;
         }
 
         this.#isUpdatingPreview = true;
-        this.updateStatus('Aktualizacja podglądu...');
-        console.log(`Rozpoczynanie aktualizacji podglądu dla L:${this.#leftAdjust}, R:${this.#rightAdjust}`);
+        this.updateStatus('Updating preview...');
+        console.log(`Starting preview update for L:${this.#leftAdjust}, R:${this.#rightAdjust}`);
 
         try {
             const clipIndexForApi = parseInt(this.#clipIndex) + 1;
             const previewBlob = await adjustVideo(clipIndexForApi, this.#leftAdjust, this.#rightAdjust);
 
             if (!previewBlob || previewBlob.size === 0) {
-                throw new Error("API /d zwróciło pusty blob dla podglądu.");
+                throw new Error("API /d returned empty blob for preview.");
             }
 
-            console.log("Otrzymano blob podglądu, rozmiar:", previewBlob.size);
+            console.log("Received preview blob, size:", previewBlob.size);
 
             if (this.#currentPreviewUrl) {
-                console.log("Zwalnianie poprzedniego URL podglądu:", this.#currentPreviewUrl.substring(0, 50));
+                console.log("Releasing previous preview URL:", this.#currentPreviewUrl.substring(0, 50));
                 URL.revokeObjectURL(this.#currentPreviewUrl);
             }
 
             this.#currentPreviewUrl = URL.createObjectURL(previewBlob);
-            console.log("Utworzono nowy URL podglądu:", this.#currentPreviewUrl.substring(0, 50));
+            console.log("Created new preview URL:", this.#currentPreviewUrl.substring(0, 50));
 
             const currentTime = this.#video.currentTime;
             const isPaused = this.#video.paused;
@@ -510,14 +473,14 @@ export class ClipInspector {
             this.#video.load();
 
             this.#video.addEventListener('loadeddata', () => {
-                console.log("Nowe dane wideo załadowane, przywracanie czasu:", currentTime);
+                console.log("New video data loaded, restoring time:", currentTime);
                 setTimeout(() => {
                     this.#video.currentTime = currentTime;
                     if (!isPaused) {
-                        this.#video.play().catch(e => console.warn("Automatyczne odtwarzanie nie powiodło się po aktualizacji podglądu:", e));
+                        this.#video.play().catch(e => console.warn("Autoplay failed after preview update:", e));
                     }
                 }, 50);
-                this.updateStatus('Podgląd zaktualizowany.');
+                this.updateStatus('Preview updated.');
                 this.#isUpdatingPreview = false;
 
                 // Ensure controls remain visible after video update
@@ -525,15 +488,15 @@ export class ClipInspector {
             }, { once: true });
 
             this.#video.addEventListener('error', (e) => {
-                console.error("Błąd ładowania nowego źródła wideo podglądu:", e);
-                this.updateStatus('Błąd ładowania podglądu.');
+                console.error("Error loading new preview video source:", e);
+                this.updateStatus('Preview loading error.');
                 this.revertToOriginalPreview();
                 this.#isUpdatingPreview = false;
             }, { once: true });
 
         } catch (error) {
-            console.error('Błąd podczas aktualizacji podglądu:', error);
-            this.updateStatus(`Błąd aktualizacji podglądu: ${error.message}`);
+            console.error('Error during preview update:', error);
+            this.updateStatus(`Preview update error: ${error.message}`);
             this.#isUpdatingPreview = false;
         }
     }
@@ -541,7 +504,7 @@ export class ClipInspector {
     revertToOriginalPreview() {
         if (!this.#video) return;
 
-        console.log("Przywracanie oryginalnego URL podglądu:", this.#originalClipUrl.substring(0, 50));
+        console.log("Reverting to original preview URL:", this.#originalClipUrl.substring(0, 50));
 
         if (this.#currentPreviewUrl && this.#currentPreviewUrl !== this.#originalClipUrl) {
             URL.revokeObjectURL(this.#currentPreviewUrl);
@@ -557,25 +520,24 @@ export class ClipInspector {
             this.#video.load();
 
             this.#video.addEventListener('loadeddata', () => {
-                console.log("Oryginalne dane wideo załadowane, przywracanie czasu:", currentTime);
+                console.log("Original video data loaded, restoring time:", currentTime);
                 setTimeout(() => {
                     this.#video.currentTime = currentTime;
                     if (!isPaused) {
-                        this.#video.play().catch(e => console.warn("Automatyczne odtwarzanie nie powiodło się po przywróceniu oryginału:", e));
+                        this.#video.play().catch(e => console.warn("Autoplay failed after reverting to original:", e));
                     }
                 }, 50);
-                this.updateStatus('Oryginalny klip przywrócony.');
+                this.updateStatus('Original clip restored.');
 
-                // Ensure controls remain visible after video reset
                 this.#ensureVisibility();
             }, { once: true });
 
             this.#video.addEventListener('error', (e) => {
-                console.error("Błąd ładowania oryginalnego źródła wideo:", e);
-                this.updateStatus('Błąd ładowania oryginalnego klipu.');
+                console.error("Error loading original video source:", e);
+                this.updateStatus('Error loading original clip.');
             }, { once: true });
         } else {
-            this.updateStatus('Oryginalny klip już wyświetlony.');
+            this.updateStatus('Original clip already displayed.');
         }
     }
 
@@ -588,35 +550,35 @@ export class ClipInspector {
             return;
         }
 
-        this.updateStatus('Przygotowanie do zapisania...');
+        this.updateStatus('Preparing to save...');
 
         try {
             await this.adjustClip();
 
-            this.updateStatus('Zapisywanie klipu na serwerze...');
+            this.updateStatus('Saving clip to server...');
             const response = await apiSaveClip(clipName);
-            console.log('Odpowiedź API zapisu (/z):', response);
+            console.log('API save response (/z):', response);
 
             if (response && response.status === 'success') {
-                this.updateStatus(`Klip "${clipName}" zapisany pomyślnie!`);
+                this.updateStatus(`Clip "${clipName}" saved successfully!`);
                 if (this.#saveForm) {
                     this.#saveForm.classList.remove(CLASSES.VISIBLE);
                 }
                 this.#clipNameInput.value = '';
             } else {
-                const errorMessage = response?.message || 'Nieznany błąd zapisu.';
-                throw new Error(`Zapis nie powiódł się: ${errorMessage}`);
+                const errorMessage = response?.message || 'Unknown save error.';
+                throw new Error(`Save failed: ${errorMessage}`);
             }
         } catch (error) {
-            console.error('Błąd podczas zapisywania klipu:', error);
-            this.updateStatus(`Błąd zapisu: ${error.message}`);
+            console.error('Error saving clip:', error);
+            this.updateStatus(`Save error: ${error.message}`);
         }
     }
 
     async adjustClip() {
         try {
             if (this.#leftAdjust === 0 && this.#rightAdjust === 0) {
-                console.log("Brak dostosowań, nie ma potrzeby wywoływania /d");
+                console.log("No adjustments, no need to call /d");
                 return null;
             }
 
@@ -627,17 +589,17 @@ export class ClipInspector {
                 this.#rightAdjust.toString()
             ];
 
-            console.log(`Wywołanie /d z parametrami:`, params);
+            console.log(`Calling /d with params:`, params);
             const adjustedBlob = await adjustVideo(adjustedClipIndex, this.#leftAdjust, this.#rightAdjust);
 
             if (!adjustedBlob || adjustedBlob.size === 0) {
-                throw new Error("API /d zwróciło pusty blob podczas dostosowywania.")
+                throw new Error("API /d returned empty blob during adjustment.");
             }
 
-            console.log("Otrzymano dostosowany blob z /d (w adjustClip), rozmiar:", adjustedBlob.size);
+            console.log("Received adjusted blob from /d (in adjustClip), size:", adjustedBlob.size);
             return adjustedBlob;
         } catch (error) {
-            console.error('Błąd podczas dostosowywania klipu przez /d:', error);
+            console.error('Error adjusting clip via /d:', error);
             throw error;
         }
     }
@@ -649,33 +611,33 @@ export class ClipInspector {
 
         try {
             if (this.#leftAdjust === 0 && this.#rightAdjust === 0) {
-                this.updateStatus('Pobieranie oryginalnego klipu...');
-                console.log("Pobieranie oryginalnego klipu przez /w, indeks:", clipId);
+                this.updateStatus('Downloading original clip...');
+                console.log("Downloading original clip via /w, index:", clipId);
                 blobToDownload = await getVideo(clipId);
                 fileName = `clip_${clipId}${FILE_EXTENSIONS.VIDEO}`;
             } else {
-                this.updateStatus('Dostosowywanie klipu do pobrania...');
+                this.updateStatus('Adjusting clip for download...');
                 blobToDownload = await this.adjustClip();
-                if (!blobToDownload) throw new Error("Nie można uzyskać dostosowanego klipu.");
+                if (!blobToDownload) throw new Error("Unable to obtain adjusted clip.");
 
-                this.updateStatus('Przygotowanie dostosowanego klipu do pobrania...');
+                this.updateStatus('Preparing adjusted clip for download...');
 
                 const formatAdjust = (val) => val >= 0 ? `+${val.toFixed(1)}` : `${val.toFixed(1)}`;
                 fileName = `clip_${clipId}_L${formatAdjust(this.#leftAdjust)}_R${formatAdjust(this.#rightAdjust)}${FILE_EXTENSIONS.VIDEO}`;
             }
 
             if (!blobToDownload || blobToDownload.size === 0) {
-                throw new Error("Otrzymano pusty blob do pobrania.");
+                throw new Error("Received empty blob for download.");
             }
 
-            console.log(`Przygotowanie do pobrania bloba: ${fileName}, rozmiar: ${blobToDownload.size}`);
+            console.log(`Preparing to download blob: ${fileName}, size: ${blobToDownload.size}`);
 
             downloadBlob(blobToDownload, fileName);
-            this.updateStatus('Klip gotowy do pobrania!');
+            this.updateStatus('Clip ready for download!');
 
         } catch (error) {
-            console.error('Błąd podczas pobierania klipu:', error);
-            this.updateStatus(`Błąd pobierania: ${error.message}`);
+            console.error('Error downloading clip:', error);
+            this.updateStatus(`Download error: ${error.message}`);
         }
     }
 }

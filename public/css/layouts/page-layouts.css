@@ -81,7 +81,7 @@
     height: 80vh;
     padding: 20px 0;
     box-sizing: border-box;
-    margin-top: 15vh;   /* <<< POPRAWIONE: Teraz jest na desktopie! */
+    margin-top: 15vh;
 }
 
 .clips-page:last-child {
@@ -168,7 +168,7 @@
         height: 80vh;
         padding: 20px 0;
         box-sizing: border-box;
-        margin-top: 0;   /* na mobile bez przesunięcia */
+        margin-top: 0;
     }
 
     .clips-page:last-child {

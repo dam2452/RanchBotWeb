@@ -5,7 +5,6 @@ body {
     overflow: hidden;
 }
 
-/* Domyślne style dla ekranów >= 1900px */
 .left {
     display: flex;
     flex-direction: column;
@@ -16,15 +15,15 @@ body {
 .logo-img {
     display: block;
     margin: 0 auto;
-    transform: scale(1.9); /* Zwiększenie rozmiaru logo o 90% */
-    margin-top: -40px; /* Przesunięcie logo wyżej */
-    margin-bottom: 90px; /* Zmniejszona przestrzeń pod logo o połowę */
+    transform: scale(1.9);
+    margin-top: -40px;
+    margin-bottom: 90px;
 }
 
 .left h1 {
     text-align: center;
-    margin-top: 60px; /* Zmniejszony odstęp między logo a napisem o połowę */
-    transform: scale(1.9); /* Zwiększenie rozmiaru napisu o 90% */
+    margin-top: 60px;
+    transform: scale(1.9);
 }
 
 .actions {
@@ -153,12 +152,11 @@ body {
     text-align: center;
     background-color: var(--color-form-bg);
     box-shadow: inset 0 0 3px var(--shadow-strong);
-    color: #8B4513; /* Ciemny brązowy kolor tekstu */
+    color: #8B4513;
 }
 
-/* Style dla placeholderów w różnych przeglądarkach */
 .form-overlay input::placeholder {
-    color: #A0522D; /* Brązowy kolor dla placeholder */
+    color: #A0522D;
     opacity: 0.8;
 }
 
@@ -189,13 +187,13 @@ body {
 }
 
 .form-overlay input[name="password"] {
-    top: 37.6%; /* Zmienione z 37% na 37.6% - przesunięcie o około 3px niżej */
+    top: 37.6%;
 }
 
 .form-overlay input:focus {
     outline: 2px solid #c58b4f;
     background-color: var(--color-form-focus);
-    color: #8B4513; /* Utrzymanie brązowego koloru podczas edycji */
+    color: #8B4513;
 }
 
 .form-overlay button {
@@ -266,16 +264,15 @@ body {
     transition: opacity 0.3s;
 }
 
-/* Style dla ekranów od 850px do 1900px */
 @media screen and (min-width: 850px) and (max-width: 1899px) {
     .logo-img {
-        transform: scale(1.5); /* Zmniejszony rozmiar logo */
+        transform: scale(1.5);
         margin-top: -20px;
         margin-bottom: 60px;
     }
 
     .left h1 {
-        transform: scale(1.5); /* Zmniejszony rozmiar napisu */
+        transform: scale(1.5);
         margin-top: 40px;
     }
 
@@ -294,17 +291,16 @@ body {
     }
 }
 
-/* Style dla ekranów poniżej 850px */
 @media screen and (max-width: 849px) {
     .logo-img {
-        transform: scale(1.5); /* Zwiększenie logo o 20% */
+        transform: scale(1.5);
         margin-top: 15px;
-        margin-bottom: 30px; /* Jeszcze bliżej napisu "ranch bot" */
+        margin-bottom: 30px;
     }
 
     .left h1 {
         transform: scale(1.2);
-        margin-top: 20px; /* Przybliżenie do logo */
+        margin-top: 20px;
     }
 
     .actions {
@@ -343,13 +339,13 @@ body {
 
     .form-overlay input[name="login"],
     .form-overlay input[name="password"] {
-        left: 15.5%; /* Zmniejszenie szerokości pola jeszcze o 4% */
+        left: 15.5%;
         width: 69%;
     }
 
     .form-overlay button {
         height: 5.5%;
-        font-size: clamp(8px, 0.7vw, 11px); /* 40% mniejszy napis "zaloguj się" */
+        font-size: clamp(8px, 0.7vw, 11px);
         transform: none;
     }
 

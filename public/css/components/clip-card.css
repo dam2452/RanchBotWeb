@@ -1,6 +1,6 @@
 .clip-card {
-    width: 100%; /* Pełna szerokość */
-    max-width: 624px; /* Zwiększone o 20% od poprzedniej wartości 520px */
+    width: 100%;
+    max-width: 624px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -27,7 +27,6 @@
     max-width: 90%;
 }
 
-/* Przycisk usuwania w dolnym prawym rogu */
 .delete-clip-btn {
     position: absolute;
     bottom: 10px;
@@ -63,7 +62,6 @@
     transform: none;
 }
 
-/* Dodatkowe style dla aktywnej karty (pomarańczowe podświetlenie) */
 .clip-card.active {
     box-shadow: 0 0 0 3px var(--color-user-btn), 0 10px 20px var(--shadow-strong);
 }
@@ -72,7 +70,7 @@
     .clip-card {
         width: 100%;
         height: auto;
-        max-width: 624px; /* Zwiększone o 20% również dla mobile */
+        max-width: 624px;
     }
 
     .clip-card video {

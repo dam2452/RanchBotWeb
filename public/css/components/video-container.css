@@ -22,8 +22,8 @@
     right: 10px !important;
     background-color: rgba(170, 170, 170, 0.9) !important;
     color: white !important;
-    padding: 6px 10px; !important;     /* DUŻY padding – TAK JAK DELETE */
-    border-radius: 6px !important;     /* Podobny/większy radius */
+    padding: 6px 10px; !important;
+    border-radius: 6px !important;
     font-size: 12px !important;
     font-weight: 500 !important;
     line-height: 1.2 !important;
@@ -38,7 +38,7 @@
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    min-height: 30px !important;      /* Minimalna wysokość, żeby był wyższy */
+    min-height: 30px !important;
     max-height: unset !important;
 }
 

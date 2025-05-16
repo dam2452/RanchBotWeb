@@ -24,13 +24,10 @@ export class PagedClipsNavigator {
     }
 
     #handleClick(e) {
-        // Sprawdzamy, czy kliknięcie dotyczy klipu na aktualnie widocznej stronie
         const clipCard = e.target.closest('.clip-card');
         if (clipCard) {
-            // Sprawdzamy, czy clip-card jest na aktualnie widocznej stronie
             const currentPage = this.#pages[this.#currentPage];
             if (currentPage && currentPage.contains(clipCard)) {
-                // Kliknięcie dotyczy klipu na aktualnie widocznej stronie - ignorujemy nawigację
                 return;
             }
         }

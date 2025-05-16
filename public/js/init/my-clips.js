@@ -56,28 +56,22 @@ class MyClipsPageManager {
         this.#pageContainer.insertAdjacentHTML('beforeend', userButtons);
     }
 
-    /* ----------  CLIPS  ---------- */
     async #loadAndRenderClips () {
-        await this.#clipsManager.loadClips();          // pobranie z API
-        this.#clipsManager.renderClips();              // tworzy .clips-page z . clip-card
+        await this.#clipsManager.loadClips();
+        this.#clipsManager.renderClips();
         this.#initializeNavigationAndVideo();
         this.#clipsManager.setupDeleteButtons();
     }
 
-    /* ----------  NAVIGACJA + WIDEO  ---------- */
     #initializeNavigationAndVideo () {
-        // 1 wideo naraz – jak w Search Results
         this.#videoManager = initializeVideoContainers();
 
-        // Sprawdź czy to urządzenie mobilne i wybierz odpowiedni nawigator
         if (window.innerWidth <= 850) {
-            // Użyj nawigatora mobilnego dla urządzeń mobilnych
             this.#navigator = new MobileClipsNavigator({
                 container: document.querySelector('.clips-reel'),
                 videoManager: this.#videoManager
             });
         } else {
-            // Użyj standardowego nawigatora dla desktopów
             this.#navigator = new PagedClipsNavigator({
                 container: document.querySelector('.clips-reel'),
                 onPageChange: () => this.#videoManager.stopAll()
@@ -97,11 +91,9 @@ class MyClipsPageManager {
             const container = card.querySelector('.video-container');
 
             video.addEventListener('play', () => {
-                // Resetujemy wszystkie podświetlenia
                 document.querySelectorAll('.video-container').forEach(c => {
                     c.classList.remove('active');
                 });
-                // Dodajemy podświetlenie dla aktywnego kontenera wideo
                 container.classList.add('active');
             });
 

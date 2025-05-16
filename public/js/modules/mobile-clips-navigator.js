@@ -24,26 +24,22 @@ export class MobileClipsNavigator {
     }
 
     #formatMobilePages() {
-        // Ograniczamy liczbę klipów na stronę do 3 dla widoku mobilnego
         const clipsPerPage = 3;
         const allClips = [];
 
-        // Zbierz wszystkie klipy ze stron
         this.#pages.forEach(page => {
             const clips = Array.from(page.querySelectorAll('.clip-card'));
             allClips.push(...clips);
-            page.innerHTML = ''; // Opróżnij stronę
+            page.innerHTML = '';
         });
 
-        // Usuń stare strony
         this.#pages.forEach(page => page.remove());
         this.#pages = [];
 
-        // Twórz nowe strony po 3 klipy każda
         for (let i = 0; i < allClips.length; i += clipsPerPage) {
             const newPage = document.createElement('div');
             newPage.className = 'clips-page';
-            newPage.style.display = 'none'; // Ukryj wszystkie strony na początku
+            newPage.style.display = 'none';
 
             const pageClips = allClips.slice(i, i + clipsPerPage);
             pageClips.forEach(clip => newPage.appendChild(clip));
@@ -61,7 +57,6 @@ export class MobileClipsNavigator {
         this.#pageIndicator = document.createElement('div');
         this.#pageIndicator.className = 'mobile-page-indicator';
 
-        // Twórz kropki wskazujące strony
         for (let i = 0; i < this.#pages.length; i++) {
             const dot = document.createElement('div');
             dot.className = 'page-dot';
@@ -101,7 +96,6 @@ export class MobileClipsNavigator {
     }
 
     #attachEvents() {
-        // Obsługa klawiszy strzałek
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') {
                 this.navigate(-1);
@@ -118,7 +112,6 @@ export class MobileClipsNavigator {
             }
         });
 
-        // Obsługa kółka myszy
         this.#container.addEventListener('wheel', (e) => {
             e.preventDefault();
             if (this.#isScrolling) return;
@@ -130,7 +123,6 @@ export class MobileClipsNavigator {
             this.navigate(direction);
         }, { passive: false });
 
-        // Obsługa gestów przesuwania (swipe)
         let startX = 0;
         let startY = 0;
 
@@ -140,7 +132,6 @@ export class MobileClipsNavigator {
         }, { passive: true });
 
         this.#container.addEventListener('touchmove', (e) => {
-            // Zapobiegaj domyślnemu przewijaniu strony
             e.preventDefault();
         }, { passive: false });
 
@@ -150,15 +141,12 @@ export class MobileClipsNavigator {
             const diffX = startX - endX;
             const diffY = startY - endY;
 
-            // Ustal główny kierunek przesuwania
             if (Math.abs(diffX) > Math.abs(diffY)) {
-                // Poziome przesuwanie
-                if (Math.abs(diffX) > 50) { // Minimalna odległość swipe
+                if (Math.abs(diffX) > 50) {
                     const direction = diffX > 0 ? 1 : -1;
                     this.navigate(direction);
                 }
             } else {
-                // Pionowe przesuwanie
                 if (Math.abs(diffY) > 50) {
                     const direction = diffY > 0 ? 1 : -1;
                     this.navigate(direction);
@@ -166,9 +154,7 @@ export class MobileClipsNavigator {
             }
         }, { passive: true });
 
-        // Umożliw kliknięcie na kontener, aby nawigować
         this.#container.addEventListener('click', (e) => {
-            // Tylko jeśli kliknięcie nie było na klipy czy inne elementy interaktywne
             if (!e.target.closest('.clip-card') &&
                 !e.target.closest('.delete-clip-btn') &&
                 !e.target.closest('.download-btn')) {
@@ -177,7 +163,6 @@ export class MobileClipsNavigator {
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
 
-                // Nawiguj w zależności od położenia kliknięcia
                 if (x > rect.width / 2 || y > rect.height / 2) {
                     this.navigate(1);
                 } else {
@@ -202,12 +187,10 @@ export class MobileClipsNavigator {
         this.#isScrolling = true;
         this.#currentPage = index;
 
-        // Zatrzymaj wszystkie filmy przed przejściem do innej strony
         if (this.#videoManager) {
             this.#videoManager.stopAll();
         }
 
-        // Ukryj wszystkie strony i pokaż aktualną
         this.#pages.forEach((page, i) => {
             page.style.display = 'none';
             page.style.opacity = '0';
@@ -217,17 +200,14 @@ export class MobileClipsNavigator {
         const currentPage = this.#pages[index];
         currentPage.style.display = 'flex';
 
-        // Opóźnij pokazanie nowej strony, aby uzyskać efekt wygaszania
         setTimeout(() => {
             currentPage.style.opacity = '1';
         }, 50);
 
-        // Aktualizuj wskaźnik strony
         this.#dots.forEach((dot, i) => {
             dot.classList.toggle('active', i === index);
         });
 
-        // Aktualizuj przyciski nawigacji
         const prevBtn = document.querySelector('.prev-button');
         const nextBtn = document.querySelector('.next-button');
 

@@ -1,20 +1,33 @@
 {
     email zodiaczek@gmail.com
     debug
+    auto_https off
 }
 
 ranchbot.pl {
     @api_matcher path /api/v1/*
     handle @api_matcher {
-        reverse_proxy {$EXISTING_RANCHBOT_API_ADDRESS} {
-        }
+        reverse_proxy {$EXISTING_RANCHBOT_API_ADDRESS}
     }
 
     handle {
         root * /srv/php-app/public
-        php_fastcgi php:9000 {
-            root /app/public
+
+        @static {
+            file
+            path *.css *.js *.svg *.png *.jpg *.jpeg *.gif *.ico *.mp4
         }
+
+        handle @static {
+            file_server
+        }
+
+        php_fastcgi php:9000 {
+            root /srv/php-app/public
+        }
+
+        try_files {path} /index.php?{query}
+
         file_server
     }
 
@@ -22,7 +35,8 @@ ranchbot.pl {
         output stdout
         format console
     }
-    encode zstd gzip
+
+    encode gzip zstd
 }
 
 www.ranchbot.pl {

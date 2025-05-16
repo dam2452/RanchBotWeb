@@ -44,10 +44,10 @@
 }
 
 .clip-controls-container {
-    background: var(--color-bg-panel, #f8f8f8);
+    background: #f0f0f0;
     border-radius: 0 0 var(--radius-l, 12px) var(--radius-l, 12px);
     padding: var(--space-m, 12px);
-    border-top: 1px solid var(--color-border, #e0e0e0);
+    border-top: 1px solid #e0e0e0;
     box-sizing: border-box;
     opacity: 0;
     max-height: 0;
@@ -71,21 +71,21 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: var(--space-s, 10px);
-    border-bottom: 1px solid var(--color-border, #eaeaea);
+    border-bottom: 1px solid #e0e0e0;
     padding-bottom: 6px;
 }
 
 .clip-editor-title {
     font-size: var(--font-size-m, 16px);
     font-weight: var(--font-weight-semibold, 600);
-    color: var(--color-text-dark, #333);
+    color: var(--color-text-dark, #0c7730);
 }
 
 .close-editor-btn {
-    background: var(--color-bg-panel, #f0f0f0);
+    background: #e5e5e5;
     border: none;
     font-size: 18px;
-    color: var(--color-text-dark, #555);
+    color: var(--color-text-dark, #0c7730);
     cursor: pointer;
     width: 26px;
     height: 26px;
@@ -96,8 +96,8 @@
     transition: background 0.2s;
 }
 .close-editor-btn:hover {
-    background: var(--color-bg-panel-hover, #e0e0e0);
-    color: var(--color-text-dark, #333);
+    background: #d5d5d5;
+    color: var(--color-text-dark, #0c7730);
 }
 
 .adjustment-controls {
@@ -105,7 +105,7 @@
     flex-direction: column;
     gap: var(--space-s, 10px);
     margin-bottom: var(--space-m, 12px);
-    background: var(--color-bg-default, #fff);
+    background: #e8e8e8;
     padding: var(--space-s, 10px);
     border-radius: var(--radius-s, 6px);
     box-shadow: var(--box-shadow-active, 0 1px 3px rgba(0,0,0,0.05));
@@ -118,7 +118,7 @@
 }
 .time-slider-label {
     font-size: var(--font-size-s, 14px);
-    color: var(--color-text-dark, #333);
+    color: var(--color-text-dark, #0c7730);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -127,7 +127,7 @@
 .left-adjust-value,
 .right-adjust-value {
     font-weight: var(--font-weight-semibold, 600);
-    color: var(--color-primary, #e09340);
+    color: var(--color-text-dark, #0c7730);
     min-width: 40px;
     text-align: right;
 }
@@ -136,19 +136,19 @@
     width: 100%;
     height: 5px;
     -webkit-appearance: none;
-    background: var(--color-border, #e0e0e0);
+    background: #d8d8d8;
     border-radius: var(--radius-s, 4px);
     margin: 3px 0;
 }
 .time-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 16px; height: 16px; border-radius: 50%;
-    background: var(--color-primary, #e09340);
+    background: var(--color-secondary, #4CAF50);
     cursor: pointer;
 }
 .time-slider::-moz-range-thumb {
     width: 16px; height: 16px; border-radius: 50%;
-    background: var(--color-primary, #e09340);
+    background: var(--color-secondary, #4CAF50);
     cursor: pointer; border: none;
 }
 
@@ -159,8 +159,8 @@
     margin-bottom: var(--space-m, 12px);
 }
 .toggle-save-btn {
-    background: var(--color-primary, #e09340);
-    color: #fff;
+    background: var(--color-secondary, #4CAF50);
+    color: var(--color-text-light, #fff);
     border: none;
     border-radius: var(--radius-s, 6px);
     padding: 8px 12px;
@@ -170,7 +170,7 @@
     transition: background 0.2s;
 }
 .toggle-save-btn:hover {
-    background: var(--color-primary-dark, #c17a30);
+    background: var(--color-secondary-dark, #45a049);
 }
 .save-form {
     display: none;
@@ -182,17 +182,18 @@
 .clip-name-input {
     flex: 1;
     padding: 6px 10px;
-    border: 1px solid var(--color-border, #ccc);
+    border: 1px solid #d0d0d0;
     border-radius: var(--radius-xs, 4px);
     font-size: 13px;
+    background-color: #f8f8f8;
 }
 .clip-name-input:focus {
-    border-color: var(--color-primary, #e09340);
+    border-color: var(--color-secondary, #4CAF50);
     outline: none;
 }
 .save-clip-btn {
-    background: var(--color-primary, #e09340);
-    color: #fff;
+    background: var(--color-secondary, #4CAF50);
+    color: var(--color-text-light, #fff);
     border: none;
     border-radius: var(--radius-xs, 4px);
     padding: 6px 12px;
@@ -203,11 +204,11 @@
     white-space: nowrap;
 }
 .save-clip-btn:hover {
-    background: var(--color-primary-dark, #c17a30);
+    background: var(--color-secondary-dark, #45a049);
 }
 .download-adjusted-clip-btn {
-    background: #4a4a4a;
-    color: #fff;
+    background: var(--color-bg-end, #f2a94c);
+    color: var(--color-text-light, #fff);
     border: none;
     border-radius: var(--radius-s, 6px);
     padding: 8px 12px;
@@ -217,11 +218,11 @@
     transition: background 0.2s;
 }
 .download-adjusted-clip-btn:hover {
-    background: #333;
+    background: var(--color-user-btn-dark, #e09340);
 }
 .clip-editor-status {
     font-size: 13px;
-    color: #555;
+    color: var(--color-muted, #666);
     text-align: center;
     margin-top: 6px;
     height: 16px;

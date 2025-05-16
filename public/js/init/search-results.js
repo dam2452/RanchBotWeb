@@ -183,12 +183,21 @@ class SearchResultsManager {
     #addInspectButton(item) {
         if (!item.querySelector(SELECTORS.INSPECT_BUTTON)) {
             const inspectBtn = createElement('button', { className: 'inspect-btn' }, 'Adjust');
-            inspectBtn.addEventListener('click', (e) => this.#handleInspectClick(e, item));
+            inspectBtn.addEventListener('click', (e) => {
+                if (!item.classList.contains('active')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+                this.#handleInspectClick(e, item);
+            });
             item.appendChild(inspectBtn);
         }
     }
 
     #handleInspectClick(e, item) {
+        if (!item.classList.contains('active')) return;
+
         e.stopPropagation();
         const editingClip = document.querySelector('.reel-item.editing-mode');
         if (editingClip && editingClip !== item && this.#clipInspector) {
@@ -210,12 +219,22 @@ class SearchResultsManager {
         if (!item.querySelector('.top-download-btn')) {
             const clipIndex = parseInt(item.dataset.idx);
             const btn = createElement('button', { className: 'top-download-btn' }, 'Download');
-            btn.addEventListener('click', (e) => this.#handleDownloadClick(e, clipIndex, btn));
+            btn.addEventListener('click', (e) => {
+                if (!item.classList.contains('active')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+                this.#handleDownloadClick(e, clipIndex, btn);
+            });
             item.appendChild(btn);
         }
     }
 
     async #handleDownloadClick(e, clipIndex, button) {
+        const item = button.closest('.reel-item');
+        if (!item || !item.classList.contains('active')) return;
+
         e.stopPropagation();
         if (isNaN(clipIndex)) return;
         try {

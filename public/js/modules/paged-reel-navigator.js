@@ -1,111 +1,78 @@
 import { isMobile } from '../core/dom-utils.js';
 
-export class PagedReelNavigator {
+export class PagedClipsNavigator {
     #container;
-    #cards;
     #pages;
     #currentPage;
-    #perPage;
+    #onPageChange;
+    #isScrolling = false;
 
-    constructor(containerSelector, itemSelector = '.clip-card', perPage = { mobile: 3, desktop: 6 }) {
-        this.#container = document.querySelector(containerSelector);
-        this.#cards = Array.from(this.#container.querySelectorAll(itemSelector));
-        this.#pages = [];
+    constructor({ container, onPageChange }) {
+        this.#container = container;
+        this.#pages = Array.from(container.querySelectorAll('.clips-page'));
         this.#currentPage = 0;
-        this.#perPage = perPage;
+        this.#onPageChange = onPageChange;
 
-        this.regroupPages();
         this.attachEvents();
-    }
-
-    get container() {
-        return this.#container;
-    }
-
-    get cards() {
-        return this.#cards;
-    }
-
-    get pages() {
-        return this.#pages;
-    }
-
-    get currentPage() {
-        return this.#currentPage;
-    }
-
-    regroupPages() {
-        const perPageCount = isMobile() ? this.#perPage.mobile : this.#perPage.desktop;
-        this.#container.querySelectorAll('.clips-page').forEach(p => p.remove());
-
-        for (let i = 0; i < this.#cards.length; i += perPageCount) {
-            const page = document.createElement('div');
-            page.className = 'clips-page';
-            this.#cards.slice(i, i + perPageCount).forEach(card => page.appendChild(card));
-            this.#container.appendChild(page);
-        }
-
-        this.#pages = Array.from(this.#container.querySelectorAll('.clips-page'));
-        this.#currentPage = 0;
         this.scrollToPage(0);
     }
 
-    scrollToPage(idx) {
-        if (idx < 0 || idx >= this.#pages.length) return;
-        this.#currentPage = idx;
-        document.querySelectorAll('.clip-card video').forEach(v => v.pause());
+    attachEvents() {
+        this.#container.addEventListener('click', this.#handleClick.bind(this));
+        window.addEventListener('keydown', this.#handleKey.bind(this));
+        this.#container.addEventListener('wheel', this.#handleWheel.bind(this), { passive: false });
+    }
 
+    #handleClick(e) {
+        const rect = this.#container.getBoundingClientRect();
+        const isForward = (e.clientX - rect.left) > rect.width / 2;
+        this.navigate(isForward ? 1 : -1);
+    }
+
+    #handleKey(e) {
+        if (e.key === 'ArrowRight') {
+            this.navigate(1);
+        } else if (e.key === 'ArrowLeft') {
+            this.navigate(-1);
+        }
+    }
+
+    #handleWheel(e) {
+        e.preventDefault();
+
+        if (this.#isScrolling) return;
+
+        const delta = e.deltaY || e.deltaX;
+        if (Math.abs(delta) < 20) return;
+
+        const direction = delta > 0 ? 1 : -1;
+        this.navigate(direction);
+    }
+
+    navigate(direction) {
+        const newPage = this.#currentPage + direction;
+        if (newPage < 0 || newPage >= this.#pages.length) return;
+        this.scrollToPage(newPage);
+    }
+
+    scrollToPage(index) {
+        if (index < 0 || index >= this.#pages.length) return;
+
+        this.#isScrolling = true;
+        this.#currentPage = index;
+
+        const page = this.#pages[index];
         this.#container.scrollTo({
-            top: isMobile() ? this.#pages[idx].offsetTop : 0,
-            left: isMobile() ? 0 : this.#pages[idx].offsetLeft,
+            left: page.offsetLeft,
             behavior: 'smooth'
         });
-    }
 
-    handleCardClick(card) {
-        const page = card.closest('.clips-page');
-        const pageIndex = this.#pages.indexOf(page);
-
-        if (pageIndex !== this.#currentPage) {
-            this.scrollToPage(pageIndex);
-            return;
+        if (typeof this.#onPageChange === 'function') {
+            this.#onPageChange();
         }
 
-        const video = card.querySelector('video');
-        document.querySelectorAll('.clip-card video').forEach(v => {
-            if (v !== video) v.pause();
-        });
-
-        video.paused ? video.play() : video.pause();
-    }
-
-    attachEvents() {
-        window.addEventListener('resize', () => this.regroupPages());
-        window.addEventListener('load', () => this.regroupPages());
-
-        this.#container.addEventListener('click', e => {
-            const card = e.target.closest('.clip-card');
-            if (card) {
-                this.handleCardClick(card);
-                return;
-            }
-
-            const rect = this.#container.getBoundingClientRect();
-            const forward = isMobile()
-                ? (e.clientY - rect.top > rect.height / 2)
-                : (e.clientX - rect.left > rect.width / 2);
-
-            this.scrollToPage(this.#currentPage + (forward ? 1 : -1));
-        });
-
-        window.addEventListener('keydown', e => {
-            if (!isMobile()) {
-                if (e.key === 'ArrowRight') this.scrollToPage(this.#currentPage + 1);
-                if (e.key === 'ArrowLeft')  this.scrollToPage(this.#currentPage - 1);
-            } else {
-                if (e.key === 'ArrowDown') this.scrollToPage(this.#currentPage + 1);
-                if (e.key === 'ArrowUp')   this.scrollToPage(this.#currentPage - 1);
-            }
-        });
+        setTimeout(() => {
+            this.#isScrolling = false;
+        }, 600);
     }
 }

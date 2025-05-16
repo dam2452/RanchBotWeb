@@ -1,5 +1,5 @@
-import { ClipsManager } from '../components/ClipsManager.js';
-import { PagedClipsNavigator } from '../components/PagedClipsNavigator.js';
+import { ClipsManager }     from '../components/ClipsManager.js';
+import { PagedClipsNavigator } from '../modules/paged-reel-navigator.js';   // Poprawiona ścieżka
 import { initializeVideoContainers } from '../components/VideoContainer.js';
 
 class MyClipsPageManager {
@@ -9,125 +9,87 @@ class MyClipsPageManager {
     #videoManager;
     #searchButton;
 
-    async initialize() {
-        console.log('Initializing My Clips page');
-
+    async initialize () {
         this.#pageContainer = document.querySelector('.my-clips-page');
-        if (!this.#pageContainer) {
-            console.error('Page container not found');
-            return;
-        }
+        if (!this.#pageContainer) return;
 
         this.#setupUI();
         await this.#loadAndRenderClips();
     }
 
-    #setupUI() {
-        // Dodanie logo z nazwą RanchBot
+    /* ----------  UI  ---------- */
+    #setupUI () {
         this.#addLogoWithName();
-
-        // Umieszczenie przycisku wyszukiwania na środku pod nagłówkiem
-        this.#setupCenteredSearchButton();
-
+        this.#addCenteredSearchButton();
         this.#clipsManager = new ClipsManager();
     }
 
-    #addLogoWithName() {
-        // Dodanie logo w lewym górnym rogu
-        const logoContainer = document.createElement('a');
-        logoContainer.href = '/';
-        logoContainer.className = 'site-logo-container';
-
-        const logoImg = document.createElement('img');
-        logoImg.src = '/images/branding/logo.svg';
-        logoImg.alt = 'Logo strony';
-        logoImg.className = 'site-logo';
-
-        const siteName = document.createElement('div');
-        siteName.className = 'site-name';
-        siteName.textContent = 'RanchBot';
-
-        logoContainer.appendChild(logoImg);
-        logoContainer.appendChild(siteName);
-        this.#pageContainer.appendChild(logoContainer);
+    #addLogoWithName () {
+        const logo = `
+            <a href="/" class="site-logo-container">
+                <img src="/images/branding/logo.svg" alt="Logo strony" class="site-logo">
+                <div class="site-name">RanchBot</div>
+            </a>`;
+        this.#pageContainer.insertAdjacentHTML('beforeend', logo);
     }
 
-    #setupCenteredSearchButton() {
-        // Tworzymy przycisk wyszukiwania ręcznie - wyśrodkowany pod nagłówkiem
-        this.#searchButton = document.createElement('a');
-        this.#searchButton.href = '/search';
-        this.#searchButton.className = 'search-nav-button';
-
-        // Dodajemy ikonę lupy
-        const searchIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        searchIcon.setAttribute('width', '20');
-        searchIcon.setAttribute('height', '20');
-        searchIcon.setAttribute('viewBox', '0 0 24 24');
-        searchIcon.setAttribute('fill', 'none');
-        searchIcon.setAttribute('stroke', 'currentColor');
-        searchIcon.setAttribute('stroke-width', '2');
-        searchIcon.setAttribute('stroke-linecap', 'round');
-        searchIcon.setAttribute('stroke-linejoin', 'round');
-
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', '11');
-        circle.setAttribute('cy', '11');
-        circle.setAttribute('r', '8');
-
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', '21');
-        line.setAttribute('y1', '21');
-        line.setAttribute('x2', '16.65');
-        line.setAttribute('y2', '16.65');
-
-        searchIcon.appendChild(circle);
-        searchIcon.appendChild(line);
-
-        // Dodajemy tekst
-        const searchText = document.createElement('span');
-        searchText.textContent = 'Search for quotes';
-
-        this.#searchButton.appendChild(searchIcon);
-        this.#searchButton.appendChild(searchText);
-
-        this.#pageContainer.appendChild(this.#searchButton);
+    #addCenteredSearchButton () {
+        const btn = `
+            <a href="/search" class="search-nav-button">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8" stroke="currentColor" fill="none" stroke-width="2"/>
+                    <line  x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Search for quotes</span>
+            </a>`;
+        this.#pageContainer.insertAdjacentHTML('beforeend', btn);
     }
 
-    async #loadAndRenderClips() {
-        try {
-            await this.#clipsManager.loadClips();
-
-            const pages = this.#clipsManager.renderClips();
-
-            if (pages && pages.length > 0) {
-                this.#initializeNavigationAndVideo();
-                this.#clipsManager.setupDeleteButtons();
-            }
-        } catch (error) {
-            console.error('Error initializing My Clips page:', error);
-            this.#showErrorMessage(error);
-        }
+    /* ----------  CLIPS  ---------- */
+    async #loadAndRenderClips () {
+        await this.#clipsManager.loadClips();          // pobranie z API
+        this.#clipsManager.renderClips();              // tworzy .clips-page z . clip-card
+        this.#initializeNavigationAndVideo();
+        this.#clipsManager.setupDeleteButtons();
     }
 
-    #initializeNavigationAndVideo() {
-        // Inicjalizacja menedżera wideo, który zapewnia odtwarzanie tylko jednego klipu
+    /* ----------  NAVIGACJA + WIDEO  ---------- */
+    #initializeNavigationAndVideo () {
+        // 1 wideo naraz – jak w Search Results
         this.#videoManager = initializeVideoContainers();
 
+        // identyczna nawigacja jak w Search Results
         this.#navigator = new PagedClipsNavigator({
-            container: document.querySelector('.clips-reel'),
+            container   : document.querySelector('.clips-reel'),
             onPageChange: () => this.#videoManager.stopAll()
+        });
+
+        this.#decorateActiveClip();
+        this.#pauseOnClickOutside();
+    }
+
+    /* ----------  UX  ---------- */
+    #decorateActiveClip () {
+        const cards = document.querySelectorAll('.clip-card');
+
+        cards.forEach(card => {
+            const video = card.querySelector('video');
+            video.addEventListener('play', () => {
+                cards.forEach(c => c.style.boxShadow = '');
+                card.style.boxShadow = '0 0 0 4px #f2a94c'; // pomarańczowa ramka
+            });
+            video.addEventListener('pause', () => { card.style.boxShadow = ''; });
         });
     }
 
-    #showErrorMessage(error) {
-        const container = document.querySelector('.clips-reel');
-        if (container) {
-            container.innerHTML = `<div class="error-message">Error loading clips: ${error.message}</div>`;
-        }
+    #pauseOnClickOutside () {
+        document.body.addEventListener('click', e => {
+            if (!e.target.closest('.clip-card')) this.#videoManager.stopAll();
+        });
     }
 }
 
-document.addEventListener('DOMContentLoaded', async function() {
-    const myClipsPage = new MyClipsPageManager();
-    await myClipsPage.initialize();
+/* ----------  start  ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+    new MyClipsPageManager().initialize();
 });

@@ -74,6 +74,28 @@
     text-align: center;
     background-color: var(--color-form-bg);
     box-shadow: inset 0 0 3px var(--shadow-strong);
+    color: #8B4513; /* Ciemny brązowy kolor tekstu */
+}
+
+/* Style dla placeholderów w różnych przeglądarkach */
+.form-overlay input::placeholder {
+    color: #A0522D; /* Brązowy kolor dla placeholder */
+    opacity: 0.8;
+}
+
+.form-overlay input::-webkit-input-placeholder {
+    color: #A0522D;
+    opacity: 0.8;
+}
+
+.form-overlay input::-moz-placeholder {
+    color: #A0522D;
+    opacity: 0.8;
+}
+
+.form-overlay input:-ms-input-placeholder {
+    color: #A0522D;
+    opacity: 0.8;
 }
 
 .form-overlay input[name="login"],
@@ -94,6 +116,7 @@
 .form-overlay input:focus {
     outline: 2px solid #c58b4f;
     background-color: var(--color-form-focus);
+    color: #8B4513; /* Utrzymanie brązowego koloru podczas edycji */
 }
 
 .form-overlay button {
@@ -108,7 +131,7 @@
     border: 2px solid #aa9169;
     border-radius: var(--form-btn-radius);
     cursor: pointer;
-    color: #000;
+    color: #8B4513; /* Brązowy kolor tekstu przycisku */
     box-shadow: var(--box-shadow-strong);
     transition: var(--transition-standard);
 }

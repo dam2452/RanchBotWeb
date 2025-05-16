@@ -128,8 +128,22 @@
         overflow-y: scroll;
         overflow-x: hidden;
         scroll-snap-type: y mandatory;
+        align-items: center;
+    }
+
+    .reel-item {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+    .reel-item video {
+        max-width: 100%;
+        margin: 0 auto;
     }
 }
+
 html, body {
     overflow: hidden;
     height: 100%;

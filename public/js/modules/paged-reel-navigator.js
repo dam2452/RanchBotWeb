@@ -24,6 +24,17 @@ export class PagedClipsNavigator {
     }
 
     #handleClick(e) {
+        // Sprawdzamy, czy kliknięcie dotyczy klipu na aktualnie widocznej stronie
+        const clipCard = e.target.closest('.clip-card');
+        if (clipCard) {
+            // Sprawdzamy, czy clip-card jest na aktualnie widocznej stronie
+            const currentPage = this.#pages[this.#currentPage];
+            if (currentPage && currentPage.contains(clipCard)) {
+                // Kliknięcie dotyczy klipu na aktualnie widocznej stronie - ignorujemy nawigację
+                return;
+            }
+        }
+
         const rect = this.#container.getBoundingClientRect();
         const isForward = (e.clientX - rect.left) > rect.width / 2;
         this.navigate(isForward ? 1 : -1);

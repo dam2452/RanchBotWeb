@@ -290,7 +290,7 @@ body {
     }
 
     .form-overlay button {
-        font-size: clamp(14px, 1vw, 16px);
+        font-size: clamp(12px, 1vw, 16px);
     }
 }
 

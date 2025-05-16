@@ -1,10 +1,10 @@
 :root {
-    --color-primary: #4a69bd;
+    --color-primary: #f2a94c;
     --color-secondary: #4CAF50;
     --color-accent: var(--color-primary);
 
-    --color-primary-light: #5a79cd;
-    --color-primary-dark: #3a59ad;
+    --color-primary-light: #ffb95c;
+    --color-primary-dark: #e2993c;
     --color-secondary-light: #5ee271;
     --color-secondary-dark: #45a049;
     --color-secondary-dark-hover: #35a33a;
@@ -47,8 +47,8 @@
     --gradient-primary-hover: linear-gradient(to bottom right, var(--color-btn-green-hover), var(--color-btn-green-hover-dark));
     --gradient-secondary: linear-gradient(to right, #ffffff, #d8ffd8);
     --gradient-secondary-hover: linear-gradient(to right, #eaffea, #b0f7b0);
-    --gradient-action: linear-gradient(145deg, #6a85b6, #4a6fa5);
-    --gradient-action-hover: linear-gradient(145deg, #7a95c6, #5a7fae);
+    --gradient-action: linear-gradient(145deg, #f2a94c, #e09340);
+    --gradient-action-hover: linear-gradient(145deg, #ffb85c, #f2a94c);
     --gradient-form-btn: linear-gradient(to right, #fdd99d, #dcae75);
     --gradient-form-btn-hover: linear-gradient(to right, #ffe0b3, #e0b88a);
 

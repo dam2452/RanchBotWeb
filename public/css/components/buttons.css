@@ -1,3 +1,4 @@
+
 .btn-base {
     display: inline-block;
     padding: 10px 20px;
@@ -70,7 +71,7 @@
 
 .action-button {
     display: inline-block;
-    background: linear-gradient(145deg, #6a85b6, #4a6fa5);
+    background: linear-gradient(145deg, #f2a94c, #e09340);
     color: white;
     padding: 12px 30px;
     border-radius: 25px;
@@ -86,7 +87,7 @@
 
 .action-button:hover,
 .action-button:focus {
-    background: linear-gradient(145deg, #7a95c6, #5a7fae);
+    background: linear-gradient(145deg, #ffb85c, #f2a94c);
     transform: translateY(-3px);
     box-shadow: var(--box-shadow-hover);
     color: white;
@@ -226,7 +227,7 @@
     top: 15px;
     left: 15px;
     z-index: 100;
-    background-color: #2266aa;
+    background-color: #f2a94c;
     color: white;
     border: none;
     border-radius: 8px;
@@ -304,7 +305,7 @@
 }
 
 .save-clip-btn {
-    background-color: #2266aa;
+    background-color: #f2a94c;
 }
 
 .toggle-save-btn {

@@ -1,5 +1,6 @@
 import { ClipsManager }     from '../components/ClipsManager.js';
-import { PagedClipsNavigator } from '../modules/paged-reel-navigator.js';   // Poprawiona ścieżka
+import { PagedClipsNavigator } from '../modules/paged-reel-navigator.js';
+import { MobileClipsNavigator } from '../modules/mobile-clips-navigator.js';
 import { initializeVideoContainers } from '../components/VideoContainer.js';
 
 class MyClipsPageManager {
@@ -21,6 +22,7 @@ class MyClipsPageManager {
     #setupUI () {
         this.#addLogoWithName();
         this.#addCenteredSearchButton();
+        this.#addUserButtons();
         this.#clipsManager = new ClipsManager();
     }
 
@@ -45,6 +47,15 @@ class MyClipsPageManager {
         this.#pageContainer.insertAdjacentHTML('beforeend', btn);
     }
 
+    #addUserButtons() {
+        const userButtons = `
+            <div class="user-buttons">
+                <a href="/logout" class="logout-btn">Log Out</a>
+                <a href="/account" class="user-greeting-btn">Hi, dam2452</a>
+            </div>`;
+        this.#pageContainer.insertAdjacentHTML('beforeend', userButtons);
+    }
+
     /* ----------  CLIPS  ---------- */
     async #loadAndRenderClips () {
         await this.#clipsManager.loadClips();          // pobranie z API
@@ -58,27 +69,45 @@ class MyClipsPageManager {
         // 1 wideo naraz – jak w Search Results
         this.#videoManager = initializeVideoContainers();
 
-        // identyczna nawigacja jak w Search Results
-        this.#navigator = new PagedClipsNavigator({
-            container   : document.querySelector('.clips-reel'),
-            onPageChange: () => this.#videoManager.stopAll()
-        });
+        // Sprawdź czy to urządzenie mobilne i wybierz odpowiedni nawigator
+        if (window.innerWidth <= 850) {
+            // Użyj nawigatora mobilnego dla urządzeń mobilnych
+            this.#navigator = new MobileClipsNavigator({
+                container: document.querySelector('.clips-reel'),
+                videoManager: this.#videoManager
+            });
+        } else {
+            // Użyj standardowego nawigatora dla desktopów
+            this.#navigator = new PagedClipsNavigator({
+                container: document.querySelector('.clips-reel'),
+                onPageChange: () => this.#videoManager.stopAll()
+            });
+        }
 
         this.#decorateActiveClip();
         this.#pauseOnClickOutside();
     }
 
     /* ----------  UX  ---------- */
-    #decorateActiveClip () {
+    #decorateActiveClip() {
         const cards = document.querySelectorAll('.clip-card');
 
         cards.forEach(card => {
             const video = card.querySelector('video');
+            const container = card.querySelector('.video-container');
+
             video.addEventListener('play', () => {
-                cards.forEach(c => c.style.boxShadow = '');
-                card.style.boxShadow = '0 0 0 4px #f2a94c'; // pomarańczowa ramka
+                // Resetujemy wszystkie podświetlenia
+                document.querySelectorAll('.video-container').forEach(c => {
+                    c.classList.remove('active');
+                });
+                // Dodajemy podświetlenie dla aktywnego kontenera wideo
+                container.classList.add('active');
             });
-            video.addEventListener('pause', () => { card.style.boxShadow = ''; });
+
+            video.addEventListener('pause', () => {
+                container.classList.remove('active');
+            });
         });
     }
 

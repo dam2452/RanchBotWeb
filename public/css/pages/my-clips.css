@@ -1,7 +1,7 @@
 .my-clips-page {
     width: 100%;
     height: 100vh;
-    overflow: hidden; /* Blokuje scrollowanie na PC */
+    overflow: hidden;
     position: relative;
 }
 
@@ -58,45 +58,238 @@
     transform: translateX(-50%);
     z-index: 1000;
 }
+
+/* Reel container dla obu trybów */
+.clips-reel {
+    width: 100%;
+    height: calc(100vh - 80px);
+    position: relative;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Mobile view specjalne ustawienia */
 @media screen and (max-width: 850px) {
     .my-clips-header {
-        top: 80px;
+        top: 100px; /* Odsunięte niżej od góry */
+        position: fixed;
+        z-index: 1002;
     }
 
     .my-clips-header h1 {
         font-size: var(--font-size-title-mobile);
-        padding: 6px 82px;
+        padding: 6px 30px;
+        min-width: 100px;
+        width: auto;
     }
 
     .site-logo-container {
+        top: 20px;
+        left: 20px;
+        position: fixed;
+        z-index: 1001;
+    }
+
+    .site-logo {
+        width: 80px;
+    }
+
+    .site-name {
+        font-size: 16px;
+    }
+
+    /* Reorganizacja przycisków w widoku mobilnym */
+    .auth-buttons {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        z-index: 1002;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+    }
+
+    /* Zmiana kolejności wyświetlania przycisków w auth-buttons */
+    .auth-buttons .tooltip-container {
+        order: 1; /* przycisk "Hi, username" na górze */
+    }
+
+    .auth-buttons button[onclick*="my-clips"] {
+        order: 2; /* przycisk "My Clips" w środku */
+    }
+
+    .auth-buttons button[onclick*="logout"] {
+        order: 3; /* przycisk "Logout" na dole */
+    }
+
+    /* Ukrycie dodatkowych przycisków w .user-buttons aby uniknąć duplikacji */
+    .user-buttons {
+        display: none;
+    }
+
+    /* Przycisk wyszukiwania pod belką "My Clips" - tylko ikona */
+    .search-nav-button {
+        position: fixed;
+        top: 145px; /* 15px pod "My Clips" (100px + wysokość belki) */
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1001;
+        width: 40px;
+        height: 40px;
+        min-width: auto;
+        padding: 0; /* Usunięty padding, który mógł powodować przesunięcie */
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--color-user-btn);
+    }
+
+    /* Ukrycie tekstu w przycisku wyszukiwania - pokazanie tylko ikony */
+    .search-nav-button span {
+        display: none;
+    }
+
+    /* Poprawione wycentrowanie ikony lupki */
+    .search-nav-button svg {
+        width: 20px;
+        height: 20px;
+        display: block;
+        margin: 0; /* Usunięcie ewentualnych marginesów */
+        padding: 0; /* Usunięcie ewentualnych paddingów */
+        position: relative;
         top: 0;
         left: 0;
     }
 
-    .site-logo {
-        width: 120px;
+    /* Nowy wrapper dla pionowego przewijania */
+    .clips-reel-wrapper {
+        width: 100%;
+        height: 100vh;
+        position: relative;
+        overflow-y: auto;
+        scroll-snap-type: y mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch; /* płynniejsze przewijanie na iOS */
     }
 
-    .site-name {
-        font-size: 20px;
+    /* Strony zajmują pełną wysokość ekranu */
+    .clips-page {
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start; /* Zmiana z center na flex-start */
+        padding: 90px 20px 30px 20px; /* Zmniejszony padding z góry - z 170px na 90px */
+        box-sizing: border-box;
+        scroll-snap-align: start;
+        position: relative;
     }
 
-    .search-nav-button {
-        top: 150px;
+    /* Dodatkowy kontener dla klipów przesunięty w górę */
+    .clips-container {
+        margin-top: 60px; /* Miejsce na nagłówek i przycisk lupki */
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Klipy w widoku mobilnym - mniejsze odstępy */
+    .clip-card {
+        width: 90%;
+        max-width: 500px;
+        margin-bottom: 10px; /* Zmniejszony margin z 20px na 10px */
+        transition: transform 0.3s ease;
+    }
+
+    /* Mniejsze odstępy dla tytułów i opisów clipów */
+    .clip-card .clip-info h3 {
+        margin-bottom: 4px; /* Zmniejszony margin dla tytułu klipu */
+        font-size: 14px; /* Mniejszy font */
+    }
+
+    .clip-card .clip-info p {
+        margin-top: 4px;
+        margin-bottom: 4px;
+        font-size: 12px; /* Mniejszy font dla opisu */
+        line-height: 1.2; /* Mniejszy odstęp między wierszami */
+    }
+
+    /* Przyciski w klipach również z mniejszymi odstępami */
+    .clip-card .clip-actions {
+        margin-top: 6px;
+        gap: 6px; /* Mniejszy odstęp między przyciskami */
+    }
+
+    /* Kompaktowe przyciski */
+    .clip-card .clip-actions button {
+        padding: 5px 10px; /* Mniejszy padding */
+        font-size: 12px; /* Mniejszy font */
+    }
+
+    /* Animacja dla klipów - pojawiają się od dołu */
+    @keyframes slideUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .clips-page .clip-card:nth-child(1) {
+        animation: slideUp 0.4s ease forwards;
+        margin-top: 0; /* Bez marginesu dla pierwszego klipu */
+    }
+
+    .clips-page .clip-card:nth-child(2) {
+        animation: slideUp 0.5s ease forwards;
+    }
+
+    .clips-page .clip-card:nth-child(3) {
+        animation: slideUp 0.6s ease forwards;
+        margin-bottom: 0; /* Usunięcie dolnego marginesu dla ostatniego klipu */
+    }
+
+    /* Przesunięcie wskaźnika stron w dół na ekranie */
+    .mobile-page-indicator {
+        bottom: 60px; /* Odległość od dołu ekranu */
     }
 }
-html, body, .my-clips-page {
-    height: 100vh !important;
-    overflow: hidden !important;
-    margin: 0 !important;
-    padding: 0 !important;
+
+/* Elementy wspólne dla obu trybów */
+.clip-card .video-container.active {
+    box-shadow: 0 0 0 4px var(--color-user-btn);
+    border-radius: 8px;
+    transition: box-shadow 0.3s ease;
 }
 
-body > *, .my-clips-page > * {
-    max-height: 100vh !important;
-    overflow: hidden !important;
+/* Wskaźnik ładowania */
+#loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.page-navigation {
-    display: none !important;
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(170, 170, 170, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--color-user-btn);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }

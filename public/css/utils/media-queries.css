@@ -327,23 +327,7 @@
         align-items: center;
     }
 
-    .clips-page {
-        flex: 0 0 auto;
-        scroll-snap-align: start;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--gap-mobile-videos);
-        width: 90%;
-        margin-right: 0;
-        height: auto;
-        padding: 0;
-        grid-template-columns: none;
-        grid-template-rows: none;
-        grid-auto-rows: unset;
-        align-content: unset;
-        place-items: unset;
-    }
+
 
     .page-navigation {
         bottom: 10px;

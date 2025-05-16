@@ -31,7 +31,6 @@ p {
     color: var(--color-text-light);
     padding: 6px 20px;
     border-radius: var(--radius-title);
-    box-shadow: var(--box-shadow-strong);
     text-align: center;
     white-space: nowrap;
 }

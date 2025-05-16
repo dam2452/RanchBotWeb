@@ -1,19 +1,39 @@
-@import '../pages/main.css';
-
-body {
-    overflow: hidden;
-}
-
 .my-clips-page {
     width: 100%;
     height: 100vh;
-    overflow: hidden;
+    overflow: hidden; /* Blokuje scrollowanie na PC */
     position: relative;
 }
 
+/* Logo bez animacji kliknięcia */
+.site-logo-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.site-logo {
+    width: 180px;
+    height: auto;
+    cursor: pointer;
+}
+
+.site-name {
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--color-text-light);
+    margin-top: 7px;
+    text-align: center;
+}
+
+/* Nagłówek "My Clips" - wyśrodkowany */
 .my-clips-header {
     position: absolute;
-    top: 100px;
+    top: 120px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
@@ -22,22 +42,61 @@ body {
 
 .my-clips-header h1 {
     font-size: var(--font-size-title-desktop);
-    background: var(--color-title-bg);
+    background: rgba(170, 170, 170, 0.92);
     color: var(--color-text-light);
-    padding: 6px 20px;
+    padding: 6px 108px;
     border-radius: var(--radius-title);
-    box-shadow: 0 6px 12px var(--shadow-strong);
     text-align: center;
     white-space: nowrap;
 }
 
+/* Przycisk wyszukiwania wyśrodkowany pod nagłówkiem */
+.search-nav-button {
+    position: absolute;
+    top: 200px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
 @media screen and (max-width: 850px) {
     .my-clips-header {
-        top: 60px;
+        top: 80px;
     }
 
     .my-clips-header h1 {
         font-size: var(--font-size-title-mobile);
-        padding: 6px 15px;
+        padding: 6px 82px;
     }
+
+    .site-logo-container {
+        top: 0;
+        left: 0;
+    }
+
+    .site-logo {
+        width: 120px;
+    }
+
+    .site-name {
+        font-size: 20px;
+    }
+
+    .search-nav-button {
+        top: 150px;
+    }
+}
+html, body, .my-clips-page {
+    height: 100vh !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body > *, .my-clips-page > * {
+    max-height: 100vh !important;
+    overflow: hidden !important;
+}
+
+.page-navigation {
+    display: none !important;
 }

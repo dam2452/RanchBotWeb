@@ -1,9 +1,11 @@
+
 @import '../pages/main.css';
 
 body {
     overflow: hidden;
 }
 
+/* Domyślne style dla ekranów >= 1900px */
 .left {
     display: flex;
     flex-direction: column;
@@ -73,34 +75,6 @@ body {
     color: #d63031;
     text-align: center;
     font-size: 14px;
-}
-
-/* Tablet view (medium screens) */
-@media screen and (min-width: 601px) and (max-width: 850px) {
-    .actions {
-        margin-top: -20px; /* Przesunięcie przycisków wyżej */
-    }
-
-    .actions button {
-        padding: 8px 20px; /* Zmniejszony padding */
-        font-size: clamp(32px, 1.3vw, 34px); /* 15% mniejsza czcionka */
-        transform: scale(0.85); /* Dodatkowo zmniejsza przyciski o 15% */
-    }
-
-    .actions button:hover {
-        transform: scale(0.89); /* 0.85 * 1.05 */
-    }
-
-    .actions button:active {
-        transform: scale(0.82); /* 0.85 * 0.97 */
-    }
-}
-
-/* Mobile view */
-@media screen and (max-width: 600px) {
-    .actions {
-        width: 90%;
-    }
 }
 
 .input-base {
@@ -292,7 +266,71 @@ body {
     transition: opacity 0.3s;
 }
 
-@media screen and (max-width: 850px) {
+/* Style dla ekranów od 850px do 1900px */
+@media screen and (min-width: 850px) and (max-width: 1899px) {
+    .logo-img {
+        transform: scale(1.5); /* Zmniejszony rozmiar logo */
+        margin-top: -20px;
+        margin-bottom: 60px;
+    }
+
+    .left h1 {
+        transform: scale(1.5); /* Zmniejszony rozmiar napisu */
+        margin-top: 40px;
+    }
+
+    .actions button {
+        font-size: clamp(32px, 1.3vw, 36px);
+        padding: 8px 20px;
+        max-width: 350px;
+    }
+
+    .form-overlay input {
+        font-size: clamp(14px, 1vw, 16px);
+    }
+
+    .form-overlay button {
+        font-size: clamp(14px, 1vw, 16px);
+    }
+}
+
+/* Style dla ekranów poniżej 850px */
+@media screen and (max-width: 849px) {
+    .logo-img {
+        transform: scale(1.5); /* Zwiększenie logo o 20% */
+        margin-top: 15px;
+        margin-bottom: 30px; /* Jeszcze bliżej napisu "ranch bot" */
+    }
+
+    .left h1 {
+        transform: scale(1.2);
+        margin-top: 20px; /* Przybliżenie do logo */
+    }
+
+    .actions {
+        margin-top: -20px;
+        width: 95%;
+        gap: 10px;
+    }
+
+    .actions button {
+        padding: 8px 15px;
+        font-size: clamp(26px, 4.8vw, 32px);
+        min-width: 140px;
+        max-width: none;
+        flex-basis: 0;
+        flex-grow: 1;
+        transform: none;
+    }
+
+    .actions button:hover {
+        transform: scale(1.05);
+    }
+
+    .actions button:active {
+        transform: scale(0.97);
+    }
+
     .search-results-page .search-container {
         top: 75px;
         width: 70vw;
@@ -305,13 +343,14 @@ body {
 
     .form-overlay input[name="login"],
     .form-overlay input[name="password"] {
-        left: 10%;
-        width: 80%;
+        left: 15.5%; /* Zmniejszenie szerokości pola jeszcze o 4% */
+        width: 69%;
     }
 
     .form-overlay button {
-        height: 6%;
-        font-size: clamp(14px, 3vw, 18px);
+        height: 5.5%;
+        font-size: clamp(8px, 0.7vw, 11px); /* 40% mniejszy napis "zaloguj się" */
+        transform: none;
     }
 
     .save-form {

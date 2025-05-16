@@ -160,14 +160,10 @@ export class ClipsManager {
                 <video loop preload="metadata" class="clip-video">
                     <source src="/api/api-video.php?endpoint=wys&id=${encodeURIComponent(clip.name)}" type="video/mp4">
                 </video>
-                <div class="download-btn" style="background-image: url('${downloadIconPath}'); background-repeat: no-repeat; background-position: 8px center; background-size: 16px; padding-left: 30px;">
-                    Download
-                </div>
+                <div class="download-btn">Download</div>
+                <button class="delete-clip-btn" title="Delete this clip">Delete</button>
             </div>
             <p class="quote">"${clip.name || 'No name'}"</p>
-            <button class="delete-clip-btn" title="Delete this clip" style="background-image: url('${deleteIconPath}'); background-repeat: no-repeat; background-position: 8px center; background-size: 16px; padding-left: 30px;">
-                Delete
-            </button>
         `;
     }
 

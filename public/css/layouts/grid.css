@@ -272,18 +272,7 @@
     }
 }
 
-.clips-page {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, auto);
-    grid-auto-rows: min-content;
-    align-content: center;
-    place-items: center;
-    gap: var(--gap-video-rows) var(--gap-video-cols);
-    height: 80vh;
-    padding: 20px 0;
-    box-sizing: border-box;
-}
+
 
 @media (max-width: 850px) {
     .clips-page {

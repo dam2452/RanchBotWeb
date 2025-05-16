@@ -75,7 +75,9 @@ export class VideoContainer {
     }
 
     #handleMouseEnter = () => {
-        this.play();
+        // Tylko przygotowuje, ale nie odtwarza automatycznie
+        removeVideoOverlays(this.#container);
+        loadVideo(this.#video, this.#container);
     }
 
     #handleMouseLeave = () => {
@@ -202,6 +204,7 @@ export function initializeVideoContainers() {
 
         const originalPlay = videoContainer.play;
         videoContainer.play = async function() {
+            // Zatrzymaj wszystkie inne aktywne kontenery przed odtworzeniem bieżącego
             if (activeContainer && activeContainer !== videoContainer) {
                 activeContainer.pause();
             }

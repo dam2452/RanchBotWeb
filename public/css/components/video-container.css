@@ -2,85 +2,80 @@
     position: relative;
     width: 100%;
     aspect-ratio: 16/9;
-    border-radius: var(--radius-video);
+    border-radius: 12px;
     overflow: hidden;
     cursor: pointer;
     background-color: #000;
-}
-
-.video-container.active {
-    box-shadow: 0 0 0 3px var(--color-accent), var(--box-shadow-hover);
 }
 
 .clip-video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: var(--radius-video);
+    border-radius: 12px;
     display: block;
 }
 
-.clip-video::-webkit-media-controls,
-.clip-video::-webkit-media-controls-enclosure,
-.clip-video::-webkit-media-controls-panel {
-    display: none !important;
-}
-
-.clip-video::-moz-media-controls {
-    display: none !important;
-}
-
-.clip-video::-ms-media-controls {
-    display: none !important;
-}
-
-.play-message {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 5px;
-    font-size: 14px;
-    z-index: 10;
-    animation: pulse 1.5s infinite;
-    pointer-events: none;
-}
-
-.video-error-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(220, 53, 69, 0.8);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 5px;
-    font-size: 14px;
-    z-index: 10;
-}
-
 .download-btn {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    padding: 6px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 5;
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    background-color: rgba(170, 170, 170, 0.9) !important;
+    color: white !important;
+    padding: 6px 10px; !important;     /* DUŻY padding – TAK JAK DELETE */
+    border-radius: 6px !important;     /* Podobny/większy radius */
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
+    cursor: pointer !important;
+    opacity: 0 !important;
+    transition: opacity 0.3s ease, transform 0.2s !important;
+    z-index: 11 !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+    height: auto !important;
+    width: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 30px !important;      /* Minimalna wysokość, żeby był wyższy */
+    max-height: unset !important;
 }
+
 
 .video-container:hover .download-btn {
-    opacity: 1;
+    opacity: 0.8 !important;
 }
 
 .download-btn:hover {
-    background-color: rgba(0, 0, 0, 0.9);
+    opacity: 1 !important;
+    transform: scale(1.05) !important;
+    background-color: rgba(190, 190, 190, 0.9) !important;
+}
+
+.delete-clip-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(220, 53, 69, 0.8);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    z-index: 10;
+    opacity: 0;
+}
+
+.video-container:hover .delete-clip-btn {
+    opacity: 0.8;
+}
+
+.delete-clip-btn:hover {
+    opacity: 1 !important;
+    background-color: #c0392b;
+    transform: scale(1.05);
 }

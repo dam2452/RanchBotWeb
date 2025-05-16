@@ -16,7 +16,7 @@ body {
     margin: 0 auto;
     transform: scale(1.9); /* Zwiększenie rozmiaru logo o 90% */
     margin-top: -40px; /* Przesunięcie logo wyżej */
-    margin-bottom: 60px; /* Zmniejszona przestrzeń pod logo o połowę */
+    margin-bottom: 90px; /* Zmniejszona przestrzeń pod logo o połowę */
 }
 
 .left h1 {

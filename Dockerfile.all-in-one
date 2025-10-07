@@ -1,0 +1,38 @@
+# Krok 1: Użyj oficjalnego obrazu PHP jako bazy
+FROM php:8.3-fpm-alpine
+
+# Krok 2: Zainstaluj Caddy, Supervisora i zależności dla rozszerzeń PHP
+RUN apk add --no-cache \
+    caddy \
+    supervisor \
+    # Zależności z oryginalnego Dockerfile
+    zlib \
+    libzip \
+    libpng \
+    libjpeg-turbo \
+    postgresql-libs
+
+# Krok 3: Zainstaluj rozszerzenia PHP (skopiowane z oryginalnego Dockerfile)
+RUN apk add --no-cache --virtual .build-deps \
+    zlib-dev \
+    libzip-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    postgresql-dev \
+    && docker-php-ext-configure gd --with-jpeg \
+    && docker-php-ext-install -j "$(nproc)" opcache zip gd bcmath pgsql pdo_pgsql \
+    && apk del .build-deps
+
+# Krok 4: Skopiuj pliki konfiguracyjne do obrazu
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY Caddyfile.all-in-one /etc/caddy/Caddyfile
+
+# Krok 5: Skopiuj kod aplikacji
+WORKDIR /srv/php-app
+COPY . .
+
+# Krok 6: Ustaw uprawnienia
+RUN chown -R www-data:www-data /srv/php-app
+
+# Krok 7: Uruchom Supervisora, który uruchomi Caddy i PHP-FPM
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

@@ -1,0 +1,41 @@
+services:
+  caddy-prod:
+    image: caddy:2-alpine
+    container_name: caddy-ranchbot-webgui-prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile.prod:/etc/caddy/Caddyfile:ro
+      - caddy_data_ranchbot_webgui_prod:/data
+      - caddy_config_ranchbot_webgui_prod:/config
+    networks:
+      - ranchbot_webgui_prod_net
+    depends_on:
+      - php-prod
+    environment:
+      - EXISTING_RANCHBOT_API_ADDRESS=${EXISTING_RANCHBOT_API_ADDRESS}
+      - ACME_EMAIL=${ACME_EMAIL}
+      - YOUR_DOMAIN=${YOUR_DOMAIN}
+    env_file:
+      - .env.prod
+
+  php-prod:
+    # Zastąp 'twoja-nazwa-uzytkownika' swoją nazwą z Docker Hub
+    image: dam245222/ranchbot-web:latest
+    container_name: php-fpm-ranchbot-webgui-prod
+    restart: unless-stopped
+    working_dir: /srv/php-app
+    networks:
+      - ranchbot_webgui_prod_net
+    env_file:
+      - .env.prod
+
+networks:
+  ranchbot_webgui_prod_net:
+    driver: bridge
+
+volumes:
+  caddy_data_ranchbot_webgui_prod:
+  caddy_config_ranchbot_webgui_prod:

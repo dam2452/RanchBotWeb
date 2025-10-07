@@ -1,0 +1,24 @@
+http://:80 {
+    @api_matcher path /api/v1/*
+    handle @api_matcher {
+        reverse_proxy {$EXISTING_RANCHBOT_API_ADDRESS}
+    }
+
+    handle {
+        root * /srv/php-app/public
+        # PHP-FPM jest teraz w tym samym kontenerze, więc łączymy się przez localhost
+        php_fastcgi localhost:9000 {
+            root /srv/php-app/public
+        }
+
+        try_files {path} /index.php?{query}
+        file_server
+    }
+
+    log {
+        output stdout
+        format console
+    }
+
+    encode gzip zstd
+}

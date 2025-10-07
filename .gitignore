@@ -3,3 +3,7 @@ RANCZO-WIDEO
 .env
 .env.dev
 *.log
+.env.final
+.env.cf
+.env.prod
+.env.all-in-one

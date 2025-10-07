@@ -1,0 +1,16 @@
+services:
+  app:
+    # Buduje obraz z naszego nowego, samowystarczalnego Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile.all-in-one
+    # Nazwa obrazu, który zostanie wypchnięty do Docker Hub
+    image: dam245222/ranchbot-app:latest
+    container_name: ranchbot-app
+    restart: unless-stopped
+    ports:
+      # Użyj portu, który preferujesz, np. 8880
+      - "8880:80"
+    env_file:
+      # Wciąż używamy pliku .env do przekazania adresu API
+      - .env.all-in-one

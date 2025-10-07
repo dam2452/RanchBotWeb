@@ -1,7 +1,26 @@
 <?php
 
 const PROJECT_ROOT = __DIR__ . '/..';
-const ENV_FILE = PROJECT_ROOT . '/.env.dev';
+
+// Determine which env file to load based on environment
+function getEnvFile(): string {
+    $allInOne = PROJECT_ROOT . '/.env.all-in-one';
+    $dev = PROJECT_ROOT . '/.env.dev';
+
+    // Check for explicit ENV_FILE override
+    if ($explicit = getenv('ENV_FILE')) {
+        return $explicit;
+    }
+
+    // Prefer all-in-one if it exists
+    if (file_exists($allInOne)) {
+        return $allInOne;
+    }
+
+    return $dev;
+}
+
+define('ENV_FILE', getEnvFile());
 
 function loadEnvironmentVars(): void {
     if (file_exists(ENV_FILE)) {

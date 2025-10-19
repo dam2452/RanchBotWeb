@@ -97,6 +97,10 @@
 .auth-buttons {
     display: flex;
     gap: var(--header-gap);
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
 }
 
 .auth-buttons button {

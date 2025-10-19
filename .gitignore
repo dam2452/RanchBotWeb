@@ -9,3 +9,6 @@ RANCZO-WIDEO
 .env.all-in-one
 __pycache__/
 *.pyc
+/.claude
+nul
+cookies.txt

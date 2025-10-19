@@ -1,14 +1,21 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { apiService } from '@/services/api'
 import type { Clip } from '@/types'
 
+const router = useRouter()
 const authStore = useAuthStore()
 const clips = ref<Clip[]>([])
 const loading = ref(true)
 const error = ref('')
 const username = ref(authStore.user?.username || 'User')
+
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push('/login')
+}
 
 onMounted(async () => {
   await loadClips()
@@ -94,9 +101,9 @@ const handleVideoPause = (event: Event) => {
     </router-link>
 
     <!-- User Buttons -->
-    <div class="user-buttons">
-      <button @click="$router.push('/logout')" class="logout-btn">Log Out</button>
-      <button class="user-greeting-btn">Hi, {{ username }}</button>
+    <div class="auth-buttons" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+      <button id="user-welcome-link">Hi, {{ username }}</button>
+      <button @click="handleLogout">Logout</button>
     </div>
 
     <!-- Loading -->

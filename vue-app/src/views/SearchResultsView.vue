@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { apiService } from '@/services/api'
 import type { SearchResult } from '@/types'
+import AppHeader from '@/components/AppHeader.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -96,6 +97,7 @@ const handleLoadMore = () => {
 </script>
 
 <template>
+  <AppHeader />
   <main class="search-results-page">
     <div class="search-header">
       <div class="logo-wrapper">

@@ -40,7 +40,7 @@ const handleSubmit = async () => {
         <img src="/images/others/bench.svg" alt="Bench Graphic" class="bench-image" />
         <form class="form-overlay" @submit.prevent="handleSubmit">
           <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-          <input v-model="login" type="text" name="login" placeholder="login" required autofocus />
+          <input v-model="login" type="text" name="login" placeholder="username" required autofocus />
           <input
             v-model="password"
             type="password"
@@ -49,14 +49,14 @@ const handleSubmit = async () => {
             required
           />
           <button type="submit" :disabled="authStore.loading">
-            {{ authStore.loading ? 'Logging in...' : 'Zaloguj się' }}
+            {{ authStore.loading ? 'Logging in...' : 'Login' }}
           </button>
         </form>
       </div>
 
       <div class="actions">
-        <button @click="$router.push('/register')">Create account ?</button>
-        <button @click="$router.push('/forgot-password')">Forgot password ?</button>
+        <button @click="$router.push('/register')">Create account</button>
+        <button @click="$router.push('/forgot-password')">Forgot password?</button>
       </div>
     </section>
   </main>

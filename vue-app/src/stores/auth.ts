@@ -20,10 +20,10 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = response.user
         return true
       }
-      error.value = 'Login failed'
+      error.value = 'Invalid username or password'
       return false
     } catch (err: any) {
-      error.value = err.response?.data?.message || 'Invalid username or password'
+      error.value = err.response?.data?.detail || 'Invalid username or password'
       return false
     } finally {
       loading.value = false

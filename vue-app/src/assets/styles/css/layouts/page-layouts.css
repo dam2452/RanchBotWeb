@@ -36,11 +36,12 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
     padding: var(--hero-padding-desktop);
     gap: var(--gap-hero-desktop);
     box-sizing: border-box;
     max-width: none;
+    overflow: hidden;
 }
 
 
@@ -116,12 +117,14 @@
 
 @media screen and (max-width: 850px) {
     .hero {
-        margin-top: -20px;
+        margin-top: 0;
         flex-direction: column;
         text-align: center;
-        height: auto;
-        padding: var(--hero-padding-mobile);
-        gap: var(--gap-hero-mobile);
+        min-height: 100vh;
+        padding: 20px 15px;
+        gap: 15px;
+        justify-content: center;
+        overflow-y: auto;
     }
 
     .search-page {
@@ -178,8 +181,17 @@
     }
 }
 
+@media screen and (max-width: 480px) {
+    .hero {
+        padding: 10px 8px;
+        gap: 8px;
+    }
+}
+
 @media (min-width: 851px) {
     .hero {
         flex-direction: row;
+        justify-content: center;
+        align-items: center;
     }
 }

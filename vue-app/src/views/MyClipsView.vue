@@ -134,10 +134,14 @@ const handleVideoPause = (event: Event) => {
   </main>
 </template>
 
-<style scoped>
+<style>
 @import '@/assets/styles/css/pages/my-clips.css';
 @import '@/assets/styles/css/components/clip-card.css';
 @import '@/assets/styles/css/components/video-container.css';
+@import '@/assets/styles/css/components/buttons.css';
+</style>
+
+<style scoped>
 
 .spinner {
   border: 4px solid #f3f3f3;

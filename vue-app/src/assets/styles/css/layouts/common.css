@@ -10,9 +10,11 @@ header {
 main {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
-    height: calc(100dvh - 70px);
+    gap: clamp(80px, 25vw, 300px);
+    min-height: 100vh;
+    width: 100%;
     padding: var(--main-gap);
     padding-bottom: calc(var(--main-gap) + env(safe-area-inset-bottom));
 }
@@ -66,14 +68,18 @@ main {
 }
 
 .left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    margin-bottom: var(--main-gap);
 }
 
 .right {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
 }
 
 .bench-container {
@@ -182,18 +188,53 @@ main {
     display: flex;
 }
 
-@media screen and (max-width: 850px) {
+@media screen and (min-width: 1025px) {
     main {
-        height: auto;
-        flex-direction: column;
-        padding-top: 15px;
-        padding-bottom: 80px;
-        justify-content: flex-start;
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
+
+    .left,
+    .right {
+        flex: 1;
     }
 
     .bench-container {
-        width: clamp(250px, 70vw, 350px);
+        width: clamp(300px, 35vw, 700px);
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    main {
+        flex-direction: column;
+        padding-top: 60px;
+        gap: 20px;
+    }
+
+    .left,
+    .right {
+        width: 100%;
+    }
+
+    .bench-container {
+        width: clamp(280px, 75vw, 450px);
         margin-bottom: 10px;
+    }
+}
+
+@media screen and (min-width: 601px) and (max-width: 1024px) {
+    .bench-container {
+        width: clamp(350px, 80vw, 500px);
+    }
+}
+
+@media screen and (max-width: 600px) {
+    main {
+        padding-top: 40px;
+    }
+
+    .bench-container {
+        width: clamp(240px, 80vw, 340px);
     }
 
     .arrow-wrapper {
@@ -204,18 +245,28 @@ main {
     }
 
     .actions {
-        flex-direction: column;
-        gap: 15px;
-        width: 80%;
-        margin-top: 20px;
+        flex-direction: row;
+        gap: 10px;
+        width: 90%;
+        margin-top: 10px;
         position: static;
     }
 
     .actions button {
-        width: 100%;
-        padding: 12px;
-        font-size: clamp(14px, 4vw, 18px);
-        max-width: none;
+        flex: 1;
+        padding: 10px 18px;
+        font-size: clamp(16px, 3.8vw, 20px);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .bench-container {
+        width: clamp(210px, 85vw, 290px);
+    }
+
+    .actions button {
+        padding: 8px 14px;
+        font-size: clamp(14px, 3.5vw, 18px);
     }
 
     .my-clips-header {

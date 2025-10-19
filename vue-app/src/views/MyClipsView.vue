@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 import { apiService } from '@/services/api'
 import type { Clip } from '@/types'
 
+const authStore = useAuthStore()
 const clips = ref<Clip[]>([])
 const loading = ref(true)
 const error = ref('')
+const username = ref(authStore.user?.username || 'User')
 
 onMounted(async () => {
   await loadClips()
@@ -41,49 +44,91 @@ const getVideoUrl = (clipId: string) => {
   return apiService.getVideoUrl(clipId)
 }
 
-const handleDownload = (clipId: string, clipName: string) => {
-  const url = getVideoUrl(clipId)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${clipName}.mp4`
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
+const handleVideoPlay = (event: Event) => {
+  const video = event.target as HTMLVideoElement
+  const container = video.closest('.video-container')
+
+  // Pause all other videos
+  document.querySelectorAll('.clip-card video').forEach((v) => {
+    if (v !== video) {
+      (v as HTMLVideoElement).pause()
+    }
+  })
+
+  // Remove active class from all containers
+  document.querySelectorAll('.video-container').forEach((c) => {
+    c.classList.remove('active')
+  })
+
+  // Add active class to current container
+  container?.classList.add('active')
+}
+
+const handleVideoPause = (event: Event) => {
+  const video = event.target as HTMLVideoElement
+  const container = video.closest('.video-container')
+  container?.classList.remove('active')
 }
 </script>
 
 <template>
   <main class="my-clips-page">
+    <!-- Logo and Site Name -->
+    <router-link to="/" class="site-logo-container">
+      <img src="/images/branding/logo.svg" alt="Logo strony" class="site-logo" />
+      <div class="site-name">RanchBot</div>
+    </router-link>
+
+    <!-- Header -->
     <div class="my-clips-header">
       <h1>My Clips</h1>
     </div>
 
+    <!-- Search Button -->
+    <router-link to="/search" class="search-nav-button">
+      <svg width="20" height="20" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8" stroke="currentColor" fill="none" stroke-width="2" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" />
+      </svg>
+      <span>Search for quotes</span>
+    </router-link>
+
+    <!-- User Buttons -->
+    <div class="user-buttons">
+      <button @click="$router.push('/logout')" class="logout-btn">Log Out</button>
+      <button class="user-greeting-btn">Hi, {{ username }}</button>
+    </div>
+
+    <!-- Loading -->
     <div v-if="loading" id="loading-indicator">
       <div class="spinner"></div>
       <div style="margin-top: 15px; font-weight: bold">Loading clips...</div>
     </div>
 
+    <!-- Error -->
     <div v-else-if="error" class="error-message">{{ error }}</div>
 
+    <!-- No clips -->
     <div v-else-if="clips.length === 0" class="no-clips-message">
       You don't have any clips yet. Use the quote search to create your first clips!
     </div>
 
+    <!-- Clips Reel -->
     <div v-else class="clips-reel">
       <div v-for="clip in clips" :key="clip.id" class="clip-card">
-        <video controls preload="metadata" :src="getVideoUrl(clip.id)"></video>
-
-        <div class="clip-info">
-          <h3>{{ clip.name }}</h3>
-          <p class="clip-date">{{ new Date(clip.created_at).toLocaleDateString() }}</p>
+        <div class="video-container">
+          <video
+            controls
+            preload="metadata"
+            :src="getVideoUrl(clip.id)"
+            @play="handleVideoPlay"
+            @pause="handleVideoPause"
+          ></video>
         </div>
 
-        <div class="clip-actions">
-          <button class="download-btn" @click="handleDownload(clip.id, clip.name)">
-            Download
-          </button>
-          <button class="delete-clip-btn" @click="handleDelete(clip.name)">Delete</button>
-        </div>
+        <div class="quote">{{ clip.name }}</div>
+
+        <button class="delete-clip-btn" @click="handleDelete(clip.name)">Delete</button>
       </div>
     </div>
   </main>
@@ -92,6 +137,7 @@ const handleDownload = (clipId: string, clipName: string) => {
 <style scoped>
 @import '@/assets/styles/css/pages/my-clips.css';
 @import '@/assets/styles/css/components/clip-card.css';
+@import '@/assets/styles/css/components/video-container.css';
 
 .spinner {
   border: 4px solid #f3f3f3;

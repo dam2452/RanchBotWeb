@@ -47,7 +47,9 @@ async def get_clip_video(
             io.BytesIO(video_data),
             media_type="video/mp4",
             headers={
-                "Content-Disposition": f'inline; filename="clip_{clip_id}.mp4"'
+                "Content-Disposition": f'inline; filename="clip_{clip_id}.mp4"',
+                "Content-Length": str(len(video_data)),
+                "Accept-Ranges": "bytes"
             }
         )
     except Exception as e:

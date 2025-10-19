@@ -4,7 +4,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     padding: var(--page-padding);
     gap: var(--section-gap);
     text-align: center;
@@ -12,13 +12,13 @@
     transition: padding 0.4s ease;
 }
 
-.search-container {
+.search-page .search-container {
     position: relative;
     width: var(--search-width);
     display: flex;
     flex-direction: column;
     align-items: center;
-    z-index: 100;
+    z-index: 10;
     transition: width 0.4s ease, margin 0.4s ease;
 }
 
@@ -63,6 +63,8 @@
 
 .logo-wrapper {
     transition: transform 0.4s ease;
+    position: relative;
+    z-index: 10;
 }
 
 .search-page .logo-img {

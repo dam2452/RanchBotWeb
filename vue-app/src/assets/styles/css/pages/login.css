@@ -1,0 +1,355 @@
+
+@import '../pages/main.css';
+
+body {
+    overflow: hidden;
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.logo-img {
+    display: block;
+    margin: 0 auto;
+    transform: scale(1.9);
+    margin-top: -40px;
+    margin-bottom: 90px;
+}
+
+.left h1 {
+    text-align: center;
+    margin-top: 60px;
+    transform: scale(1.9);
+}
+
+.actions {
+    margin-top: 10px;
+    display: flex;
+    gap: var(--main-gap);
+    width: 100%;
+    justify-content: center;
+}
+
+.actions button {
+    background: linear-gradient(to bottom right, var(--color-btn-green), var(--color-btn-green-dark));
+    color: var(--color-text-light);
+    padding: 10px 25px;
+    font-size: clamp(38px, 1.5vw, 40px);
+    border: none;
+    border-radius: var(--radius-m);
+    cursor: pointer;
+    box-shadow: 0 6px 14px var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    position: relative;
+    z-index: 1;
+    flex-grow: 1;
+    max-width: 400px;
+    white-space: nowrap;
+}
+
+.actions button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(to bottom right, var(--color-btn-green-hover), var(--color-btn-green-hover-dark));
+    box-shadow: 0 8px 20px var(--shadow-heavy);
+}
+
+.actions button:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 6px var(--shadow);
+}
+
+.error-message {
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    width: 80%;
+    padding: 8px;
+    background-color: rgba(255, 0, 0, 0.1);
+    border: 1px solid #ff6b6b;
+    border-radius: var(--input-radius);
+    color: #d63031;
+    text-align: center;
+    font-size: 14px;
+}
+
+.input-base {
+    appearance: none;
+    -webkit-appearance: none;
+    border: 1px solid #ddd;
+    border-radius: var(--input-radius);
+    padding: 10px 15px;
+    font-size: 16px;
+    color: var(--color-dark);
+    background-color: var(--color-white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-base:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(74, 105, 189, 0.2);
+}
+
+.search-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.search-input {
+    width: 100%;
+    padding: clamp(16px, 2vw, 24px) clamp(20px, 3vw, 32px);
+    padding-right: clamp(60px, 6vw, 70px);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: bold;
+    text-align: center;
+    border-radius: var(--radius-xl);
+    border: none;
+    box-shadow: 0 10px 24px var(--shadow-strong);
+    background: var(--color-white);
+    color: var(--color-dark);
+}
+
+.search-icon-btn {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    height: var(--search-btn-size);
+    width: var(--search-btn-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.search-icon-btn img {
+    width: clamp(30px, 4vw, 42px);
+    height: auto;
+    pointer-events: none;
+    filter: drop-shadow(0 0 4px var(--shadow-strong));
+    transition: transform 0.2s ease;
+}
+
+.search-icon-btn:hover img {
+    transform: scale(1.15);
+}
+
+.form-overlay input {
+    position: absolute;
+    left: 12%;
+    width: 76%;
+    height: 8%;
+    font-size: clamp(14px, 1.2vw, 18px);
+    border: none;
+    border-radius: var(--input-radius);
+    text-align: center;
+    background-color: var(--color-form-bg);
+    box-shadow: inset 0 0 3px var(--shadow-strong);
+    color: #8B4513;
+}
+
+.form-overlay input::placeholder {
+    color: #A0522D;
+    opacity: 0.8;
+}
+
+.form-overlay input::-webkit-input-placeholder {
+    color: #A0522D;
+    opacity: 0.8;
+}
+
+.form-overlay input::-moz-placeholder {
+    color: #A0522D;
+    opacity: 0.8;
+}
+
+.form-overlay input:-ms-input-placeholder {
+    color: #A0522D;
+    opacity: 0.8;
+}
+
+.form-overlay input[name="login"],
+.form-overlay input[name="password"] {
+    left: 15%;
+    width: 70%;
+    background-color: var(--color-form-highlight);
+}
+
+.form-overlay input[name="login"] {
+    top: 23.5%;
+}
+
+.form-overlay input[name="password"] {
+    top: 37.6%;
+}
+
+.form-overlay input:focus {
+    outline: 2px solid #c58b4f;
+    background-color: var(--color-form-focus);
+    color: #8B4513;
+}
+
+.form-overlay button {
+    position: absolute;
+    top: 53%;
+    left: 0;
+    width: 100%;
+    height: 5.5%;
+    font-size: clamp(14px, 1.2vw, 18px);
+    font-weight: bold;
+    background: linear-gradient(to right, #fdd99d, #dcae75);
+    border: 2px solid #aa9169;
+    border-radius: var(--form-btn-radius);
+    cursor: pointer;
+    color: #8B4513; /* Brązowy kolor tekstu przycisku */
+    box-shadow: var(--box-shadow-strong);
+    transition: var(--transition-standard);
+}
+
+.form-overlay button:hover {
+    transform: scale(1.04);
+    background: linear-gradient(to right, #ffe0b3, #e0b88a);
+    box-shadow: var(--box-shadow-hover);
+}
+
+.form-overlay button:active {
+    transform: scale(0.96);
+    box-shadow: var(--box-shadow-active);
+}
+
+.save-form {
+    display: none;
+    flex-direction: row;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.save-form.visible {
+    display: flex;
+}
+
+.clip-name-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.search-container {
+    width: clamp(280px, 60vw, 720px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.search-results-page .search-container {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+.search-container.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+@media screen and (min-width: 850px) and (max-width: 1899px) {
+    .logo-img {
+        transform: scale(1.5);
+        margin-top: -20px;
+        margin-bottom: 60px;
+    }
+
+    .left h1 {
+        transform: scale(1.5);
+        margin-top: 40px;
+    }
+
+    .actions button {
+        font-size: clamp(32px, 1.3vw, 36px);
+        padding: 8px 20px;
+        max-width: 350px;
+    }
+
+    .form-overlay input {
+        font-size: clamp(14px, 1vw, 16px);
+    }
+
+    .form-overlay button {
+        font-size: clamp(12px, 1vw, 16px);
+    }
+}
+
+@media screen and (max-width: 849px) {
+    .logo-img {
+        transform: scale(1.5);
+        margin-top: 15px;
+        margin-bottom: 30px;
+    }
+
+    .left h1 {
+        transform: scale(1.2);
+        margin-top: 20px;
+    }
+
+    .actions {
+        margin-top: -20px;
+        width: 95%;
+        gap: 10px;
+    }
+
+    .actions button {
+        padding: 8px 15px;
+        font-size: clamp(26px, 4.8vw, 32px);
+        min-width: 140px;
+        max-width: none;
+        flex-basis: 0;
+        flex-grow: 1;
+        transform: none;
+    }
+
+    .actions button:hover {
+        transform: scale(1.05);
+    }
+
+    .actions button:active {
+        transform: scale(0.97);
+    }
+
+    .search-results-page .search-container {
+        top: 75px;
+        width: 70vw;
+    }
+
+    .form-overlay input {
+        font-size: 16px;
+        height: 9%;
+    }
+
+    .form-overlay input[name="login"],
+    .form-overlay input[name="password"] {
+        left: 15.5%;
+        width: 69%;
+    }
+
+    .form-overlay button {
+        height: 5.5%;
+        font-size: clamp(8px, 0.7vw, 11px);
+        transform: none;
+    }
+
+    .save-form {
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,273 @@
+.my-clips-page {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+.site-logo-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.site-logo {
+    width: 180px;
+    height: auto;
+    cursor: pointer;
+}
+
+.site-name {
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--color-text-light);
+    margin-top: 7px;
+    text-align: center;
+}
+
+.my-clips-header {
+    position: absolute;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.my-clips-header h1 {
+    font-size: var(--font-size-title-desktop);
+    background: rgba(170, 170, 170, 0.92);
+    color: var(--color-text-light);
+    padding: 6px 108px;
+    border-radius: var(--radius-title);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.search-nav-button {
+    position: absolute;
+    top: 200px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+.clips-reel {
+    width: 100%;
+    height: calc(100vh - 80px);
+    position: relative;
+    display: flex;
+    overflow: hidden;
+}
+
+@media screen and (max-width: 850px) {
+    .my-clips-header {
+        top: 100px;
+        position: fixed;
+        z-index: 1002;
+    }
+
+    .my-clips-header h1 {
+        font-size: var(--font-size-title-mobile);
+        padding: 6px 30px;
+        min-width: 100px;
+        width: auto;
+    }
+
+    .site-logo-container {
+        top: 20px;
+        left: 20px;
+        position: fixed;
+        z-index: 1001;
+    }
+
+    .site-logo {
+        width: 80px;
+    }
+
+    .site-name {
+        font-size: 16px;
+    }
+
+    .auth-buttons {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        z-index: 1002;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+    }
+
+    .auth-buttons .tooltip-container {
+        order: 1;
+    }
+
+    .auth-buttons button[onclick*="my-clips"] {
+        order: 2;
+    }
+
+    .auth-buttons button[onclick*="logout"] {
+        order: 3;
+    }
+
+    .user-buttons {
+        display: none;
+    }
+
+    .search-nav-button {
+        position: fixed;
+        top: 145px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1001;
+        width: 40px;
+        height: 40px;
+        min-width: auto;
+        padding: 0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--color-user-btn);
+    }
+
+    .search-nav-button span {
+        display: none;
+    }
+
+    .search-nav-button svg {
+        width: 20px;
+        height: 20px;
+        display: block;
+        margin: 0;
+        padding: 0;
+        position: relative;
+        top: 0;
+        left: 0;
+    }
+
+    .clips-reel-wrapper {
+        width: 100%;
+        height: 100vh;
+        position: relative;
+        overflow-y: auto;
+        scroll-snap-type: y mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .clips-page {
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 90px 20px 30px 20px;
+        box-sizing: border-box;
+        scroll-snap-align: start;
+        position: relative;
+    }
+
+    .clips-container {
+        margin-top: 60px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .clip-card {
+        width: 90%;
+        max-width: 500px;
+        margin-bottom: 10px;
+        transition: transform 0.3s ease;
+    }
+
+    .clip-card .clip-info h3 {
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+
+    .clip-card .clip-info p {
+        margin-top: 4px;
+        margin-bottom: 4px;
+        font-size: 12px;
+        line-height: 1.2;
+    }
+
+    .clip-card .clip-actions {
+        margin-top: 6px;
+        gap: 6px;
+    }
+
+    .clip-card .clip-actions button {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .clips-page .clip-card:nth-child(1) {
+        animation: slideUp 0.4s ease forwards;
+        margin-top: 0;
+    }
+
+    .clips-page .clip-card:nth-child(2) {
+        animation: slideUp 0.5s ease forwards;
+    }
+
+    .clips-page .clip-card:nth-child(3) {
+        animation: slideUp 0.6s ease forwards;
+        margin-bottom: 0;
+    }
+
+    .mobile-page-indicator {
+        bottom: 60px;
+    }
+}
+
+.clip-card .video-container.active {
+    box-shadow: 0 0 0 4px var(--color-user-btn);
+    border-radius: 8px;
+    transition: box-shadow 0.3s ease;
+}
+
+#loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(170, 170, 170, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--color-user-btn);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

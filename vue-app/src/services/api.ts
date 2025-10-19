@@ -39,7 +39,7 @@ class ApiService {
   }
 
   async logout(): Promise<void> {
-    await this.client.get('/logout')
+    await this.client.get('/auth/logout')
   }
 
   async register(data: any): Promise<void> {
@@ -49,7 +49,7 @@ class ApiService {
 
   async getCurrentUser(): Promise<User | null> {
     try {
-      const response = await this.client.get('/api/user.php')
+      const response = await this.client.get('/auth/user')
       if (response.data.status === 'success') {
         return response.data.user
       }
@@ -64,7 +64,7 @@ class ApiService {
 
   // Search
   async searchClips(query: string): Promise<SearchResult[]> {
-    const response = await this.client.post('/api/api-json.php', {
+    const response = await this.client.post('/api/json', {
       endpoint: 'sz',
       args: [query],
     })
@@ -78,7 +78,7 @@ class ApiService {
   // Video operations
   async getVideo(index: string): Promise<Blob> {
     const response = await this.client.post(
-      '/api/api-video.php',
+      '/api/video',
       {
         endpoint: 'w',
         args: [index],
@@ -92,7 +92,7 @@ class ApiService {
 
   async adjustVideo(clipIndex: string, leftAdjust: number, rightAdjust: number): Promise<Blob> {
     const response = await this.client.post(
-      '/api/api-video.php',
+      '/api/video',
       {
         endpoint: 'd',
         args: [clipIndex, leftAdjust.toString(), rightAdjust.toString()],
@@ -106,7 +106,7 @@ class ApiService {
 
   // Clips management
   async getUserClips(): Promise<Clip[]> {
-    const response = await this.client.get('/api/clips-api.php?action=get_clips')
+    const response = await this.client.get('/clips?action=get_clips')
 
     if (response.data.status === 'success' && response.data.clips) {
       return response.data.clips
@@ -115,21 +115,21 @@ class ApiService {
   }
 
   async saveClip(clipName: string): Promise<void> {
-    await this.client.post('/api/api-json.php', {
+    await this.client.post('/api/json', {
       endpoint: 'z',
       args: [clipName],
     })
   }
 
   async deleteClip(clipName: string): Promise<void> {
-    await this.client.post('/api/api-json.php', {
+    await this.client.post('/api/json', {
       endpoint: 'uk',
       args: [clipName],
     })
   }
 
   getVideoUrl(clipId: string): string {
-    return `/api/api-video.php?endpoint=wys&id=${encodeURIComponent(clipId)}`
+    return `/clips/video/${encodeURIComponent(clipId)}`
   }
 }
 

@@ -1,7 +1,6 @@
-# Moja palikacja RanchBot ma dwie czesci 
-1. Forntend - 
-
-
+# Moja palikacja RanchBot ma dwie czesci
+1. Forntend - C:\GIT_REPO\RanchBotWeb
+2. Api od klipowania C:\GIT_REPO\RANCZO_KLIPY
 
 ### Jak pisać kod?
 Jak piszesz kod to nie dawaj zbędnych komentarzy i docs stringów i pilnuj żeby linter nic nie rzucał. I nie używaj emoji w kodzie.
@@ -12,3 +11,6 @@ Wszelki prompty trzymaj w osobnych plikach w folderze prompts/
 ### Notatnik
 Kluczowe zasady działania aplikacji w sensie informacje jak user oczekuje że apka będzie działać notuj sobie do pliku "app_logic_notes.md"
 Czyli jak ci w jakiś wiaodmosciach opisuje czego chce od tej apki to sobie to zanotuj żeby zbierać cały obraz tego czym apk ma być i jak działać.
+
+### commitownie
+Jesli przyjdzie ci commitowac nie zamieszczaj iforamcji o tym ze kod robil claude code ani anthrioic itd

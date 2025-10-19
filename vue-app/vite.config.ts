@@ -18,20 +18,21 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      // Proxy all /api requests to PHP backend
+      // Proxy all API requests to FastAPI backend
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
       },
-      // Proxy auth endpoints to PHP
-      '/login': {
-        target: 'http://localhost:8080',
+      // Proxy auth endpoints to FastAPI
+      '/auth': {
+        target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
       },
-      '/logout': {
-        target: 'http://localhost:8080',
+      // Proxy clips endpoints to FastAPI
+      '/clips': {
+        target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
       },

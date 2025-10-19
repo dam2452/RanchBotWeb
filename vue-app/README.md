@@ -61,8 +61,8 @@ vue-app/
 ### Prerequisites
 
 - Node.js 18+ and npm
-- PHP 8.0+ with curl extension
-- The existing RanchBot PHP backend (required for session management and API proxy)
+- Python 3.10+ (for FastAPI backend)
+- The FastAPI backend running (required for session management and API proxy)
 
 ### Installation
 
@@ -78,21 +78,23 @@ vue-app/
 
 ### Development
 
-For development, you need to run BOTH the PHP backend and Vue dev server:
+For development, you need to run BOTH the FastAPI backend and Vue dev server:
 
-1. Start the PHP backend on port 8080:
+1. Start the FastAPI backend on port 8000:
    ```bash
-   # From the root directory (RanchBotWeb)
-   php -S localhost:8080 -t public
+   # From the backend directory
+   cd backend
+   python -m uvicorn app.main:app --reload --port 8000
    ```
 
 2. In a separate terminal, start the Vue dev server:
    ```bash
    # From vue-app directory
+   cd vue-app
    npm run dev
    ```
 
-The Vue app will be available at `http://localhost:5173` and will proxy API/auth requests to the PHP backend at `http://localhost:8080`.
+The Vue app will be available at `http://localhost:5173` and will proxy API/auth requests to the FastAPI backend at `http://localhost:8000`.
 
 ### Building for Production
 
@@ -129,29 +131,30 @@ npm run lint
 
 ### Architecture
 
-The Vue app works in conjunction with the existing PHP backend:
+The Vue app works in conjunction with the FastAPI backend:
 
 1. **Vue Frontend** (`http://localhost:5173` in dev)
    - Handles all UI and routing
-   - Makes API calls to PHP backend
+   - Makes API calls to FastAPI backend
 
-2. **PHP Backend** (`http://localhost:8080` in dev)
+2. **FastAPI Backend** (`http://localhost:8000` in dev)
    - Handles authentication (sessions)
    - Proxies API requests to the external RanchBot API
    - Manages user sessions and JWT tokens
 
-### API Endpoints (PHP Backend)
+### API Endpoints (FastAPI Backend)
 
-The Vue app communicates with these PHP endpoints:
+The Vue app communicates with these FastAPI endpoints:
 
-- `POST /login` - User login (creates PHP session)
-- `GET /logout` - User logout (destroys session)
-- `GET /api/user.php` - Get current user info
-- `POST /api/api-json.php` - Generic JSON API proxy
-- `POST /api/api-video.php` - Video blob API proxy
-- `GET /api/clips-api.php` - Get user clips
+- `POST /auth/login` - User login (creates session)
+- `GET /auth/logout` - User logout (destroys session)
+- `GET /auth/user` - Get current user info
+- `POST /api/json` - Generic JSON API proxy
+- `POST /api/video` - Video blob API proxy
+- `GET /clips?action=get_clips` - Get user clips
+- `GET /clips/video/{clip_id}` - Get specific clip video
 
-All endpoints use PHP sessions for authentication (no localStorage/JWT in frontend).
+All endpoints use session cookies for authentication (no localStorage/JWT in frontend).
 
 ## Differences from PHP Version
 
@@ -159,6 +162,13 @@ All endpoints use PHP sessions for authentication (no localStorage/JWT in fronte
 
 - **Old**: PHP templates with inline JavaScript
 - **New**: Vue 3 with TypeScript, modern component architecture
+
+### Backend Technology
+
+- **Old**: PHP backend (sessions, routing, templating)
+- **New**: FastAPI Python backend (modern, async, type-safe)
+- Better performance with async/await
+- OpenAPI documentation (Swagger UI)
 
 ### Routing
 
@@ -169,12 +179,12 @@ All endpoints use PHP sessions for authentication (no localStorage/JWT in fronte
 ### State Management
 
 - **Old**: PHP sessions only
-- **New**: PHP sessions + Pinia store for reactive state
+- **New**: FastAPI sessions + Pinia store for reactive state
 - Better UX with instant UI updates
 
 ### Authentication
 
-- **Still uses PHP sessions** (no change to backend auth)
+- **Session-based authentication** (cookie-based)
 - Auth state is managed in Vue store for reactive UI
 - Session validation on every route change
 
@@ -186,8 +196,8 @@ All endpoints use PHP sessions for authentication (no localStorage/JWT in fronte
 
 ### API Communication
 
-- Same PHP backend and API endpoints
-- Vue uses Axios instead of fetch
+- FastAPI backend proxies requests to external RanchBot API
+- Vue uses Axios for HTTP requests
 - All requests proxied through Vite dev server during development
 
 ## Pages

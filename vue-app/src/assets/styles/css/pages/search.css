@@ -10,6 +10,13 @@
     text-align: center;
     min-height: 100vh;
     transition: padding 0.4s ease;
+    transform: translateX(-140px);
+}
+
+@media screen and (max-width: 850px) {
+    .search-page {
+        transform: translateX(0);
+    }
 }
 
 .search-page .search-container {

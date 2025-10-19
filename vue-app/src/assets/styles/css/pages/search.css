@@ -66,13 +66,13 @@
 }
 
 .search-page .logo-img {
-    width: clamp(180px, 22vw, 260px);
+    width: clamp(243px, 29.7vw, 351px);
     margin-bottom: 15px;
     transition: transform 0.3s ease;
 }
 
 .search-page .title {
-    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-size: clamp(3.375rem, 6.75vw, 5.4rem);
     margin-bottom: 20px;
     transition: font-size 0.4s ease, margin 0.4s ease;
 }

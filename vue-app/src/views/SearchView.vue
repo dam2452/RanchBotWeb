@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import AppHeader from '@/components/AppHeader.vue'
+import UserButtons from '@/components/UserButtons.vue'
 
 const router = useRouter()
 const query = ref('')
@@ -18,7 +18,7 @@ const handleSearch = () => {
 </script>
 
 <template>
-  <AppHeader />
+  <UserButtons fixed />
   <main class="search-page">
     <div class="logo-wrapper">
       <router-link to="/">

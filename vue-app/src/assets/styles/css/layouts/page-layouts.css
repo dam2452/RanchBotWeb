@@ -5,12 +5,19 @@
 }
 
 .search-results-page,
-.search-page,
 .my-clips-page {
     width: 100%;
     height: 100vh;
     position: relative;
     overflow: hidden;
+}
+
+.search-page {
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .static-page {
@@ -36,16 +43,6 @@
     max-width: none;
 }
 
-.search-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: var(--page-padding);
-    gap: var(--section-gap);
-    text-align: center;
-    min-height: 100vh;
-}
 
 .clips-reel {
     display: flex;

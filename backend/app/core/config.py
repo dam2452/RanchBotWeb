@@ -11,11 +11,8 @@ class Settings(BaseSettings):
     secret_key: str = "your-secret-key-change-this-in-production"
     session_max_age: int = 86400  # 24 hours
 
-    # CORS
-    allowed_origins: List[str] = [
-        "http://localhost:5173",
-        "http://localhost:3000",
-    ]
+    # CORS - will be split by comma if from env
+    allowed_origins: str = "http://localhost:5173,http://localhost:3000"
 
     # Server
     host: str = "0.0.0.0"
@@ -25,6 +22,10 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+
+    def get_allowed_origins(self) -> List[str]:
+        """Get allowed origins as a list"""
+        return [origin.strip() for origin in self.allowed_origins.split(",")]
 
 
 settings = Settings()

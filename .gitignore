@@ -7,3 +7,5 @@ RANCZO-WIDEO
 .env.cf
 .env.prod
 .env.all-in-one
+__pycache__/
+*.pyc

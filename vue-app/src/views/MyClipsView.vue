@@ -1,21 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
 import { apiService } from '@/services/api'
 import type { Clip } from '@/types'
+import UserButtons from '@/components/UserButtons.vue'
+import SiteLogo from '@/components/SiteLogo.vue'
+import SearchButton from '@/components/SearchButton.vue'
 
-const router = useRouter()
-const authStore = useAuthStore()
 const clips = ref<Clip[]>([])
 const loading = ref(true)
 const error = ref('')
-const username = ref(authStore.user?.username || 'User')
-
-const handleLogout = async () => {
-  await authStore.logout()
-  router.push('/login')
-}
 
 onMounted(async () => {
   await loadClips()
@@ -81,10 +74,7 @@ const handleVideoPause = (event: Event) => {
 <template>
   <main class="my-clips-page">
     <!-- Logo and Site Name -->
-    <router-link to="/" class="site-logo-container">
-      <img src="/images/branding/logo.svg" alt="Logo strony" class="site-logo" />
-      <div class="site-name">RanchBot</div>
-    </router-link>
+    <SiteLogo />
 
     <!-- Header -->
     <div class="my-clips-header">
@@ -92,19 +82,10 @@ const handleVideoPause = (event: Event) => {
     </div>
 
     <!-- Search Button -->
-    <router-link to="/search" class="search-nav-button">
-      <svg width="20" height="20" viewBox="0 0 24 24">
-        <circle cx="11" cy="11" r="8" stroke="currentColor" fill="none" stroke-width="2" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" />
-      </svg>
-      <span>Search for quotes</span>
-    </router-link>
+    <SearchButton />
 
     <!-- User Buttons -->
-    <div class="auth-buttons" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
-      <button id="user-welcome-link">Hi, {{ username }}</button>
-      <button @click="handleLogout">Logout</button>
-    </div>
+    <UserButtons fixed :show-my-clips="false" :show-tooltip="false" />
 
     <!-- Loading -->
     <div v-if="loading" id="loading-indicator">

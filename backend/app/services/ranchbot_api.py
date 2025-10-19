@@ -60,12 +60,12 @@ class RanchBotAPIClient:
             response.raise_for_status()
             return response.content
 
-    async def authenticate(self, username: str, password: str) -> Dict[str, Any]:
+    async def authenticate(self, login: str, password: str) -> Dict[str, Any]:
         """Authenticate user and get JWT token"""
         url = f"{self.base_url}/auth/login"
 
         payload = {
-            "username": username,
+            "username": login,  # External API expects 'username', we receive 'login'
             "password": password
         }
 

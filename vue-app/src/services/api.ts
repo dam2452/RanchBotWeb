@@ -10,32 +10,31 @@ class ApiService {
       headers: {
         'Content-Type': 'application/json',
       },
-      withCredentials: true, // Important for PHP sessions
+      withCredentials: true, // Important for session cookies
     })
   }
 
-  // Authentication - using PHP backend
+  // Authentication - using FastAPI backend
   async login(credentials: LoginCredentials): Promise<{ user: User; success: boolean }> {
     const formData = new FormData()
     formData.append('login', credentials.login)
     formData.append('password', credentials.password)
 
-    const response = await this.client.post('/login', formData, {
+    const response = await this.client.post('/auth/login', formData, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     })
 
-    // PHP redirects on success, so if we get here it was successful
-    // Extract username from response or session
-    return {
-      success: true,
-      user: {
-        id: 0,
-        username: credentials.login,
-        email: '',
-      },
+    // FastAPI returns user data on success
+    if (response.data.status === 'success') {
+      return {
+        success: true,
+        user: response.data.user,
+      }
     }
+
+    throw new Error('Login failed')
   }
 
   async logout(): Promise<void> {

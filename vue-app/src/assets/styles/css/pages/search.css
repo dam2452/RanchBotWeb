@@ -1,14 +1,24 @@
 @import '../pages/main.css';
 
 .search-page {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: var(--page-padding);
+    padding: 0;
     gap: var(--section-gap);
     text-align: center;
     min-height: 100vh;
+    height: 100vh;
     transition: padding 0.4s ease;
-    transform: translateX(-140px);
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    box-sizing: border-box;
+    margin: 0 auto;
 }
 
 @media screen and (max-width: 850px) {
@@ -20,6 +30,7 @@
 .search-page .search-container {
     position: relative;
     width: var(--search-width);
+    max-width: 90vw;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -42,6 +53,10 @@
     position: absolute;
     bottom: -50px;
     right: 8px;
+    z-index: 20;
+    pointer-events: auto;
+    display: block;
+    visibility: visible;
 }
 
 .filter-btn:hover {
@@ -70,6 +85,11 @@
     transition: transform 0.4s ease;
     position: relative;
     z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .search-page .logo-img {
@@ -82,6 +102,7 @@
     font-size: clamp(3.375rem, 6.75vw, 5.4rem);
     margin-bottom: 20px;
     transition: font-size 0.4s ease, margin 0.4s ease;
+    text-align: center;
 }
 
 .search-page .logo-wrapper a:active .logo-img {

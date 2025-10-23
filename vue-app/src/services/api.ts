@@ -41,6 +41,27 @@ class ApiService {
     await this.client.get('/auth/logout')
   }
 
+  async logoutAll(credentials: LoginCredentials): Promise<{ message: string; revokedCount: number }> {
+    const formData = new FormData()
+    formData.append('login', credentials.login)
+    formData.append('password', credentials.password)
+
+    const response = await this.client.post('/auth/logout-all', formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    })
+
+    if (response.data.status === 'success') {
+      return {
+        message: response.data.message,
+        revokedCount: response.data.revoked_count,
+      }
+    }
+
+    throw new Error('Failed to logout from all sessions')
+  }
+
   async register(data: any): Promise<void> {
     // Registration is disabled
     throw new Error('Registration is currently disabled')

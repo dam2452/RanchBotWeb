@@ -87,7 +87,12 @@ RanchBotWeb/
 
 **Terminal 1 - Backend:**
 ```bash
+./start_backend.sh
+```
+lub ręcznie:
+```bash
 cd backend
+source ../.venv/bin/activate
 python -m uvicorn app.main:app --reload --port 8000
 ```
 
@@ -162,6 +167,18 @@ gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker
 ```
 
 Or use Docker (see individual READMEs for Docker configurations).
+
+## API Endpoints
+
+### Authentication
+- `POST /auth/login` - Login user
+- `GET /auth/logout` - Logout current session
+- `POST /auth/logout-all` - Logout from all sessions (requires username & password)
+- `GET /auth/user` - Get current user info
+
+### RanchBot API (External)
+- `POST http://192.168.1.210:8077/api/v1/auth/login` - Login to RanchBot API
+- `POST http://192.168.1.210:8077/api/v1/auth/logout-all` - Logout from all sessions (clears all refresh tokens)
 
 ## Version History
 

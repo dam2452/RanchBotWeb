@@ -59,18 +59,52 @@ body {
     box-shadow: 0 2px 6px var(--shadow);
 }
 
+.actions button.logout-all-btn {
+    background: linear-gradient(to bottom right, #f39c12, #e67e22);
+}
+
+.actions button.logout-all-btn:hover {
+    background: linear-gradient(to bottom right, #f1c40f, #f39c12);
+}
+
+.actions button.logout-all-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: scale(1);
+}
+
 .error-message {
     position: absolute;
-    top: 10%;
-    left: 10%;
-    width: 80%;
-    padding: 8px;
+    top: 15.5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    padding: 10px;
     background-color: rgba(255, 0, 0, 0.1);
     border: 1px solid #ff6b6b;
     border-radius: var(--input-radius);
     color: #d63031;
     text-align: center;
-    font-size: 14px;
+    font-size: clamp(12px, 1vw, 14px);
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.success-message {
+    position: absolute;
+    top: 15.5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    padding: 10px;
+    background-color: rgba(0, 255, 0, 0.1);
+    border: 1px solid #00d25b;
+    border-radius: var(--input-radius);
+    color: #00984a;
+    text-align: center;
+    font-size: clamp(12px, 1vw, 14px);
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .input-base {
@@ -346,6 +380,14 @@ body {
         height: 5.5%;
         font-size: clamp(8px, 0.7vw, 11px);
         transform: none;
+    }
+
+    .error-message,
+    .success-message {
+        top: 13%;
+        width: 75%;
+        font-size: 11px;
+        padding: 8px;
     }
 
     .save-form {

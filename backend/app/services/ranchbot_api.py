@@ -65,7 +65,26 @@ class RanchBotAPIClient:
         url = f"{self.base_url}/auth/login"
 
         payload = {
-            "username": login,  # External API expects 'username', we receive 'login'
+            "username": login,
+            "password": password
+        }
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, json=payload)
+
+            if response.status_code == 429:
+                error_detail = response.json().get("detail", "Too many active sessions")
+                raise Exception(f"Rate limit: {error_detail}")
+
+            response.raise_for_status()
+            return response.json()
+
+    async def logout_all_sessions(self, login: str, password: str) -> Dict[str, Any]:
+        """Logout from all sessions by revoking all refresh tokens"""
+        url = f"{self.base_url}/auth/logout-all"
+
+        payload = {
+            "username": login,
             "password": password
         }
 

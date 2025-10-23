@@ -33,6 +33,8 @@
     box-shadow: 0 10px 24px var(--shadow-strong);
     background: var(--color-white);
     color: var(--color-dark);
+    position: relative;
+    z-index: 1;
 }
 
 .search-icon-btn {
@@ -49,6 +51,8 @@
     border: none;
     cursor: pointer;
     padding: 0;
+    z-index: 20;
+    pointer-events: auto;
 }
 
 .search-icon-btn img {

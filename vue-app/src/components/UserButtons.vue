@@ -1,7 +1,7 @@
 <template>
   <div
-    class="flex gap-2.5 max-[400px]:gap-[10px]"
-    :class="fixed ? 'fixed top-5 right-5 z-1000 max-[850px]:top-[15px] max-[850px]:right-[15px]' : ''"
+    class="auth-buttons-container flex gap-2.5 max-[400px]:gap-[10px]"
+    :class="{ 'fixed': fixed }"
   >
     <template v-if="authStore.isAuthenticated">
       <button
@@ -71,4 +71,20 @@ const handleLogout = async () => {
   router.push('/login')
 }
 </script>
+
+<style scoped>
+.auth-buttons-container.fixed {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  z-index: 1000 !important;
+}
+
+@media (max-width: 850px) {
+  .auth-buttons-container.fixed {
+    top: 15px !important;
+    right: 15px !important;
+  }
+}
+</style>
 

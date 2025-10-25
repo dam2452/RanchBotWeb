@@ -6,6 +6,8 @@ import type { SearchResult } from '@/types'
 import UserButtons from '@/components/UserButtons.vue'
 import ClipInspector from '@/components/ClipInspector.vue'
 
+type VisibleEntry = { entry: IntersectionObserverEntry; ratio: number }
+
 const route = useRoute()
 const router = useRouter()
 
@@ -54,32 +56,35 @@ onMounted(async () => {
 
   setTimeout(() => {
     if (videoReel.value) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          if (isManualScroll.value) return
+      const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+        if (isManualScroll.value) return
 
-          let mostVisible: { entry: IntersectionObserverEntry; ratio: number } | null = null
+        let mostVisible: VisibleEntry | null = null
 
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              if (!mostVisible || entry.intersectionRatio > mostVisible.ratio) {
-                mostVisible = { entry, ratio: entry.intersectionRatio }
-              }
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (!mostVisible || entry.intersectionRatio > mostVisible.ratio) {
+              mostVisible = { entry, ratio: entry.intersectionRatio }
             }
-          })
+          }
+        })
 
-          if (mostVisible && mostVisible.ratio > 0.5) {
-            const index = parseInt((mostVisible.entry.target as HTMLElement).dataset.idx || '0')
+        if (mostVisible) {
+          const visible = mostVisible as VisibleEntry
+          if (visible.ratio > 0.5) {
+            const target = visible.entry.target as HTMLElement
+            const index = parseInt(target.dataset.idx || '0')
             if (activeIndex.value !== index) {
               activeIndex.value = index
             }
           }
-        },
-        {
-          threshold: [0, 0.25, 0.5, 0.75, 1],
-          root: videoReel.value
         }
-      )
+      }
+
+      const observer = new IntersectionObserver(handleIntersection, {
+        threshold: [0, 0.25, 0.5, 0.75, 1],
+        root: videoReel.value
+      })
 
       const items = videoReel.value.querySelectorAll('.reel-item')
       items.forEach((item) => observer.observe(item))

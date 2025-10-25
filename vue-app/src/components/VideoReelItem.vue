@@ -63,16 +63,29 @@ const handleLoaded = (event: Event) => {
     <button
       v-if="videoUrl"
       style="background: linear-gradient(145deg, #f2a94c, #e09340);"
-      class="absolute top-[15px] left-[15px] px-3 py-2 border-none rounded-xl text-sm font-medium leading-[1.4] cursor-default z-100 transition-all duration-300 pointer-events-none opacity-0 box-border h-auto min-h-auto inline-flex items-center justify-center whitespace-nowrap text-white hover:opacity-100 hover:scale-105 active:scale-95 shadow-[0_2px_5px_rgba(0,0,0,0.2)] max-[850px]:px-2.5 max-[850px]:py-[6px] max-[850px]:text-xs max-[850px]:top-2.5 max-[850px]:left-2.5"
-      :class="{ '!opacity-80 pointer-events-auto cursor-pointer': isActive }"
+      class="adjust-btn absolute top-[15px] left-[15px] px-3 py-2 border-none rounded-xl text-sm font-medium leading-[1.4] z-100 transition-all duration-300 box-border h-auto min-h-auto inline-flex items-center justify-center whitespace-nowrap text-white shadow-[0_2px_5px_rgba(0,0,0,0.2)] max-[850px]:px-2.5 max-[850px]:py-[6px] max-[850px]:text-xs max-[850px]:top-2.5 max-[850px]:left-2.5"
+      :class="isActive ? 'opacity-80 cursor-pointer' : 'opacity-0 pointer-events-none cursor-default'"
       @click.stop="handleAdjust"
     >Adjust</button>
 
     <button
       v-if="videoUrl"
-      class="absolute top-[15px] right-[15px] px-3 py-2 border-none rounded-xl text-sm font-medium leading-[1.4] cursor-default z-100 transition-all duration-300 pointer-events-none opacity-0 box-border h-auto min-h-auto inline-flex items-center justify-center whitespace-nowrap bg-white text-gray-700 hover:opacity-100 hover:scale-105 active:scale-95 shadow-[0_2px_5px_rgba(0,0,0,0.2)] max-[850px]:px-2.5 max-[850px]:py-[6px] max-[850px]:text-xs max-[850px]:top-2.5 max-[850px]:right-2.5"
-      :class="{ '!opacity-80 pointer-events-auto cursor-pointer': isActive }"
+      class="download-btn absolute top-[15px] right-[15px] px-3 py-2 border-none rounded-xl text-sm font-medium leading-[1.4] z-100 transition-all duration-300 box-border h-auto min-h-auto inline-flex items-center justify-center whitespace-nowrap bg-white text-gray-700 shadow-[0_2px_5px_rgba(0,0,0,0.2)] max-[850px]:px-2.5 max-[850px]:py-[6px] max-[850px]:text-xs max-[850px]:top-2.5 max-[850px]:right-2.5"
+      :class="isActive ? 'opacity-80 cursor-pointer' : 'opacity-0 pointer-events-none cursor-default'"
       @click.stop="handleDownload"
     >Download</button>
   </div>
 </template>
+
+<style scoped>
+.adjust-btn:hover,
+.download-btn:hover {
+  opacity: 1 !important;
+  transform: scale(1.05);
+}
+
+.adjust-btn:active,
+.download-btn:active {
+  transform: scale(0.95);
+}
+</style>

@@ -20,7 +20,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-bottom: 1.25rem;
+  margin: 0 auto 1.25rem auto;
 }
 
 .logo-link {

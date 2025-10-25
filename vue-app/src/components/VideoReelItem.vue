@@ -37,7 +37,7 @@ const handleLoaded = (event: Event) => {
   <div
     class="reel-item snap-center transition-all duration-300 flex-shrink-0 opacity-50 scale-85 w-auto h-[55vh] min-w-auto max-w-none mx-5 p-0 relative flex items-center justify-center cursor-pointer overflow-hidden rounded-[32px] z-1 max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
     :class="{ 'z-50 opacity-100 scale-100': isActive }"
-    :style="isActive ? 'box-shadow: 0 0 20px rgba(242, 169, 76, 0.95), 0 0 35px rgba(242, 169, 76, 0.6);' : ''"
+    :style="isActive ? 'box-shadow: 0 0 3px rgba(242, 169, 76, 1), 0 0 5px rgba(242, 169, 76, 0.8);' : ''"
     :data-idx="index"
     @click="handleClick"
   >

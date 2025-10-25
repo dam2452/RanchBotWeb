@@ -21,12 +21,12 @@ const goToSearch = () => {
       <button style="background-color: #888; color: #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);" class="border-none rounded-[25px] cursor-pointer mb-7.5 transition-all duration-200 hover:scale-105 hover:shadow-hover active:scale-95 active:shadow-active text-[clamp(1.2rem,2vw,2rem)] font-bold p-[20px_40px] max-[850px]:p-[16px_32px] max-[1199px]:!mb-[10px] max-[480px]:!mb-[5px] max-[480px]:!mx-[15px]" @click="goToSearch">enter a quote</button>
     </div>
 
-    <div class="hidden min-[1200px]:block absolute top-1/2 -translate-y-1/2 w-[55px] z-10 transition-all duration-400 max-[1199px]:!static max-[1199px]:!block max-[1199px]:!transform-none max-[1199px]:!m-[20px_auto] max-[1199px]:!w-[60px] max-[1199px]:order-2 max-[480px]:!m-[10px_auto]" style="left: calc(50% - 60px);">
-      <img src="/images/ui/icons/arrow.svg" class="w-[55px] transition-all duration-400 arrow-animate max-[1199px]:!w-[60px] max-[1199px]:!rotate-90 max-[1199px]:!animate-bounce-rotated" alt="Arrow" />
+    <div class="hidden min-[1200px]:block absolute top-1/2 -translate-y-1/2 w-[76px] z-10 transition-all duration-400 max-[1199px]:!static max-[1199px]:!block max-[1199px]:!transform-none max-[1199px]:!m-[20px_auto] max-[1199px]:!w-[60px] max-[1199px]:order-2 max-[480px]:!m-[10px_auto]" style="left: calc(50% - 20px);">
+      <img src="/images/ui/icons/arrow.svg" class="w-[76px] transition-all duration-400 arrow-animate max-[1199px]:!w-[60px] max-[1199px]:!rotate-90 max-[1199px]:!animate-bounce-rotated" alt="Arrow" />
     </div>
 
-    <div class="flex-1 flex items-center justify-center transition-all duration-400 min-[1200px]:min-w-0 min-[1200px]:mr-[50px] max-[1199px]:flex-[0_0_auto] max-[1199px]:w-full max-[1199px]:max-w-800px max-[1199px]:order-3 max-[1199px]:mt-7.5 max-[500px]:!w-[90%] max-[500px]:!mx-auto max-[500px]:!mt-[-20px] max-[480px]:!mt-[15px]">
-      <router-link to="/search" class="cursor-pointer block max-w-[550px] w-full transition-transform duration-300 hover:scale-102 active:scale-95 min-[1800px]:max-w-[650px]">
+    <div class="flex-1 flex items-center justify-center transition-all duration-400 min-[1200px]:min-w-0 min-[1200px]:mr-[30px] max-[1199px]:flex-[0_0_auto] max-[1199px]:w-full max-[1199px]:max-w-800px max-[1199px]:order-3 max-[1199px]:mt-7.5 max-[500px]:!w-[90%] max-[500px]:!mx-auto max-[500px]:!mt-[-20px] max-[480px]:!mt-[15px]">
+      <router-link to="/search" class="cursor-pointer block max-w-[760px] w-full transition-transform duration-300 hover:scale-102 active:scale-95 min-[1800px]:max-w-[900px]">
         <img src="/images/others/KusyDworek.png" class="block w-full h-auto object-cover rounded-[30px] transition-all duration-400 shadow-hover max-[1199px]:w-[90%] max-[1199px]:max-w-[720px] max-[1199px]:mx-auto max-[500px]:!mt-[-60px] max-[500px]:!w-full max-[500px]:!max-w-full max-[480px]:!mt-[-80px] max-[480px]:!w-[95vw] max-[480px]:!max-w-[95vw]" alt="Dworek Kusy" />
       </router-link>
     </div>

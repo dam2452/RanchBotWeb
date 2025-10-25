@@ -131,6 +131,12 @@ const loadNextClips = async (batchSize = 3) => {
 
   loadedClips.value = endIdx
   loadingClips.value = false
+
+  if (startIdx === 0 && endIdx > 0) {
+    setTimeout(() => {
+      scrollToClip(0)
+    }, 200)
+  }
 }
 
 const handleSearch = (newQuery: string) => {
@@ -226,7 +232,18 @@ const handleClipClick = (index: number, event: MouseEvent) => {
     return
   }
 
-  scrollToClip(index)
+  if (index === activeIndex.value) {
+    const video = (event.currentTarget as HTMLElement).querySelector('video')
+    if (video) {
+      if (video.paused) {
+        video.play().catch(() => {})
+      } else {
+        video.pause()
+      }
+    }
+  } else {
+    scrollToClip(index)
+  }
 }
 
 const onVideoLoaded = (event: Event, index: number) => {

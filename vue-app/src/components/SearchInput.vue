@@ -72,6 +72,7 @@ const handleSubmit = () => {
 .search-input:focus {
   outline: none;
   box-shadow: 0 0 30px rgba(255, 184, 92, 0.8), 0 12px 28px rgba(0, 0, 0, 0.4);
+  border: 3px solid #f2a94c;
 }
 
 .search-button {

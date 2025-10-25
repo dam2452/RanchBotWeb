@@ -64,7 +64,7 @@ const handleLoaded = (event: Event) => {
     <button
       v-if="videoUrl"
       style="background: linear-gradient(145deg, #f2a94c, #e09340);"
-      class="adjust-btn absolute top-[30px] left-[30px] px-4 py-3 border-none rounded-3xl text-sm font-medium leading-[1.4] z-100 transition-all duration-300 box-border h-auto min-h-auto inline-flex items-center justify-center whitespace-nowrap text-white shadow-[0_2px_5px_rgba(0,0,0,0.2)] max-[850px]:px-3 max-[850px]:py-2.5 max-[850px]:text-xs max-[850px]:top-[20px] max-[850px]:left-[20px]"
+      class="adjust-btn absolute top-[30px] left-[30px] px-4 py-3 border-none rounded-full text-sm font-medium leading-[1.4] z-100 transition-all duration-300 box-border h-auto min-h-auto inline-flex items-center justify-center whitespace-nowrap text-white shadow-[0_2px_5px_rgba(0,0,0,0.2)] max-[850px]:px-3 max-[850px]:py-2.5 max-[850px]:text-xs max-[850px]:top-[20px] max-[850px]:left-[20px]"
       :class="isActive ? 'opacity-80 cursor-pointer' : 'opacity-0 pointer-events-none cursor-default'"
       @click.stop="handleAdjust"
     >Adjust</button>
@@ -72,7 +72,7 @@ const handleLoaded = (event: Event) => {
     <button
       v-if="videoUrl"
       style="background: linear-gradient(145deg, #aaaaaa, #999999);"
-      class="download-btn absolute top-[30px] right-[30px] px-4 py-3 border-none rounded-3xl text-sm font-medium leading-[1.4] z-100 transition-all duration-300 box-border h-auto min-h-auto inline-flex items-center justify-center whitespace-nowrap text-white shadow-[0_2px_5px_rgba(0,0,0,0.2)] max-[850px]:px-3 max-[850px]:py-2.5 max-[850px]:text-xs max-[850px]:top-[20px] max-[850px]:right-[20px]"
+      class="download-btn absolute top-[30px] right-[30px] px-4 py-3 border-none rounded-full text-sm font-medium leading-[1.4] z-100 transition-all duration-300 box-border h-auto min-h-auto inline-flex items-center justify-center whitespace-nowrap text-white shadow-[0_2px_5px_rgba(0,0,0,0.2)] max-[850px]:px-3 max-[850px]:py-2.5 max-[850px]:text-xs max-[850px]:top-[20px] max-[850px]:right-[20px]"
       :class="isActive ? 'opacity-80 cursor-pointer' : 'opacity-0 pointer-events-none cursor-default'"
       @click.stop="handleDownload"
     >Download</button>

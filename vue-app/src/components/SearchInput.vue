@@ -44,16 +44,17 @@ const handleSubmit = () => {
 
 .search-input {
   width: 100%;
-  padding: clamp(16px, 2vw, 24px) clamp(60px, 6vw, 70px) clamp(16px, 2vw, 24px) clamp(20px, 3vw, 32px);
+  padding: clamp(16px, 2vw, 24px) clamp(60px, 6vw, 70px);
   font-size: clamp(1.4rem, 3vw, 2rem);
   font-weight: 800;
-  text-align: left;
+  text-align: center;
   border: none;
   border-radius: 40px;
   background: #fff;
   color: #333;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
   transition: all 0.4s ease;
+  box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -64,7 +65,7 @@ const handleSubmit = () => {
 .search-button {
   position: absolute;
   top: 50%;
-  right: 15px;
+  right: clamp(10px, 1.5vw, 15px);
   transform: translateY(-50%);
   width: 42px;
   height: 42px;

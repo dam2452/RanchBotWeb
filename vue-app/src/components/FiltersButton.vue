@@ -20,7 +20,7 @@ const handleClick = () => {
 .filters-button {
   position: absolute;
   bottom: -50px;
-  right: 8px;
+  right: 0;
   padding: clamp(10px, 1.5vw, 14px) clamp(16px, 2vw, 24px);
   font-size: clamp(1rem, 2.5vw, 1.6rem);
   font-weight: bold;

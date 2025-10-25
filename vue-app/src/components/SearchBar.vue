@@ -28,23 +28,8 @@ const handleFilters = () => {
 <style scoped>
 .search-container {
   position: relative;
-  width: clamp(280px, 60vw, 720px);
-  max-width: 90vw;
-  margin: 0 auto;
+  width: 100%;
   z-index: 100;
   transition: all 0.4s ease;
-}
-
-@media (max-width: 850px) {
-  .search-container {
-    width: 85vw;
-    max-width: 500px;
-  }
-}
-
-@media (max-width: 480px) {
-  .search-container {
-    width: 85vw;
-  }
 }
 </style>

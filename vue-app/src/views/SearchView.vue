@@ -23,8 +23,10 @@ const handleFilters = () => {
   <UserButtons fixed />
 
   <main class="search-page">
-    <LogoSection />
-    <SearchBar @search="handleSearch" @filters="handleFilters" />
+    <div class="content-wrapper">
+      <LogoSection />
+      <SearchBar @search="handleSearch" @filters="handleFilters" />
+    </div>
   </main>
 </template>
 
@@ -34,7 +36,6 @@ const handleFilters = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3.75rem;
   width: 100%;
   min-height: 100vh;
   height: 100vh;
@@ -50,15 +51,33 @@ const handleFilters = () => {
   transition: all 0.4s;
 }
 
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3.75rem;
+  width: clamp(280px, 60vw, 720px);
+  max-width: 90vw;
+}
+
 @media (max-width: 850px) {
   .search-page {
     transform: translateX(0);
+  }
+
+  .content-wrapper {
+    width: 85vw;
+    max-width: 500px;
   }
 }
 
 @media (max-width: 480px) {
   .search-page {
     padding-top: 2.5rem;
+  }
+
+  .content-wrapper {
+    width: 85vw;
   }
 }
 </style>

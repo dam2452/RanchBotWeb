@@ -2,20 +2,16 @@
 </script>
 
 <template>
-  <main class="page-container static-page">
-    <div class="message-box info-box">
-      <h1>Password Recovery</h1>
-      <p class="important-message">The password recovery feature is currently disabled.</p>
-      <p>
+  <main class="flex items-center justify-center min-h-screen p-5">
+    <div class="bg-white rounded-xl shadow-strong p-10 max-w-[600px] w-full text-center">
+      <h1 class="text-4xl font-bold mb-5 text-dark">Password Recovery</h1>
+      <p class="text-xl font-bold mb-5 text-warning">The password recovery feature is currently disabled.</p>
+      <p class="mb-5 text-lg">
         The application is in closed beta. To reset your password, please contact the
         administrator.
       </p>
-      <p class="login-link-container">Remember your password?</p>
-      <router-link to="/login" class="action-button">Log in</router-link>
+      <p class="mb-5 text-lg">Remember your password?</p>
+      <router-link to="/login" class="inline-block bg-gradient-action text-white p-[12px_30px] rounded-[25px] no-underline font-semibold transition-all duration-300 shadow-standard hover:-translate-y-[3px] hover:shadow-hover">Log in</router-link>
     </div>
   </main>
 </template>
-
-<style scoped>
-@import '@/assets/styles/css/pages/register.css';
-</style>

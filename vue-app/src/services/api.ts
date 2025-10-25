@@ -177,6 +177,22 @@ class ApiService {
   getVideoUrl(clipId: string): string {
     return `/clips/video/${encodeURIComponent(clipId)}`
   }
+
+  async getSubscription(): Promise<{ subscriptionEnd: string; daysRemaining: number }> {
+    const response = await this.client.post('/api/json', {
+      endpoint: 'sub',
+      args: [],
+    })
+
+    if (response.data && response.data.status === 'success' && response.data.data) {
+      return {
+        subscriptionEnd: response.data.data.subscription_end,
+        daysRemaining: response.data.data.days_remaining,
+      }
+    }
+
+    throw new Error('Failed to fetch subscription data')
+  }
 }
 
 export const apiService = new ApiService()

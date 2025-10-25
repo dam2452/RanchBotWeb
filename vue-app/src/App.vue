@@ -20,7 +20,7 @@ const showHeader = computed(() => {
 
 <style>
 * {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif;
+  font-family: 'Verdana', sans-serif;
   font-weight: 600;
 }
 

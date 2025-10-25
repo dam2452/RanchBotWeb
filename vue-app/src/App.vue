@@ -6,7 +6,7 @@ import AppHeader from './components/AppHeader.vue'
 const route = useRoute()
 
 const showHeader = computed(() => {
-  const noHeaderRoutes = ['/', 'login', 'register', 'forgot-password']
+  const noHeaderRoutes = ['home', 'login', 'register', 'forgot-password', 'search', 'search-results', 'my-clips']
   return !noHeaderRoutes.includes(route.name as string)
 })
 </script>
@@ -29,6 +29,11 @@ const showHeader = computed(() => {
 @import '@/assets/styles/css/utils/helpers.css';
 @import '@/assets/styles/css/utils/animations.css';
 @import '@/assets/styles/css/utils/media-queries.css';
+
+* {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif;
+  font-weight: 600;
+}
 
 #app {
   width: 100%;

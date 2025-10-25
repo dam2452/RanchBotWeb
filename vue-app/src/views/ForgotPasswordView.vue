@@ -1,7 +1,12 @@
 <script setup lang="ts">
+import LogoHeader from '@/components/LogoHeader.vue'
+import AppFooter from '@/components/AppFooter.vue'
 </script>
 
 <template>
+  <LogoHeader />
+  <AppFooter />
+
   <main class="flex items-center justify-center min-h-screen p-5">
     <div class="bg-white rounded-xl shadow-strong p-10 max-w-[600px] w-full text-center">
       <h1 class="text-4xl font-bold mb-5 text-dark">Password Recovery</h1>

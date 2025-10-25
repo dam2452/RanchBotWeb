@@ -1,17 +1,40 @@
 <script setup lang="ts">
 interface Props {
   message?: string
+  size?: 'small' | 'medium' | 'large'
+  showMessage?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  message: 'Loading...'
+  message: 'Loading...',
+  size: 'large',
+  showMessage: true
 })
+
+const spinnerSizes = {
+  small: { width: '60px', border: '6px' },
+  medium: { width: '80px', border: '8px' },
+  large: { width: '120px', border: '12px' }
+}
+
+const messageSizes = {
+  small: '1rem',
+  medium: '1.5rem',
+  large: '2rem'
+}
 </script>
 
 <template>
-  <div class="loading-container">
-    <div class="spinner"></div>
-    <p class="message">{{ message }}</p>
+  <div class="loading-container" :class="{ 'inline': !showMessage }">
+    <div
+      class="spinner"
+      :style="{
+        width: spinnerSizes[size].width,
+        height: spinnerSizes[size].width,
+        borderWidth: spinnerSizes[size].border
+      }"
+    ></div>
+    <p v-if="showMessage" class="message" :style="{ fontSize: messageSizes[size] }">{{ message }}</p>
   </div>
 </template>
 
@@ -20,12 +43,14 @@ const props = withDefaults(defineProps<Props>(), {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 30px;
+  gap: 1rem;
+}
+
+.loading-container.inline {
+  display: inline-flex;
 }
 
 .spinner {
-  width: 120px;
-  height: 120px;
   border: 12px solid rgba(200, 200, 200, 0.3);
   border-top-color: #f2a94c;
   border-radius: 50%;
@@ -39,8 +64,7 @@ const props = withDefaults(defineProps<Props>(), {
 }
 
 .message {
-  font-size: 2rem;
   font-weight: bold;
-  color: #333;
+  color: white;
 }
 </style>

@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import UserButtons from '@/components/UserButtons.vue'
 import LogoSection from '@/components/LogoSection.vue'
 import SearchBar from '@/components/SearchBar.vue'
+import AppFooter from '@/components/AppFooter.vue'
 
 const router = useRouter()
 
@@ -21,6 +22,7 @@ const handleFilters = () => {
 
 <template>
   <UserButtons fixed />
+  <AppFooter />
 
   <main class="search-page">
     <div class="content-wrapper">

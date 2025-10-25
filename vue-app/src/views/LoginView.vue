@@ -5,6 +5,8 @@ import { useAuthStore } from '@/stores/auth'
 import LogoSection from '@/components/LogoSection.vue'
 import LoginForm from '@/components/LoginForm.vue'
 import ActionButtons from '@/components/ActionButtons.vue'
+import LogoHeader from '@/components/LogoHeader.vue'
+import AppFooter from '@/components/AppFooter.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -24,6 +26,9 @@ const handleSubmit = async (credentials: { login: string; password: string }) =>
 </script>
 
 <template>
+  <LogoHeader />
+  <AppFooter />
+
   <main class="login-page">
     <LogoSection />
 

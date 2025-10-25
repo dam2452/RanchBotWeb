@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { apiService } from '@/services/api'
+import LoadingSpinner from './LoadingSpinner.vue'
 
 interface Props {
   visible: boolean
@@ -82,7 +83,8 @@ defineExpose({
 <template>
   <div v-if="visible" class="subscription-tooltip">
     <div v-if="loading" class="loading">
-      <div class="spinner"></div> Checking subscription...
+      <LoadingSpinner size="small" :show-message="false" />
+      <span>Checking subscription...</span>
     </div>
     <div v-else-if="error" class="error">
       Error: {{ error }}
@@ -92,6 +94,9 @@ defineExpose({
       <div class="days-remaining" :class="getDaysText(daysRemaining).className">
         {{ getDaysText(daysRemaining).text }}
       </div>
+    </div>
+    <div v-else class="error">
+      No subscription data available
     </div>
   </div>
 </template>
@@ -133,19 +138,6 @@ defineExpose({
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.spinner {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
 }
 
 .error {

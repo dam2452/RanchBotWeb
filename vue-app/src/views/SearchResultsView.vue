@@ -259,12 +259,12 @@ watch(activeIndex, async (newIndex, oldIndex) => {
 <template>
   <UserButtons fixed />
   <main class="relative w-screen h-screen overflow-hidden m-0 p-0">
-    <div class="fixed flex flex-row items-center justify-between max-[850px]:flex-col max-[850px]:p-[10px_15px] max-[850px]:gap-[10px] max-[850px]:top-[5px]" style="top: 30px; left: 30px; right: 0; padding-right: 30px; z-index: 100;">
-      <div class="flex flex-row items-center no-underline flex-shrink-0" style="gap: 15px;">
+    <div class="fixed top-7.5 left-7.5 right-0 pr-7.5 z-100 flex flex-row items-center justify-between max-[850px]:flex-col max-[850px]:p-[10px_15px] max-[850px]:gap-2.5 max-[850px]:top-[5px]">
+      <div class="flex flex-row items-center no-underline flex-shrink-0 gap-[15px]">
         <router-link to="/" class="flex items-center">
-          <img src="/images/branding/logo.svg" class="w-[100px] h-[100px] cursor-pointer block max-[850px]:w-[50px] max-[850px]:h-[50px]" style="filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));" alt="RanchBot Logo" />
+          <img src="/images/branding/logo.svg" class="w-[100px] h-[100px] cursor-pointer block drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] max-[850px]:w-[50px] max-[850px]:h-[50px]" alt="RanchBot Logo" />
         </router-link>
-        <h1 class="text-5xl font-bold text-text-light m-0 whitespace-nowrap max-[850px]:text-2xl" style="text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);">RanchBot</h1>
+        <h1 class="text-5xl font-bold text-white m-0 whitespace-nowrap [text-shadow:0_2px_8px_rgba(0,0,0,0.5)] max-[850px]:text-2xl">RanchBot</h1>
       </div>
 
       <div class="absolute left-1/2 -translate-x-1/2 w-500px max-w-500px flex flex-col items-center max-[850px]:relative max-[850px]:left-0 max-[850px]:translate-x-0 max-[850px]:w-full max-[850px]:max-w-full">
@@ -274,21 +274,20 @@ watch(activeIndex, async (newIndex, oldIndex) => {
             id="query-input"
             type="text"
             placeholder="Enter a quote"
-            class="w-full border-none bg-white rounded-[40px]"
-            style="padding: clamp(16px, 2vw, 24px) clamp(20px, 3vw, 32px); padding-right: clamp(60px, 6vw, 70px); font-size: clamp(1.4rem, 3vw, 2rem); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3); color: #333; font-weight: 800; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;"
+            class="w-full border-none bg-white rounded-xl p-[clamp(16px,2vw,24px)_clamp(20px,3vw,32px)] pr-[clamp(60px,6vw,70px)] text-[clamp(1.4rem,3vw,2rem)] shadow-[0_10px_24px_rgba(0,0,0,0.3)] text-dark font-extrabold font-sans"
             @keypress.enter="handleSearch"
           />
-          <button class="absolute top-1/2 -translate-y-1/2 h-[42px] w-[42px] flex items-center justify-center bg-transparent border-none cursor-pointer p-0 pointer-events-auto transition-transform duration-200 active:scale-95" style="right: 15px;" @click="handleSearch" aria-label="Search">
-            <img src="/images/ui/icons/arrow-circle-right.svg" alt="Search" class="pointer-events-none transition-transform duration-200 hover:scale-115" style="width: clamp(30px, 4vw, 42px); height: auto; filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3));" />
+          <button class="absolute top-1/2 -translate-y-1/2 right-[15px] h-[42px] w-[42px] flex items-center justify-center bg-transparent border-none cursor-pointer p-0 pointer-events-auto transition-transform duration-200 active:scale-95" @click="handleSearch" aria-label="Search">
+            <img src="/images/ui/icons/arrow-circle-right.svg" alt="Search" class="pointer-events-none transition-transform duration-200 hover:scale-115 w-[clamp(30px,4vw,42px)] h-auto drop-shadow-[0_0_4px_rgba(0,0,0,0.3)]" />
           </button>
         </div>
-        <button type="button" class="font-bold bg-[#888] text-white border-none cursor-pointer transition-all duration-200 hover:bg-[#666] rotate-[5deg] hover:rotate-[5deg] hover:scale-108 active:rotate-[5deg] active:scale-95 rounded-[20px]" style="position: absolute; bottom: -50px; right: 8px; padding: clamp(10px, 1.5vw, 14px) clamp(16px, 2vw, 24px); font-size: clamp(1rem, 2.5vw, 1.6rem); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); z-index: 20;">Filters</button>
+        <button type="button" class="absolute bottom-[-50px] right-2 z-20 font-bold bg-btn-bg text-white border-none cursor-pointer transition-all duration-200 hover:bg-btn-bg-hover rotate-[5deg] hover:rotate-[5deg] hover:scale-108 active:rotate-[5deg] active:scale-95 rounded-l p-[clamp(10px,1.5vw,14px)_clamp(16px,2vw,24px)] text-[clamp(1rem,2.5vw,1.6rem)] shadow-[0_6px_15px_rgba(0,0,0,0.2)]">Filters</button>
       </div>
     </div>
 
-    <div v-if="loading" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-5 flex flex-col items-center" style="gap: 30px;">
-      <div class="spinner-large"></div>
-      <p style="font-size: 2rem; font-weight: 700; color: #333;">Loading results...</p>
+    <div v-if="loading" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-5 flex flex-col items-center gap-7.5">
+      <div class="w-[120px] h-[120px] border-[12px] border-[rgba(200,200,200,0.3)] border-t-accent rounded-full animate-spin"></div>
+      <p class="text-[2rem] font-bold text-dark">Loading results...</p>
     </div>
 
     <div v-else-if="error" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-xl z-5 text-red-600">{{ error }}</div>
@@ -301,7 +300,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
       <div
         v-for="(result, index) in displayedResults"
         :key="index"
-        class="reel-item snap-center transition-all duration-300 flex-shrink-0 opacity-50 scale-85 w-auto h-70vh min-w-auto max-w-none mx-5 p-0 relative flex items-center justify-center cursor-pointer overflow-hidden rounded-xl z-1 max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-[10px] max-[850px]:mx-0"
+        class="reel-item snap-center transition-all duration-300 flex-shrink-0 opacity-50 scale-85 w-auto h-70vh min-w-auto max-w-none mx-5 p-0 relative flex items-center justify-center cursor-pointer overflow-hidden rounded-xl z-1 max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
         :class="{ 'z-50 opacity-100 scale-100 shadow-glow-orange': index === activeIndex }"
         :data-idx="index"
         @click="handleClipClick(index, $event)"
@@ -314,9 +313,8 @@ watch(activeIndex, async (newIndex, oldIndex) => {
           preload="auto"
           :src="videoCache[index]"
           @loadeddata="onVideoLoaded($event, index)"
-          class="w-auto h-full max-h-70vh object-contain rounded-xl block cursor-pointer max-[850px]:w-full max-[850px]:h-auto max-[850px]:max-h-none"
-          :class="{ 'border-[3px] border-[#ffb85c]': index === activeIndex }"
-          style="aspect-ratio: unset;"
+          class="w-auto h-full max-h-70vh object-contain rounded-xl block cursor-pointer aspect-auto max-[850px]:w-full max-[850px]:h-auto max-[850px]:max-h-none"
+          :class="{ 'border-[3px] border-accent': index === activeIndex }"
         ></video>
         <div v-else-if="videoErrors[index]" class="flex flex-col items-center justify-center min-h-[300px] bg-red-100 text-red-700 p-4 rounded-xl text-center">
           <svg class="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -326,22 +324,21 @@ watch(activeIndex, async (newIndex, oldIndex) => {
           <p class="text-sm mt-1">Clip #{{ index + 1 }} is unavailable</p>
         </div>
 
-        <button v-if="videoCache[index]" class="absolute px-[14px] py-2 border-none rounded-lg text-sm font-medium leading-[1.4] cursor-default z-100 transition-all duration-300 pointer-events-none opacity-70 box-border h-auto min-h-auto inline-flex items-center justify-center whitespace-nowrap bg-gradient-to-br from-accent to-[#e09340] text-white hover:opacity-100 hover:scale-105 active:scale-95 top-[25px] left-[25px] max-[850px]:px-[10px] max-[850px]:py-[6px] max-[850px]:text-xs max-[850px]:top-[10px] max-[850px]:left-[10px]" :class="{ '!opacity-100 pointer-events-auto cursor-pointer': index === activeIndex }" @click.stop="handleAdjust(index)" style="box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);">Adjust</button>
-        <button v-if="videoCache[index]" class="absolute px-[14px] py-2 border-none rounded-lg text-sm font-medium leading-[1.4] cursor-default z-100 transition-all duration-300 pointer-events-none opacity-70 box-border h-auto min-h-auto inline-flex items-center justify-center whitespace-nowrap bg-[rgba(170,170,170,0.9)] text-white hover:opacity-100 hover:scale-105 active:scale-95 top-[25px] right-[25px] max-[850px]:px-[10px] max-[850px]:py-[6px] max-[850px]:text-xs max-[850px]:top-[10px] max-[850px]:right-[10px]" :class="{ '!opacity-100 pointer-events-auto cursor-pointer': index === activeIndex }" @click.stop="handleDownload(index)" style="box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);">Download</button>
+        <button v-if="videoCache[index]" class="absolute top-[25px] left-[25px] px-[14px] py-2 border-none rounded-lg text-sm font-medium leading-[1.4] cursor-default z-100 transition-all duration-300 pointer-events-none opacity-70 box-border h-auto min-h-auto inline-flex items-center justify-center whitespace-nowrap bg-gradient-action text-white hover:opacity-100 hover:scale-105 active:scale-95 shadow-[0_2px_5px_rgba(0,0,0,0.3)] max-[850px]:px-2.5 max-[850px]:py-[6px] max-[850px]:text-xs max-[850px]:top-2.5 max-[850px]:left-2.5" :class="{ '!opacity-100 pointer-events-auto cursor-pointer': index === activeIndex }" @click.stop="handleAdjust(index)">Adjust</button>
+        <button v-if="videoCache[index]" class="absolute top-[25px] right-[25px] px-[14px] py-2 border-none rounded-lg text-sm font-medium leading-[1.4] cursor-default z-100 transition-all duration-300 pointer-events-none opacity-70 box-border h-auto min-h-auto inline-flex items-center justify-center whitespace-nowrap bg-[rgba(170,170,170,0.9)] text-white hover:opacity-100 hover:scale-105 active:scale-95 shadow-[0_2px_5px_rgba(0,0,0,0.3)] max-[850px]:px-2.5 max-[850px]:py-[6px] max-[850px]:text-xs max-[850px]:top-2.5 max-[850px]:right-2.5" :class="{ '!opacity-100 pointer-events-auto cursor-pointer': index === activeIndex }" @click.stop="handleDownload(index)">Download</button>
       </div>
 
       <div
         v-if="loadingClips || loadedClips < results.length"
-        class="reel-item snap-center flex-shrink-0 opacity-50 w-auto h-70vh min-w-auto max-w-none mx-5 p-0 flex items-center justify-center rounded-xl z-1 max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-[10px] max-[850px]:mx-0"
+        class="reel-item snap-center flex-shrink-0 opacity-50 w-auto h-70vh min-w-auto max-w-none mx-5 p-0 flex items-center justify-center rounded-xl z-1 max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
       >
         <div v-if="loadingClips" class="flex flex-col items-center justify-center min-h-[300px] bg-gray-200 rounded-xl w-full">
-          <div class="spinner mb-3"></div>
+          <div class="w-[50px] h-[50px] border-[5px] border-[rgba(200,200,200,0.3)] border-t-accent rounded-full animate-spin mb-3"></div>
           <p class="text-gray-600 font-semibold">Loading more clips...</p>
         </div>
         <button
           v-else
-          class="px-8 py-4 bg-gradient-to-br from-accent to-[#e09340] text-white border-none rounded-xl cursor-pointer font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
-          style="box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);"
+          class="px-8 py-4 bg-gradient-action text-white border-none rounded-xl cursor-pointer font-semibold transition-all duration-200 hover:scale-105 active:scale-95 shadow-strong"
           @click="handleLoadMore"
         >
           Load More
@@ -357,29 +354,3 @@ watch(activeIndex, async (newIndex, oldIndex) => {
     @close="closeInspector"
   />
 </template>
-
-<style scoped>
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid rgba(200, 200, 200, 0.3);
-  border-top-color: #ffb85c;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-.spinner-large {
-  width: 120px;
-  height: 120px;
-  border: 12px solid rgba(200, 200, 200, 0.3);
-  border-top-color: #ffb85c;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-</style>

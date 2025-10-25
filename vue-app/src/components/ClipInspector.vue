@@ -187,16 +187,14 @@ onUnmounted(() => {
                 <button
                   @click="handleDownloadAdjusted"
                   :disabled="isDownloading"
-                  class="flex-1 px-6 py-3 bg-gradient-to-br from-accent to-[#e09340] text-white font-semibold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                  style="box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);"
+                  class="flex-1 px-6 py-3 bg-gradient-action text-white font-semibold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-strong"
                 >
                   {{ isDownloading ? 'Downloading...' : 'Download Adjusted' }}
                 </button>
 
                 <button
                   @click="showSaveForm = !showSaveForm"
-                  class="flex-1 px-6 py-3 bg-gradient-to-br from-[#4CAF50] to-[#45a049] text-white font-semibold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
-                  style="box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);"
+                  class="flex-1 px-6 py-3 bg-gradient-primary text-white font-semibold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 shadow-strong"
                 >
                   {{ showSaveForm ? 'Cancel Save' : 'Save to My Clips' }}
                 </button>
@@ -213,8 +211,7 @@ onUnmounted(() => {
                   />
                   <button
                     @click="handleSaveClip"
-                    class="w-full px-6 py-3 bg-gradient-to-br from-[#4CAF50] to-[#45a049] text-white font-semibold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
-                    style="box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);"
+                    class="w-full px-6 py-3 bg-gradient-primary text-white font-semibold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 shadow-strong"
                   >
                     Save Clip
                   </button>

@@ -281,7 +281,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
 <template>
   <UserButtons fixed />
   <main class="relative w-screen h-screen overflow-hidden m-0 p-0">
-    <div class="search-bar-container fixed top-20 left-1/2 -translate-x-1/2 z-1000 w-[clamp(280px,60vw,720px)] max-w-[90vw] max-[850px]:!top-[100px] max-[850px]:!w-[85vw] max-[850px]:!max-w-[500px] max-[480px]:!w-[85vw]">
+    <div class="search-bar-container fixed top-32 left-1/2 -translate-x-1/2 z-1000 w-[clamp(280px,60vw,720px)] max-w-[90vw] max-[850px]:!top-[110px] max-[850px]:!w-[85vw] max-[850px]:!max-w-[500px] max-[480px]:!w-[85vw]">
       <SearchBar :initial-query="query" @search="handleSearch" @filters="handleFilters" />
     </div>
 
@@ -295,7 +295,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
       No results found for "{{ query }}"
     </div>
 
-    <div v-else class="scroll-smooth snap-x snap-mandatory overflow-x-scroll overflow-y-hidden flex items-center h-screen w-screen fixed top-0 left-0 m-0 p-0 pt-[160px] max-[850px]:flex-col max-[850px]:overflow-y-scroll max-[850px]:overflow-x-hidden max-[850px]:snap-y max-[850px]:pt-[220px]" ref="videoReel">
+    <div v-else class="scroll-smooth snap-x snap-mandatory overflow-x-scroll overflow-y-hidden flex items-center h-screen w-screen fixed top-0 left-0 m-0 p-0 pt-[200px] max-[850px]:flex-col max-[850px]:overflow-y-scroll max-[850px]:overflow-x-hidden max-[850px]:snap-y max-[850px]:pt-[230px]" ref="videoReel">
       <VideoReelItem
         v-for="(result, index) in displayedResults"
         :key="index"

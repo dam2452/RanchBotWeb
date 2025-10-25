@@ -190,8 +190,6 @@ const handleLoadMore = () => {
 const scrollToClip = (index: number) => {
   if (!videoReel.value) return
 
-  console.log('Scrolling to clip:', index)
-
   isManualScroll.value = true
 
   const items = videoReel.value.querySelectorAll('.reel-item')
@@ -250,7 +248,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
         await items[newIndex].play()
       }
     } catch (err) {
-      console.log('Autoplay prevented')
+      // Autoplay prevented - silent fail
     }
   }
 })

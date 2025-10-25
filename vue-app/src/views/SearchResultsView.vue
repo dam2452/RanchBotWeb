@@ -5,6 +5,8 @@ import { apiService } from '@/services/api'
 import type { SearchResult } from '@/types'
 import UserButtons from '@/components/UserButtons.vue'
 import ClipInspector from '@/components/ClipInspector.vue'
+import SearchInput from '@/components/SearchInput.vue'
+import FiltersButton from '@/components/FiltersButton.vue'
 
 type VisibleEntry = { entry: IntersectionObserverEntry; ratio: number }
 
@@ -12,7 +14,6 @@ const route = useRoute()
 const router = useRouter()
 
 const query = ref('')
-const searchQuery = ref('')
 const results = ref<SearchResult[]>([])
 const loading = ref(false)
 const error = ref('')
@@ -35,7 +36,6 @@ const displayedResults = computed(() => {
 
 onMounted(async () => {
   query.value = (route.query.query as string) || ''
-  searchQuery.value = query.value
   await loadSearchResults()
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -133,21 +133,22 @@ const loadNextClips = async (batchSize = 3) => {
   loadingClips.value = false
 }
 
-const handleSearch = () => {
-  const trimmedQuery = searchQuery.value.trim()
-  if (!trimmedQuery) return
-
+const handleSearch = (newQuery: string) => {
   router.push({
     name: 'search-results',
-    query: { query: trimmedQuery },
+    query: { query: newQuery },
   })
 
-  query.value = trimmedQuery
+  query.value = newQuery
   results.value = []
   loadedClips.value = 0
   videoCache.value = {}
   videoErrors.value = {}
   loadSearchResults()
+}
+
+const handleFilters = () => {
+  console.log('Filters clicked')
 }
 
 const handleAdjust = (index: number) => {
@@ -262,21 +263,9 @@ watch(activeIndex, async (newIndex, oldIndex) => {
 <template>
   <UserButtons fixed />
   <main class="relative w-screen h-screen overflow-hidden m-0 p-0">
-    <div class="search-container fixed top-5 left-1/2 -translate-x-1/2 z-1000 w-[clamp(280px,60vw,720px)] flex flex-col items-center max-[850px]:!top-[75px] max-[850px]:!w-[70vw]">
-        <div class="relative w-full">
-          <input
-            v-model="searchQuery"
-            id="query-input"
-            type="text"
-            placeholder="Enter a quote"
-            class="w-full border-none bg-white rounded-xl p-[clamp(16px,2vw,24px)_clamp(20px,3vw,32px)] pr-[clamp(60px,6vw,70px)] text-[clamp(1.4rem,3vw,2rem)] shadow-[0_10px_24px_rgba(0,0,0,0.3)] text-dark font-extrabold font-sans"
-            @keypress.enter="handleSearch"
-          />
-          <button class="absolute top-1/2 -translate-y-1/2 right-[15px] h-[42px] w-[42px] flex items-center justify-center bg-transparent border-none cursor-pointer p-0 pointer-events-auto transition-transform duration-200 active:scale-95" @click="handleSearch" aria-label="Search">
-            <img src="/images/ui/icons/arrow-circle-right.svg" alt="Search" class="pointer-events-none transition-transform duration-200 hover:scale-115 w-[clamp(30px,4vw,42px)] h-auto drop-shadow-[0_0_4px_rgba(0,0,0,0.3)]" />
-          </button>
-        </div>
-      <button type="button" class="absolute bottom-[-50px] right-2 z-20 font-bold bg-btn-bg text-white border-none cursor-pointer transition-all duration-200 hover:bg-btn-bg-hover rotate-[5deg] hover:rotate-[5deg] hover:scale-108 active:rotate-[5deg] active:scale-95 rounded-l p-[clamp(10px,1.5vw,14px)_clamp(16px,2vw,24px)] text-[clamp(1rem,2.5vw,1.6rem)] shadow-[0_6px_15px_rgba(0,0,0,0.2)]">Filters</button>
+    <div class="search-container fixed top-5 left-1/2 -translate-x-1/2 z-1000 w-[clamp(280px,60vw,720px)] max-w-[90vw] max-[850px]:!top-[75px] max-[850px]:!w-[85vw] max-[850px]:!max-w-[500px] max-[480px]:!w-[85vw]">
+      <SearchInput :initial-query="query" @search="handleSearch" />
+      <FiltersButton @click="handleFilters" />
     </div>
 
     <div v-if="loading" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-5 flex flex-col items-center gap-7.5">
@@ -294,7 +283,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
       <div
         v-for="(result, index) in displayedResults"
         :key="index"
-        class="reel-item snap-center transition-all duration-300 flex-shrink-0 opacity-50 scale-85 w-auto h-70vh min-w-auto max-w-none mx-5 p-0 relative flex items-center justify-center cursor-pointer overflow-hidden rounded-xl z-1 max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
+        class="reel-item snap-center transition-all duration-300 flex-shrink-0 opacity-50 scale-85 w-auto h-[55vh] min-w-auto max-w-none mx-5 p-0 relative flex items-center justify-center cursor-pointer overflow-hidden rounded-xl z-1 max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
         :class="{ 'z-50 opacity-100 scale-100 shadow-glow-orange': index === activeIndex }"
         :data-idx="index"
         @click="handleClipClick(index, $event)"
@@ -307,7 +296,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
           preload="auto"
           :src="videoCache[index]"
           @loadeddata="onVideoLoaded($event, index)"
-          class="w-auto h-full max-h-70vh object-contain rounded-xl block cursor-pointer aspect-auto max-[850px]:w-full max-[850px]:h-auto max-[850px]:max-h-none"
+          class="w-auto h-full max-h-[55vh] object-contain rounded-xl block cursor-pointer aspect-auto max-[850px]:w-full max-[850px]:h-auto max-[850px]:max-h-none"
           :class="{ 'border-[3px] border-accent': index === activeIndex }"
         ></video>
         <div v-else-if="videoErrors[index]" class="flex flex-col items-center justify-center min-h-[300px] bg-red-100 text-red-700 p-4 rounded-xl text-center">
@@ -324,7 +313,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
 
       <div
         v-if="loadingClips || loadedClips < results.length"
-        class="reel-item snap-center flex-shrink-0 opacity-50 w-auto h-70vh min-w-auto max-w-none mx-5 p-0 flex items-center justify-center rounded-xl z-1 max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
+        class="reel-item snap-center flex-shrink-0 opacity-50 w-auto h-[55vh] min-w-auto max-w-none mx-5 p-0 flex items-center justify-center rounded-xl z-1 max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
       >
         <div v-if="loadingClips" class="flex flex-col items-center justify-center min-h-[300px] bg-gray-200 rounded-xl w-full">
           <div class="w-[50px] h-[50px] border-[5px] border-[rgba(200,200,200,0.3)] border-t-accent rounded-full animate-spin mb-3"></div>

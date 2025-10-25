@@ -1,12 +1,24 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+
+interface Props {
+  initialQuery?: string
+}
 
 interface Emits {
   (e: 'search', query: string): void
 }
 
+const props = withDefaults(defineProps<Props>(), {
+  initialQuery: ''
+})
+
 const emit = defineEmits<Emits>()
-const query = ref('')
+const query = ref(props.initialQuery)
+
+watch(() => props.initialQuery, (newValue) => {
+  query.value = newValue
+})
 
 const handleSubmit = () => {
   const trimmedQuery = query.value.trim()

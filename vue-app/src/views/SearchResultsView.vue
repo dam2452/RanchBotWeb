@@ -5,8 +5,9 @@ import { apiService } from '@/services/api'
 import type { SearchResult } from '@/types'
 import UserButtons from '@/components/UserButtons.vue'
 import ClipInspector from '@/components/ClipInspector.vue'
-import SearchInput from '@/components/SearchInput.vue'
-import FiltersButton from '@/components/FiltersButton.vue'
+import SearchBar from '@/components/SearchBar.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import VideoReelItem from '@/components/VideoReelItem.vue'
 
 type VisibleEntry = { entry: IntersectionObserverEntry; ratio: number }
 
@@ -280,14 +281,12 @@ watch(activeIndex, async (newIndex, oldIndex) => {
 <template>
   <UserButtons fixed />
   <main class="relative w-screen h-screen overflow-hidden m-0 p-0">
-    <div class="search-container fixed top-10 left-1/2 -translate-x-1/2 z-1000 w-[clamp(280px,60vw,720px)] max-w-[90vw] max-[850px]:!top-[85px] max-[850px]:!w-[85vw] max-[850px]:!max-w-[500px] max-[480px]:!w-[85vw]">
-      <SearchInput :initial-query="query" @search="handleSearch" />
-      <FiltersButton @click="handleFilters" />
+    <div class="search-bar-container fixed top-10 left-1/2 -translate-x-1/2 z-1000 w-[clamp(280px,60vw,720px)] max-w-[90vw] max-[850px]:!top-[85px] max-[850px]:!w-[85vw] max-[850px]:!max-w-[500px] max-[480px]:!w-[85vw]">
+      <SearchBar :initial-query="query" @search="handleSearch" @filters="handleFilters" />
     </div>
 
-    <div v-if="loading" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-5 flex flex-col items-center gap-7.5">
-      <div class="loading-spinner"></div>
-      <p class="text-[2rem] font-bold text-dark">Loading results...</p>
+    <div v-if="loading" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-5">
+      <LoadingSpinner message="Loading results..." />
     </div>
 
     <div v-else-if="error" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-xl z-5 text-red-600">{{ error }}</div>
@@ -297,47 +296,18 @@ watch(activeIndex, async (newIndex, oldIndex) => {
     </div>
 
     <div v-else class="scroll-smooth snap-x snap-mandatory overflow-x-scroll overflow-y-hidden flex items-center h-screen w-screen fixed top-0 left-0 m-0 p-0 pt-[140px] max-[850px]:flex-col max-[850px]:overflow-y-scroll max-[850px]:overflow-x-hidden max-[850px]:snap-y max-[850px]:pt-[195px]" ref="videoReel">
-      <div
+      <VideoReelItem
         v-for="(result, index) in displayedResults"
         :key="index"
-        class="reel-item snap-center transition-all duration-300 flex-shrink-0 opacity-50 scale-85 w-auto h-[55vh] min-w-auto max-w-none mx-5 p-0 relative flex items-center justify-center cursor-pointer overflow-hidden rounded-3xl z-1 max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
-        :class="{ 'z-50 opacity-100 scale-100 shadow-glow-orange': index === activeIndex }"
-        :data-idx="index"
-        @click="handleClipClick(index, $event)"
-      >
-        <video
-          v-if="videoCache[index]"
-          loop
-          muted
-          playsinline
-          preload="auto"
-          :src="videoCache[index]"
-          @loadeddata="onVideoLoaded($event, index)"
-          class="w-auto h-full max-h-[55vh] object-contain rounded-3xl block cursor-pointer aspect-auto scale-[0.99] max-[850px]:w-full max-[850px]:h-auto max-[850px]:max-h-none"
-          :class="{ 'border-[3px] border-accent': index === activeIndex }"
-        ></video>
-        <div v-else-if="videoErrors[index]" class="flex flex-col items-center justify-center min-h-[300px] bg-red-100 text-red-700 p-4 rounded-xl text-center">
-          <svg class="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <p class="font-semibold text-lg">Failed to load clip</p>
-          <p class="text-sm mt-1">Clip #{{ index + 1 }} is unavailable</p>
-        </div>
-
-        <button
-          v-if="videoCache[index]"
-          style="background: linear-gradient(145deg, #f2a94c, #e09340);"
-          class="absolute top-[15px] left-[15px] px-3 py-2 border-none rounded-xl text-sm font-medium leading-[1.4] cursor-default z-100 transition-all duration-300 pointer-events-none opacity-0 box-border h-auto min-h-auto inline-flex items-center justify-center whitespace-nowrap text-white hover:opacity-100 hover:scale-105 active:scale-95 shadow-[0_2px_5px_rgba(0,0,0,0.2)] max-[850px]:px-2.5 max-[850px]:py-[6px] max-[850px]:text-xs max-[850px]:top-2.5 max-[850px]:left-2.5"
-          :class="{ '!opacity-80 pointer-events-auto cursor-pointer': index === activeIndex }"
-          @click.stop="handleAdjust(index)"
-        >Adjust</button>
-        <button
-          v-if="videoCache[index]"
-          class="absolute top-[15px] right-[15px] px-3 py-2 border-none rounded-xl text-sm font-medium leading-[1.4] cursor-default z-100 transition-all duration-300 pointer-events-none opacity-0 box-border h-auto min-h-auto inline-flex items-center justify-center whitespace-nowrap bg-white text-gray-700 hover:opacity-100 hover:scale-105 active:scale-95 shadow-[0_2px_5px_rgba(0,0,0,0.2)] max-[850px]:px-2.5 max-[850px]:py-[6px] max-[850px]:text-xs max-[850px]:top-2.5 max-[850px]:right-2.5"
-          :class="{ '!opacity-80 pointer-events-auto cursor-pointer': index === activeIndex }"
-          @click.stop="handleDownload(index)"
-        >Download</button>
-      </div>
+        :index="index"
+        :video-url="videoCache[index]"
+        :has-error="videoErrors[index] || false"
+        :is-active="index === activeIndex"
+        @click="handleClipClick"
+        @adjust="handleAdjust"
+        @download="handleDownload"
+        @loaded="onVideoLoaded"
+      />
 
       <div
         v-if="loadingClips || loadedClips < results.length"
@@ -365,20 +335,3 @@ watch(activeIndex, async (newIndex, oldIndex) => {
     @close="closeInspector"
   />
 </template>
-
-<style scoped>
-.loading-spinner {
-  width: 120px;
-  height: 120px;
-  border: 12px solid rgba(200, 200, 200, 0.3);
-  border-top-color: #f2a94c;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-</style>

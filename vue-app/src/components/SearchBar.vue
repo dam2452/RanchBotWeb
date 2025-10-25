@@ -2,10 +2,18 @@
 import SearchInput from './SearchInput.vue'
 import FiltersButton from './FiltersButton.vue'
 
+interface Props {
+  initialQuery?: string
+}
+
 interface Emits {
   (e: 'search', query: string): void
   (e: 'filters'): void
 }
+
+const props = withDefaults(defineProps<Props>(), {
+  initialQuery: ''
+})
 
 const emit = defineEmits<Emits>()
 
@@ -20,7 +28,7 @@ const handleFilters = () => {
 
 <template>
   <div class="search-container">
-    <SearchInput @search="handleSearch" />
+    <SearchInput :initial-query="initialQuery" @search="handleSearch" />
     <FiltersButton @click="handleFilters" />
   </div>
 </template>

@@ -21,8 +21,8 @@ const goToSearch = () => {
       <button style="background-color: #888; color: #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);" class="border-none rounded-[25px] cursor-pointer mb-7.5 transition-all duration-200 hover:scale-105 hover:shadow-hover active:scale-95 active:shadow-active text-[clamp(1.2rem,2vw,2rem)] font-bold p-[20px_40px] max-[850px]:p-[16px_32px] max-[1199px]:!mb-[10px] max-[480px]:!mb-[5px] max-[480px]:!mx-[15px]" @click="goToSearch">enter a quote</button>
     </div>
 
-    <div class="hidden min-[1200px]:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 z-10 transition-all duration-400 max-[1199px]:!static max-[1199px]:!block max-[1199px]:!transform-none max-[1199px]:!m-[20px_auto] max-[1199px]:!w-[60px] max-[1199px]:order-2 max-[480px]:!m-[10px_auto]">
-      <img src="/images/ui/icons/arrow.svg" class="w-20 transition-all duration-400 animate-bounce max-[1199px]:!w-[60px] max-[1199px]:!rotate-90 max-[1199px]:!animate-bounce-rotated" alt="Arrow" />
+    <div class="hidden min-[1200px]:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 z-10 transition-all duration-400 max-[1199px]:!static max-[1199px]:!block max-[1199px]:!transform-none max-[1199px]:!m-[20px_auto] max-[1199px]:!w-[60px] max-[1199px]:order-2 max-[480px]:!m-[10px_auto]">
+      <img src="/images/ui/icons/arrow.svg" class="w-4 transition-all duration-400 animate-bounce max-[1199px]:!w-[60px] max-[1199px]:!rotate-90 max-[1199px]:!animate-bounce-rotated" alt="Arrow" />
     </div>
 
     <div class="flex-1 flex items-center justify-center transition-all duration-400 min-[1200px]:min-w-0 max-[1199px]:flex-[0_0_auto] max-[1199px]:w-full max-[1199px]:max-w-800px max-[1199px]:order-3 max-[1199px]:mt-7.5 max-[500px]:!w-[90%] max-[500px]:!mx-auto max-[500px]:!mt-[-20px] max-[480px]:!mt-[15px]">

@@ -141,6 +141,32 @@ class ApiService {
     })
   }
 
+  async adjustClip(params: { clipId: number; leftAdjust: number; rightAdjust: number }): Promise<Response> {
+    const response = await this.client.post(
+      '/api/video',
+      {
+        endpoint: 'd',
+        args: [params.clipId.toString(), params.leftAdjust.toString(), params.rightAdjust.toString()],
+      },
+      {
+        responseType: 'blob',
+      }
+    )
+    return new Response(response.data)
+  }
+
+  async saveAdjustedClip(params: {
+    clipId: number
+    clipName: string
+    leftAdjust: number
+    rightAdjust: number
+  }): Promise<void> {
+    await this.client.post('/api/json', {
+      endpoint: 'z',
+      args: [params.clipName, params.clipId.toString(), params.leftAdjust.toString(), params.rightAdjust.toString()],
+    })
+  }
+
   async deleteClip(clipName: string): Promise<void> {
     await this.client.post('/api/json', {
       endpoint: 'uk',

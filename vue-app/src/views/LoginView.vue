@@ -27,41 +27,63 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <main>
-    <section class="left">
-      <router-link to="/">
-        <img src="/images/branding/logo.svg" class="logo-img" alt="RanchBot Logo" />
+  <main class="flex flex-row justify-center items-center w-full min-h-screen box-border p-[40px] gap-[100px] max-[850px]:flex-col max-[850px]:mt-0 max-[850px]:text-center max-[850px]:min-h-screen max-[850px]:p-[20px_15px] max-[850px]:gap-[15px] max-[850px]:justify-center max-[850px]:overflow-y-auto max-[480px]:!p-[10px_8px] max-[480px]:!gap-[8px]">
+    <section class="flex flex-col items-center text-center transition-all duration-400">
+      <router-link to="/" class="inline-block">
+        <img src="/images/branding/logo.svg" class="block mx-auto scale-[1.9] -mt-[40px] mb-[90px] min-[850px]:max-[1899px]:!scale-[1.5] min-[850px]:max-[1899px]:!-mt-[20px] min-[850px]:max-[1899px]:!mb-[60px] min-[601px]:max-[1024px]:!scale-100 min-[601px]:max-[1024px]:!mt-[15px] min-[601px]:max-[1024px]:!mb-[15px] max-[600px]:!scale-[1.4] max-[600px]:!mt-[10px] max-[600px]:!mb-[20px] max-[480px]:!scale-90 max-[480px]:!mt-[10px] max-[480px]:!mb-[10px]" alt="RanchBot Logo" />
       </router-link>
-      <h1>RanchBot</h1>
+      <h1 class="text-center mt-[60px] scale-[1.9] transition-all duration-400 min-[850px]:max-[1899px]:!scale-[1.5] min-[850px]:max-[1899px]:!mt-[40px] min-[601px]:max-[1024px]:!scale-100 min-[601px]:max-[1024px]:!mt-[12px] max-[600px]:!scale-[1.4] max-[600px]:!mt-[12px] max-[480px]:!scale-90 max-[480px]:!mt-[8px]">RanchBot</h1>
     </section>
 
-    <section class="right">
-      <div class="bench-container">
-        <img src="/images/others/bench.svg" alt="Bench Graphic" class="bench-image" />
-        <form class="form-overlay" @submit.prevent="handleSubmit">
-          <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-          <input v-model="login" type="text" name="login" placeholder="username" required autofocus />
+    <section class="flex flex-col items-center transition-all duration-400">
+      <div class="bench-container relative">
+        <img src="/images/others/bench.svg" alt="Bench Graphic" class="bench-image w-full h-auto block" />
+        <form class="form-overlay absolute top-0 left-0 w-full h-full" @submit.prevent="handleSubmit">
+          <div v-if="errorMessage" class="absolute top-[15.5%] left-1/2 -translate-x-1/2 w-[70%] p-[10px] bg-[rgba(255,0,0,0.1)] border border-[#ff6b6b] rounded-[8px] text-[#d63031] text-center font-semibold shadow-[0_2px_4px_rgba(0,0,0,0.2)] max-[480px]:!top-[13%] max-[480px]:!w-[75%] max-[480px]:!text-[11px] max-[480px]:!p-[8px]" style="font-size: clamp(12px, 1vw, 14px);">{{ errorMessage }}</div>
+          <input
+            v-model="login"
+            type="text"
+            name="login"
+            placeholder="username"
+            required
+            autofocus
+            class="absolute left-[15%] top-[23.5%] w-[70%] h-[8%] border-none rounded-[8px] text-center shadow-[inset_0_0_3px_rgba(0,0,0,0.3)] text-[#8B4513] placeholder-[#A0522D] placeholder-opacity-80 focus:outline-[2px_solid_#c58b4f] max-[480px]:!text-base max-[480px]:!h-[9%] max-[480px]:!left-[15.5%] max-[480px]:!w-[69%] min-[850px]:max-[1899px]:text-[clamp(14px,1vw,16px)]"
+            style="background-color: #fdd99d; font-size: clamp(14px, 1.2vw, 18px);"
+          />
           <input
             v-model="password"
             type="password"
             name="password"
             placeholder="password"
             required
+            class="absolute left-[15%] top-[37.6%] w-[70%] h-[8%] border-none rounded-[8px] text-center shadow-[inset_0_0_3px_rgba(0,0,0,0.3)] text-[#8B4513] placeholder-[#A0522D] placeholder-opacity-80 focus:outline-[2px_solid_#c58b4f] max-[480px]:!text-base max-[480px]:!h-[9%] max-[480px]:!left-[15.5%] max-[480px]:!w-[69%] min-[850px]:max-[1899px]:text-[clamp(14px,1vw,16px)]"
+            style="background-color: #fdd99d; font-size: clamp(14px, 1.2vw, 18px);"
           />
-          <button type="submit" :disabled="authStore.loading">
+          <button
+            type="submit"
+            :disabled="authStore.loading"
+            class="absolute top-[53%] left-0 w-full h-[5.5%] font-bold bg-gradient-to-r from-[#fdd99d] to-[#dcae75] border-2 border-[#aa9169] rounded-[10px] cursor-pointer text-[#8B4513] transition-all duration-200 hover:scale-[1.04] hover:bg-gradient-to-r hover:from-[#ffe0b3] hover:to-[#e0b88a] hover:shadow-hover active:scale-[0.96] active:shadow-active disabled:opacity-60 disabled:cursor-not-allowed max-[480px]:!h-[5.5%] max-[480px]:!transform-none min-[850px]:max-[1899px]:text-[clamp(12px,1vw,16px)]"
+            style="box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3); font-size: clamp(14px, 1.2vw, 18px);"
+          >
             {{ authStore.loading ? 'Logging in...' : 'Login' }}
           </button>
         </form>
       </div>
 
-      <div class="actions">
-        <button @click="$router.push('/register')">Create account</button>
-        <button @click="$router.push('/forgot-password')">Forgot password?</button>
+      <div class="mt-[10px] flex gap-[20px] w-full justify-center">
+        <button @click="$router.push('/register')" class="bg-gradient-to-br from-[#4CAF50] to-[#45a049] text-white p-[24px_60px] border-none rounded-[10px] cursor-pointer font-semibold whitespace-nowrap transition-all duration-200 hover:scale-105 hover:bg-gradient-to-br hover:from-[#5ee271] hover:to-[#35a33a] active:scale-[0.97] active:shadow-active min-[850px]:max-[1899px]:!text-[clamp(32px,1.3vw,36px)] min-[850px]:max-[1899px]:!p-[8px_20px] min-[850px]:max-[1899px]:!max-w-[350px]" style="font-size: clamp(28px, 2.2vw, 38px); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);">Create account</button>
+        <button @click="$router.push('/forgot-password')" class="bg-gradient-to-br from-[#4CAF50] to-[#45a049] text-white p-[24px_60px] border-none rounded-[10px] cursor-pointer font-semibold whitespace-nowrap transition-all duration-200 hover:scale-105 hover:bg-gradient-to-br hover:from-[#5ee271] hover:to-[#35a33a] active:scale-[0.97] active:shadow-active min-[850px]:max-[1899px]:!text-[clamp(32px,1.3vw,36px)] min-[850px]:max-[1899px]:!p-[8px_20px] min-[850px]:max-[1899px]:!max-w-[350px]" style="font-size: clamp(28px, 2.2vw, 38px); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);">Forgot password?</button>
       </div>
     </section>
   </main>
 </template>
 
 <style scoped>
-@import '@/assets/styles/css/pages/login.css';
+body {
+  overflow: hidden;
+}
+
+input:focus {
+  background-color: #fff8dc !important;
+}
 </style>

@@ -37,7 +37,7 @@ const handleLoaded = (event: Event) => {
   <div
     class="reel-item snap-center transition-all duration-300 flex-shrink-0 opacity-50 scale-85 w-auto h-[55vh] min-w-auto max-w-none mx-5 p-0 relative flex items-center justify-center cursor-pointer overflow-hidden rounded-[32px] z-1 max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
     :class="{ 'z-50 opacity-100 scale-100': isActive }"
-    :style="isActive ? 'box-shadow: 0 0 0 0 rgba(242, 169, 76, 1), 0 0 32px rgba(242, 169, 76, 0.8);' : ''"
+    :style="isActive ? 'box-shadow: 0 0 0 3px #f2a94c, 0 0 32px rgba(242, 169, 76, 0.8);' : ''"
     :data-idx="index"
     @click="handleClick"
   >
@@ -50,7 +50,6 @@ const handleLoaded = (event: Event) => {
       :src="videoUrl"
       @loadeddata="handleLoaded"
       class="w-auto h-full max-h-[55vh] object-contain rounded-[32px] block cursor-pointer aspect-auto scale-[0.99] max-[850px]:w-full max-[850px]:h-auto max-[850px]:max-h-none"
-      :style="isActive ? 'border: 3px solid #f2a94c; box-sizing: border-box;' : ''"
     ></video>
 
     <div v-else-if="hasError" class="flex flex-col items-center justify-center min-h-[300px] bg-red-100 text-red-700 p-4 rounded-xl text-center">

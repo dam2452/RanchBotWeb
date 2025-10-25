@@ -17,7 +17,7 @@ const goToSearch = () => {
         <img src="/images/branding/logo.svg" class="mt-7.5 transition-transform duration-400 min-w-[160px] w-[clamp(200px,20vw,300px)] max-[1199px]:!w-[clamp(160px,40vw,240px)] min-[1800px]:!w-[clamp(250px,15vw,350px)]" alt="RanchBot Logo" />
       </router-link>
       <h1 class="text-center transition-all duration-400 m-[20px_0] text-[clamp(3.5rem,6vw,7rem)] max-[1199px]:!m-[20px_0_10px] max-[1199px]:!text-[clamp(2.2rem,8vw,5rem)] max-[480px]:!m-[0_15px_5px_15px] min-[1800px]:!text-[clamp(4rem,5vw,8rem)]">RanchBot</h1>
-      <p class="tagline text-center max-[480px]:!m-[0_15px_10px_15px]">Find, cut, and share your favorite Ranczo scene — in seconds.</p>
+      <p class="tagline text-center m-[20px_0] text-[clamp(1.5rem,3vw,2.2rem)] max-[850px]:!text-[clamp(1.1rem,2.5vw,1.8rem)] max-[480px]:!m-[0_15px_10px_15px]">Find, cut, and share your favorite Ranczo scene — in seconds.</p>
       <button class="bg-btn-bg text-white p-[20px_40px] border-none rounded-xl cursor-pointer mb-7.5 transition-all duration-200 hover:scale-105 hover:shadow-hover active:scale-95 active:shadow-active shadow-strong text-[clamp(1.2rem,2vw,2rem)] max-[850px]:p-[16px_32px] max-[1199px]:!mb-[10px] max-[480px]:!mb-[5px] max-[480px]:!mx-[15px]" @click="goToSearch">enter a quote</button>
     </div>
 

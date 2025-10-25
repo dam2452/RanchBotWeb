@@ -24,6 +24,16 @@ const showHeader = computed(() => {
   font-weight: 600;
 }
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;
+  color: #fff;
+}
+
 #app {
   width: 100%;
   min-height: 100vh;

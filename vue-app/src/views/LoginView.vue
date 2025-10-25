@@ -36,7 +36,7 @@ const handleSubmit = async () => {
     </section>
 
     <section class="flex flex-col items-center transition-all duration-400">
-      <div class="bench-container relative">
+      <div class="bench-container relative w-[clamp(280px,40vw,900px)] aspect-square max-[850px]:!w-[clamp(250px,70vw,350px)] max-[850px]:!mb-2.5 max-[600px]:!w-[clamp(220px,80vw,300px)]">
         <img src="/images/others/bench.svg" alt="Bench Graphic" class="bench-image w-full h-auto block" />
         <form class="form-overlay absolute top-0 left-0 w-full h-full" @submit.prevent="handleSubmit">
           <div v-if="errorMessage" class="absolute top-[15.5%] left-1/2 -translate-x-1/2 w-[70%] p-2.5 bg-[rgba(255,0,0,0.1)] border border-[#ff6b6b] rounded-s text-[#d63031] text-center font-semibold shadow-[0_2px_4px_rgba(0,0,0,0.2)] text-[clamp(12px,1vw,14px)] max-[480px]:!top-[13%] max-[480px]:!w-[75%] max-[480px]:!text-[11px] max-[480px]:!p-2">{{ errorMessage }}</div>
@@ -67,9 +67,9 @@ const handleSubmit = async () => {
         </form>
       </div>
 
-      <div class="mt-2.5 flex gap-5 w-full justify-center">
-        <button @click="$router.push('/register')" class="bg-gradient-primary text-white p-[24px_60px] border-none rounded-m cursor-pointer font-semibold whitespace-nowrap transition-all duration-200 hover:scale-105 hover:bg-gradient-primary-hover active:scale-[0.97] active:shadow-active shadow-standard text-[clamp(28px,2.2vw,38px)] min-[850px]:max-[1899px]:!text-[clamp(32px,1.3vw,36px)] min-[850px]:max-[1899px]:!p-[8px_20px] min-[850px]:max-[1899px]:!max-w-[350px]">Create account</button>
-        <button @click="$router.push('/forgot-password')" class="bg-gradient-primary text-white p-[24px_60px] border-none rounded-m cursor-pointer font-semibold whitespace-nowrap transition-all duration-200 hover:scale-105 hover:bg-gradient-primary-hover active:scale-[0.97] active:shadow-active shadow-standard text-[clamp(28px,2.2vw,38px)] min-[850px]:max-[1899px]:!text-[clamp(32px,1.3vw,36px)] min-[850px]:max-[1899px]:!p-[8px_20px] min-[850px]:max-[1899px]:!max-w-[350px]">Forgot password?</button>
+      <div class="mt-2.5 flex gap-5 w-full justify-center max-[850px]:!flex-col max-[850px]:!gap-[15px] max-[850px]:!w-4/5 max-[850px]:!mt-5 max-[600px]:!w-[90%]">
+        <button @click="$router.push('/register')" class="bg-gradient-primary text-white p-[24px_60px] border-none rounded-m cursor-pointer font-semibold whitespace-nowrap transition-all duration-200 hover:scale-105 hover:bg-gradient-primary-hover active:scale-[0.97] active:shadow-active shadow-standard text-[clamp(28px,2.2vw,38px)] min-[850px]:max-[1899px]:!text-[clamp(32px,1.3vw,36px)] min-[850px]:max-[1899px]:!p-[8px_20px] min-[850px]:max-[1899px]:!max-w-[350px] max-[850px]:!w-full max-[850px]:!p-3 max-[850px]:!text-[clamp(14px,4vw,18px)] max-[850px]:!max-w-none">Create account</button>
+        <button @click="$router.push('/forgot-password')" class="bg-gradient-primary text-white p-[24px_60px] border-none rounded-m cursor-pointer font-semibold whitespace-nowrap transition-all duration-200 hover:scale-105 hover:bg-gradient-primary-hover active:scale-[0.97] active:shadow-active shadow-standard text-[clamp(28px,2.2vw,38px)] min-[850px]:max-[1899px]:!text-[clamp(32px,1.3vw,36px)] min-[850px]:max-[1899px]:!p-[8px_20px] min-[850px]:max-[1899px]:!max-w-[350px] max-[850px]:!w-full max-[850px]:!p-3 max-[850px]:!text-[clamp(14px,4vw,18px)] max-[850px]:!max-w-none">Forgot password?</button>
       </div>
     </section>
   </main>

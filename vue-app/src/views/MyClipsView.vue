@@ -128,14 +128,14 @@ const handleVideoClick = (clip: Clip, event: Event) => {
 
               <button
                 @click="(e) => handleDownload(clip, e)"
-                class="absolute top-[25px] right-[25px] p-[8px_14px] bg-[rgba(170,170,170,0.9)] text-white font-medium text-sm leading-[1.4] border-none rounded-s cursor-default transition-all duration-300 shadow-[0_2px_5px_rgba(0,0,0,0.3)] z-100 opacity-70 pointer-events-none font-sans inline-flex items-center justify-center whitespace-nowrap max-[850px]:top-2.5 max-[850px]:right-2.5 max-[850px]:p-[6px_10px] max-[850px]:text-xs group-[.active-clip]:opacity-100 group-[.active-clip]:pointer-events-auto group-[.active-clip]:cursor-pointer hover:scale-105 active:scale-95"
+                class="absolute top-[15px] right-[15px] p-[8px_14px] bg-[rgba(170,170,170,0.8)] text-white font-medium text-sm leading-[1.4] border-none rounded-s cursor-default transition-all duration-300 shadow-[0_2px_5px_rgba(0,0,0,0.2)] z-100 opacity-0 pointer-events-none font-sans inline-flex items-center justify-center whitespace-nowrap max-[850px]:top-2.5 max-[850px]:right-2.5 max-[850px]:p-[6px_10px] max-[850px]:text-xs group-[.active-clip]:opacity-80 group-[.active-clip]:pointer-events-auto group-[.active-clip]:cursor-pointer hover:opacity-100 hover:scale-105 active:scale-95"
               >
                 Download
               </button>
 
               <button
                 @click="(e) => handleDelete(clip.name, e)"
-                class="absolute bottom-[25px] right-[25px] p-[8px_14px] bg-gradient-to-br from-[#ef4444] to-[#dc2626] text-white font-medium text-sm leading-[1.4] border-none rounded-s cursor-default transition-all duration-300 shadow-[0_2px_5px_rgba(0,0,0,0.3)] z-100 opacity-70 pointer-events-none font-sans inline-flex items-center justify-center whitespace-nowrap max-[850px]:bottom-2.5 max-[850px]:right-2.5 max-[850px]:p-[6px_10px] max-[850px]:text-xs group-[.active-clip]:opacity-100 group-[.active-clip]:pointer-events-auto group-[.active-clip]:cursor-pointer hover:scale-105 active:scale-95"
+                class="absolute bottom-[25px] right-[25px] p-[8px_14px] bg-gradient-to-br from-[#ef4444] to-[#dc2626] text-white font-medium text-sm leading-[1.4] border-none rounded-s cursor-default transition-all duration-300 shadow-[0_2px_5px_rgba(0,0,0,0.2)] z-100 opacity-0 pointer-events-none font-sans inline-flex items-center justify-center whitespace-nowrap max-[850px]:bottom-2.5 max-[850px]:right-2.5 max-[850px]:p-[6px_10px] max-[850px]:text-xs group-[.active-clip]:opacity-80 group-[.active-clip]:pointer-events-auto group-[.active-clip]:cursor-pointer hover:opacity-100 hover:scale-105 active:scale-95"
               >
                 Delete
               </button>

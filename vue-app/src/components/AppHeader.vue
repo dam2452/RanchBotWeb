@@ -1,5 +1,5 @@
 <template>
-  <header>
+  <header class="flex justify-end items-center p-[15px_calc(15px*1.666)] relative z-100">
     <UserButtons />
   </header>
 </template>

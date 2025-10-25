@@ -262,15 +262,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
 <template>
   <UserButtons fixed />
   <main class="relative w-screen h-screen overflow-hidden m-0 p-0">
-    <div class="fixed top-7.5 left-7.5 right-0 pr-7.5 z-100 flex flex-row items-center justify-between max-[850px]:flex-col max-[850px]:p-[10px_15px] max-[850px]:gap-2.5 max-[850px]:top-[5px]">
-      <div class="flex flex-row items-center no-underline flex-shrink-0 gap-[15px]">
-        <router-link to="/" class="flex items-center">
-          <img src="/images/branding/logo.svg" class="w-[100px] h-[100px] cursor-pointer block drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] max-[850px]:w-[50px] max-[850px]:h-[50px]" alt="RanchBot Logo" />
-        </router-link>
-        <h1 class="text-5xl font-bold text-white m-0 whitespace-nowrap [text-shadow:0_2px_8px_rgba(0,0,0,0.5)] max-[850px]:text-2xl">RanchBot</h1>
-      </div>
-
-      <div class="absolute left-1/2 -translate-x-1/2 w-500px max-w-500px flex flex-col items-center max-[850px]:relative max-[850px]:left-0 max-[850px]:translate-x-0 max-[850px]:w-full max-[850px]:max-w-full">
+    <div class="search-container fixed top-5 left-1/2 -translate-x-1/2 z-1000 w-[clamp(280px,60vw,720px)] flex flex-col items-center max-[850px]:!top-[75px] max-[850px]:!w-[70vw]">
         <div class="relative w-full">
           <input
             v-model="searchQuery"
@@ -284,8 +276,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
             <img src="/images/ui/icons/arrow-circle-right.svg" alt="Search" class="pointer-events-none transition-transform duration-200 hover:scale-115 w-[clamp(30px,4vw,42px)] h-auto drop-shadow-[0_0_4px_rgba(0,0,0,0.3)]" />
           </button>
         </div>
-        <button type="button" class="absolute bottom-[-50px] right-2 z-20 font-bold bg-btn-bg text-white border-none cursor-pointer transition-all duration-200 hover:bg-btn-bg-hover rotate-[5deg] hover:rotate-[5deg] hover:scale-108 active:rotate-[5deg] active:scale-95 rounded-l p-[clamp(10px,1.5vw,14px)_clamp(16px,2vw,24px)] text-[clamp(1rem,2.5vw,1.6rem)] shadow-[0_6px_15px_rgba(0,0,0,0.2)]">Filters</button>
-      </div>
+      <button type="button" class="absolute bottom-[-50px] right-2 z-20 font-bold bg-btn-bg text-white border-none cursor-pointer transition-all duration-200 hover:bg-btn-bg-hover rotate-[5deg] hover:rotate-[5deg] hover:scale-108 active:rotate-[5deg] active:scale-95 rounded-l p-[clamp(10px,1.5vw,14px)_clamp(16px,2vw,24px)] text-[clamp(1rem,2.5vw,1.6rem)] shadow-[0_6px_15px_rgba(0,0,0,0.2)]">Filters</button>
     </div>
 
     <div v-if="loading" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-5 flex flex-col items-center gap-7.5">

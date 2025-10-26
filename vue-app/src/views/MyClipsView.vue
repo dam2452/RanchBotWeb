@@ -256,12 +256,21 @@ const handleVideoError = (clipId: string) => {
 
 @media (max-width: 850px) {
   .clips-grid {
-    width: 90vw;
-    height: 80vh;
+    width: 85vw;
+    height: 40vh;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    gap: 1rem;
-    padding: 1rem;
+    gap: 0.3rem;
+    padding: 0.3rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .clips-grid {
+    width: 90vw;
+    height: 38vh;
+    gap: 0.25rem;
+    padding: 0.25rem;
   }
 }
 </style>

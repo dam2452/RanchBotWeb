@@ -197,4 +197,37 @@ const handleVideoError = (event: Event) => {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+@media (max-width: 850px) {
+  .clip-card {
+    gap: 0.2rem;
+  }
+
+  .video-container {
+    border-radius: 8px;
+  }
+
+  .clip-video {
+    border-radius: 8px;
+  }
+
+  .clip-name {
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+  }
+
+  .clip-name p {
+    font-size: 0.7rem;
+  }
+
+  .error-icon {
+    width: 2rem;
+    height: 2rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .error-text {
+    font-size: 0.7rem;
+  }
+}
 </style>

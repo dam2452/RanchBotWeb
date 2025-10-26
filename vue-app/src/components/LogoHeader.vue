@@ -50,12 +50,12 @@
   }
 
   .logo-header img {
-    width: 5rem;
-    height: 5rem;
+    width: 4rem;
+    height: 4rem;
   }
 
   .logo-header span {
-    font-size: 2.25rem;
+    font-size: 1.8rem;
   }
 }
 </style>

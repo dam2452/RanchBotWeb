@@ -32,7 +32,10 @@ const inspectorClipUrl = ref('')
 
 const totalClips = computed(() => {
   const hasLoadMore = loadedClips.value < results.value.length
-  return hasLoadMore ? displayedResults.value.length + 1 : displayedResults.value.length
+  if (hasLoadMore && !loadingClips.value) {
+    return displayedResults.value.length + 1
+  }
+  return displayedResults.value.length
 })
 
 const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTimeout, isManualScroll } = useHorizontalScroll({
@@ -51,9 +54,6 @@ const displayedResults = computed(() => {
 onMounted(async () => {
   query.value = (route.query.query as string) || ''
   await loadSearchResults()
-  await nextTick()
-  setupScrollListeners()
-  setupLoadMoreObserver()
 })
 
 const setupLoadMoreObserver = () => {
@@ -131,6 +131,9 @@ const loadNextClips = async (batchSize = 3) => {
       loadedClips.value = clipIndex + 1
 
       if (startIdx === 0 && clipIndex === 0) {
+        await nextTick()
+        setupScrollListeners()
+        setupLoadMoreObserver()
         setTimeout(() => {
           scrollToClip(0)
         }, 50)
@@ -338,14 +341,20 @@ watch(activeIndex, async (newIndex, oldIndex) => {
         v-if="loadedClips < results.length"
         ref="loadMoreElement"
         :data-idx="displayedResults.length"
-        class="reel-item load-more-item clip-loaded snap-center transition-all duration-300 flex-shrink-0 opacity-50 scale-85 w-auto h-[55vh] min-w-auto max-w-none mx-5 p-0 relative flex items-center justify-center cursor-pointer rounded-[32px] z-[1] max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
-        :class="{ 'active z-[50] opacity-100 scale-100': activeIndex === displayedResults.length }"
-        :style="activeIndex === displayedResults.length ? 'box-shadow: 0 0 32px rgba(242, 169, 76, 0.8); border-radius: 32px;' : 'border-radius: 32px;'"
-        @click="handleLoadMore"
+        class="reel-item load-more-item clip-loaded snap-center transition-all duration-300 flex-shrink-0 opacity-50 scale-85 w-auto h-[55vh] min-w-auto max-w-none mx-5 p-0 relative flex items-center justify-center rounded-[32px] z-[1] max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
+        :class="{
+          'active z-[50] opacity-100 scale-100': activeIndex === displayedResults.length,
+          'cursor-pointer': !loadingClips
+        }"
+        :style="[
+          activeIndex === displayedResults.length ? 'box-shadow: 0 0 32px rgba(242, 169, 76, 0.8); border-radius: 32px;' : 'border-radius: 32px;',
+          loadingClips ? 'pointer-events: none;' : ''
+        ].join(' ')"
+        @click="!loadingClips && handleLoadMore()"
       >
         <div
           v-if="loadingClips"
-          class="w-auto h-full max-h-[55vh] object-contain rounded-[32px] block cursor-pointer aspect-video scale-[0.99] max-[850px]:w-full max-[850px]:h-auto max-[850px]:max-h-none flex flex-col items-center justify-center bg-gray-100"
+          class="w-auto h-full max-h-[55vh] object-contain rounded-[32px] block aspect-video scale-[0.99] max-[850px]:w-full max-[850px]:h-auto max-[850px]:max-h-none flex flex-col items-center justify-center bg-gray-100 pointer-events-none"
           :style="activeIndex === displayedResults.length ? 'box-shadow: 0 0 0 3px #f2a94c; box-sizing: border-box; border-radius: 32px;' : 'border-radius: 32px;'"
         >
           <LoadingSpinner size="small" message="Loading more clips..." />

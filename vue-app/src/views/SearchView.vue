@@ -54,6 +54,7 @@ const handleFilters = () => {
 }
 
 .content-wrapper {
+  transform: translateY(-12vh);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -62,12 +63,39 @@ const handleFilters = () => {
   max-width: 90vw;
 }
 
+.search-page :deep(.logo-section) {
+  max-width: 100%;
+  flex: none;
+}
+
+.search-page :deep(.logo) {
+  width: clamp(224px, 24vw, 352px) !important;
+}
+
+.search-page :deep(.title) {
+  font-size: clamp(4.48rem, 8vw, 8.8rem) !important;
+  margin: 1rem 0 !important;
+}
+
+@media (max-width: 850px) {
+  .search-page :deep(.logo) {
+    width: clamp(230px, 23vw, 345px) !important;
+  }
+
+  .search-page :deep(.title) {
+    font-size: clamp(4rem, 6.9vw, 8rem) !important;
+  }
+}
+
 @media (max-width: 850px) {
   .search-page {
     transform: translateX(0);
+    justify-content: flex-start;
+    padding-top: 15vh !important;
   }
 
   .content-wrapper {
+    transform: none;
     width: 85vw;
     max-width: 500px;
   }
@@ -75,10 +103,11 @@ const handleFilters = () => {
 
 @media (max-width: 480px) {
   .search-page {
-    padding-top: 2.5rem;
+    padding-top: 12vh !important;
   }
 
   .content-wrapper {
+    transform: none;
     width: 85vw;
   }
 }

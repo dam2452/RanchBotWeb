@@ -12,6 +12,7 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
 
   const scrollTimeout = ref<number | null>(null)
   const isManualScroll = ref(false)
+  const navigationLock = ref(false)
 
   const handleWheel = (event: WheelEvent) => {
     if (!containerRef.value) return
@@ -25,21 +26,20 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
       clearTimeout(scrollTimeout.value)
     }
 
-    isManualScroll.value = true
-
     scrollTimeout.value = window.setTimeout(() => {
-      isManualScroll.value = false
       updateActiveFromScroll()
     }, 150)
   }
 
   const handleScroll = () => {
+    if (isManualScroll.value || navigationLock.value) return
+
     if (scrollTimeout.value) {
       clearTimeout(scrollTimeout.value)
     }
 
     scrollTimeout.value = window.setTimeout(() => {
-      if (!isManualScroll.value) {
+      if (!isManualScroll.value && !navigationLock.value) {
         updateActiveFromScroll()
       }
     }, 150)
@@ -72,22 +72,57 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
+    console.log('Key pressed:', e.key, 'Target:', e.target)
+
     if (e.key === 'ArrowLeft') {
-      scrollToItem(Math.max(0, activeIndex.value - 1))
+      e.preventDefault()
+      e.stopPropagation()
+      const newIndex = Math.max(0, activeIndex.value - 1)
+      console.log('Arrow Left - changing from', activeIndex.value, 'to', newIndex, 'totalItems:', totalItems.value)
+      scrollToItem(newIndex)
     } else if (e.key === 'ArrowRight') {
-      scrollToItem(Math.min(totalItems.value - 1, activeIndex.value + 1))
+      e.preventDefault()
+      e.stopPropagation()
+      if (activeIndex.value >= totalItems.value - 1) {
+        console.log('Arrow Right - already at last valid item')
+        return
+      }
+      const newIndex = Math.min(totalItems.value - 1, activeIndex.value + 1)
+      console.log('Arrow Right - changing from', activeIndex.value, 'to', newIndex, 'totalItems:', totalItems.value)
+      scrollToItem(newIndex)
     }
   }
 
   const scrollToItem = (index: number) => {
     if (!containerRef.value) return
 
+    if (scrollTimeout.value) {
+      clearTimeout(scrollTimeout.value)
+    }
+
+    navigationLock.value = true
+    isManualScroll.value = true
+    activeIndex.value = index
+    console.log('scrollToItem - activeIndex set to:', index)
+
     const items = containerRef.value.querySelectorAll(itemSelector)
     const targetItem = items[index] as HTMLElement
 
     if (targetItem) {
-      targetItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
-      activeIndex.value = index
+      const containerRect = containerRef.value.getBoundingClientRect()
+      const itemRect = targetItem.getBoundingClientRect()
+      const scrollLeft = containerRef.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) / 2
+
+      containerRef.value.scrollTo({
+        left: scrollLeft,
+        behavior: 'smooth'
+      })
+
+      scrollTimeout.value = window.setTimeout(() => {
+        navigationLock.value = false
+        isManualScroll.value = false
+        console.log('navigationLock released, activeIndex:', activeIndex.value)
+      }, 1500)
     }
   }
 
@@ -102,11 +137,16 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
   }
 
   const setupScrollListeners = () => {
-    if (!containerRef.value) return
+    if (!containerRef.value) {
+      console.warn('setupScrollListeners - containerRef is null!')
+      return
+    }
 
+    console.log('setupScrollListeners - adding event listeners')
     containerRef.value.addEventListener('wheel', handleWheel, { passive: false })
     containerRef.value.addEventListener('scroll', handleScroll)
     document.addEventListener('keydown', handleKeyDown)
+    console.log('setupScrollListeners - keydown listener added to document')
   }
 
   const cleanupScrollListeners = () => {
@@ -120,6 +160,7 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
   return {
     scrollTimeout,
     isManualScroll,
+    navigationLock,
     handleWheel,
     handleScroll,
     updateActiveFromScroll,

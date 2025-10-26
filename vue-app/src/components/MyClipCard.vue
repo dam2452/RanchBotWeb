@@ -78,11 +78,10 @@ const handleVideoError = (event: Event) => {
       </ClipActionButton>
 
       <ClipActionButton
-        v-if="!hasError"
         variant="danger"
         position="bottom-right"
         size="small"
-        class="action-button"
+        :class="['action-button', { 'error-delete-button': hasError }]"
         @click="handleDelete"
       >
         Delete
@@ -110,8 +109,8 @@ const handleVideoError = (event: Event) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   border-radius: 16px;
+  transition: all 0.3s;
 }
 
 .clip-video {
@@ -125,8 +124,7 @@ const handleVideoError = (event: Event) => {
 }
 
 .clip-video.active {
-  border: 3px solid #f2a94c;
-  box-shadow: 0 0 20px rgba(242, 169, 76, 0.6);
+  box-shadow: 0 0 0 3px #f2a94c, 0 0 20px rgba(242, 169, 76, 0.6);
 }
 
 .error-placeholder {
@@ -158,6 +156,15 @@ const handleVideoError = (event: Event) => {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s;
+}
+
+.error-delete-button {
+  opacity: 0.9 !important;
+  pointer-events: auto !important;
+}
+
+.error-delete-button:hover {
+  opacity: 1 !important;
 }
 
 .video-container:hover .action-button {

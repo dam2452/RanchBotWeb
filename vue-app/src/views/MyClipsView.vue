@@ -21,25 +21,74 @@ const clipsPerPage = 6
 
 const totalPages = computed(() => Math.ceil(clips.value.length / clipsPerPage))
 
-const { setupScrollListeners, cleanupScrollListeners, handleItemClick } = useHorizontalScroll({
+const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTimeout, isManualScroll } = useHorizontalScroll({
   containerRef: pageReel,
   activeIndex: activePage,
   totalItems: totalPages,
   itemSelector: '.page-item'
 })
 
+const handleKeyDown = (e: KeyboardEvent) => {
+  if (e.key === 'ArrowLeft') {
+    e.preventDefault()
+    e.stopPropagation()
+    const newIndex = Math.max(0, activePage.value - 1)
+    scrollToPage(newIndex)
+  } else if (e.key === 'ArrowRight') {
+    e.preventDefault()
+    e.stopPropagation()
+    const newIndex = Math.min(totalPages.value - 1, activePage.value + 1)
+    scrollToPage(newIndex)
+  }
+}
+
 onMounted(async () => {
   await loadClips()
   await nextTick()
-  setupScrollListeners()
+  if (clips.value.length > 0) {
+    setupScrollListeners()
+    await nextTick()
+    document.addEventListener('keydown', handleKeyDown, { capture: true })
+    scrollToPage(0)
+  }
 })
 
 onUnmounted(() => {
   cleanupScrollListeners()
+  document.removeEventListener('keydown', handleKeyDown, { capture: true } as any)
+  if (scrollTimeout.value) {
+    clearTimeout(scrollTimeout.value)
+  }
 })
 
+const scrollToPage = (index: number) => {
+  if (!pageReel.value) return
+
+  if (scrollTimeout.value) {
+    clearTimeout(scrollTimeout.value)
+  }
+
+  isManualScroll.value = true
+  activePage.value = index
+
+  const items = pageReel.value.querySelectorAll('.page-item')
+  const targetItem = items[index] as HTMLElement
+
+  if (targetItem) {
+    targetItem.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center'
+    })
+
+    scrollTimeout.value = window.setTimeout(() => {
+      isManualScroll.value = false
+    }, 300)
+  }
+}
+
 const handlePageClick = (pageIndex: number, event?: MouseEvent) => {
-  handleItemClick(pageIndex, event)
+  scrollToPage(pageIndex)
 }
 
 const loadClips = async () => {

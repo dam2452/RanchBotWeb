@@ -26,23 +26,25 @@ const goToForgotPassword = () => {
 
 <style scoped>
 .action-buttons {
-  margin-top: 0.625rem;
+  margin-top: 0.3rem;
   display: flex;
   gap: 1.25rem;
   width: 100%;
+  max-width: 100%;
   justify-content: center;
+  box-sizing: border-box;
 }
 
 .action-button {
-  padding: 2.25rem;
+  padding: clamp(1rem, 1.5vw, 1.6rem);
   border: none;
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
   white-space: nowrap;
   flex-grow: 1;
-  max-width: 520px;
-  font-size: clamp(44px, 1.7vw, 46px);
+  max-width: clamp(260px, 30vw, 360px);
+  font-size: clamp(20px, 1.5vw, 28px);
   background: linear-gradient(to bottom right, #4CAF50, #45a049);
   color: #fff;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
@@ -59,19 +61,27 @@ const goToForgotPassword = () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+@media (max-width: 1100px) and (min-width: 850px) {
+  .action-button {
+    max-width: clamp(220px, 40vw, 300px);
+    font-size: clamp(18px, 2vw, 24px);
+    padding: clamp(0.8rem, 1.3vw, 1.3rem);
+  }
+}
+
 @media (max-width: 849px) {
   .action-buttons {
     flex-direction: column;
     gap: 0.9375rem;
-    width: 80%;
-    margin-top: 1.25rem;
+    width: 100%;
+    margin-top: 0.3rem;
   }
 
   .action-button {
     flex-basis: 0;
-    padding: 1.375rem;
-    font-size: clamp(30px, 5.5vw, 37px);
-    min-width: 140px;
+    padding: clamp(1rem, 3vw, 1.17rem);
+    font-size: clamp(26px, 4.7vw, 31px);
+    min-width: 119px;
     max-width: none;
   }
 }

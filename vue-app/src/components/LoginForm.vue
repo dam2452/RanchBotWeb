@@ -25,12 +25,13 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <div class="bench-container" style="position: relative; aspect-ratio: 1/1;">
-    <img
-      src="/images/others/bench.svg"
-      alt="Bench Graphic"
-      class="w-full h-auto block"
-    />
+  <div class="bench-wrapper">
+    <div class="bench-container" style="position: relative; aspect-ratio: 1/1;">
+      <img
+        src="/images/others/bench.svg"
+        alt="Bench Graphic"
+        class="w-full h-auto block"
+      />
 
     <form class="form-overlay" @submit.prevent="handleSubmit">
       <!-- Error Message -->
@@ -71,23 +72,39 @@ const handleSubmit = () => {
         {{ loading ? 'Logging in...' : 'Login' }}
       </button>
     </form>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.bench-wrapper {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
 .bench-container {
-  width: clamp(280px, 40vw, 900px);
+  width: clamp(416px, 42vw, 754px);
+  max-width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .bench-container {
+    width: clamp(390px, 52vw, 650px);
+  }
 }
 
 @media (max-width: 850px) {
   .bench-container {
-    width: clamp(250px, 70vw, 350px);
+    width: clamp(320px, 65vw, 480px);
   }
 }
 
 @media (max-width: 600px) {
   .bench-container {
-    width: clamp(220px, 80vw, 300px);
+    width: clamp(266px, 98vw, 363px);
   }
 }
 

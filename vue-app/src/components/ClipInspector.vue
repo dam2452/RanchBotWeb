@@ -14,60 +14,153 @@ const emit = defineEmits<{
 }>()
 
 const video = ref<HTMLVideoElement | null>(null)
-const leftSlider = ref(0)
-const rightSlider = ref(100)
+const leftAdjust = ref(0)
+const rightAdjust = ref(0)
 const duration = ref(0)
-const status = ref('Adjust the sliders to trim your clip')
+const status = ref('Adjust the sliders to extend or trim your clip')
 const isDownloading = ref(false)
 const showSaveForm = ref(false)
 const clipName = ref('')
-
-const leftTime = () => (leftSlider.value / 100) * duration.value
-const rightTime = () => (rightSlider.value / 100) * duration.value
+const isUpdatingPreview = ref(false)
+const currentPreviewUrl = ref<string | null>(null)
+const originalUrl = ref('')
+const previewTimeout = ref<number | null>(null)
 
 watch(() => props.visible, (newVal) => {
-  if (newVal && video.value) {
-    video.value.currentTime = leftTime()
-    video.value.play().catch(() => {})
+  if (newVal) {
+    leftAdjust.value = 0
+    rightAdjust.value = 0
+    originalUrl.value = props.clipUrl
+    if (video.value) {
+      video.value.src = props.clipUrl
+      video.value.load()
+      video.value.play().catch(() => {})
+    }
+  } else {
+    cleanupPreview()
   }
 })
 
-watch([leftSlider, rightSlider], () => {
-  if (video.value) {
-    video.value.currentTime = leftTime()
-    status.value = `Trimmed: ${leftTime().toFixed(2)}s - ${rightTime().toFixed(2)}s`
+watch([leftAdjust, rightAdjust], () => {
+  const left = leftAdjust.value
+  const right = rightAdjust.value
+  status.value = `Left: ${left >= 0 ? '+' : ''}${left.toFixed(1)}s | Right: ${right >= 0 ? '+' : ''}${right.toFixed(1)}s`
+
+  if (previewTimeout.value) {
+    clearTimeout(previewTimeout.value)
   }
+
+  previewTimeout.value = window.setTimeout(() => {
+    updatePreview()
+  }, 1000)
 })
 
 const handleLoadedMetadata = () => {
   if (video.value) {
     duration.value = video.value.duration
-    status.value = `Duration: ${duration.value.toFixed(2)}s - Adjust sliders to trim`
+    status.value = `Duration: ${duration.value.toFixed(2)}s - Adjust sliders to extend/trim`
   }
 }
 
-const handleTimeUpdate = () => {
-  if (video.value && video.value.currentTime >= rightTime()) {
-    video.value.currentTime = leftTime()
+const updatePreview = async () => {
+  if (isUpdatingPreview.value) return
+
+  const left = leftAdjust.value
+  const right = rightAdjust.value
+
+  if (left === 0 && right === 0) {
+    if (currentPreviewUrl.value) {
+      URL.revokeObjectURL(currentPreviewUrl.value)
+      currentPreviewUrl.value = null
+    }
+    if (video.value) {
+      video.value.src = originalUrl.value
+      video.value.load()
+    }
+    return
   }
+
+  try {
+    isUpdatingPreview.value = true
+    status.value = 'Updating preview...'
+
+    const blob = await apiService.adjustVideo(
+      (props.clipIndex + 1).toString(),
+      left,
+      right
+    )
+
+    const oldUrl = currentPreviewUrl.value
+    const newUrl = URL.createObjectURL(blob)
+    currentPreviewUrl.value = newUrl
+
+    if (video.value) {
+      const currentTime = video.value.currentTime
+      const wasPlaying = !video.value.paused
+
+      video.value.src = newUrl
+      video.value.load()
+
+      video.value.onloadeddata = () => {
+        if (video.value) {
+          video.value.currentTime = currentTime
+          if (wasPlaying) {
+            video.value.play().catch(() => {})
+          }
+        }
+      }
+    }
+
+    if (oldUrl) {
+      URL.revokeObjectURL(oldUrl)
+    }
+
+    status.value = `Left: ${left >= 0 ? '+' : ''}${left.toFixed(1)}s | Right: ${right >= 0 ? '+' : ''}${right.toFixed(1)}s`
+  } catch (err: any) {
+    status.value = 'Preview failed: ' + err.message
+    console.error('Preview update failed:', err)
+  } finally {
+    isUpdatingPreview.value = false
+  }
+}
+
+const cleanupPreview = () => {
+  if (previewTimeout.value) {
+    clearTimeout(previewTimeout.value)
+    previewTimeout.value = null
+  }
+  if (currentPreviewUrl.value) {
+    URL.revokeObjectURL(currentPreviewUrl.value)
+    currentPreviewUrl.value = null
+  }
+  isUpdatingPreview.value = false
 }
 
 const handleDownloadAdjusted = async () => {
   try {
     isDownloading.value = true
-    status.value = 'Preparing adjusted clip...'
+    status.value = 'Preparing download...'
 
-    const response = await apiService.adjustClip({
-      clipId: props.clipIndex + 1,
-      leftAdjust: leftSlider.value,
-      rightAdjust: 100 - rightSlider.value
-    })
+    let blob: Blob
+    let filename: string
 
-    const blob = await response.blob()
+    if (leftAdjust.value === 0 && rightAdjust.value === 0) {
+      blob = await apiService.getVideo((props.clipIndex + 1).toString())
+      filename = `clip_${props.clipIndex + 1}.mp4`
+    } else {
+      blob = await apiService.adjustVideo(
+        (props.clipIndex + 1).toString(),
+        leftAdjust.value,
+        rightAdjust.value
+      )
+      const formatAdjust = (val: number) => val >= 0 ? `+${val.toFixed(1)}` : `${val.toFixed(1)}`
+      filename = `clip_${props.clipIndex + 1}_L${formatAdjust(leftAdjust.value)}_R${formatAdjust(rightAdjust.value)}.mp4`
+    }
+
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `adjusted_clip_${props.clipIndex + 1}.mp4`
+    a.download = filename
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -76,7 +169,7 @@ const handleDownloadAdjusted = async () => {
     status.value = 'Download complete!'
   } catch (err: any) {
     status.value = 'Download failed: ' + err.message
-    console.error('Adjust download failed:', err)
+    console.error('Download failed:', err)
   } finally {
     isDownloading.value = false
   }
@@ -91,16 +184,23 @@ const handleSaveClip = async () => {
   try {
     status.value = 'Saving clip...'
 
-    await apiService.saveAdjustedClip({
-      clipId: props.clipIndex + 1,
-      clipName: clipName.value,
-      leftAdjust: leftSlider.value,
-      rightAdjust: 100 - rightSlider.value
-    })
+    if (leftAdjust.value !== 0 || rightAdjust.value !== 0) {
+      await apiService.saveAdjustedClip({
+        clipId: props.clipIndex + 1,
+        clipName: clipName.value,
+        leftAdjust: leftAdjust.value,
+        rightAdjust: rightAdjust.value
+      })
+    } else {
+      await apiService.saveClip(clipName.value)
+    }
 
     status.value = 'Clip saved successfully!'
     showSaveForm.value = false
     clipName.value = ''
+    setTimeout(() => {
+      emit('close')
+    }, 1000)
   } catch (err: any) {
     status.value = 'Save failed: ' + err.message
     console.error('Save clip failed:', err)
@@ -119,6 +219,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
+  cleanupPreview()
 })
 </script>
 
@@ -145,36 +246,38 @@ onUnmounted(() => {
                 :src="clipUrl"
                 class="w-full h-auto rounded-lg shadow-lg"
                 loop
+                muted
                 @loadedmetadata="handleLoadedMetadata"
-                @timeupdate="handleTimeUpdate"
               ></video>
             </div>
 
             <div class="space-y-6">
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                  Trim Start: {{ leftTime().toFixed(2) }}s
+                  Left side ({{ leftAdjust >= 0 ? '+' : '' }}{{ leftAdjust.toFixed(1) }}s)
+                  <span class="text-xs text-gray-500 ml-2">+ extend, - trim</span>
                 </label>
                 <input
-                  v-model.number="leftSlider"
+                  v-model.number="leftAdjust"
                   type="range"
-                  min="0"
-                  :max="rightSlider - 1"
-                  step="0.1"
+                  min="-10"
+                  max="10"
+                  step="0.5"
                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-accent"
                 />
               </div>
 
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                  Trim End: {{ rightTime().toFixed(2) }}s
+                  Right side ({{ rightAdjust >= 0 ? '+' : '' }}{{ rightAdjust.toFixed(1) }}s)
+                  <span class="text-xs text-gray-500 ml-2">+ extend, - trim</span>
                 </label>
                 <input
-                  v-model.number="rightSlider"
+                  v-model.number="rightAdjust"
                   type="range"
-                  :min="leftSlider + 1"
-                  max="100"
-                  step="0.1"
+                  min="-10"
+                  max="10"
+                  step="0.5"
                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-accent"
                 />
               </div>

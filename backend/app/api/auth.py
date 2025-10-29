@@ -19,7 +19,6 @@ async def login(
     """Login user and create session"""
     try:
         print(f"Attempting login for user: {login}")
-        # Authenticate with RanchBot API
         auth_response = await api_client.authenticate(login, password)
         print(f"Auth response: {auth_response}")
 
@@ -31,7 +30,6 @@ async def login(
 
         token = auth_response["access_token"]
 
-        # Decode JWT to get user info (simple base64 decode, not verification)
         try:
             jwt_parts = token.split('.')
             if len(jwt_parts) >= 2:
@@ -45,7 +43,6 @@ async def login(
             user_id = 0
             username = login
 
-        # Create session
         user_session = UserSession(
             user_id=user_id,
             username=username,
@@ -57,7 +54,6 @@ async def login(
             max_age=settings.session_max_age
         )
 
-        # Set session cookie
         response.set_cookie(
             key="session_id",
             value=session_id,
@@ -83,10 +79,65 @@ async def login(
 
         error_msg = str(e)
         if "Rate limit" in error_msg or "Too many" in error_msg:
-            raise HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail=error_msg
-            )
+            print(f"Rate limit detected, attempting to logout all sessions for user: {login}")
+            try:
+                await api_client.logout_all_sessions(login, password)
+                print(f"Successfully logged out all sessions, retrying login")
+                auth_response = await api_client.authenticate(login, password)
+
+                if not auth_response or "access_token" not in auth_response:
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Invalid credentials"
+                    )
+
+                token = auth_response["access_token"]
+
+                try:
+                    jwt_parts = token.split('.')
+                    if len(jwt_parts) >= 2:
+                        payload = json.loads(base64.b64decode(jwt_parts[1] + '=='))
+                        user_id = payload.get('user_id', 0)
+                        username = payload.get('username', login)
+                    else:
+                        user_id = 0
+                        username = login
+                except Exception:
+                    user_id = 0
+                    username = login
+
+                user_session = UserSession(
+                    user_id=user_id,
+                    username=username,
+                    jwt_token=token
+                )
+
+                session_id = session_store.create_session(
+                    user_session,
+                    max_age=settings.session_max_age
+                )
+
+                response.set_cookie(
+                    key="session_id",
+                    value=session_id,
+                    max_age=settings.session_max_age,
+                    httponly=True,
+                    samesite="lax"
+                )
+
+                return {
+                    "status": "success",
+                    "user": {
+                        "id": user_id,
+                        "username": username
+                    }
+                }
+            except Exception as retry_error:
+                print(f"Retry login failed: {retry_error}")
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail="Failed to login after clearing sessions"
+                )
 
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

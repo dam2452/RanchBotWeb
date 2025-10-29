@@ -7,6 +7,7 @@ interface Props {
   videoUrl?: string
   hasError: boolean
   isActive: boolean
+  isLastLoaded?: boolean
 }
 
 interface Emits {
@@ -41,10 +42,11 @@ const handleLoaded = (event: Event) => {
     class="reel-item snap-center transition-all duration-300 flex-shrink-0 opacity-50 scale-85 w-auto h-[55vh] min-w-auto max-w-none mx-5 p-0 relative flex items-center justify-center cursor-pointer rounded-[32px] z-[1] max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
     :class="{
       'active z-[50] opacity-100 scale-100': isActive,
+      'last-loaded z-[10] !opacity-75 !scale-90': isLastLoaded && !isActive,
       'clip-loaded': videoUrl || hasError,
       'clip-loading': !videoUrl && !hasError
     }"
-    :style="isActive ? 'box-shadow: 0 0 32px rgba(242, 169, 76, 0.8); border-radius: 32px;' : 'border-radius: 32px;'"
+    :style="isActive ? 'box-shadow: 0 0 32px rgba(242, 169, 76, 0.8); border-radius: 32px;' : (isLastLoaded && !isActive ? 'box-shadow: 0 0 16px rgba(242, 169, 76, 0.4); border-radius: 32px;' : 'border-radius: 32px;')"
     :data-idx="index"
     @click="handleClick"
   >

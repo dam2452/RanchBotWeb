@@ -17,9 +17,10 @@ const activeClipId = ref<string | null>(null)
 const pageReel = ref<HTMLElement | null>(null)
 const clipErrors = ref<{ [key: string]: boolean }>({})
 
-const clipsPerPage = 6
+const isMobile = computed(() => window.innerWidth <= 850)
+const clipsPerPage = computed(() => isMobile.value ? 3 : 6)
 
-const totalPages = computed(() => Math.ceil(clips.value.length / clipsPerPage))
+const totalPages = computed(() => Math.ceil(clips.value.length / clipsPerPage.value))
 
 const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTimeout, isManualScroll } = useHorizontalScroll({
   containerRef: pageReel,
@@ -29,12 +30,12 @@ const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTim
 })
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  if (e.key === 'ArrowLeft') {
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
     e.preventDefault()
     e.stopPropagation()
     const newIndex = Math.max(0, activePage.value - 1)
     scrollToPage(newIndex)
-  } else if (e.key === 'ArrowRight') {
+  } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
     e.preventDefault()
     e.stopPropagation()
     const newIndex = Math.min(totalPages.value - 1, activePage.value + 1)

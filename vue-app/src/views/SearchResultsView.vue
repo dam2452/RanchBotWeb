@@ -42,7 +42,8 @@ const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTim
   containerRef: videoReel,
   activeIndex,
   totalItems: totalClips,
-  itemSelector: '.reel-item'
+  itemSelector: '.reel-item',
+  isLastItem: (index: number) => index === loadedClips.value - 1 && loadedClips.value < results.value.length
 })
 
 let loadMoreObserver: IntersectionObserver | null = null
@@ -234,12 +235,34 @@ const scrollToClip = (index: number) => {
   if (targetItem) {
     const containerRect = videoReel.value.getBoundingClientRect()
     const itemRect = targetItem.getBoundingClientRect()
-    const scrollLeft = videoReel.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) / 2
+    const isMobile = window.innerWidth <= 850
+    const isLastLoaded = index === loadedClips.value - 1 && loadedClips.value < results.value.length
 
-    videoReel.value.scrollTo({
-      left: scrollLeft,
-      behavior: 'smooth'
-    })
+    if (isMobile) {
+      let scrollTop
+      if (isLastLoaded) {
+        scrollTop = videoReel.value.scrollTop + (itemRect.top - containerRect.top) - 50
+      } else {
+        scrollTop = videoReel.value.scrollTop + (itemRect.top - containerRect.top) - (containerRect.height - itemRect.height) / 2
+      }
+
+      videoReel.value.scrollTo({
+        top: scrollTop,
+        behavior: 'smooth'
+      })
+    } else {
+      let scrollLeft
+      if (isLastLoaded) {
+        scrollLeft = videoReel.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) * 0.1
+      } else {
+        scrollLeft = videoReel.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) / 2
+      }
+
+      videoReel.value.scrollTo({
+        left: scrollLeft,
+        behavior: 'smooth'
+      })
+    }
 
     scrollTimeout.value = window.setTimeout(() => {
       isManualScroll.value = false
@@ -331,6 +354,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
         :video-url="videoCache[index]"
         :has-error="videoErrors[index] || false"
         :is-active="index === activeIndex"
+        :is-last-loaded="index === loadedClips - 1 && loadedClips < results.length"
         @click="handleClipClick"
         @adjust="handleAdjust"
         @download="handleDownload"

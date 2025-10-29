@@ -5,10 +5,11 @@ interface UseHorizontalScrollOptions {
   activeIndex: Ref<number>
   totalItems: Ref<number>
   itemSelector?: string
+  isLastItem?: (index: number) => boolean
 }
 
 export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
-  const { containerRef, activeIndex, totalItems, itemSelector = '.scroll-item' } = options
+  const { containerRef, activeIndex, totalItems, itemSelector = '.scroll-item', isLastItem } = options
 
   const scrollTimeout = ref<number | null>(null)
   const isManualScroll = ref(false)
@@ -19,7 +20,13 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
 
     if (Math.abs(event.deltaY) > 0) {
       event.preventDefault()
-      containerRef.value.scrollLeft += event.deltaY
+      const isMobile = window.innerWidth <= 850
+
+      if (isMobile) {
+        containerRef.value.scrollTop += event.deltaY
+      } else {
+        containerRef.value.scrollLeft += event.deltaY
+      }
     }
 
     if (scrollTimeout.value) {
@@ -49,7 +56,7 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
     if (!containerRef.value) return
 
     const container = containerRef.value
-    const containerCenter = container.scrollLeft + container.clientWidth / 2
+    const isMobile = window.innerWidth <= 850
     const items = container.querySelectorAll(itemSelector)
 
     let closestIndex = 0
@@ -57,12 +64,25 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
 
     items.forEach((item, index) => {
       const element = item as HTMLElement
-      const itemCenter = element.offsetLeft + element.offsetWidth / 2
-      const distance = Math.abs(containerCenter - itemCenter)
 
-      if (distance < closestDistance) {
-        closestDistance = distance
-        closestIndex = index
+      if (isMobile) {
+        const containerCenter = container.scrollTop + container.clientHeight / 2
+        const itemCenter = element.offsetTop + element.offsetHeight / 2
+        const distance = Math.abs(containerCenter - itemCenter)
+
+        if (distance < closestDistance) {
+          closestDistance = distance
+          closestIndex = index
+        }
+      } else {
+        const containerCenter = container.scrollLeft + container.clientWidth / 2
+        const itemCenter = element.offsetLeft + element.offsetWidth / 2
+        const distance = Math.abs(containerCenter - itemCenter)
+
+        if (distance < closestDistance) {
+          closestDistance = distance
+          closestIndex = index
+        }
       }
     })
 
@@ -74,21 +94,21 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
   const handleKeyDown = (e: KeyboardEvent) => {
     console.log('Key pressed:', e.key, 'Target:', e.target)
 
-    if (e.key === 'ArrowLeft') {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
       e.preventDefault()
       e.stopPropagation()
       const newIndex = Math.max(0, activeIndex.value - 1)
-      console.log('Arrow Left - changing from', activeIndex.value, 'to', newIndex, 'totalItems:', totalItems.value)
+      console.log('Arrow Left/Up - changing from', activeIndex.value, 'to', newIndex, 'totalItems:', totalItems.value)
       scrollToItem(newIndex)
-    } else if (e.key === 'ArrowRight') {
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       e.preventDefault()
       e.stopPropagation()
       if (activeIndex.value >= totalItems.value - 1) {
-        console.log('Arrow Right - already at last valid item')
+        console.log('Arrow Right/Down - already at last valid item')
         return
       }
       const newIndex = Math.min(totalItems.value - 1, activeIndex.value + 1)
-      console.log('Arrow Right - changing from', activeIndex.value, 'to', newIndex, 'totalItems:', totalItems.value)
+      console.log('Arrow Right/Down - changing from', activeIndex.value, 'to', newIndex, 'totalItems:', totalItems.value)
       scrollToItem(newIndex)
     }
   }
@@ -111,12 +131,34 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
     if (targetItem) {
       const containerRect = containerRef.value.getBoundingClientRect()
       const itemRect = targetItem.getBoundingClientRect()
-      const scrollLeft = containerRef.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) / 2
+      const isMobile = window.innerWidth <= 850
+      const isLast = isLastItem ? isLastItem(index) : false
 
-      containerRef.value.scrollTo({
-        left: scrollLeft,
-        behavior: 'smooth'
-      })
+      if (isMobile) {
+        let scrollTop
+        if (isLast) {
+          scrollTop = containerRef.value.scrollTop + (itemRect.top - containerRect.top) - 50
+        } else {
+          scrollTop = containerRef.value.scrollTop + (itemRect.top - containerRect.top) - (containerRect.height - itemRect.height) / 2
+        }
+
+        containerRef.value.scrollTo({
+          top: scrollTop,
+          behavior: 'smooth'
+        })
+      } else {
+        let scrollLeft
+        if (isLast) {
+          scrollLeft = containerRef.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) * 0.1
+        } else {
+          scrollLeft = containerRef.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) / 2
+        }
+
+        containerRef.value.scrollTo({
+          left: scrollLeft,
+          behavior: 'smooth'
+        })
+      }
 
       scrollTimeout.value = window.setTimeout(() => {
         navigationLock.value = false

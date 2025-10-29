@@ -55,7 +55,7 @@
   }
 
   .logo-header span {
-    font-size: 1.8rem;
+    display: none;
   }
 }
 </style>

@@ -45,6 +45,7 @@ const sizes = {
 }
 
 const handleClick = (event: MouseEvent) => {
+  event.stopPropagation()
   emit('click', event)
 }
 </script>

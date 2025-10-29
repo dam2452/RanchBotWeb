@@ -24,11 +24,13 @@ const handleClick = (event: MouseEvent) => {
   emit('click', props.index, event)
 }
 
-const handleAdjust = () => {
+const handleAdjust = (event: Event) => {
+  event.stopPropagation()
   emit('adjust', props.index)
 }
 
-const handleDownload = () => {
+const handleDownload = (event: Event) => {
+  event.stopPropagation()
   emit('download', props.index)
 }
 

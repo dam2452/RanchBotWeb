@@ -200,34 +200,43 @@ const handleVideoError = (event: Event) => {
 
 @media (max-width: 850px) {
   .clip-card {
-    gap: 0.2rem;
+    gap: 0.5rem;
+    height: auto;
   }
 
   .video-container {
-    border-radius: 8px;
+    border-radius: 16px;
+    min-height: 280px;
   }
 
   .clip-video {
-    border-radius: 8px;
+    border-radius: 16px;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .error-placeholder {
+    min-height: 280px;
+    height: 100%;
   }
 
   .clip-name {
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
   }
 
   .clip-name p {
-    font-size: 0.7rem;
+    font-size: 1rem;
   }
 
   .error-icon {
-    width: 2rem;
-    height: 2rem;
-    margin-bottom: 0.25rem;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 0.5rem;
   }
 
   .error-text {
-    font-size: 0.7rem;
+    font-size: 0.9rem;
   }
 }
 </style>

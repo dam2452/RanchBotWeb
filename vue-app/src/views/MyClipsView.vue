@@ -17,10 +17,15 @@ const activeClipId = ref<string | null>(null)
 const pageReel = ref<HTMLElement | null>(null)
 const clipErrors = ref<{ [key: string]: boolean }>({})
 
-const isMobile = computed(() => window.innerWidth <= 850)
+const windowWidth = ref(window.innerWidth)
+const isMobile = computed(() => windowWidth.value <= 850)
 const clipsPerPage = computed(() => isMobile.value ? 3 : 6)
 
 const totalPages = computed(() => Math.ceil(clips.value.length / clipsPerPage.value))
+
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth
+}
 
 const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTimeout, isManualScroll } = useHorizontalScroll({
   containerRef: pageReel,
@@ -44,6 +49,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
 }
 
 onMounted(async () => {
+  window.addEventListener('resize', updateWindowWidth)
   await loadClips()
   await nextTick()
   if (clips.value.length > 0) {
@@ -55,6 +61,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  window.removeEventListener('resize', updateWindowWidth)
   cleanupScrollListeners()
   document.removeEventListener('keydown', handleKeyDown, { capture: true } as any)
   if (scrollTimeout.value) {
@@ -78,8 +85,8 @@ const scrollToPage = (index: number) => {
   if (targetItem) {
     targetItem.scrollIntoView({
       behavior: 'smooth',
-      block: 'nearest',
-      inline: 'center'
+      block: isMobile.value ? 'center' : 'nearest',
+      inline: isMobile.value ? 'nearest' : 'center'
     })
 
     scrollTimeout.value = window.setTimeout(() => {
@@ -106,8 +113,8 @@ const loadClips = async () => {
 }
 
 const getClipsForPage = (pageIndex: number) => {
-  const start = pageIndex * clipsPerPage
-  const end = start + clipsPerPage
+  const start = pageIndex * clipsPerPage.value
+  const end = start + clipsPerPage.value
   return clips.value.slice(start, end)
 }
 
@@ -186,13 +193,13 @@ const handleVideoError = (clipId: string) => {
     <div
       v-else
       ref="pageReel"
-      class="page-reel flex w-full h-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+      class="page-reel flex w-full h-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden max-[850px]:flex-col max-[850px]:overflow-y-auto max-[850px]:overflow-x-hidden max-[850px]:snap-y"
     >
       <div
         v-for="pageIndex in totalPages"
         :key="`page-${pageIndex}`"
         :data-page-idx="pageIndex - 1"
-        class="page-item snap-center transition-all duration-300 flex-shrink-0 opacity-50 scale-90 w-auto h-full min-w-auto max-w-none mx-8 p-0 relative flex items-center justify-center cursor-pointer z-[1] max-[850px]:mx-4"
+        class="page-item snap-center transition-all duration-300 flex-shrink-0 opacity-50 scale-90 w-auto h-full min-w-auto max-w-none mx-8 p-0 relative flex items-center justify-center cursor-pointer z-[1] max-[850px]:mx-0 max-[850px]:my-4 max-[850px]:w-full max-[850px]:h-auto"
         :class="{ 'active-page z-[50] opacity-100 scale-100': activePage === pageIndex - 1 }"
         @click="handlePageClick(pageIndex - 1)"
       >
@@ -256,22 +263,27 @@ const handleVideoError = (clipId: string) => {
 }
 
 @media (max-width: 850px) {
+  .page-reel {
+    padding: 120px 0 80px 0;
+    align-items: flex-start;
+  }
+
   .clips-grid {
-    width: 85vw;
-    height: 40vh;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 0.3rem;
-    padding: 0.3rem;
+    width: 90vw;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    background: transparent;
+    backdrop-filter: none;
   }
 }
 
 @media (max-width: 600px) {
   .clips-grid {
     width: 90vw;
-    height: 38vh;
-    gap: 0.25rem;
-    padding: 0.25rem;
+    gap: 0.75rem;
   }
 }
 </style>

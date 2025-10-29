@@ -19,7 +19,7 @@ const clipErrors = ref<{ [key: string]: boolean }>({})
 
 const windowWidth = ref(window.innerWidth)
 const isMobile = computed(() => windowWidth.value <= 850)
-const clipsPerPage = computed(() => isMobile.value ? 3 : 6)
+const clipsPerPage = computed(() => isMobile.value ? 2 : 6)
 
 const totalPages = computed(() => Math.ceil(clips.value.length / clipsPerPage.value))
 
@@ -264,17 +264,17 @@ const handleVideoError = (clipId: string) => {
 
 @media (max-width: 850px) {
   .page-reel {
-    padding: 120px 0 80px 0;
+    padding: 140px 0 60px 0;
     align-items: flex-start;
   }
 
   .clips-grid {
-    width: 90vw;
+    width: 85vw;
     height: auto;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
+    gap: 1.5rem;
+    padding: 0;
     background: transparent;
     backdrop-filter: none;
   }
@@ -282,8 +282,8 @@ const handleVideoError = (clipId: string) => {
 
 @media (max-width: 600px) {
   .clips-grid {
-    width: 90vw;
-    gap: 0.75rem;
+    width: 85vw;
+    gap: 1.5rem;
   }
 }
 </style>

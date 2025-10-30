@@ -118,8 +118,7 @@ const getClipsForPage = (pageIndex: number) => {
   return clips.value.slice(start, end)
 }
 
-const handleDelete = async (clipName: string, event: Event) => {
-  event.stopPropagation()
+const handleDelete = async (clipName: string) => {
   if (!confirm(`Are you sure you want to delete the clip "${clipName}"?`)) {
     return
   }
@@ -132,8 +131,7 @@ const handleDelete = async (clipName: string, event: Event) => {
   }
 }
 
-const handleDownload = async (clip: Clip, event: Event) => {
-  event.stopPropagation()
+const handleDownload = async (clip: Clip) => {
   try {
     const a = document.createElement('a')
     a.href = apiService.getVideoUrl(clip.id)
@@ -212,8 +210,8 @@ const handleVideoError = (clipId: string) => {
             :is-active="activeClipId === clip.id"
             :has-error="!!clipErrors[clip.id]"
             @video-click="(e) => handleVideoClick(clip, e)"
-            @download="(e) => handleDownload(clip, e)"
-            @delete="(e) => handleDelete(clip.name, e)"
+            @download="handleDownload(clip)"
+            @delete="handleDelete(clip.name)"
             @video-error="handleVideoError(clip.id)"
           />
         </div>

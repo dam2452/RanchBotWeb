@@ -172,6 +172,8 @@ const handleFilters = () => {
 }
 
 const handleAdjust = (index: number) => {
+  if (inspectorVisible.value) return
+
   if (videoCache.value[index]) {
     inspectorClipIndex.value = index
     inspectorClipUrl.value = videoCache.value[index]

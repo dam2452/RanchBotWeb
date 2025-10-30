@@ -163,7 +163,7 @@ class ApiService {
   }): Promise<void> {
     await this.client.post('/api/json', {
       endpoint: 'z',
-      args: [params.clipName, params.clipId.toString(), params.leftAdjust.toString(), params.rightAdjust.toString()],
+      args: [params.clipName],
     })
   }
 

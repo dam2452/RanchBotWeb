@@ -26,15 +26,15 @@ const currentPreviewUrl = ref<string | null>(null)
 const originalUrl = ref('')
 const previewTimeout = ref<number | null>(null)
 
-watch(() => props.visible, (newVal) => {
+watch(() => props.visible, async (newVal) => {
   if (newVal) {
     leftAdjust.value = 0
     rightAdjust.value = 0
     originalUrl.value = props.clipUrl
     if (video.value) {
       video.value.src = props.clipUrl
-      video.value.load()
-      video.value.play().catch(() => {})
+      await video.value.load()
+      await video.value.play().catch(() => {})
     }
   } else {
     cleanupPreview()
@@ -224,119 +224,290 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Transition name="fade">
-    <div v-if="visible" class="fixed inset-0 z-[2000] flex items-center justify-center">
-      <div class="absolute inset-0 bg-black bg-opacity-70" @click="$emit('close')"></div>
+  <Teleport to="body">
+    <div v-if="visible" class="inspector-overlay">
+      <div class="inspector-backdrop" @click="$emit('close')"></div>
 
-      <div class="relative bg-white rounded-xl shadow-2xl max-w-4xl w-[90vw] max-h-[90vh] overflow-hidden z-10">
-        <div class="flex flex-col h-full max-h-[90vh]">
-          <div class="flex items-center justify-between p-4 border-b border-gray-200">
-            <h2 class="text-xl font-bold text-gray-800">Adjust Clip #{{ clipIndex + 1 }}</h2>
-            <button @click="$emit('close')" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
+      <div class="inspector-modal">
+        <div class="inspector-header">
+          <h3 class="inspector-title">Clip Adjustment</h3>
+          <button @click="$emit('close')" class="inspector-close">×</button>
+        </div>
+
+        <video
+          ref="video"
+          :src="clipUrl"
+          class="inspector-video"
+          controls
+          loop
+          muted
+          playsinline
+          autoplay
+          @loadedmetadata="handleLoadedMetadata"
+        ></video>
+
+        <div class="inspector-controls">
+          <div class="slider-group">
+            <label class="slider-label">
+              Left side <span class="slider-value">{{ leftAdjust >= 0 ? '+' : '' }}{{ leftAdjust.toFixed(1) }}s</span>
+            </label>
+            <input
+              v-model.number="leftAdjust"
+              type="range"
+              min="-10"
+              max="10"
+              step="0.5"
+              class="slider"
+            />
+          </div>
+
+          <div class="slider-group">
+            <label class="slider-label">
+              Right side <span class="slider-value">{{ rightAdjust >= 0 ? '+' : '' }}{{ rightAdjust.toFixed(1) }}s</span>
+            </label>
+            <input
+              v-model.number="rightAdjust"
+              type="range"
+              min="-10"
+              max="10"
+              step="0.5"
+              class="slider"
+            />
+          </div>
+
+          <div class="inspector-status">{{ status }}</div>
+
+          <div class="button-group">
+            <button
+              @click="handleDownloadAdjusted"
+              :disabled="isDownloading"
+              class="inspector-btn download-btn"
+            >
+              {{ isDownloading ? 'Downloading...' : 'Download' }}
+            </button>
+
+            <button
+              @click="showSaveForm = !showSaveForm"
+              class="inspector-btn save-btn"
+            >
+              {{ showSaveForm ? 'Cancel' : 'Save' }}
             </button>
           </div>
 
-          <div class="flex-1 overflow-y-auto p-6">
-            <div class="mb-6">
-              <video
-                ref="video"
-                :src="clipUrl"
-                class="w-full h-auto rounded-lg shadow-lg"
-                loop
-                muted
-                @loadedmetadata="handleLoadedMetadata"
-              ></video>
+          <Transition name="slide-down">
+            <div v-if="showSaveForm" class="save-form">
+              <input
+                v-model="clipName"
+                type="text"
+                placeholder="Enter clip name"
+                class="save-input"
+                @keypress.enter="handleSaveClip"
+              />
+              <button @click="handleSaveClip" class="inspector-btn save-btn">
+                Save Clip
+              </button>
             </div>
-
-            <div class="space-y-6">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                  Left side ({{ leftAdjust >= 0 ? '+' : '' }}{{ leftAdjust.toFixed(1) }}s)
-                  <span class="text-xs text-gray-500 ml-2">+ extend, - trim</span>
-                </label>
-                <input
-                  v-model.number="leftAdjust"
-                  type="range"
-                  min="-10"
-                  max="10"
-                  step="0.5"
-                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-accent"
-                />
-              </div>
-
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                  Right side ({{ rightAdjust >= 0 ? '+' : '' }}{{ rightAdjust.toFixed(1) }}s)
-                  <span class="text-xs text-gray-500 ml-2">+ extend, - trim</span>
-                </label>
-                <input
-                  v-model.number="rightAdjust"
-                  type="range"
-                  min="-10"
-                  max="10"
-                  step="0.5"
-                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-accent"
-                />
-              </div>
-
-              <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p class="text-sm text-blue-800 font-medium">{{ status }}</p>
-              </div>
-
-              <div class="flex gap-3">
-                <button
-                  @click="handleDownloadAdjusted"
-                  :disabled="isDownloading"
-                  class="flex-1 px-6 py-3 bg-gradient-action text-white font-semibold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-strong"
-                >
-                  {{ isDownloading ? 'Downloading...' : 'Download Adjusted' }}
-                </button>
-
-                <button
-                  @click="showSaveForm = !showSaveForm"
-                  class="flex-1 px-6 py-3 bg-gradient-primary text-white font-semibold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 shadow-strong"
-                >
-                  {{ showSaveForm ? 'Cancel Save' : 'Save to My Clips' }}
-                </button>
-              </div>
-
-              <Transition name="slide-down">
-                <div v-if="showSaveForm" class="space-y-3 pt-3 border-t border-gray-200">
-                  <input
-                    v-model="clipName"
-                    type="text"
-                    placeholder="Enter clip name"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                    @keypress.enter="handleSaveClip"
-                  />
-                  <button
-                    @click="handleSaveClip"
-                    class="w-full px-6 py-3 bg-gradient-primary text-white font-semibold rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 shadow-strong"
-                  >
-                    Save Clip
-                  </button>
-                </div>
-              </Transition>
-            </div>
-          </div>
+          </Transition>
         </div>
       </div>
     </div>
-  </Transition>
+  </Teleport>
 </template>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
+.inspector-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
 }
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+.inspector-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.inspector-modal {
+  position: relative;
+  z-index: 1000;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.inspector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f8f8;
+}
+
+.inspector-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.inspector-close {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.inspector-close:hover {
+  background: #d0d0d0;
+}
+
+.inspector-video {
+  width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  background: #000;
+}
+
+.inspector-controls {
+  padding: 12px;
+  background: #f0f0f0;
+  border-top: 1px solid #e0e0e0;
+}
+
+.slider-group {
+  margin-bottom: 12px;
+}
+
+.slider-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.slider-value {
+  color: #f2a94c;
+  font-weight: 600;
+}
+
+.slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #ddd;
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #f2a94c;
+  cursor: pointer;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #f2a94c;
+  cursor: pointer;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: none;
+}
+
+.inspector-status {
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.inspector-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.download-btn {
+  background: #f2a94c;
+  color: white;
+}
+
+.download-btn:hover {
+  background: #e09340;
+}
+
+.download-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.save-btn {
+  background: #4CAF50;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #45a049;
+}
+
+.save-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.save-input {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+}
+
+.save-input:focus {
+  border-color: #f2a94c;
 }
 
 .slide-down-enter-active,
@@ -350,23 +521,17 @@ onUnmounted(() => {
   transform: translateY(-10px);
 }
 
-input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  background: #ffb85c;
-  cursor: pointer;
-  border-radius: 50%;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
+@media (max-width: 640px) {
+  .inspector-modal {
+    max-width: 95vw;
+  }
 
-input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  background: #ffb85c;
-  cursor: pointer;
-  border-radius: 50%;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  border: none;
+  .inspector-video {
+    max-height: 50vh;
+  }
+
+  .inspector-controls {
+    padding: 10px;
+  }
 }
 </style>

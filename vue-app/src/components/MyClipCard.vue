@@ -11,8 +11,8 @@ interface Props {
 
 interface Emits {
   (e: 'video-click', event: Event): void
-  (e: 'download', event: Event): void
-  (e: 'delete', event: Event): void
+  (e: 'download'): void
+  (e: 'delete'): void
   (e: 'video-error'): void
 }
 
@@ -28,12 +28,12 @@ const handleVideoClick = (event: Event) => {
   }
 }
 
-const handleDownload = (event: Event) => {
-  emit('download', event)
+const handleDownload = () => {
+  emit('download')
 }
 
-const handleDelete = (event: Event) => {
-  emit('delete', event)
+const handleDelete = () => {
+  emit('delete')
 }
 
 const handleVideoError = (event: Event) => {

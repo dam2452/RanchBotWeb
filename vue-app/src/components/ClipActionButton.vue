@@ -7,15 +7,13 @@ interface Props {
   size?: 'small' | 'medium' | 'large'
 }
 
-interface Emits {
-  (e: 'click', event: MouseEvent): void
-}
-
 const props = withDefaults(defineProps<Props>(), {
   size: 'small'
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  click: []
+}>()
 
 const gradients = {
   primary: 'linear-gradient(145deg, #f2a94c, #e09340)',
@@ -46,7 +44,7 @@ const sizes = {
 
 const handleClick = (event: MouseEvent) => {
   event.stopPropagation()
-  emit('click', event)
+  emit('click')
 }
 </script>
 
@@ -55,7 +53,7 @@ const handleClick = (event: MouseEvent) => {
     :style="`background: ${gradients[variant]}; color: white; ${positionStyles}`"
     :class="[
       sizes[size],
-      'absolute border-none rounded-full font-medium leading-[1.4] z-[100] transition-all duration-200 shadow-[0_2px_5px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95'
+      'clip-action-btn absolute border-none rounded-full font-medium leading-[1.4] z-[100] transition-all duration-200 shadow-[0_2px_5px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95'
     ]"
     @click="handleClick"
   >

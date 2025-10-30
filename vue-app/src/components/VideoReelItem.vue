@@ -14,6 +14,7 @@ interface Emits {
   (e: 'click', index: number, event: MouseEvent): void
   (e: 'adjust', index: number): void
   (e: 'download', index: number): void
+  (e: 'save', index: number): void
   (e: 'loaded', event: Event, index: number): void
 }
 
@@ -30,6 +31,10 @@ const handleAdjust = () => {
 
 const handleDownload = () => {
   emit('download', props.index)
+}
+
+const handleSave = () => {
+  emit('save', props.index)
 }
 
 const handleLoaded = (event: Event) => {
@@ -95,6 +100,17 @@ const handleLoaded = (event: Event) => {
     >
       Download
     </ClipActionButton>
+
+    <ClipActionButton
+      v-if="videoUrl"
+      variant="success"
+      position="bottom-left"
+      size="large"
+      class="save-btn max-[850px]:!px-5 max-[850px]:!py-4 max-[850px]:!text-xs"
+      @click="handleSave"
+    >
+      Save
+    </ClipActionButton>
   </div>
 </template>
 
@@ -136,20 +152,23 @@ const handleLoaded = (event: Event) => {
 }
 
 .reel-item:not(.active) .adjust-btn,
-.reel-item:not(.active) .download-btn {
+.reel-item:not(.active) .download-btn,
+.reel-item:not(.active) .save-btn {
   opacity: 0;
   pointer-events: none;
 }
 
 .reel-item.active .adjust-btn,
-.reel-item.active .download-btn {
+.reel-item.active .download-btn,
+.reel-item.active .save-btn {
   opacity: 0.8;
   pointer-events: auto;
   cursor: pointer;
 }
 
 .reel-item.active .adjust-btn:hover,
-.reel-item.active .download-btn:hover {
+.reel-item.active .download-btn:hover,
+.reel-item.active .save-btn:hover {
   opacity: 1 !important;
 }
 </style>

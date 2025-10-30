@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 
 interface Props {
-  variant: 'primary' | 'secondary' | 'danger'
+  variant: 'primary' | 'secondary' | 'danger' | 'success'
   position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
   size?: 'small' | 'medium' | 'large'
 }
@@ -18,7 +18,8 @@ const emit = defineEmits<{
 const gradients = {
   primary: 'linear-gradient(145deg, #f2a94c, #e09340)',
   secondary: 'linear-gradient(145deg, #aaaaaa, #999999)',
-  danger: 'linear-gradient(145deg, #ef4444, #dc2626)'
+  danger: 'linear-gradient(145deg, #ef4444, #dc2626)',
+  success: 'linear-gradient(145deg, #1aa899, #159085)'
 }
 
 const positionStyles = computed(() => {

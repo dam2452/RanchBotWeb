@@ -365,7 +365,14 @@ watch(activeIndex, async (newIndex, oldIndex) => {
       No results found for "{{ query }}"
     </div>
 
-    <div v-else-if="videoCache[0] || videoErrors[0]" class="scroll-smooth snap-x snap-mandatory overflow-x-scroll overflow-y-hidden flex items-center h-screen w-screen fixed top-0 left-0 m-0 p-0 pt-[140px] max-[850px]:flex-col max-[850px]:overflow-y-scroll max-[850px]:overflow-x-hidden max-[850px]:snap-y max-[850px]:pt-[195px]" ref="videoReel">
+    <div
+      v-if="editingClipIndex !== null"
+      class="fixed inset-0 bg-black bg-opacity-30 z-[1050]"
+      style="pointer-events: auto;"
+      @click="closeEditor"
+    ></div>
+
+    <div v-if="videoCache[0] || videoErrors[0]" class="scroll-smooth snap-x snap-mandatory overflow-x-scroll overflow-y-hidden flex items-center h-screen w-screen fixed top-0 left-0 m-0 p-0 pt-[140px] max-[850px]:flex-col max-[850px]:overflow-y-scroll max-[850px]:overflow-x-hidden max-[850px]:snap-y max-[850px]:pt-[195px]" ref="videoReel">
       <VideoReelItem
         v-for="(result, index) in displayedResults"
         :key="index"

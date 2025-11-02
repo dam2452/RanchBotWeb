@@ -103,18 +103,23 @@ const handleSaveAdjusted = async () => {
 
 <template>
   <div
-    class="reel-item snap-center transition-all duration-500 flex-shrink-0 opacity-50 scale-85 w-auto min-w-auto max-w-none mx-5 p-0 relative flex items-center justify-center cursor-pointer rounded-[32px] z-[1] max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
+    class="reel-item snap-center transition-all duration-500 flex-shrink-0 opacity-50 scale-85 w-auto min-w-auto max-w-none mx-5 p-0 relative flex items-center justify-center rounded-[32px] z-[1] max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
     :class="{
       'active opacity-100 scale-100': (isActive && !isEditing) || isEditing,
       'z-[1001]': isActive && !isEditing,
-      'z-[1005]': isEditing,
+      'z-[1060]': isEditing,
+      'cursor-pointer': !isEditing,
       'last-loaded z-[10] !opacity-75 !scale-90': isLastLoaded && !isActive && !isEditing,
       'clip-loaded': videoUrl || hasError,
       'clip-loading': !videoUrl && !hasError,
       'h-[55vh]': !isEditing,
       'h-auto': isEditing
     }"
-    :style="isActive && !isEditing ? 'box-shadow: 0 0 32px rgba(242, 169, 76, 0.8); border-radius: 32px;' : (isLastLoaded && !isActive ? 'box-shadow: 0 0 16px rgba(242, 169, 76, 0.4); border-radius: 32px;' : 'border-radius: 32px;')"
+    :style="[
+      isActive && !isEditing ? 'box-shadow: 0 0 32px rgba(242, 169, 76, 0.8);' : (isLastLoaded && !isActive ? 'box-shadow: 0 0 16px rgba(242, 169, 76, 0.4);' : ''),
+      'border-radius: 32px;',
+      isEditing ? 'pointer-events: auto;' : ''
+    ].filter(s => s).join(' ')"
     :data-idx="index"
     @click="handleClick"
   >
@@ -268,8 +273,7 @@ const handleSaveAdjusted = async () => {
 
 .editing-wrapper {
   position: relative;
-  transform: translateY(-15vh) translateX(120px) scale(1.08);
-  z-index: 1001;
+  transform: translateY(-5vh) scale(1.08);
   filter: drop-shadow(0 0 50px rgba(242, 169, 76, 1));
 }
 
@@ -280,8 +284,11 @@ const handleSaveAdjusted = async () => {
   object-fit: contain;
   border-radius: 32px;
   display: block;
-  cursor: pointer;
   transition: all 0.5s ease;
+}
+
+.reel-item:not(.editing-wrapper) .clip-video {
+  cursor: pointer;
 }
 
 .editing-video {
@@ -299,5 +306,15 @@ const handleSaveAdjusted = async () => {
 .panel-slide-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+.reel-item[data-idx="0"]:not(.z-\[1006\]) {
+  margin-left: 80px;
+}
+
+@media (max-width: 850px) {
+  .reel-item[data-idx="0"]:not(.z-\[1006\]) {
+    margin-left: 0;
+  }
 }
 </style>

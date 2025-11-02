@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { apiService } from '@/services/api'
 import type { SearchResult } from '@/types'
 import UserButtons from '@/components/UserButtons.vue'
-import ClipInspector from '@/components/ClipInspector.vue'
 import SearchBar from '@/components/SearchBar.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import VideoReelItem from '@/components/VideoReelItem.vue'
@@ -26,9 +25,7 @@ const loadingClips = ref(false)
 const activeIndex = ref(0)
 const videoReel = ref<HTMLElement | null>(null)
 const loadMoreElement = ref<HTMLElement | null>(null)
-const inspectorVisible = ref(false)
-const inspectorClipIndex = ref(0)
-const inspectorClipUrl = ref('')
+const editingClipIndex = ref<number | null>(null)
 
 const totalClips = computed(() => {
   const hasLoadMore = loadedClips.value < results.value.length
@@ -172,17 +169,17 @@ const handleFilters = () => {
 }
 
 const handleAdjust = (index: number) => {
-  if (inspectorVisible.value) return
-
-  if (videoCache.value[index]) {
-    inspectorClipIndex.value = index
-    inspectorClipUrl.value = videoCache.value[index]
-    inspectorVisible.value = true
+  if (editingClipIndex.value === index) {
+    editingClipIndex.value = null
+  } else {
+    editingClipIndex.value = index
+    activeIndex.value = index
+    scrollToClip(index)
   }
 }
 
-const closeInspector = () => {
-  inspectorVisible.value = false
+const closeEditor = () => {
+  editingClipIndex.value = null
 }
 
 const handleDownload = async (index: number) => {
@@ -319,6 +316,10 @@ const onVideoLoaded = (event: Event, index: number) => {
 watch(activeIndex, async (newIndex, oldIndex) => {
   if (!videoReel.value) return
 
+  if (editingClipIndex.value !== null && editingClipIndex.value !== newIndex) {
+    editingClipIndex.value = null
+  }
+
   const items = videoReel.value.querySelectorAll('.reel-item video') as NodeListOf<HTMLVideoElement>
 
   items.forEach((video, index) => {
@@ -373,11 +374,13 @@ watch(activeIndex, async (newIndex, oldIndex) => {
         :has-error="videoErrors[index] || false"
         :is-active="index === activeIndex"
         :is-last-loaded="index === loadedClips - 1 && loadedClips < results.length"
+        :is-editing="index === editingClipIndex"
         @click="handleClipClick"
         @adjust="handleAdjust"
         @download="handleDownload"
         @save="handleSave"
         @loaded="onVideoLoaded"
+        @close-editor="closeEditor"
       />
 
       <div
@@ -418,12 +421,6 @@ watch(activeIndex, async (newIndex, oldIndex) => {
     </div>
   </main>
 
-  <ClipInspector
-    :clip-index="inspectorClipIndex"
-    :clip-url="inspectorClipUrl"
-    :visible="inspectorVisible"
-    @close="closeInspector"
-  />
 </template>
 
 <style scoped>

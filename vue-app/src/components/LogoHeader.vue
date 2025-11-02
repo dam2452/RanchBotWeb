@@ -13,7 +13,7 @@
   position: fixed;
   top: 2rem;
   left: 2rem;
-  z-index: 1001;
+  z-index: 1010;
   display: flex;
   align-items: center;
   gap: 2rem;

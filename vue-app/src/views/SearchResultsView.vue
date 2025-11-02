@@ -254,22 +254,15 @@ const closeEditor = () => {
 
 const handleDownload = async (index: number) => {
   try {
+    const { createClipFilename, downloadFile } = await import('@/utils/formatters')
+    const filename = createClipFilename(index, 0, 0, query.value)
+
     if (videoCache.value[index]) {
-      const a = document.createElement('a')
-      a.href = videoCache.value[index]
-      a.download = `ranchbot_clip_${index + 1}.mp4`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
+      downloadFile(videoCache.value[index], filename)
     } else {
       const blob = await apiService.getVideo((index + 1).toString())
       const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `ranchbot_clip_${index + 1}.mp4`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
+      downloadFile(url, filename)
       URL.revokeObjectURL(url)
     }
   } catch (err: any) {
@@ -460,6 +453,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
         :is-active="index === activeIndex"
         :is-last-loaded="index === loadedClips - 1 && loadedClips < results.length"
         :is-editing="index === editingClipIndex"
+        :search-query="query"
         @click="handleClipClick"
         @adjust="handleAdjust"
         @download="handleDownload"

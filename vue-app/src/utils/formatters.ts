@@ -6,15 +6,19 @@ export function formatAdjustmentValue(value: number): string {
 export function createClipFilename(
   clipIndex: number,
   leftAdjust?: number,
-  rightAdjust?: number
+  rightAdjust?: number,
+  searchQuery?: string
 ): string {
+  const sanitizedQuery = searchQuery ? searchQuery.replace(/[^a-zA-Z0-9]/g, '_') : ''
+  const queryPrefix = sanitizedQuery ? `${sanitizedQuery}_` : ''
+
   if (leftAdjust === undefined || rightAdjust === undefined || (leftAdjust === 0 && rightAdjust === 0)) {
-    return `clip_${clipIndex + 1}.mp4`
+    return `${queryPrefix}clip_${clipIndex + 1}.mp4`
   }
 
   const leftStr = formatAdjustmentValue(leftAdjust).replace('+', '').replace('s', '')
   const rightStr = formatAdjustmentValue(rightAdjust).replace('+', '').replace('s', '')
-  return `clip_${clipIndex + 1}_L${leftStr}_R${rightStr}.mp4`
+  return `${queryPrefix}clip_${clipIndex + 1}_L${leftStr}_R${rightStr}.mp4`
 }
 
 export function downloadFile(url: string, filename: string): void {

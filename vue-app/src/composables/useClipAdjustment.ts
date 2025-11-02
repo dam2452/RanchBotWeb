@@ -6,6 +6,7 @@ interface UseClipAdjustmentOptions {
   clipIndex: number
   originalVideoUrl: string | undefined
   isEditing: boolean
+  searchQuery?: string
 }
 
 export function useClipAdjustment(options: UseClipAdjustmentOptions) {
@@ -100,7 +101,7 @@ export function useClipAdjustment(options: UseClipAdjustmentOptions) {
             rightAdjust.value
           )
 
-      const filename = createClipFilename(options.clipIndex, leftAdjust.value, rightAdjust.value)
+      const filename = createClipFilename(options.clipIndex, leftAdjust.value, rightAdjust.value, options.searchQuery)
       const url = URL.createObjectURL(blob)
 
       downloadFile(url, filename)

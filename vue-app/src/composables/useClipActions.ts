@@ -1,29 +1,23 @@
 import { apiService } from '@/services/api'
+import { createClipFilename, downloadFile } from '@/utils/formatters'
 
 interface UseClipActionsOptions {
   clipIndex: number
   videoUrl: string | undefined
+  searchQuery?: string
 }
 
 export function useClipActions(options: UseClipActionsOptions) {
   const download = async () => {
     try {
+      const filename = createClipFilename(options.clipIndex, 0, 0, options.searchQuery)
+
       if (options.videoUrl) {
-        const a = document.createElement('a')
-        a.href = options.videoUrl
-        a.download = `ranchbot_clip_${options.clipIndex + 1}.mp4`
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
+        downloadFile(options.videoUrl, filename)
       } else {
         const blob = await apiService.getVideo((options.clipIndex + 1).toString())
         const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `ranchbot_clip_${options.clipIndex + 1}.mp4`
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
+        downloadFile(url, filename)
         URL.revokeObjectURL(url)
       }
     } catch (err: any) {

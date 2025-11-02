@@ -5,6 +5,7 @@ export interface ClipInfo {
   isActive: boolean
   isLastLoaded?: boolean
   isEditing?: boolean
+  searchQuery?: string
 }
 
 export interface ClipAdjustmentState {

@@ -35,12 +35,14 @@ const {
 } = useClipAdjustment({
   clipIndex: props.index,
   originalVideoUrl: props.videoUrl,
-  isEditing: props.isEditing || false
+  isEditing: props.isEditing || false,
+  searchQuery: props.searchQuery
 })
 
 const { download, save } = useClipActions({
   clipIndex: props.index,
-  videoUrl: props.videoUrl
+  videoUrl: props.videoUrl,
+  searchQuery: props.searchQuery
 })
 
 watch(() => props.isEditing, (editing, wasEditingBefore) => {

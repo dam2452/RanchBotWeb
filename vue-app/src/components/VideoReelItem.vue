@@ -142,7 +142,6 @@ const handleSaveAdjusted = async () => {
     >
       <video
         loop
-        muted
         playsinline
         preload="auto"
         :src="previewUrl || videoUrl"

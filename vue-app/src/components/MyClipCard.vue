@@ -57,7 +57,6 @@ const handleVideoError = (event: Event) => {
       <video
         v-if="!hasError"
         loop
-        muted
         playsinline
         :src="videoUrl"
         class="clip-video"

@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import type { Clip } from '@/types'
 import ClipActionButton from './ClipActionButton.vue'
+import ConfirmModal from './ConfirmModal.vue'
 
 interface Props {
   clip: Clip
@@ -22,6 +24,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
+const showDeleteConfirm = ref(false)
+
 const handleVideoClick = (event: Event) => {
   if (!props.hasError) {
     emit('video-click', event)
@@ -33,7 +37,20 @@ const handleDownload = () => {
 }
 
 const handleDelete = () => {
+  document.querySelectorAll('video').forEach((video) => {
+    video.pause()
+  })
+
+  showDeleteConfirm.value = true
+}
+
+const handleConfirmDelete = () => {
+  showDeleteConfirm.value = false
   emit('delete')
+}
+
+const handleCancelDelete = () => {
+  showDeleteConfirm.value = false
 }
 
 const handleVideoError = (event: Event) => {
@@ -99,6 +116,16 @@ const handleVideoError = (event: Event) => {
     <div class="clip-name">
       <p>{{ clip.name }}</p>
     </div>
+
+    <ConfirmModal
+      :show="showDeleteConfirm"
+      title="Delete Clip"
+      :message="`Are you sure you want to delete '${clip.name}'? This action cannot be undone.`"
+      confirm-text="Delete"
+      cancel-text="Cancel"
+      @confirm="handleConfirmDelete"
+      @close="handleCancelDelete"
+    />
   </div>
 </template>
 

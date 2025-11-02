@@ -177,7 +177,6 @@ const handleDownloadAdjusted = async () => {
 
 const handleSaveClip = async () => {
   if (!clipName.value.trim()) {
-    alert('Please enter a clip name')
     return
   }
 

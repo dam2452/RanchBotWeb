@@ -119,15 +119,11 @@ const getClipsForPage = (pageIndex: number) => {
 }
 
 const handleDelete = async (clipName: string) => {
-  if (!confirm(`Are you sure you want to delete the clip "${clipName}"?`)) {
-    return
-  }
-
   try {
     await apiService.deleteClip(clipName)
     clips.value = clips.value.filter((clip) => clip.name !== clipName)
   } catch (err: any) {
-    alert('Failed to delete clip: ' + err.message)
+    console.error('Failed to delete clip:', err)
   }
 }
 
@@ -140,7 +136,7 @@ const handleDownload = async (clip: Clip) => {
     a.click()
     document.body.removeChild(a)
   } catch (err: any) {
-    alert('Failed to download clip: ' + err.message)
+    console.error('Failed to download clip:', err)
   }
 }
 

@@ -267,23 +267,20 @@ const handleDownload = async (index: number) => {
     }
   } catch (err: any) {
     console.error('Download failed:', err)
-    alert('Download failed: ' + err.message)
   }
 }
 
 const handleSave = async (index: number) => {
   if (!query.value) {
-    alert('No search query to use as clip name')
+    console.error('No search query to use as clip name')
     return
   }
 
   try {
     await apiService.adjustVideo((index + 1).toString(), 0, 0)
     await apiService.saveClip(query.value)
-    alert(`Clip saved as "${query.value}"`)
   } catch (err: any) {
     console.error('Save failed:', err)
-    alert('Save failed: ' + err.message)
   }
 }
 

@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import LoadingSpinner from './LoadingSpinner.vue'
 import ClipActionButton from './ClipActionButton.vue'
 import ClipEditor from './ClipEditor.vue'
+import SaveClipModal from './SaveClipModal.vue'
 import { useClipAdjustment } from '@/composables/useClipAdjustment'
 import { useClipActions } from '@/composables/useClipActions'
 import type { ClipInfo } from '@/types/clip'
@@ -22,6 +23,8 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const wasEditing = ref(false)
+const showSaveModal = ref(false)
+const isAdjustedSave = ref(false)
 
 const {
   leftAdjust,
@@ -69,20 +72,17 @@ const handleDownload = async () => {
   try {
     await download()
   } catch (err: any) {
-    alert(err.message)
+    console.error('Download failed:', err)
   }
 }
 
 const handleSave = async () => {
-  const clipName = prompt('Enter clip name:')
-  if (!clipName) return
+  document.querySelectorAll('video').forEach((video) => {
+    video.pause()
+  })
 
-  try {
-    await save(clipName)
-    alert(`Clip saved as "${clipName}"`)
-  } catch (err: any) {
-    alert(err.message)
-  }
+  isAdjustedSave.value = false
+  showSaveModal.value = true
 }
 
 const handleLoaded = (event: Event) => {
@@ -99,15 +99,35 @@ const handleDownloadAdjusted = async () => {
 }
 
 const handleSaveAdjusted = async () => {
-  const clipName = prompt('Enter clip name:')
-  if (!clipName) return
+  document.querySelectorAll('video').forEach((video) => {
+    video.pause()
+  })
 
-  const success = await saveAdjusted(clipName)
-  if (success) {
-    setTimeout(() => {
-      handleCloseEditor()
-    }, 1500)
+  isAdjustedSave.value = true
+  showSaveModal.value = true
+}
+
+const handleModalSave = async (clipName: string) => {
+  showSaveModal.value = false
+
+  try {
+    if (isAdjustedSave.value) {
+      const success = await saveAdjusted(clipName)
+      if (success) {
+        setTimeout(() => {
+          handleCloseEditor()
+        }, 1500)
+      }
+    } else {
+      await save(clipName)
+    }
+  } catch (err: any) {
+    console.error('Save failed:', err)
   }
+}
+
+const handleModalClose = () => {
+  showSaveModal.value = false
 }
 </script>
 
@@ -212,6 +232,12 @@ const handleSaveAdjusted = async () => {
     >
       Save
     </ClipActionButton>
+
+    <SaveClipModal
+      :show="showSaveModal"
+      @close="handleModalClose"
+      @save="handleModalSave"
+    />
   </div>
 </template>
 

@@ -37,7 +37,16 @@ const handleDelete = () => {
 }
 
 const handleVideoError = (event: Event) => {
-  console.error('Video error for clip:', props.clip.id, 'URL:', props.videoUrl, event)
+  const videoElement = event.target as HTMLVideoElement
+  const error = videoElement.error
+
+  console.error('Video error for clip:', props.clip.id)
+  console.error('URL:', props.videoUrl)
+  console.error('Error code:', error?.code)
+  console.error('Error message:', error?.message)
+  console.error('Network state:', videoElement.networkState)
+  console.error('Ready state:', videoElement.readyState)
+
   emit('video-error')
 }
 </script>
@@ -63,15 +72,15 @@ const handleVideoError = (event: Event) => {
         <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
         </svg>
-        <p class="error-text">Clip unavailable</p>
+        <p class="error-text">Can't play in browser</p>
+        <p class="error-subtext">Try downloading</p>
       </div>
 
       <ClipActionButton
-        v-if="!hasError"
         variant="secondary"
         position="top-right"
         size="small"
-        class="action-button"
+        :class="['action-button', { 'error-download-button': hasError }]"
         @click="handleDownload"
       >
         Download
@@ -152,18 +161,26 @@ const handleVideoError = (event: Event) => {
   margin: 0;
 }
 
+.error-subtext {
+  color: #d1d5db;
+  font-size: 0.875rem;
+  margin: 0.5rem 0 0 0;
+}
+
 .action-button {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s;
 }
 
-.error-delete-button {
+.error-delete-button,
+.error-download-button {
   opacity: 0.9 !important;
   pointer-events: auto !important;
 }
 
-.error-delete-button:hover {
+.error-delete-button:hover,
+.error-download-button:hover {
   opacity: 1 !important;
 }
 

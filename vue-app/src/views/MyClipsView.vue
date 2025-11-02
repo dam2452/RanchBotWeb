@@ -134,7 +134,7 @@ const handleDelete = async (clipName: string) => {
 const handleDownload = async (clip: Clip) => {
   try {
     const a = document.createElement('a')
-    a.href = apiService.getVideoUrl(clip.id)
+    a.href = apiService.getVideoUrl(clip.name)
     a.download = `${clip.name}.mp4`
     document.body.appendChild(a)
     a.click()
@@ -144,8 +144,8 @@ const handleDownload = async (clip: Clip) => {
   }
 }
 
-const getVideoUrl = (clipId: string) => {
-  return apiService.getVideoUrl(clipId)
+const getVideoUrl = (clipName: string) => {
+  return apiService.getVideoUrl(clipName)
 }
 
 const handleVideoClick = (clip: Clip, event: Event) => {
@@ -206,7 +206,7 @@ const handleVideoError = (clipId: string) => {
             v-for="clip in getClipsForPage(pageIndex - 1)"
             :key="clip.id"
             :clip="clip"
-            :video-url="getVideoUrl(clip.id)"
+            :video-url="getVideoUrl(clip.name)"
             :is-active="activeClipId === clip.id"
             :has-error="!!clipErrors[clip.id]"
             @video-click="(e) => handleVideoClick(clip, e)"

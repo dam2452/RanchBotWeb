@@ -5,6 +5,7 @@ from app.core.dependencies import get_current_user
 from app.models.user import UserSession
 from app.models.clip import ClipCreate
 import io
+from urllib.parse import unquote, quote
 
 router = APIRouter(prefix="/clips", tags=["clips"])
 
@@ -36,22 +37,28 @@ async def get_clip_video(
 ):
     """Get video for a specific clip"""
     try:
-        # This calls the 'wys' endpoint with clip ID
+        decoded_clip_name = unquote(clip_id)
+        print(f"Fetching clip video: {decoded_clip_name}")
+
         video_data = await api_client.call_api_for_blob(
             endpoint="wys",
-            args=[clip_id],
+            args=[decoded_clip_name],
             token=user.jwt_token
         )
+
+        encoded_filename = quote(decoded_clip_name)
 
         return StreamingResponse(
             io.BytesIO(video_data),
             media_type="video/mp4",
             headers={
-                "Content-Disposition": f'inline; filename="clip_{clip_id}.mp4"',
+                "Content-Disposition": f"inline; filename*=UTF-8''{encoded_filename}.mp4",
                 "Content-Length": str(len(video_data)),
                 "Accept-Ranges": "bytes"
             }
         )
     except Exception as e:
-        print(f"Get clip video error: {e}")
+        print(f"Get clip video error for '{decoded_clip_name}': {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

@@ -11,7 +11,7 @@ interface UseClipAdjustmentOptions {
 export function useClipAdjustment(options: UseClipAdjustmentOptions) {
   const leftAdjust = ref(0)
   const rightAdjust = ref(0)
-  const statusMessage = ref('Adjust the sliders to extend or trim your clip')
+  const statusMessage = ref('Move sliders: negative values trim, positive extend')
   const isUpdatingPreview = ref(false)
   const previewUrl = ref<string | null>(null)
   const previewTimeout = ref<number | null>(null)
@@ -19,7 +19,7 @@ export function useClipAdjustment(options: UseClipAdjustmentOptions) {
   const resetAdjustments = () => {
     leftAdjust.value = 0
     rightAdjust.value = 0
-    statusMessage.value = 'Adjust the sliders to extend or trim your clip'
+    statusMessage.value = 'Move sliders: negative values trim, positive extend'
 
     if (previewUrl.value) {
       URL.revokeObjectURL(previewUrl.value)
@@ -75,7 +75,7 @@ export function useClipAdjustment(options: UseClipAdjustmentOptions) {
         URL.revokeObjectURL(previewUrl.value)
         previewUrl.value = null
       }
-      statusMessage.value = 'Adjust the sliders to extend or trim your clip'
+      statusMessage.value = 'Move sliders: negative values trim, positive extend'
       return
     }
 

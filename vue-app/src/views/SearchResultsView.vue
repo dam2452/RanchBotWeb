@@ -49,9 +49,70 @@ const displayedResults = computed(() => {
   return results.value.slice(0, loadedClips.value)
 })
 
+let keydownTimeout: number | null = null
+let canNavigate = true
+
+const handleKeydown = (event: KeyboardEvent) => {
+  if (!canNavigate) return
+
+  if (event.key === 'ArrowLeft') {
+    if (activeIndex.value > 0) {
+      scrollToClip(activeIndex.value - 1)
+      canNavigate = false
+      setTimeout(() => {
+        canNavigate = true
+      }, 1000)
+    }
+  } else if (event.key === 'ArrowRight') {
+    if (activeIndex.value < displayedResults.value.length - 1) {
+      scrollToClip(activeIndex.value + 1)
+      canNavigate = false
+      setTimeout(() => {
+        canNavigate = true
+      }, 1000)
+    } else if (activeIndex.value === displayedResults.value.length - 1 && loadedClips.value < results.value.length) {
+      scrollToClip(displayedResults.value.length)
+      canNavigate = false
+      setTimeout(() => {
+        canNavigate = true
+      }, 1000)
+    }
+  }
+}
+
+let wheelTimeout: number | null = null
+const handleWheel = (event: WheelEvent) => {
+  if (!videoReel.value) return
+
+  if (wheelTimeout) {
+    clearTimeout(wheelTimeout)
+  }
+
+  wheelTimeout = window.setTimeout(() => {
+    if (event.deltaY > 0) {
+      if (activeIndex.value < displayedResults.value.length - 1) {
+        scrollToClip(activeIndex.value + 1)
+      } else if (activeIndex.value === displayedResults.value.length - 1 && loadedClips.value < results.value.length) {
+        scrollToClip(displayedResults.value.length)
+      }
+    } else if (event.deltaY < 0) {
+      if (activeIndex.value > 0) {
+        scrollToClip(activeIndex.value - 1)
+      }
+    }
+  }, 50)
+}
+
 onMounted(async () => {
   query.value = (route.query.query as string) || ''
   await loadSearchResults()
+  window.addEventListener('keydown', handleKeydown)
+
+  nextTick(() => {
+    if (videoReel.value) {
+      videoReel.value.addEventListener('wheel', handleWheel, { passive: true })
+    }
+  })
 })
 
 const setupLoadMoreObserver = () => {
@@ -82,6 +143,15 @@ const setupLoadMoreObserver = () => {
 
 onUnmounted(() => {
   cleanupScrollListeners()
+  window.removeEventListener('keydown', handleKeydown)
+
+  if (videoReel.value) {
+    videoReel.value.removeEventListener('wheel', handleWheel)
+  }
+
+  if (wheelTimeout) {
+    clearTimeout(wheelTimeout)
+  }
 
   if (loadMoreObserver) {
     loadMoreObserver.disconnect()
@@ -285,6 +355,16 @@ const scrollToClip = (index: number) => {
   }
 }
 
+const handleReelClick = (event: MouseEvent) => {
+  if (editingClipIndex.value === null) return
+
+  const target = event.target as HTMLElement
+
+  if (!target.closest('.reel-item') || (!target.closest('.clip-video') && !target.closest('.edit-panel'))) {
+    closeEditor()
+  }
+}
+
 const handleClipClick = (index: number, event: MouseEvent) => {
   const target = event.target as HTMLElement
 
@@ -367,12 +447,10 @@ watch(activeIndex, async (newIndex, oldIndex) => {
 
     <div
       v-if="editingClipIndex !== null"
-      class="fixed inset-0 bg-black bg-opacity-30 z-[1050]"
-      style="pointer-events: auto;"
-      @click="closeEditor"
+      class="fixed inset-0 bg-black bg-opacity-30 z-[1] pointer-events-none"
     ></div>
 
-    <div v-if="videoCache[0] || videoErrors[0]" class="scroll-smooth snap-x snap-mandatory overflow-x-scroll overflow-y-hidden flex items-center h-screen w-screen fixed top-0 left-0 m-0 p-0 pt-[140px] max-[850px]:flex-col max-[850px]:overflow-y-scroll max-[850px]:overflow-x-hidden max-[850px]:snap-y max-[850px]:pt-[195px]" ref="videoReel">
+    <div v-if="videoCache[0] || videoErrors[0]" class="scroll-smooth snap-x snap-mandatory overflow-x-scroll overflow-y-hidden flex items-center h-screen w-screen fixed top-0 left-0 m-0 p-0 pt-[140px] max-[850px]:flex-col max-[850px]:overflow-y-scroll max-[850px]:overflow-x-hidden max-[850px]:snap-y max-[850px]:pt-[195px]" ref="videoReel" @click="handleReelClick">
       <VideoReelItem
         v-for="(result, index) in displayedResults"
         :key="index"

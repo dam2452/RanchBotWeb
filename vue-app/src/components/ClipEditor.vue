@@ -47,7 +47,7 @@ const formatValue = (value: number): string => {
     <div class="edit-controls">
       <div class="slider-group">
         <label class="slider-label">
-          Left side
+          <span>Left (- trim / + extend)</span>
           <span class="slider-value">{{ formatValue(leftAdjust) }}</span>
         </label>
         <input
@@ -57,13 +57,13 @@ const formatValue = (value: number): string => {
           max="10"
           step="0.5"
           class="slider"
-          aria-label="Adjust left side"
+          aria-label="Trim or extend left side"
         />
       </div>
 
       <div class="slider-group">
         <label class="slider-label">
-          Right side
+          <span>Right (- trim / + extend)</span>
           <span class="slider-value">{{ formatValue(rightAdjust) }}</span>
         </label>
         <input
@@ -73,7 +73,7 @@ const formatValue = (value: number): string => {
           max="10"
           step="0.5"
           class="slider"
-          aria-label="Adjust right side"
+          aria-label="Trim or extend right side"
         />
       </div>
 

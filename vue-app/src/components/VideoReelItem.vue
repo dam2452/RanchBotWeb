@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch } from 'vue'
+import { ref, watch } from 'vue'
 import LoadingSpinner from './LoadingSpinner.vue'
 import ClipActionButton from './ClipActionButton.vue'
 import ClipEditor from './ClipEditor.vue'
@@ -21,6 +21,8 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
+const wasEditing = ref(false)
+
 const {
   leftAdjust,
   rightAdjust,
@@ -41,9 +43,15 @@ const { download, save } = useClipActions({
   videoUrl: props.videoUrl
 })
 
-watch(() => props.isEditing, (editing) => {
+watch(() => props.isEditing, (editing, wasEditingBefore) => {
   if (editing) {
     resetAdjustments()
+    wasEditing.value = false
+  } else if (wasEditingBefore) {
+    wasEditing.value = true
+    setTimeout(() => {
+      wasEditing.value = false
+    }, 2000)
   }
 })
 
@@ -108,12 +116,14 @@ const handleSaveAdjusted = async () => {
       'active opacity-100 scale-100': (isActive && !isEditing) || isEditing,
       'z-[1001]': isActive && !isEditing,
       'z-[1060]': isEditing,
+      'was-editing': wasEditing,
       'cursor-pointer': !isEditing,
       'last-loaded z-[10] !opacity-75 !scale-90': isLastLoaded && !isActive && !isEditing,
       'clip-loaded': videoUrl || hasError,
       'clip-loading': !videoUrl && !hasError,
-      'h-[55vh]': !isEditing,
-      'h-auto': isEditing
+      'h-[50vh]': !isEditing,
+      'h-auto': isEditing,
+      'max-[850px]:h-auto': true
     }"
     :style="[
       isActive && !isEditing ? 'box-shadow: 0 0 32px rgba(242, 169, 76, 0.8);' : (isLastLoaded && !isActive ? 'box-shadow: 0 0 16px rgba(242, 169, 76, 0.4);' : ''),
@@ -244,16 +254,30 @@ const handleSaveAdjusted = async () => {
 .reel-item .adjust-btn,
 .reel-item .download-btn,
 .reel-item .save-btn {
-  opacity: 0.6;
-  pointer-events: auto;
+  opacity: 0;
+  pointer-events: none;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: opacity 0.3s ease;
 }
 
 .reel-item.active .adjust-btn,
 .reel-item.active .download-btn,
 .reel-item.active .save-btn {
   opacity: 0.8;
+  pointer-events: auto;
+}
+
+.reel-item.z-\[1060\] .adjust-btn,
+.reel-item.z-\[1060\] .download-btn,
+.reel-item.z-\[1060\] .save-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.reel-item.was-editing.active .adjust-btn,
+.reel-item.was-editing.active .download-btn,
+.reel-item.was-editing.active .save-btn {
+  transition: opacity 0.3s ease 1.6s;
 }
 
 .reel-item .adjust-btn:hover,
@@ -277,14 +301,27 @@ const handleSaveAdjusted = async () => {
   filter: drop-shadow(0 0 50px rgba(242, 169, 76, 1));
 }
 
+@media (max-width: 850px) {
+  .editing-wrapper {
+    transform: translateY(0.5vh) scale(1.08);
+  }
+}
+
 .clip-video {
   width: auto;
   height: auto;
-  max-height: 55vh;
+  max-height: 50vh;
   object-fit: contain;
   border-radius: 32px;
   display: block;
   transition: all 0.5s ease;
+}
+
+@media (max-width: 850px) {
+  .clip-video {
+    max-height: 60vh;
+    max-width: 90vw;
+  }
 }
 
 .reel-item:not(.editing-wrapper) .clip-video {
@@ -292,9 +329,15 @@ const handleSaveAdjusted = async () => {
 }
 
 .editing-video {
-  max-height: 52vh;
+  max-height: 48vh;
   border-radius: 32px 32px 0 0;
   margin-bottom: 0;
+}
+
+@media (max-width: 850px) {
+  .editing-video {
+    max-height: 55vh;
+  }
 }
 
 .panel-slide-enter-active,
@@ -315,6 +358,7 @@ const handleSaveAdjusted = async () => {
 @media (max-width: 850px) {
   .reel-item[data-idx="0"]:not(.z-\[1006\]) {
     margin-left: 0;
+    margin-top: 60px;
   }
 }
 </style>

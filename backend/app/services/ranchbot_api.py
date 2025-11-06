@@ -73,11 +73,21 @@ class RanchBotAPIClient:
             response = await client.post(url, json=payload)
 
             if response.status_code == 429:
-                error_detail = response.json().get("detail", "Too many active sessions")
+                try:
+                    error_detail = response.json().get("detail", "Too many active sessions")
+                except Exception:
+                    error_detail = "Too many active sessions"
                 raise Exception(f"Rate limit: {error_detail}")
 
             response.raise_for_status()
-            return response.json()
+
+            if not response.content:
+                raise Exception("Empty response from authentication API")
+
+            try:
+                return response.json()
+            except Exception as e:
+                raise Exception(f"Invalid JSON response from authentication API: {response.text}")
 
     async def logout_all_sessions(self, login: str, password: str) -> Dict[str, Any]:
         """Logout from all sessions by revoking all refresh tokens"""

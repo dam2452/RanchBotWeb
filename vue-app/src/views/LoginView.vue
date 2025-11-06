@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import LogoSection from '@/components/LogoSection.vue'
@@ -10,6 +10,21 @@ import AppFooter from '@/components/AppFooter.vue'
 const router = useRouter()
 const authStore = useAuthStore()
 const errorMessage = ref('')
+const windowWidth = ref(window.innerWidth)
+
+const isWatchView = computed(() => windowWidth.value <= 196)
+
+const handleResize = () => {
+  windowWidth.value = window.innerWidth
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 
 const handleSubmit = async (credentials: { login: string; password: string }) => {
   errorMessage.value = ''
@@ -25,10 +40,10 @@ const handleSubmit = async (credentials: { login: string; password: string }) =>
 </script>
 
 <template>
-  <AppFooter />
+  <AppFooter v-if="!isWatchView" />
 
   <main class="login-page">
-    <LogoSection />
+    <LogoSection v-if="!isWatchView" />
 
     <section class="login-section">
       <LoginForm
@@ -45,14 +60,14 @@ const handleSubmit = async (credentials: { login: string; password: string }) =>
 <style scoped>
 .login-page {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
-  min-height: calc(100dvh - 70px);
+  min-height: calc(100vh - 70px);
   box-sizing: border-box;
-  padding: 2.5rem;
-  gap: 3rem;
+  padding: 24px 16px 24px;
+  gap: 0;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -61,31 +76,34 @@ const handleSubmit = async (credentials: { login: string; password: string }) =>
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 1;
-  max-width: 50%;
+  justify-content: flex-start;
+  flex: 0 0 auto;
+  max-width: 100%;
+  width: 100%;
   box-sizing: border-box;
+  gap: 0;
 }
 
-@media (max-width: 850px) {
+@media (min-width: 481px) {
   .login-page {
-    height: auto;
-    flex-direction: column;
-    padding-top: 2rem;
-    padding-bottom: 3rem;
-    gap: 0.1rem;
-    justify-content: flex-start;
+    padding: 32px 24px 32px;
+    gap: 0;
+  }
+}
+
+@media (min-width: 851px) {
+  .login-page {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px;
+    gap: 48px;
   }
 
   .login-section {
-    max-width: 100%;
-    width: 100%;
-  }
-}
-
-@media (max-width: 600px) {
-  .login-page {
-    padding-top: 1.5rem;
-    gap: 0.1rem;
+    flex: 1;
+    max-width: 50%;
+    justify-content: center;
   }
 }
 </style>

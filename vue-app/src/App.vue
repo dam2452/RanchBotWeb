@@ -25,6 +25,10 @@ onMounted(async () => {
 </template>
 
 <style>
+:root {
+  color-scheme: light only;
+}
+
 * {
   font-family: 'Verdana', sans-serif;
   font-weight: 600;
@@ -38,9 +42,10 @@ body {
   height: -webkit-fill-available;
   overflow: hidden;
   background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;
-  color: #fff;
+  color: #fff !important;
   position: fixed;
   width: 100%;
+  color-scheme: light only;
 }
 
 #app {
@@ -49,7 +54,18 @@ body {
   min-height: -webkit-fill-available;
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
-  background: linear-gradient(to bottom, #1aa899, #f2a94c);
+  background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;
   box-sizing: border-box;
+  color-scheme: light only;
+}
+
+@media (prefers-color-scheme: dark) {
+  html,
+  body,
+  #app {
+    background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;
+    color: #fff !important;
+    filter: none !important;
+  }
 }
 </style>

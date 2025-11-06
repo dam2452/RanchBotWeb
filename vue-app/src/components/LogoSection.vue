@@ -1,15 +1,31 @@
 <script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import BrandLogo from './BrandLogo.vue'
+
+const windowWidth = ref(window.innerWidth)
+
+const logoSize = computed(() => {
+  if (windowWidth.value <= 196) return 'small'
+  if (windowWidth.value >= 851) return 'large'
+  return 'medium'
+})
+
+const handleResize = () => {
+  windowWidth.value = window.innerWidth
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <template>
   <section class="logo-section">
-    <router-link to="/" class="logo-link">
-      <img
-        src="/images/branding/logo.svg"
-        alt="RanchBot Logo"
-        class="logo"
-      />
-    </router-link>
+    <BrandLogo :size="logoSize" class="logo-brand" />
     <h1 class="title">RanchBot</h1>
   </section>
 </template>
@@ -20,45 +36,47 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin: 0;
-  flex: 1;
-  max-width: 50%;
+  margin: 1.5rem auto 0.2rem auto;
+  flex: none;
+  max-width: 100%;
+  width: 100%;
   box-sizing: border-box;
 }
 
-.logo-link {
-  display: inline-block;
-}
-
-.logo {
-  width: clamp(200px, 20vw, 300px);
+.logo-brand {
+  transform: scale(1.0);
 }
 
 .title {
   font-size: clamp(3.5rem, 6vw, 7rem);
-  margin: 0.5rem 0;
+  margin: 0.3rem 0;
+  transition: all var(--transition-default);
+}
+
+@media (min-width: 481px) {
+  .logo-section {
+    margin: 2rem auto 0.2rem auto;
+  }
+
+  .title {
+    margin: 0.4rem 0;
+  }
 }
 
 @media (min-width: 851px) {
-  .logo {
-    width: clamp(390px, 39vw, 585px);
+  .logo-section {
+    flex: 1;
+    max-width: 50%;
+    margin: 0;
+  }
+
+  .logo-brand {
+    transform: scale(1.0);
   }
 
   .title {
     font-size: clamp(4.63rem, 7.94vw, 9.26rem);
-  }
-}
-
-@media (max-width: 850px) {
-  .logo-section {
-    margin: 0.5rem auto 0.2rem auto;
-    flex: none;
-    max-width: 100%;
-    width: 100%;
-  }
-
-  .title {
-    margin: 0.3rem 0;
+    margin: 0.5rem 0;
   }
 }
 </style>

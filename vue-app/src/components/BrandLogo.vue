@@ -32,27 +32,27 @@ const props = withDefaults(defineProps<Props>(), {
 }
 
 .logo-small {
-  width: 80px;
+  width: 120px;
 }
 
 .logo-medium {
-  width: 110px;
+  width: 165px;
 }
 
 .logo-large {
-  width: clamp(160px, 40vw, 240px);
+  width: clamp(240px, 60vw, 360px);
 }
 
 @media (min-width: 1200px) {
   .logo-large {
-    min-width: 160px;
-    width: clamp(200px, 20vw, 300px);
+    min-width: 240px;
+    width: clamp(300px, 30vw, 450px);
   }
 }
 
 @media (min-width: 1800px) {
   .logo-large {
-    width: clamp(250px, 15vw, 350px);
+    width: clamp(375px, 22.5vw, 525px);
   }
 }
 </style>

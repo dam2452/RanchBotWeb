@@ -126,6 +126,7 @@ const goToSearch = () => {
 
 .logo {
   margin-top: -110px;
+  transform: scale(0.7);
 }
 
 .title {
@@ -177,6 +178,10 @@ const goToSearch = () => {
     padding: 0;
   }
 
+  .logo {
+    transform: scale(0.85);
+  }
+
   .title {
     margin: var(--spacing-lg) 0 10px;
     font-size: clamp(2.2rem, 8vw, 5rem);
@@ -215,6 +220,7 @@ const goToSearch = () => {
 
   .logo {
     margin-top: 0;
+    transform: scale(1);
   }
 
   .title {

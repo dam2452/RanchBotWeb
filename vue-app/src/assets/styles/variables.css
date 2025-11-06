@@ -1,4 +1,6 @@
 :root {
+  color-scheme: light only;
+
   --color-primary: #1aa899;
   --color-secondary: #f2a94c;
   --color-button-bg: #888;
@@ -28,4 +30,19 @@
   --font-size-md: 1rem;
   --font-size-lg: 1.5rem;
   --font-size-xl: 2rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: light only;
+
+    --color-primary: #1aa899;
+    --color-secondary: #f2a94c;
+    --color-button-bg: #888;
+    --color-text: #fff;
+  }
+
+  * {
+    filter: none !important;
+  }
 }

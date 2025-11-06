@@ -1,9 +1,51 @@
 <script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import UserButtons from '@/components/UserButtons.vue'
 import AppFooter from '@/components/AppFooter.vue'
+import BrandLogo from '@/components/BrandLogo.vue'
+import PrimaryButton from '@/components/PrimaryButton.vue'
+import AnimatedArrow from '@/components/AnimatedArrow.vue'
+import HeroImage from '@/components/HeroImage.vue'
 
 const router = useRouter()
+const authStore = useAuthStore()
+
+const windowWidth = ref(window.innerWidth)
+const windowHeight = ref(window.innerHeight)
+
+const isPortrait = computed(() => {
+  return windowHeight.value > windowWidth.value
+})
+
+const arrowSize = computed(() => {
+  if (windowWidth.value >= 1200) return 'large'
+  if (windowWidth.value >= 481) return 'medium'
+  return 'small'
+})
+
+const arrowDirection = computed(() => {
+  if (isPortrait.value) return 'vertical'
+  return windowWidth.value >= 1200 ? 'horizontal' : 'vertical'
+})
+
+const handleResize = () => {
+  windowWidth.value = window.innerWidth
+  windowHeight.value = window.innerHeight
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
+
+const goToLogin = () => {
+  router.push('/login')
+}
 
 const goToSearch = () => {
   router.push('/search')
@@ -11,44 +53,265 @@ const goToSearch = () => {
 </script>
 
 <template>
-  <UserButtons fixed />
-  <AppFooter />
+  <UserButtons v-if="windowWidth > 196" fixed />
+  <AppFooter v-if="windowWidth > 196" />
 
-  <main class="flex items-center justify-between w-full min-h-screen p-10 box-border relative max-w-1600px mx-auto max-[1199px]:flex-col max-[1199px]:justify-center max-[850px]:mt-0 max-[850px]:text-center max-[850px]:p-[20px_15px] max-[850px]:gap-[15px] max-[480px]:!p-[10px_8px] max-[480px]:!gap-[8px] min-[1200px]:flex-row min-[1200px]:gap-[60px]">
-    <div class="flex-1 flex flex-col items-center transition-all duration-400 max-[1199px]:flex-[0_0_auto] max-[1199px]:w-full max-[1199px]:max-w-[600px] max-[1199px]:order-1 max-[480px]:!p-[0_15px]">
-      <router-link to="/" class="inline-block">
-        <img src="/images/branding/logo.svg" class="mt-7.5 transition-transform duration-400 min-w-[160px] w-[clamp(200px,20vw,300px)] max-[1199px]:!w-[clamp(160px,40vw,240px)] min-[1800px]:!w-[clamp(250px,15vw,350px)]" alt="RanchBot Logo" />
-      </router-link>
-      <h1 class="text-center transition-all duration-400 m-[20px_0] text-[clamp(3.5rem,6vw,7rem)] max-[1199px]:!m-[20px_0_10px] max-[1199px]:!text-[clamp(2.2rem,8vw,5rem)] max-[480px]:!m-[0_15px_5px_15px] min-[1800px]:!text-[clamp(4rem,5vw,8rem)]">RanchBot</h1>
-      <p class="tagline text-center m-[20px_0] text-[clamp(1.5rem,3vw,2.2rem)] max-[850px]:!text-[clamp(1.1rem,2.5vw,1.8rem)] max-[480px]:!m-[0_15px_10px_15px]">Find, cut, and share your favorite Ranczo scene — in seconds.</p>
-      <button style="background-color: #888; color: #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);" class="border-none rounded-[25px] cursor-pointer mb-7.5 transition-all duration-200 hover:scale-105 hover:shadow-hover active:scale-95 active:shadow-active text-[clamp(1.2rem,2vw,2rem)] font-bold p-[20px_40px] max-[850px]:p-[16px_32px] max-[1199px]:!mb-[10px] max-[480px]:!mb-[5px] max-[480px]:!mx-[15px]" @click="goToSearch">enter a quote</button>
+  <main class="home-main">
+    <div v-if="windowWidth <= 196" class="watch-view">
+      <PrimaryButton v-if="!authStore.isAuthenticated" size="small" @click="goToLogin">Login</PrimaryButton>
+      <PrimaryButton v-else size="small" @click="goToSearch">Search</PrimaryButton>
     </div>
 
-    <div class="hidden min-[1200px]:block absolute top-1/2 -translate-y-1/2 w-[76px] z-10 transition-all duration-400 max-[1199px]:!static max-[1199px]:!block max-[1199px]:!transform-none max-[1199px]:!m-[20px_auto] max-[1199px]:!w-[60px] max-[1199px]:order-2 max-[480px]:!m-[10px_auto]" style="left: calc(50% - 20px);">
-      <img src="/images/ui/icons/arrow.svg" class="w-[76px] transition-all duration-400 arrow-animate max-[1199px]:!w-[60px] max-[1199px]:!rotate-90 max-[1199px]:!animate-bounce-rotated" alt="Arrow" />
-    </div>
+    <div v-else class="full-view">
+      <div class="content-section">
+        <BrandLogo class="logo" size="large" />
+        <h1 class="title">RanchBot</h1>
+        <p class="tagline">Find, cut, and share your favorite Ranczo scene — in seconds.</p>
+        <PrimaryButton class="cta-button" size="large" @click="goToSearch">enter a quote</PrimaryButton>
+      </div>
 
-    <div class="flex-1 flex items-center justify-center transition-all duration-400 min-[1200px]:min-w-0 min-[1200px]:mr-[30px] max-[1199px]:flex-[0_0_auto] max-[1199px]:w-full max-[1199px]:max-w-800px max-[1199px]:order-3 max-[1199px]:mt-7.5 max-[500px]:!w-[90%] max-[500px]:!mx-auto max-[500px]:!mt-[-20px] max-[480px]:!mt-[15px]">
-      <router-link to="/search" class="cursor-pointer block max-w-[760px] w-full transition-transform duration-300 hover:scale-102 active:scale-95 min-[1800px]:max-w-[900px]">
-        <img src="/images/others/KusyDworek.webp" class="block w-full h-auto object-cover rounded-[30px] transition-all duration-400 shadow-hover max-[1199px]:w-[90%] max-[1199px]:max-w-[720px] max-[1199px]:mx-auto max-[500px]:!mt-[-60px] max-[500px]:!w-full max-[500px]:!max-w-full max-[480px]:!mt-[-80px] max-[480px]:!w-[95vw] max-[480px]:!max-w-[95vw]" alt="Dworek Kusy" />
-      </router-link>
+      <AnimatedArrow class="arrow-section" :direction="arrowDirection" :size="arrowSize" />
+
+      <div class="image-section">
+        <HeroImage size="large" />
+      </div>
     </div>
   </main>
 </template>
 
 <style scoped>
-@keyframes arrow-bounce-pulse {
-  0%, 100% {
-    transform: translateX(0) scale(1);
-    opacity: 0.85;
+.home-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: var(--gradient-main);
+  text-align: center;
+}
+
+.watch-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.full-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  padding: 0 var(--spacing-sm) var(--spacing-sm);
+  padding-top: 0;
+  gap: 4px;
+}
+
+.content-section {
+  flex: 0 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 var(--spacing-sm);
+  transition: all var(--transition-default);
+}
+
+.logo {
+  margin-top: -110px;
+}
+
+.title {
+  text-align: center;
+  margin: 3px 15px 2px;
+  font-size: 1.6rem;
+  transition: all var(--transition-default);
+}
+
+.tagline {
+  text-align: center;
+  margin: 0 15px 3px;
+  font-size: 0.8rem;
+}
+
+.cta-button {
+  margin-bottom: 3px;
+}
+
+.arrow-section {
+  margin: 15px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.image-section {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-default);
+}
+
+@media (min-width: 481px) {
+  .full-view {
+    padding: var(--spacing-lg) var(--spacing-md);
+    padding-top: var(--spacing-lg);
+    gap: 12px;
   }
-  50% {
-    transform: translateX(12px) scale(1.1);
-    opacity: 1;
+
+  .content-section {
+    max-width: 600px;
+    padding: 0;
+  }
+
+  .title {
+    margin: var(--spacing-lg) 0 10px;
+    font-size: clamp(2.2rem, 8vw, 5rem);
+  }
+
+  .tagline {
+    margin: var(--spacing-lg) 0;
+    font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+  }
+
+  .image-section {
+    max-width: 600px;
+    margin-top: 15px;
   }
 }
 
-.arrow-animate {
-  animation: arrow-bounce-pulse 1.8s ease-in-out infinite;
+@media (min-width: 1200px) {
+  .home-main {
+    max-width: 1500px;
+  }
+
+  .full-view {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-xl);
+    gap: 30px;
+    text-align: left;
+  }
+
+  .content-section {
+    flex: 0 0 auto;
+    max-width: 480px;
+    padding-right: 0;
+  }
+
+  .logo {
+    margin-top: 0;
+  }
+
+  .title {
+    font-size: clamp(3rem, 5vw, 5.5rem);
+    margin: 15px 0 10px;
+  }
+
+  .tagline {
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    margin: 10px 0 15px;
+  }
+
+  .cta-button {
+    margin-bottom: 0;
+  }
+
+  .arrow-section {
+    flex: 0 0 auto;
+    position: relative;
+    transform: none;
+    z-index: 20;
+    margin: 0 20px;
+  }
+
+  .image-section {
+    flex: 0 0 auto;
+    max-width: 800px;
+    margin-right: 0;
+    margin-top: 0;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@media (min-width: 1800px) {
+  .title {
+    font-size: clamp(4rem, 5vw, 8rem);
+  }
+}
+
+@media (min-width: 2560px) {
+  .home-main {
+    max-width: 2400px;
+  }
+}
+
+@media (min-width: 3840px) {
+  .home-main {
+    max-width: 3200px;
+  }
+
+  .title {
+    font-size: clamp(5rem, 4vw, 9rem);
+  }
+
+  .tagline {
+    font-size: clamp(2rem, 2.5vw, 3rem);
+  }
+}
+
+@media (orientation: portrait) and (min-width: 1080px) {
+  .home-main {
+    max-width: 800px;
+  }
+
+  .full-view {
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 60px;
+    gap: 15px;
+  }
+
+  .content-section {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .title {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    margin: 20px 0 15px;
+  }
+
+  .tagline {
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    margin: 15px 0 20px;
+  }
+
+  .arrow-section {
+    position: static;
+    transform: none;
+    margin: 15px auto;
+  }
+
+  .image-section {
+    margin-right: 0;
+    max-width: 600px;
+    margin-top: 20px;
+  }
 }
 </style>

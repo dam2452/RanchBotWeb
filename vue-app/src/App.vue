@@ -35,13 +35,21 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
+  height: -webkit-fill-available;
   overflow: hidden;
   background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;
   color: #fff;
+  position: fixed;
+  width: 100%;
 }
 
 #app {
   width: 100%;
   min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  background: linear-gradient(to bottom, #1aa899, #f2a94c);
+  box-sizing: border-box;
 }
 </style>

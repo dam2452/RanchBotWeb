@@ -10,9 +10,9 @@
 <style scoped>
 .app-footer {
   position: fixed;
-  bottom: 1rem;
-  left: 0;
-  right: 0;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  left: env(safe-area-inset-left);
+  right: env(safe-area-inset-right);
   z-index: 1000;
   text-align: center;
 }

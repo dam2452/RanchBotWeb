@@ -115,15 +115,15 @@ onUnmounted(() => {
 <style scoped>
 .auth-buttons-container.fixed {
   position: fixed !important;
-  top: 20px !important;
-  right: 20px !important;
+  top: calc(20px + env(safe-area-inset-top)) !important;
+  right: calc(20px + env(safe-area-inset-right)) !important;
   z-index: 1000 !important;
 }
 
 @media (max-width: 850px) {
   .auth-buttons-container.fixed {
-    top: 15px !important;
-    right: 15px !important;
+    top: calc(15px + env(safe-area-inset-top)) !important;
+    right: calc(15px + env(safe-area-inset-right)) !important;
   }
 }
 </style>

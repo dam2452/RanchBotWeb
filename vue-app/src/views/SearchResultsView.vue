@@ -13,6 +13,10 @@ import { useHorizontalScroll } from '@/composables/useHorizontalScroll'
 
 const route = useRoute()
 const router = useRouter()
+const windowWidth = ref(window.innerWidth)
+
+const isWatchView = computed(() => windowWidth.value <= 196)
+const isDesktop = computed(() => windowWidth.value > 850)
 
 const query = ref('')
 const results = ref<SearchResult[]>([])
@@ -103,10 +107,15 @@ const handleWheel = (event: WheelEvent) => {
   }, 50)
 }
 
+const handleResize = () => {
+  windowWidth.value = window.innerWidth
+}
+
 onMounted(async () => {
   query.value = (route.query.query as string) || ''
   await loadSearchResults()
   window.addEventListener('keydown', handleKeydown)
+  window.addEventListener('resize', handleResize)
 
   nextTick(() => {
     if (videoReel.value) {
@@ -144,6 +153,7 @@ const setupLoadMoreObserver = () => {
 onUnmounted(() => {
   cleanupScrollListeners()
   window.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener('resize', handleResize)
 
   if (videoReel.value) {
     videoReel.value.removeEventListener('wheel', handleWheel)
@@ -341,7 +351,7 @@ const scrollToClip = (index: number) => {
 
     scrollTimeout.value = window.setTimeout(() => {
       isManualScroll.value = false
-    }, 300)
+    }, 1000)
   }
 }
 
@@ -399,48 +409,62 @@ watch(activeIndex, async (newIndex, oldIndex) => {
     }
   })
 
+  await new Promise(resolve => setTimeout(resolve, 100))
+
   if (items[newIndex]) {
     try {
-      if (items[newIndex].readyState >= 2) {
-        await items[newIndex].play()
+      const video = items[newIndex]
+      if (video.readyState >= 2) {
+        await video.play()
+      } else {
+        const playWhenReady = () => {
+          if (video.readyState >= 2) {
+            video.play().catch(() => {})
+          } else {
+            video.addEventListener('loadeddata', () => {
+              video.play().catch(() => {})
+            }, { once: true })
+          }
+        }
+        setTimeout(playWhenReady, 200)
       }
     } catch (err) {
-      // Autoplay prevented - silent fail
+      console.log('Autoplay prevented for clip', newIndex)
     }
   }
 
-  if (newIndex === loadedClips.value - 1 && loadedClips.value < results.value.length && !loadingClips.value) {
+  if (newIndex >= loadedClips.value - 2 && loadedClips.value < results.value.length && !loadingClips.value) {
     loadNextClips()
   }
 })
 </script>
 
 <template>
-  <UserButtons fixed />
-  <LogoHeader />
-  <AppFooter />
+  <UserButtons v-if="!isWatchView" fixed />
+  <LogoHeader v-if="isDesktop" />
+  <AppFooter v-if="!isWatchView" />
 
-  <main class="relative w-screen h-screen overflow-hidden m-0 p-0">
-    <div class="search-bar-container fixed left-1/2 -translate-x-1/2 z-1000 w-[clamp(280px,60vw,720px)] max-w-[90vw] mt-20 max-[850px]:!w-[85vw] max-[850px]:!max-w-[500px] max-[480px]:!w-[85vw]" style="top: 100px;">
+  <main class="results-main">
+    <div v-if="!isWatchView" class="search-bar-container">
       <SearchBar :initial-query="query" @search="handleSearch" @filters="handleFilters" />
     </div>
 
-    <div v-if="loading || (results.length > 0 && !videoCache[0] && !videoErrors[0])" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-5">
+    <div v-if="loading || (results.length > 0 && !videoCache[0] && !videoErrors[0])" class="loading-overlay">
       <LoadingSpinner message="Loading results..." />
     </div>
 
-    <div v-else-if="error" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-xl z-5 text-red-600">{{ error }}</div>
+    <div v-else-if="error" class="error-overlay">{{ error }}</div>
 
-    <div v-else-if="results.length === 0 && !loading" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-xl z-5">
+    <div v-else-if="results.length === 0 && !loading" class="no-results-overlay">
       No results found for "{{ query }}"
     </div>
 
     <div
       v-if="editingClipIndex !== null"
-      class="fixed inset-0 bg-black bg-opacity-30 z-[1] pointer-events-none"
+      class="editing-backdrop"
     ></div>
 
-    <div v-if="videoCache[0] || videoErrors[0]" class="scroll-smooth snap-x snap-mandatory overflow-x-scroll overflow-y-hidden flex items-center h-screen w-screen fixed top-0 left-0 m-0 p-0 pt-[140px] max-[850px]:flex-col max-[850px]:overflow-y-scroll max-[850px]:overflow-x-hidden max-[850px]:snap-y max-[850px]:pt-[195px]" ref="videoReel" @click="handleReelClick">
+    <div v-if="videoCache[0] || videoErrors[0]" class="video-reel" :class="{ 'watch-reel': isWatchView }" ref="videoReel" @click="handleReelClick">
       <VideoReelItem
         v-for="(result, index) in displayedResults"
         :key="index"
@@ -460,38 +484,27 @@ watch(activeIndex, async (newIndex, oldIndex) => {
       />
 
       <div
-        v-if="loadedClips < results.length"
+        v-if="loadedClips < results.length && !isWatchView"
         ref="loadMoreElement"
         :data-idx="displayedResults.length"
-        class="reel-item load-more-item clip-loaded snap-center transition-all duration-300 flex-shrink-0 opacity-50 scale-85 w-auto h-[55vh] min-w-auto max-w-none mx-5 p-0 relative flex items-center justify-center rounded-[32px] z-[1] max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
+        class="reel-item load-more-item clip-loaded"
         :class="{
-          'active z-[50] opacity-100 scale-100': activeIndex === displayedResults.length,
-          'cursor-pointer': !loadingClips
+          'active': activeIndex === displayedResults.length,
+          'clickable': !loadingClips,
+          'loading-state': loadingClips
         }"
-        :style="[
-          activeIndex === displayedResults.length ? 'box-shadow: 0 0 32px rgba(242, 169, 76, 0.8); border-radius: 32px;' : 'border-radius: 32px;',
-          loadingClips ? 'pointer-events: none;' : ''
-        ].join(' ')"
         @click="!loadingClips && handleLoadMore()"
       >
-        <div
-          v-if="loadingClips"
-          class="w-auto h-full max-h-[55vh] object-contain rounded-[32px] block aspect-video scale-[0.99] max-[850px]:w-full max-[850px]:h-auto max-[850px]:max-h-none flex flex-col items-center justify-center bg-gray-100 pointer-events-none"
-          :style="activeIndex === displayedResults.length ? 'box-shadow: 0 0 0 3px #f2a94c; box-sizing: border-box; border-radius: 32px;' : 'border-radius: 32px;'"
-        >
+        <div v-if="loadingClips" class="load-more-content" :class="{ 'active-border': activeIndex === displayedResults.length }">
           <LoadingSpinner size="small" message="Loading more clips..." />
         </div>
-        <div
-          v-else
-          class="w-auto h-full max-h-[55vh] object-contain rounded-[32px] block cursor-pointer aspect-video scale-[0.99] max-[850px]:w-full max-[850px]:h-auto max-[850px]:max-h-none flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100"
-          :style="activeIndex === displayedResults.length ? 'box-shadow: 0 0 0 3px #f2a94c; box-sizing: border-box; border-radius: 32px;' : 'border-radius: 32px;'"
-        >
-          <svg class="w-20 h-20 mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div v-else class="load-more-content load-more-prompt" :class="{ 'active-border': activeIndex === displayedResults.length }">
+          <svg class="load-more-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
           </svg>
-          <p class="text-gray-700 font-bold text-2xl mb-2">Load More</p>
-          <p class="text-gray-500 text-sm">Scroll here or click to load</p>
-          <p class="text-gray-400 text-xs mt-1">{{ results.length - loadedClips }} clips remaining</p>
+          <p class="load-more-title">Load More</p>
+          <p class="load-more-subtitle">Scroll here or click to load</p>
+          <p class="load-more-count">{{ results.length - loadedClips }} clips remaining</p>
         </div>
       </div>
     </div>
@@ -500,33 +513,194 @@ watch(activeIndex, async (newIndex, oldIndex) => {
 </template>
 
 <style scoped>
-.load-more-item.clip-loaded {
-  animation: slideInFromRight 0.4s ease-out forwards;
+.results-main {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
 
-@keyframes slideInFromRight {
-  from {
-    opacity: 0;
-    transform: translateX(100px) scale(0.85);
+.search-bar-container {
+  position: fixed;
+  left: 50%;
+  top: 80px;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 85vw;
+  max-width: 500px;
+}
+
+.loading-overlay,
+.error-overlay,
+.no-results-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 5;
+}
+
+.error-overlay {
+  font-size: 20px;
+  color: #dc2626;
+}
+
+.no-results-overlay {
+  font-size: 20px;
+}
+
+.editing-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.video-reel {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.video-reel::-webkit-scrollbar {
+  display: none;
+}
+
+.video-reel.watch-reel {
+  padding: 0;
+  justify-content: center;
+}
+
+.load-more-item {
+  display: none;
+}
+
+
+
+@media (min-width: 481px) {
+  .search-bar-container {
+    width: clamp(400px, 60vw, 550px);
   }
-  to {
+}
+
+@media (min-width: 851px) {
+  .search-bar-container {
+    width: clamp(280px, 60vw, 720px);
+    max-width: 90vw;
+    top: 100px;
+  }
+
+  .video-reel {
+    scroll-snap-type: x mandatory;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    flex-direction: row;
+    padding: 140px 0 0;
+  }
+
+  .video-reel.watch-reel {
+    padding: 0;
+  }
+
+  .load-more-item {
+    display: flex;
+    width: auto;
+    height: 55vh;
+    max-width: none;
+    margin: 0 20px;
     opacity: 0.5;
-    transform: translateX(0) scale(0.85);
+    transform: scale(0.85);
+    border-radius: 32px;
+    scroll-snap-align: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    padding: 0;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
   }
-}
 
-.load-more-item.clip-loaded.active {
-  animation: slideInFromRightActive 0.4s ease-out forwards;
-}
-
-@keyframes slideInFromRightActive {
-  from {
-    opacity: 0;
-    transform: translateX(100px) scale(0.85);
-  }
-  to {
+  .load-more-item.active {
+    z-index: 50;
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: scale(1);
+  }
+
+  .load-more-item.clickable {
+    cursor: pointer;
+  }
+
+  .load-more-item.loading-state {
+    pointer-events: none;
+  }
+
+  .load-more-content {
+    width: auto;
+    height: 100%;
+    max-height: 55vh;
+    object-fit: contain;
+    border-radius: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+    aspect-ratio: 16 / 9;
+    transform: scale(0.99);
+  }
+
+  .load-more-content.active-border {
+    box-shadow: 0 0 0 3px #f2a94c, 0 0 32px rgba(242, 169, 76, 0.8);
+    box-sizing: border-box;
+  }
+
+  .load-more-prompt {
+    background: linear-gradient(135deg, #fafafa, #f5f5f5);
+    cursor: pointer;
+  }
+
+  .load-more-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 16px;
+    color: #9ca3af;
+  }
+
+  .load-more-title {
+    color: #374151;
+    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .load-more-subtitle {
+    color: #6b7280;
+    font-size: 14px;
+  }
+
+  .load-more-count {
+    color: #9ca3af;
+    font-size: 12px;
+    margin-top: 4px;
   }
 }
 </style>

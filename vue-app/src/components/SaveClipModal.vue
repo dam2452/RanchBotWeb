@@ -103,7 +103,7 @@ const handleKeydown = (event: KeyboardEvent) => {
   border-radius: 32px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
   border-top: 2px solid #f2a94c;
-  width: 90%;
+  width: 95%;
   max-width: 500px;
   overflow: hidden;
 }
@@ -112,7 +112,7 @@ const handleKeydown = (event: KeyboardEvent) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem 1.75rem;
+  padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #e0e0e0;
   background: #f8f8f8;
 }
@@ -146,7 +146,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 }
 
 .modal-body {
-  padding: 1.75rem;
+  padding: 1.5rem;
 }
 
 .input-label {
@@ -160,13 +160,13 @@ const handleKeydown = (event: KeyboardEvent) => {
 .clip-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  font-size: 1rem;
+  font-size: 16px;
   border: 1px solid #ddd;
   border-radius: 8px;
   background: #fff;
   color: #333;
   box-sizing: border-box;
-  transition: all 0.2s;
+  transition: all var(--transition-default);
 }
 
 .clip-input:focus {
@@ -182,7 +182,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 .modal-footer {
   display: flex;
   gap: 0.75rem;
-  padding: 1.25rem 1.75rem;
+  padding: 1.25rem 1.5rem;
   border-top: 1px solid #e0e0e0;
   justify-content: flex-end;
   background: #f8f8f8;
@@ -190,13 +190,13 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 .cancel-btn,
 .save-btn {
-  padding: 0.625rem 1.75rem;
-  font-size: 0.95rem;
+  padding: 0.625rem 1.5rem;
+  font-size: 0.9rem;
   font-weight: 600;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-default);
 }
 
 .cancel-btn {
@@ -242,31 +242,31 @@ const handleKeydown = (event: KeyboardEvent) => {
   transform: scale(0.9);
 }
 
-@media (max-width: 600px) {
+@media (min-width: 601px) {
   .modal-container {
-    width: 95%;
+    width: 90%;
   }
 
   .modal-header {
-    padding: 1.25rem 1.5rem;
-  }
-
-  .modal-header h2 {
-    font-size: 1.5rem;
+    padding: 1.25rem 1.75rem;
   }
 
   .modal-body {
-    padding: 1.5rem;
+    padding: 1.75rem;
   }
 
   .modal-footer {
-    padding: 1.25rem 1.5rem;
+    padding: 1.25rem 1.75rem;
   }
 
   .cancel-btn,
   .save-btn {
-    padding: 0.625rem 1.5rem;
-    font-size: 0.9rem;
+    padding: 0.625rem 1.75rem;
+    font-size: 0.95rem;
+  }
+
+  .clip-input {
+    font-size: 1rem;
   }
 }
 </style>

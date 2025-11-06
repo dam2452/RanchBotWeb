@@ -49,7 +49,7 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
       if (!isManualScroll.value && !navigationLock.value) {
         updateActiveFromScroll()
       }
-    }, 150)
+    }, 250)
   }
 
   const updateActiveFromScroll = () => {
@@ -164,7 +164,7 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
         navigationLock.value = false
         isManualScroll.value = false
         console.log('navigationLock released, activeIndex:', activeIndex.value)
-      }, 1500)
+      }, 1200)
     }
   }
 

@@ -133,25 +133,19 @@ const handleModalClose = () => {
 
 <template>
   <div
-    class="reel-item snap-center transition-all duration-500 flex-shrink-0 opacity-50 scale-85 w-auto min-w-auto max-w-none mx-5 p-0 relative flex items-center justify-center rounded-[32px] z-[1] max-[850px]:w-[90vw] max-[850px]:h-auto max-[850px]:max-w-[90vw] max-[850px]:my-2.5 max-[850px]:mx-0"
+    class="reel-item"
     :class="{
-      'active opacity-100 scale-100': (isActive && !isEditing) || isEditing,
-      'z-[1001]': isActive && !isEditing,
-      'z-[1060]': isEditing,
+      'active': (isActive && !isEditing) || isEditing,
+      'z-active': isActive && !isEditing,
+      'z-editing': isEditing,
       'was-editing': wasEditing,
-      'cursor-pointer': !isEditing,
-      'last-loaded z-[10] !opacity-75 !scale-90': isLastLoaded && !isActive && !isEditing,
+      'clickable': !isEditing,
+      'last-loaded': isLastLoaded && !isActive && !isEditing,
       'clip-loaded': videoUrl || hasError,
       'clip-loading': !videoUrl && !hasError,
-      'h-[50vh]': !isEditing,
-      'h-auto': isEditing,
-      'max-[850px]:h-auto': true
+      'not-editing': !isEditing,
+      'editing-height': isEditing
     }"
-    :style="[
-      isActive && !isEditing ? 'box-shadow: 0 0 32px rgba(242, 169, 76, 0.8);' : (isLastLoaded && !isActive ? 'box-shadow: 0 0 16px rgba(242, 169, 76, 0.4);' : ''),
-      'border-radius: 32px;',
-      isEditing ? 'pointer-events: auto;' : ''
-    ].filter(s => s).join(' ')"
     :data-idx="index"
     @click="handleClick"
   >
@@ -160,16 +154,53 @@ const handleModalClose = () => {
       class="clip-wrapper"
       :class="{ 'editing-wrapper': isEditing }"
     >
-      <video
-        loop
-        playsinline
-        preload="auto"
-        :src="previewUrl || videoUrl"
-        @loadeddata="handleLoaded"
-        class="clip-video"
-        :class="{ 'editing-video': isEditing }"
-        :style="isActive && !isEditing ? 'box-shadow: 0 0 0 3px #f2a94c;' : ''"
-      ></video>
+      <div class="video-container">
+        <video
+          loop
+          playsinline
+          preload="auto"
+          :src="previewUrl || videoUrl"
+          @loadeddata="handleLoaded"
+          class="clip-video"
+          :class="{
+            'editing-video': isEditing,
+            'active-video': isActive && !isEditing
+          }"
+        ></video>
+
+        <ClipActionButton
+          v-if="!isEditing"
+          variant="primary"
+          position="top-left"
+          size="medium"
+          class="adjust-btn"
+          @click="handleAdjust"
+        >
+          Adjust
+        </ClipActionButton>
+
+        <ClipActionButton
+          v-if="!isEditing"
+          variant="secondary"
+          position="top-right"
+          size="medium"
+          class="download-btn"
+          @click="handleDownload"
+        >
+          Download
+        </ClipActionButton>
+
+        <ClipActionButton
+          v-if="!isEditing"
+          variant="success"
+          position="bottom-left"
+          size="medium"
+          class="save-btn"
+          @click="handleSave"
+        >
+          Save
+        </ClipActionButton>
+      </div>
 
       <Transition name="panel-slide">
         <ClipEditor
@@ -188,50 +219,17 @@ const handleModalClose = () => {
       </Transition>
     </div>
 
-    <div v-else-if="hasError" class="flex flex-col items-center justify-center min-h-[300px] bg-red-100 text-red-700 p-4 rounded-xl text-center">
-      <svg class="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div v-else-if="hasError" class="error-state">
+      <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
       </svg>
-      <p class="font-semibold text-lg">Failed to load clip</p>
-      <p class="text-sm mt-1">Clip #{{ index + 1 }} is unavailable</p>
+      <p class="error-title">Failed to load clip</p>
+      <p class="error-subtitle">Clip #{{ index + 1 }} is unavailable</p>
     </div>
 
-    <div v-else class="flex flex-col items-center justify-center min-h-[300px] bg-gray-100 p-4 rounded-xl">
+    <div v-else class="loading-state">
       <LoadingSpinner size="small" :message="`Loading clip #${index + 1}...`" />
     </div>
-
-    <ClipActionButton
-      v-if="videoUrl && !isEditing"
-      variant="primary"
-      position="top-left"
-      size="large"
-      class="adjust-btn max-[850px]:!px-5 max-[850px]:!py-4 max-[850px]:!text-xs"
-      @click="handleAdjust"
-    >
-      Adjust
-    </ClipActionButton>
-
-    <ClipActionButton
-      v-if="videoUrl && !isEditing"
-      variant="secondary"
-      position="top-right"
-      size="large"
-      class="download-btn max-[850px]:!px-5 max-[850px]:!py-4 max-[850px]:!text-xs"
-      @click="handleDownload"
-    >
-      Download
-    </ClipActionButton>
-
-    <ClipActionButton
-      v-if="videoUrl && !isEditing"
-      variant="success"
-      position="bottom-left"
-      size="large"
-      class="save-btn max-[850px]:!px-5 max-[850px]:!py-4 max-[850px]:!text-xs"
-      @click="handleSave"
-    >
-      Save
-    </ClipActionButton>
 
     <SaveClipModal
       :show="showSaveModal"
@@ -242,113 +240,183 @@ const handleModalClose = () => {
 </template>
 
 <style scoped>
-.reel-item.clip-loading {
+.reel-item {
+  scroll-snap-align: center;
+  transition: all 0.5s ease;
+  flex-shrink: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  z-index: 1;
+}
+
+.reel-item.not-editing {
+  height: 100vh;
+}
+
+.reel-item.editing-height {
+  height: auto;
+}
+
+.reel-item:not(.active) {
   opacity: 0;
-  transform: translateX(100px) scale(0.85);
+  transform: scale(0.8);
   pointer-events: none;
 }
 
-.reel-item.clip-loaded {
-  animation: slideInFromRight 0.4s ease-out forwards;
+.reel-item.active {
+  opacity: 1;
+  transform: scale(1);
 }
 
-@keyframes slideInFromRight {
-  from {
-    opacity: 0;
-    transform: translateX(100px) scale(0.85);
-  }
-  to {
-    opacity: 0.5;
-    transform: translateX(0) scale(0.85);
-  }
+.reel-item.z-active {
+  z-index: 1001;
 }
 
-.reel-item.clip-loaded.active {
-  animation: slideInFromRightActive 0.4s ease-out forwards;
+.reel-item.z-editing {
+  z-index: 1060;
+  pointer-events: auto;
 }
 
-@keyframes slideInFromRightActive {
-  from {
-    opacity: 0;
-    transform: translateX(100px) scale(0.85);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-  }
+.reel-item.clickable {
+  cursor: pointer;
 }
 
-.reel-item .adjust-btn,
-.reel-item .download-btn,
-.reel-item .save-btn {
+.reel-item.last-loaded {
+  z-index: 10;
+  opacity: 0.75;
+  transform: scale(0.9);
+}
+
+.reel-item.last-loaded .clip-video {
+  box-shadow: 0 0 16px rgba(242, 169, 76, 0.4);
+}
+
+.reel-item.clip-loading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.error-state,
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 16px;
+  border-radius: 24px;
+  text-align: center;
+}
+
+.error-state {
+  background: #fee;
+  color: #c33;
+}
+
+.error-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 12px;
+}
+
+.error-title {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.error-subtitle {
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.loading-state {
+  background: #f5f5f5;
+}
+
+.video-container .adjust-btn,
+.video-container .download-btn,
+.video-container .save-btn {
   opacity: 0;
   pointer-events: none;
   cursor: pointer;
   transition: opacity 0.3s ease;
 }
 
-.reel-item.active .adjust-btn,
-.reel-item.active .download-btn,
-.reel-item.active .save-btn {
+.reel-item.active .video-container .adjust-btn,
+.reel-item.active .video-container .download-btn,
+.reel-item.active .video-container .save-btn {
   opacity: 0.8;
   pointer-events: auto;
 }
 
-.reel-item.z-\[1060\] .adjust-btn,
-.reel-item.z-\[1060\] .download-btn,
-.reel-item.z-\[1060\] .save-btn {
+.reel-item.z-editing .video-container .adjust-btn,
+.reel-item.z-editing .video-container .download-btn,
+.reel-item.z-editing .video-container .save-btn {
   opacity: 0;
   pointer-events: none;
 }
 
-.reel-item.was-editing.active .adjust-btn,
-.reel-item.was-editing.active .download-btn,
-.reel-item.was-editing.active .save-btn {
+.reel-item.was-editing.active .video-container .adjust-btn,
+.reel-item.was-editing.active .video-container .download-btn,
+.reel-item.was-editing.active .video-container .save-btn {
   transition: opacity 0.3s ease 1.6s;
 }
 
-.reel-item .adjust-btn:hover,
-.reel-item .download-btn:hover,
-.reel-item .save-btn:hover {
+.video-container .adjust-btn:hover,
+.video-container .download-btn:hover,
+.video-container .save-btn:hover {
   opacity: 1 !important;
 }
 
 .clip-wrapper {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: auto;
+  width: 100%;
   height: auto;
   transition: all 0.5s ease;
+  box-sizing: border-box;
 }
 
 .editing-wrapper {
   position: relative;
-  transform: translateY(-5vh) scale(1.08);
-  filter: drop-shadow(0 0 50px rgba(242, 169, 76, 1));
+  transform: translateY(0) scale(1);
+  filter: none;
 }
 
-@media (max-width: 850px) {
-  .editing-wrapper {
-    transform: translateY(0.5vh) scale(1.08);
-  }
+.video-container {
+  position: relative;
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .clip-video {
-  width: auto;
-  height: auto;
-  max-height: 50vh;
+  width: 100%;
+  height: 100%;
+  max-height: 100vh;
+  max-width: 100vw;
   object-fit: contain;
-  border-radius: 32px;
+  border-radius: 24px;
   display: block;
   transition: all 0.5s ease;
+  box-sizing: border-box;
 }
 
-@media (max-width: 850px) {
-  .clip-video {
-    max-height: 60vh;
-    max-width: 90vw;
-  }
+.active-video {
+  box-shadow:
+    0 0 0 3px #f2a94c,
+    0 0 40px rgba(242, 169, 76, 0.8);
 }
 
 .reel-item:not(.editing-wrapper) .clip-video {
@@ -356,15 +424,9 @@ const handleModalClose = () => {
 }
 
 .editing-video {
-  max-height: 48vh;
-  border-radius: 32px 32px 0 0;
+  max-height: 70vh;
+  border-radius: 24px 24px 0 0;
   margin-bottom: 0;
-}
-
-@media (max-width: 850px) {
-  .editing-video {
-    max-height: 55vh;
-  }
 }
 
 .panel-slide-enter-active,
@@ -378,14 +440,75 @@ const handleModalClose = () => {
   transform: translateY(-10px);
 }
 
-.reel-item[data-idx="0"]:not(.z-\[1006\]) {
-  margin-left: 80px;
+.reel-item[data-idx="0"]:not(.z-editing) {
+  margin-left: 0;
+  margin-top: 0;
 }
 
-@media (max-width: 850px) {
-  .reel-item[data-idx="0"]:not(.z-\[1006\]) {
-    margin-left: 0;
-    margin-top: 60px;
+@media (min-width: 851px) {
+  .reel-item {
+    width: auto;
+    height: 50vh;
+    max-width: none;
+    margin: 0 20px;
+    border-radius: 32px;
+  }
+
+  .reel-item:not(.active) {
+    opacity: 0.5;
+    transform: scale(0.85);
+    pointer-events: auto;
+  }
+
+  .reel-item.active {
+    box-shadow: none;
+  }
+
+  .active-video {
+    box-shadow: 0 0 0 3px #f2a94c, 0 0 32px rgba(242, 169, 76, 0.8);
+  }
+
+  .reel-item.last-loaded {
+    box-shadow: none;
+  }
+
+  .reel-item.last-loaded .clip-video {
+    box-shadow: 0 0 16px rgba(242, 169, 76, 0.4);
+  }
+
+  .reel-item.editing-height {
+    height: auto;
+  }
+
+  .clip-wrapper {
+    width: auto;
+  }
+
+  .video-container {
+    width: auto;
+  }
+
+  .clip-video {
+    width: auto;
+    height: auto;
+    max-height: 50vh;
+    max-width: none;
+    border-radius: 32px;
+  }
+
+  .editing-wrapper {
+    transform: translateY(-5vh) scale(1.08);
+    filter: drop-shadow(0 0 50px rgba(242, 169, 76, 1));
+  }
+
+  .editing-video {
+    max-height: 48vh;
+    border-radius: 32px 32px 0 0;
+  }
+
+  .reel-item[data-idx="0"]:not(.z-editing) {
+    margin-left: 80px;
+    margin-top: 0;
   }
 }
 </style>

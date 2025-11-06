@@ -1,24 +1,42 @@
 <script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import BrandLogo from './BrandLogo.vue'
+
+const windowWidth = ref(window.innerWidth)
+
+const isWatchView = computed(() => windowWidth.value <= 196)
+
+const handleResize = () => {
+  windowWidth.value = window.innerWidth
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <template>
-  <router-link to="/" class="logo-header">
-    <img src="/images/branding/logo.svg" alt="RanchBot Logo" />
-    <span>RanchBot</span>
+  <router-link v-if="!isWatchView" to="/" class="logo-header">
+    <BrandLogo size="small" class="logo-brand" />
+    <span class="logo-text">RanchBot</span>
   </router-link>
 </template>
 
 <style scoped>
 .logo-header {
   position: fixed;
-  top: 2rem;
-  left: 2rem;
+  top: 1.5rem;
+  left: 1.5rem;
   z-index: 1010;
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
   text-decoration: none;
-  transition: opacity 0.3s;
+  transition: opacity var(--transition-default);
 }
 
 .logo-header:hover {
@@ -30,32 +48,33 @@
   text-decoration: none;
 }
 
-.logo-header img {
-  width: 7rem;
-  height: 7rem;
+.logo-brand {
+  transform: scale(0.4);
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.3));
 }
 
-.logo-header span {
+.logo-text {
+  display: none;
   color: white;
   font-weight: bold;
   font-size: 3rem;
   letter-spacing: -0.025em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-@media (max-width: 850px) {
+@media (min-width: 851px) {
   .logo-header {
-    top: 1.5rem;
-    left: 1.5rem;
-    gap: 1.5rem;
+    top: 2rem;
+    left: 2rem;
+    gap: 2rem;
   }
 
-  .logo-header img {
-    width: 4rem;
-    height: 4rem;
+  .logo-brand {
+    transform: scale(0.7);
   }
 
-  .logo-header span {
-    display: none;
+  .logo-text {
+    display: block;
   }
 }
 </style>

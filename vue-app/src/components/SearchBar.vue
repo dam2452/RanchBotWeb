@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import SearchInput from './SearchInput.vue'
 import FiltersButton from './FiltersButton.vue'
 
@@ -16,6 +17,21 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<Emits>()
+const windowWidth = ref(window.innerWidth)
+
+const showFilters = computed(() => windowWidth.value > 196)
+
+const handleResize = () => {
+  windowWidth.value = window.innerWidth
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 
 const handleSearch = (query: string) => {
   emit('search', query)
@@ -29,7 +45,7 @@ const handleFilters = () => {
 <template>
   <div class="search-container">
     <SearchInput :initial-query="initialQuery" @search="handleSearch" />
-    <FiltersButton @click="handleFilters" />
+    <FiltersButton v-if="showFilters" @click="handleFilters" />
   </div>
 </template>
 

@@ -19,19 +19,19 @@ const handleClick = () => {
 <style scoped>
 .filters-button {
   position: absolute;
-  bottom: -50px;
+  bottom: -35px;
   right: 0;
-  padding: clamp(10px, 1.5vw, 14px) clamp(16px, 2vw, 24px);
-  font-size: clamp(1rem, 2.5vw, 1.6rem);
+  padding: 8px 16px;
+  font-size: 16px;
   font-weight: bold;
   border: none;
   border-radius: 20px;
-  background: #888;
-  color: #fff;
+  background: var(--color-button-bg);
+  color: var(--color-text);
   cursor: pointer;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-default);
   transform: rotate(5deg);
-  transition: all 0.3s ease;
+  transition: all var(--transition-default);
   white-space: nowrap;
 }
 
@@ -45,9 +45,11 @@ const handleClick = () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-@media (max-width: 850px) {
+@media (min-width: 481px) {
   .filters-button {
     bottom: -40px;
+    padding: clamp(10px, 1.5vw, 12px) clamp(18px, 2vw, 20px);
+    font-size: clamp(16px, 2.5vw, 1.3rem);
     transform: rotate(5deg) translateY(-5px);
   }
 
@@ -60,11 +62,20 @@ const handleClick = () => {
   }
 }
 
-@media (max-width: 480px) {
+@media (min-width: 851px) {
   .filters-button {
-    bottom: -35px;
-    padding: 8px 16px;
-    font-size: 1rem;
+    bottom: -50px;
+    padding: clamp(12px, 1.5vw, 14px) clamp(20px, 2vw, 24px);
+    font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+    transform: rotate(5deg);
+  }
+
+  .filters-button:hover {
+    transform: rotate(5deg) scale(1.08);
+  }
+
+  .filters-button:active {
+    transform: rotate(5deg) scale(0.95);
   }
 }
 </style>

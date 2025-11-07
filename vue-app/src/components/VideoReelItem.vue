@@ -25,6 +25,8 @@ const emit = defineEmits<Emits>()
 const wasEditing = ref(false)
 const showSaveModal = ref(false)
 const isAdjustedSave = ref(false)
+const videoRef = ref<HTMLVideoElement | null>(null)
+const isVideoLoading = ref(true)
 
 const {
   leftAdjust,
@@ -86,6 +88,7 @@ const handleSave = async () => {
 }
 
 const handleLoaded = (event: Event) => {
+  isVideoLoading.value = false
   emit('loaded', event, props.index)
 }
 
@@ -129,6 +132,16 @@ const handleModalSave = async (clipName: string) => {
 const handleModalClose = () => {
   showSaveModal.value = false
 }
+
+watch(() => props.videoUrl, () => {
+  isVideoLoading.value = true
+})
+
+watch(() => previewUrl.value, () => {
+  if (previewUrl.value) {
+    isVideoLoading.value = true
+  }
+})
 </script>
 
 <template>
@@ -155,18 +168,26 @@ const handleModalClose = () => {
       :class="{ 'editing-wrapper': isEditing }"
     >
       <div class="video-container">
-        <video
-          loop
-          playsinline
-          preload="auto"
-          :src="previewUrl || videoUrl"
-          @loadeddata="handleLoaded"
-          class="clip-video"
-          :class="{
-            'editing-video': isEditing,
-            'active-video': isActive && !isEditing
-          }"
-        ></video>
+        <div class="video-wrapper">
+          <video
+            ref="videoRef"
+            loop
+            playsinline
+            muted
+            preload="metadata"
+            :src="previewUrl || videoUrl"
+            @loadeddata="handleLoaded"
+            class="clip-video"
+            :class="{
+              'editing-video': isEditing,
+              'active-video': isActive && !isEditing
+            }"
+          ></video>
+
+          <div v-if="isVideoLoading" class="video-loading-overlay">
+            <LoadingSpinner size="small" />
+          </div>
+        </div>
 
         <ClipActionButton
           v-if="!isEditing"
@@ -266,14 +287,15 @@ const handleModalClose = () => {
 }
 
 .reel-item:not(.active) {
-  opacity: 0;
-  transform: scale(0.8);
+  opacity: 1;
+  transform: scale(1);
   pointer-events: none;
 }
 
 .reel-item.active {
   opacity: 1;
   transform: scale(1);
+  pointer-events: auto;
 }
 
 .reel-item.z-active {
@@ -401,6 +423,31 @@ const handleModalClose = () => {
   justify-content: center;
 }
 
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(2px);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  pointer-events: none;
+}
+
 .clip-video {
   width: 100%;
   height: 100%;
@@ -493,6 +540,10 @@ const handleModalClose = () => {
     height: auto;
     max-height: 50vh;
     max-width: none;
+    border-radius: 32px;
+  }
+
+  .video-loading-overlay {
     border-radius: 32px;
   }
 

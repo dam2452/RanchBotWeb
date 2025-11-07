@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, nextTick, onUnmounted } from 'vue'
+import { ref, onMounted, computed, nextTick, onUnmounted, watch } from 'vue'
 import { apiService } from '@/services/api'
 import type { Clip } from '@/types'
 import UserButtons from '@/components/UserButtons.vue'
@@ -18,6 +18,7 @@ const pageReel = ref<HTMLElement | null>(null)
 const clipErrors = ref<{ [key: string]: boolean }>({})
 
 const windowWidth = ref(window.innerWidth)
+const isAppleWatch = computed(() => windowWidth.value <= 196)
 const isMobile = computed(() => windowWidth.value <= 850)
 const clipsPerPage = computed(() => isMobile.value ? 2 : 6)
 
@@ -164,37 +165,66 @@ const handleVideoError = (clipId: string) => {
   console.error('Video error for clip:', clipId)
   clipErrors.value = { ...clipErrors.value, [clipId]: true }
 }
+
+const pauseInactivePageVideos = () => {
+  if (!pageReel.value) return
+
+  const pages = pageReel.value.querySelectorAll('.page-item')
+  pages.forEach((page, pageIndex) => {
+    if (pageIndex !== activePage.value) {
+      const videos = page.querySelectorAll('video')
+      videos.forEach((video) => {
+        if (!video.paused) {
+          video.pause()
+          video.currentTime = 0
+        }
+      })
+    }
+  })
+
+  if (activeClipId.value) {
+    activeClipId.value = null
+  }
+}
+
+watch(activePage, () => {
+  pauseInactivePageVideos()
+})
 </script>
 
 <template>
   <UserButtons fixed :show-my-clips="false" />
-  <LogoHeader />
+  <LogoHeader v-if="!isMobile" />
   <AppFooter />
 
-  <main class="relative w-screen h-screen overflow-hidden m-0 p-0">
-    <div v-if="loading" class="w-screen h-screen flex flex-col items-center justify-center text-center p-5">
+  <main class="main-container">
+    <div v-if="isAppleWatch" class="center-message">
+      <p class="message-text">My Clips feature is not available on Apple Watch. Please use a larger device.</p>
+    </div>
+
+    <div v-else-if="loading" class="center-message">
       <LoadingSpinner message="Loading clips..." />
     </div>
 
-    <div v-else-if="error" class="w-screen h-screen flex flex-col items-center justify-center text-center p-5">
-      <p class="text-error text-[clamp(1.2rem,2.5vw,1.8rem)] font-bold">{{ error }}</p>
+    <div v-else-if="error" class="center-message">
+      <p class="message-text error-text">{{ error }}</p>
     </div>
 
-    <div v-else-if="clips.length === 0" class="w-screen h-screen flex flex-col items-center justify-center text-center p-5">
-      <p class="text-[clamp(1.2rem,2.5vw,1.8rem)] font-bold max-w-[600px]">You don't have any clips yet. Use the quote search to create your first clips!</p>
+    <div v-else-if="clips.length === 0" class="center-message">
+      <p class="message-text">You don't have any clips yet. Use the quote search to create your first clips!</p>
     </div>
 
     <div
       v-else
       ref="pageReel"
-      class="page-reel flex w-full h-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden max-[850px]:flex-col max-[850px]:overflow-y-auto max-[850px]:overflow-x-hidden max-[850px]:snap-y"
+      class="page-reel"
     >
       <div
         v-for="pageIndex in totalPages"
         :key="`page-${pageIndex}`"
         :data-page-idx="pageIndex - 1"
-        class="page-item snap-center transition-all duration-300 flex-shrink-0 opacity-50 scale-90 w-auto h-full min-w-auto max-w-none mx-8 p-0 relative flex items-center justify-center cursor-pointer z-[1] max-[850px]:mx-0 max-[850px]:my-4 max-[850px]:w-full max-[850px]:h-auto"
-        :class="{ 'active-page z-[50] opacity-100 scale-100': activePage === pageIndex - 1 }"
+        class="page-item"
+        :class="{ 'active-page': activePage === pageIndex - 1 }"
         @click="handlePageClick(pageIndex - 1)"
       >
         <div class="clips-grid">
@@ -217,67 +247,134 @@ const handleVideoError = (clipId: string) => {
 </template>
 
 <style scoped>
+.main-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.center-message {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.25rem;
+}
+
+.message-text {
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+  font-weight: bold;
+  max-width: 600px;
+}
+
+.error-text {
+  color: #ef4444;
+}
+
 .page-reel {
   display: flex;
-  align-items: center;
-  padding: 0 10vw;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 140px 0 60px 0;
+  align-items: flex-start;
+}
+
+.page-reel::-webkit-scrollbar {
+  display: none;
 }
 
 .page-item {
   scroll-snap-align: center;
-}
-
-.page-item:not(.active-page) {
-  opacity: 0.5;
-  transform: scale(0.9);
+  transition: all 0.3s;
+  flex-shrink: 0;
+  opacity: 1;
+  transform: scale(1);
+  width: 100%;
+  height: auto;
+  margin: 1rem 0;
+  padding: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .page-item.active-page {
   opacity: 1;
   transform: scale(1);
+  z-index: 50;
+  pointer-events: auto;
 }
 
 .clips-grid {
-  width: 70vw;
-  height: 70vh;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  width: 85vw;
+  height: auto;
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 32px;
-  backdrop-filter: blur(8px);
+  padding: 0;
+  background: transparent;
+  backdrop-filter: none;
 }
 
-@media (max-width: 1200px) {
+@media (min-width: 851px) {
+  .page-reel {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    padding: 0 10vw;
+    align-items: center;
+  }
+
+  .page-item {
+    width: auto;
+    height: 100%;
+    min-width: auto;
+    max-width: none;
+    margin: 0 2rem;
+    pointer-events: auto;
+  }
+
+  .page-item:not(.active-page) {
+    opacity: 0.5;
+    transform: scale(0.9);
+    pointer-events: auto;
+  }
+
+  .clips-grid {
+    width: 70vw;
+    height: 70vh;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 32px;
+    backdrop-filter: blur(8px);
+  }
+}
+
+@media (min-width: 851px) and (max-width: 1200px) {
   .clips-grid {
     width: 80vw;
-  }
-}
-
-@media (max-width: 850px) {
-  .page-reel {
-    padding: 140px 0 60px 0;
-    align-items: flex-start;
-  }
-
-  .clips-grid {
-    width: 85vw;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 0;
-    background: transparent;
-    backdrop-filter: none;
-  }
-}
-
-@media (max-width: 600px) {
-  .clips-grid {
-    width: 85vw;
-    gap: 1.5rem;
   }
 }
 </style>

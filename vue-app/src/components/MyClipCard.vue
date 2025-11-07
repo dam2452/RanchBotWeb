@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import type { Clip } from '@/types'
 import ClipActionButton from './ClipActionButton.vue'
 import ConfirmModal from './ConfirmModal.vue'
+import LoadingSpinner from './LoadingSpinner.vue'
 
 interface Props {
   clip: Clip
@@ -25,6 +26,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>()
 
 const showDeleteConfirm = ref(false)
+const videoRef = ref<HTMLVideoElement | null>(null)
+const isLoading = ref(true)
 
 const handleVideoClick = (event: Event) => {
   if (!props.hasError) {
@@ -64,25 +67,40 @@ const handleVideoError = (event: Event) => {
   console.error('Network state:', videoElement.networkState)
   console.error('Ready state:', videoElement.readyState)
 
+  isLoading.value = false
   emit('video-error')
 }
+
+const handleVideoLoaded = () => {
+  console.log('Video loaded:', props.clip.id)
+  isLoading.value = false
+}
+
 </script>
 
 <template>
   <div class="clip-card">
     <div class="video-container">
-      <video
-        v-if="!hasError"
-        loop
-        playsinline
-        :src="videoUrl"
-        class="clip-video"
-        :class="{ active: isActive }"
-        @click="handleVideoClick"
-        @error="handleVideoError"
-        @loadstart="() => console.log('Loading video:', clip.id)"
-        @loadeddata="() => console.log('Video loaded:', clip.id)"
-      ></video>
+      <div v-if="!hasError" class="video-wrapper">
+        <video
+          ref="videoRef"
+          loop
+          playsinline
+          muted
+          preload="metadata"
+          :src="videoUrl"
+          class="clip-video"
+          :class="{ active: isActive }"
+          @click="handleVideoClick"
+          @error="handleVideoError"
+          @loadstart="() => console.log('Loading video:', clip.id)"
+          @loadeddata="handleVideoLoaded"
+        ></video>
+
+        <div v-if="isLoading" class="loading-overlay">
+          <LoadingSpinner size="small" />
+        </div>
+      </div>
 
       <div v-else class="error-placeholder">
         <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,8 +151,8 @@ const handleVideoError = (event: Event) => {
 .clip-card {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  height: 100%;
+  gap: 0.3rem;
+  height: auto;
 }
 
 .video-container {
@@ -144,15 +162,43 @@ const handleVideoError = (event: Event) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 16px;
+  border-radius: 12px;
+  min-height: 200px;
+  max-height: 35vh;
   transition: all 0.3s;
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(2px);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
 }
 
 .clip-video {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 16px;
+  height: auto;
+  max-height: 35vh;
+  object-fit: contain;
+  border-radius: 12px;
   display: block;
   cursor: pointer;
   transition: all 0.3s;
@@ -164,9 +210,10 @@ const handleVideoError = (event: Event) => {
 
 .error-placeholder {
   width: 100%;
+  min-height: 200px;
   height: 100%;
   background: #1f2937;
-  border-radius: 16px;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -174,15 +221,15 @@ const handleVideoError = (event: Event) => {
 }
 
 .error-icon {
-  width: 4rem;
-  height: 4rem;
+  width: 2.5rem;
+  height: 2.5rem;
   color: #d1d5db;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.4rem;
 }
 
 .error-text {
   color: white;
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: bold;
   margin: 0;
 }
@@ -222,8 +269,8 @@ const handleVideoError = (event: Event) => {
 .clip-name {
   display: inline-block;
   align-self: center;
-  border-radius: 12px;
-  padding: 0.5rem 1.25rem;
+  border-radius: 10px;
+  padding: 0.4rem 0.8rem;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   flex-shrink: 0;
@@ -233,7 +280,7 @@ const handleVideoError = (event: Event) => {
 
 .clip-name p {
   color: white;
-  font-size: 1.125rem;
+  font-size: 0.95rem;
   font-weight: bold;
   margin: 0;
   overflow: hidden;
@@ -241,48 +288,51 @@ const handleVideoError = (event: Event) => {
   white-space: nowrap;
 }
 
-@media (max-width: 850px) {
+@media (min-width: 851px) {
   .clip-card {
-    gap: 0.3rem;
-    height: auto;
+    gap: 0.5rem;
+    height: 100%;
   }
 
   .video-container {
-    border-radius: 12px;
-    min-height: 200px;
-    max-height: 35vh;
+    border-radius: 16px;
+    min-height: initial;
+    max-height: none;
   }
 
   .clip-video {
-    border-radius: 12px;
-    height: auto;
-    max-height: 35vh;
-    object-fit: contain;
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
+    border-radius: 16px;
+  }
+
+  .loading-overlay {
+    border-radius: 16px;
   }
 
   .error-placeholder {
-    min-height: 200px;
-    height: 100%;
-    border-radius: 12px;
-  }
-
-  .clip-name {
-    padding: 0.4rem 0.8rem;
-    border-radius: 10px;
-  }
-
-  .clip-name p {
-    font-size: 0.95rem;
+    min-height: initial;
+    border-radius: 16px;
   }
 
   .error-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    margin-bottom: 0.4rem;
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 0.75rem;
   }
 
   .error-text {
-    font-size: 0.85rem;
+    font-size: 1rem;
+  }
+
+  .clip-name {
+    padding: 0.5rem 1.25rem;
+    border-radius: 12px;
+  }
+
+  .clip-name p {
+    font-size: 1.125rem;
   }
 }
 </style>

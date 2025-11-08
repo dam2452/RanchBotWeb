@@ -40,8 +40,9 @@ const {
 } = useClipAdjustment({
   clipIndex: props.index,
   originalVideoUrl: props.videoUrl,
-  isEditing: props.isEditing || false,
-  searchQuery: props.searchQuery
+  isEditing: () => props.isEditing || false,
+  searchQuery: props.searchQuery,
+  videoRef
 })
 
 const { download, save } = useClipActions({
@@ -559,6 +560,11 @@ watch(() => previewUrl.value, () => {
 
   .reel-item[data-idx="0"]:not(.z-editing) {
     margin-left: 80px;
+    margin-top: 0;
+  }
+
+  .reel-item[data-idx="0"].z-editing {
+    margin-left: 400px;
     margin-top: 0;
   }
 }

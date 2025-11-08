@@ -1,12 +1,13 @@
-import { ref, watch } from 'vue'
+import { ref, watch, toValue, type Ref, type MaybeRefOrGetter } from 'vue'
 import { apiService } from '@/services/api'
 import { formatAdjustmentValue, createClipFilename, downloadFile } from '@/utils/formatters'
 
 interface UseClipAdjustmentOptions {
   clipIndex: number
   originalVideoUrl: string | undefined
-  isEditing: boolean
+  isEditing: MaybeRefOrGetter<boolean>
   searchQuery?: string
+  videoRef?: Ref<HTMLVideoElement | null>
 }
 
 export function useClipAdjustment(options: UseClipAdjustmentOptions) {
@@ -16,6 +17,22 @@ export function useClipAdjustment(options: UseClipAdjustmentOptions) {
   const isUpdatingPreview = ref(false)
   const previewUrl = ref<string | null>(null)
   const previewTimeout = ref<number | null>(null)
+
+  const validateAdjustment = (): boolean => {
+    if (!options.videoRef?.value) return true
+
+    const video = options.videoRef.value
+    if (!video.duration || isNaN(video.duration)) return true
+
+    const newDuration = video.duration + leftAdjust.value + rightAdjust.value
+
+    if (newDuration <= 0) {
+      statusMessage.value = 'Clip not available - adjustment exceeds clip duration'
+      return false
+    }
+
+    return true
+  }
 
   const resetAdjustments = () => {
     leftAdjust.value = 0
@@ -34,7 +51,11 @@ export function useClipAdjustment(options: UseClipAdjustmentOptions) {
   }
 
   const updatePreview = async () => {
-    if (isUpdatingPreview.value || !options.isEditing) return
+    if (isUpdatingPreview.value || !toValue(options.isEditing)) return
+
+    if (!validateAdjustment()) {
+      return
+    }
 
     try {
       isUpdatingPreview.value = true
@@ -90,6 +111,12 @@ export function useClipAdjustment(options: UseClipAdjustmentOptions) {
   watch([leftAdjust, rightAdjust], schedulePreviewUpdate)
 
   const downloadAdjusted = async () => {
+    if (leftAdjust.value !== 0 || rightAdjust.value !== 0) {
+      if (!validateAdjustment()) {
+        return
+      }
+    }
+
     try {
       statusMessage.value = 'Preparing download...'
 
@@ -118,6 +145,10 @@ export function useClipAdjustment(options: UseClipAdjustmentOptions) {
   }
 
   const saveAdjusted = async (clipName: string): Promise<boolean> => {
+    if (!validateAdjustment()) {
+      return false
+    }
+
     try {
       statusMessage.value = 'Saving clip...'
 

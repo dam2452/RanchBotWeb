@@ -6,10 +6,11 @@ interface UseHorizontalScrollOptions {
   totalItems: Ref<number>
   itemSelector?: string
   isLastItem?: (index: number) => boolean
+  isEditing?: () => boolean
 }
 
 export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
-  const { containerRef, activeIndex, totalItems, itemSelector = '.scroll-item', isLastItem } = options
+  const { containerRef, activeIndex, totalItems, itemSelector = '.scroll-item', isLastItem, isEditing } = options
 
   const scrollTimeout = ref<number | null>(null)
   const isManualScroll = ref(false)
@@ -133,6 +134,8 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
       const itemRect = targetItem.getBoundingClientRect()
       const isMobile = window.innerWidth <= 850
       const isLast = isLastItem ? isLastItem(index) : false
+      const editing = isEditing ? isEditing() : false
+      const isFirstEditing = editing && index === 0
 
       if (isMobile) {
         let scrollTop
@@ -150,6 +153,8 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
         let scrollLeft
         if (isLast) {
           scrollLeft = containerRef.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) * 0.1
+        } else if (isFirstEditing) {
+          scrollLeft = containerRef.value.scrollLeft + (itemRect.left - containerRect.left) - 350
         } else {
           scrollLeft = containerRef.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) / 2
         }

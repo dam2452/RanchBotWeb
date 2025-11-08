@@ -44,7 +44,8 @@ const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTim
   activeIndex,
   totalItems: totalClips,
   itemSelector: '.reel-item',
-  isLastItem: (index: number) => index === loadedClips.value - 1 && loadedClips.value < results.value.length
+  isLastItem: (index: number) => editingClipIndex.value === null && index === loadedClips.value - 1 && loadedClips.value < results.value.length,
+  isEditing: () => editingClipIndex.value !== null
 })
 
 let loadMoreObserver: IntersectionObserver | null = null
@@ -134,7 +135,7 @@ const setupLoadMoreObserver = () => {
       loadMoreObserver = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (entry.isIntersecting && !loadingClips.value && loadedClips.value < results.value.length) {
+            if (entry.isIntersecting && !loadingClips.value && loadedClips.value < results.value.length && !isManualScroll.value && editingClipIndex.value === null) {
               loadNextClips()
             }
           })
@@ -183,7 +184,7 @@ const loadSearchResults = async () => {
     loading.value = false
 
     if (results.value.length > 0) {
-      loadNextClips()
+      loadNextClips(2)
       setupLoadMoreObserver()
     }
   } catch (err: any) {
@@ -192,7 +193,7 @@ const loadSearchResults = async () => {
   }
 }
 
-const loadNextClips = async (batchSize = 3) => {
+const loadNextClips = async (batchSize = 2) => {
   if (loadingClips.value) return
 
   loadingClips.value = true
@@ -321,7 +322,9 @@ const scrollToClip = (index: number) => {
     const containerRect = videoReel.value.getBoundingClientRect()
     const itemRect = targetItem.getBoundingClientRect()
     const isMobile = window.innerWidth <= 850
-    const isLastLoaded = index === loadedClips.value - 1 && loadedClips.value < results.value.length
+    const isEditing = editingClipIndex.value !== null
+    const isFirstClipEditing = isEditing && index === 0
+    const isLastLoaded = !isEditing && index === loadedClips.value - 1 && loadedClips.value < results.value.length
 
     if (isMobile) {
       let scrollTop
@@ -339,6 +342,8 @@ const scrollToClip = (index: number) => {
       let scrollLeft
       if (isLastLoaded) {
         scrollLeft = videoReel.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) * 0.1
+      } else if (isFirstClipEditing) {
+        scrollLeft = videoReel.value.scrollLeft + (itemRect.left - containerRect.left) - 350
       } else {
         scrollLeft = videoReel.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) / 2
       }
@@ -369,6 +374,11 @@ const handleClipClick = (index: number, event: MouseEvent) => {
   const target = event.target as HTMLElement
 
   if (target.closest('.adjust-btn') || target.closest('.download-btn') || target.closest('button')) {
+    return
+  }
+
+  if (editingClipIndex.value !== null) {
+    closeEditor()
     return
   }
 
@@ -431,10 +441,6 @@ watch(activeIndex, async (newIndex, oldIndex) => {
     } catch (err) {
       console.log('Autoplay prevented for clip', newIndex)
     }
-  }
-
-  if (newIndex >= loadedClips.value - 2 && loadedClips.value < results.value.length && !loadingClips.value) {
-    loadNextClips()
   }
 })
 </script>

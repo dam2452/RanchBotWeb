@@ -134,6 +134,21 @@ const handleModalClose = () => {
   showSaveModal.value = false
 }
 
+const handleVideoClick = async (event: MouseEvent) => {
+  if (!videoRef.value) return
+
+  const video = videoRef.value
+
+  if (video.muted) {
+    video.muted = false
+    try {
+      await video.play()
+    } catch (err) {
+      console.log('Play failed:', err)
+    }
+  }
+}
+
 watch(() => props.videoUrl, () => {
   isVideoLoading.value = true
 })
@@ -174,10 +189,12 @@ watch(() => previewUrl.value, () => {
             ref="videoRef"
             loop
             playsinline
+            webkit-playsinline
             muted
-            preload="metadata"
+            preload="auto"
             :src="previewUrl || videoUrl"
             @loadeddata="handleLoaded"
+            @click.stop="handleVideoClick"
             class="clip-video"
             :class="{
               'editing-video': isEditing,
@@ -187,6 +204,15 @@ watch(() => previewUrl.value, () => {
 
           <div v-if="isVideoLoading" class="video-loading-overlay">
             <LoadingSpinner size="small" />
+          </div>
+
+          <div v-if="isActive && !isEditing && videoRef?.muted" class="sound-indicator" @click.stop="handleVideoClick">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+            <span>Tap for sound</span>
           </div>
         </div>
 
@@ -447,6 +473,46 @@ watch(() => previewUrl.value, () => {
   justify-content: center;
   z-index: 100;
   pointer-events: none;
+}
+
+.sound-indicator {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  z-index: 200;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.sound-indicator:hover {
+  background: rgba(0, 0, 0, 0.85);
+  transform: translateX(-50%) scale(1.05);
+}
+
+.sound-indicator svg {
+  width: 20px;
+  height: 20px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .clip-video {

@@ -398,8 +398,15 @@ const handleClipClick = (index: number, event: MouseEvent) => {
 
 const onVideoLoaded = (event: Event, index: number) => {
   const video = event.target as HTMLVideoElement
+
+  video.load()
+
   if (index === activeIndex.value) {
-    video.play().catch(() => {})
+    setTimeout(() => {
+      video.play().catch((err) => {
+        console.log('Autoplay prevented:', err)
+      })
+    }, 100)
   }
 }
 
@@ -419,24 +426,28 @@ watch(activeIndex, async (newIndex, oldIndex) => {
     }
   })
 
-  await new Promise(resolve => setTimeout(resolve, 100))
+  await new Promise(resolve => setTimeout(resolve, 150))
 
   if (items[newIndex]) {
     try {
       const video = items[newIndex]
-      if (video.readyState >= 2) {
-        await video.play()
-      } else {
-        const playWhenReady = () => {
-          if (video.readyState >= 2) {
-            video.play().catch(() => {})
-          } else {
-            video.addEventListener('loadeddata', () => {
+
+      if (video.paused) {
+        if (video.readyState >= 3) {
+          await video.play()
+        } else {
+          video.load()
+          const playWhenReady = () => {
+            if (video.readyState >= 3) {
               video.play().catch(() => {})
-            }, { once: true })
+            } else {
+              video.addEventListener('canplay', () => {
+                video.play().catch(() => {})
+              }, { once: true })
+            }
           }
+          setTimeout(playWhenReady, 200)
         }
-        setTimeout(playWhenReady, 200)
       }
     } catch (err) {
       console.log('Autoplay prevented for clip', newIndex)

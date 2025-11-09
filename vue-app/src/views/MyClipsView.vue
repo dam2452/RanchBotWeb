@@ -218,6 +218,18 @@ watch(activePage, () => {
   <LogoHeader v-if="!isMobile" />
   <AppFooter />
 
+  <button
+    v-if="!isAppleWatch && !loading && !error && clips.length > 0"
+    class="search-button"
+    @click="$router.push('/search')"
+  >
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="10" cy="10" r="7"></circle>
+      <path d="M15 15 L21 21"></path>
+    </svg>
+    Search
+  </button>
+
   <main class="main-container">
     <div v-if="isAppleWatch" class="center-message">
       <p class="message-text">My Clips feature is not available on Apple Watch. Please use a larger device.</p>
@@ -421,6 +433,63 @@ watch(activePage, () => {
 @media (min-width: 851px) and (max-width: 1200px) {
   .clips-grid {
     width: 80vw;
+  }
+}
+
+.search-button {
+  position: fixed;
+  top: calc(80px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  background: linear-gradient(145deg, #f2a94c, #e09340);
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+  border: none;
+  border-radius: 15px;
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: bold;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.search-button:hover {
+  transform: translateX(-50%) scale(1.05);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+}
+
+.search-button:active {
+  transform: translateX(-50%) scale(0.95);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.search-icon {
+  width: 1.2em;
+  height: 1.2em;
+  transition: transform 0.3s;
+}
+
+.search-button:hover .search-icon {
+  transform: scaleX(-1);
+}
+
+@media (max-width: 850px) {
+  .search-button {
+    top: calc(65px + env(safe-area-inset-top));
+    padding: 8px 14px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 400px) {
+  .search-button {
+    padding: 6px 12px;
+    font-size: 13px;
   }
 }
 </style>

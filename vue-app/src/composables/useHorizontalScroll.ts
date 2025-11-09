@@ -15,6 +15,7 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
   const scrollTimeout = ref<number | null>(null)
   const isManualScroll = ref(false)
   const navigationLock = ref(false)
+  const isScrolling = ref(false)
 
   const handleWheel = (event: WheelEvent) => {
     if (!containerRef.value) return
@@ -42,6 +43,8 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
   const handleScroll = () => {
     if (isManualScroll.value || navigationLock.value) return
 
+    isScrolling.value = true
+
     if (scrollTimeout.value) {
       clearTimeout(scrollTimeout.value)
     }
@@ -49,8 +52,9 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
     scrollTimeout.value = window.setTimeout(() => {
       if (!isManualScroll.value && !navigationLock.value) {
         updateActiveFromScroll()
+        isScrolling.value = false
       }
-    }, 250)
+    }, 300)
   }
 
   const updateActiveFromScroll = () => {
@@ -168,8 +172,9 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
       scrollTimeout.value = window.setTimeout(() => {
         navigationLock.value = false
         isManualScroll.value = false
+        isScrolling.value = false
         console.log('navigationLock released, activeIndex:', activeIndex.value)
-      }, 1200)
+      }, 800)
     }
   }
 
@@ -208,6 +213,7 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
     scrollTimeout,
     isManualScroll,
     navigationLock,
+    isScrolling,
     handleWheel,
     handleScroll,
     updateActiveFromScroll,

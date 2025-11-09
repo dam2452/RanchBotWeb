@@ -24,12 +24,16 @@ const loading = ref(false)
 const error = ref('')
 const loadedClips = ref(0)
 const videoCache = ref<{ [key: number]: string }>({})
+const thumbnailCache = ref<{ [key: number]: string }>({})
 const videoErrors = ref<{ [key: number]: boolean }>({})
 const loadingClips = ref(false)
 const activeIndex = ref(0)
 const videoReel = ref<HTMLElement | null>(null)
 const loadMoreElement = ref<HTMLElement | null>(null)
 const editingClipIndex = ref<number | null>(null)
+const userUnmutedOnce = ref(false)
+const userInteracted = ref(false)
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
 const totalClips = computed(() => {
   const hasLoadMore = loadedClips.value < results.value.length
@@ -39,7 +43,7 @@ const totalClips = computed(() => {
   return displayedResults.value.length
 })
 
-const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTimeout, isManualScroll } = useHorizontalScroll({
+const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTimeout, isManualScroll, isScrolling } = useHorizontalScroll({
   containerRef: videoReel,
   activeIndex,
   totalItems: totalClips,
@@ -49,6 +53,7 @@ const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTim
 })
 
 let loadMoreObserver: IntersectionObserver | null = null
+let lastClipObserver: IntersectionObserver | null = null
 
 const displayedResults = computed(() => {
   return results.value.slice(0, loadedClips.value)
@@ -127,7 +132,7 @@ onMounted(async () => {
 
 const setupLoadMoreObserver = () => {
   nextTick(() => {
-    if (loadMoreElement.value && videoReel.value) {
+    if (loadMoreElement.value && videoReel.value && !isMobile) {
       if (loadMoreObserver) {
         loadMoreObserver.disconnect()
       }
@@ -148,6 +153,34 @@ const setupLoadMoreObserver = () => {
 
       loadMoreObserver.observe(loadMoreElement.value)
     }
+
+    if (isMobile && videoReel.value && loadedClips.value < results.value.length) {
+      if (lastClipObserver) {
+        lastClipObserver.disconnect()
+      }
+
+      const lastClipIndex = loadedClips.value - 1
+      const items = videoReel.value.querySelectorAll('.reel-item:not(.load-more-item)')
+      const lastClipElement = items[lastClipIndex] as HTMLElement
+
+      if (lastClipElement) {
+        lastClipObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting && !loadingClips.value && loadedClips.value < results.value.length && editingClipIndex.value === null) {
+                loadNextClips()
+              }
+            })
+          },
+          {
+            root: videoReel.value,
+            threshold: 0.3
+          }
+        )
+
+        lastClipObserver.observe(lastClipElement)
+      }
+    }
   })
 }
 
@@ -166,6 +199,10 @@ onUnmounted(() => {
 
   if (loadMoreObserver) {
     loadMoreObserver.disconnect()
+  }
+
+  if (lastClipObserver) {
+    lastClipObserver.disconnect()
   }
 
   if (scrollTimeout.value) {
@@ -202,11 +239,23 @@ const loadNextClips = async (batchSize = 2) => {
 
   for (let i = startIdx; i < endIdx; i++) {
     const clipIndex = i
+    const clipPositionId = (clipIndex + 1).toString()
+    const clipResult = results.value[clipIndex]
+    if (!clipResult) continue
+    const clipUniqueId = clipResult.id
+
     try {
-      const blob = await apiService.getVideo((clipIndex + 1).toString())
+      console.log(`Loading clip ${clipIndex}:`, clipResult)
+      console.log(`Loading thumbnail - Position: ${clipPositionId}, ID: ${clipUniqueId}, Type: ${typeof clipUniqueId}`)
+
+      const thumbnailBlob = await apiService.getThumbnail(clipPositionId, String(clipUniqueId))
+      const thumbnailUrl = URL.createObjectURL(thumbnailBlob)
+      thumbnailCache.value[clipIndex] = thumbnailUrl
+      videoErrors.value[clipIndex] = false
+
+      const blob = await apiService.getVideo(clipPositionId)
       const url = URL.createObjectURL(blob)
       videoCache.value[clipIndex] = url
-      videoErrors.value[clipIndex] = false
       loadedClips.value = clipIndex + 1
 
       if (startIdx === 0 && clipIndex === 0) {
@@ -217,8 +266,14 @@ const loadNextClips = async (batchSize = 2) => {
           scrollToClip(0)
         }, 50)
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(`Failed to load clip ${clipIndex}:`, err)
+      if (err.response?.data instanceof Blob) {
+        const text = await err.response.data.text()
+        console.error('Error details (parsed):', JSON.parse(text))
+      } else {
+        console.error('Error details:', err.response?.data)
+      }
       videoErrors.value[clipIndex] = true
       loadedClips.value = clipIndex + 1
     }
@@ -241,6 +296,7 @@ const handleSearch = (newQuery: string) => {
   results.value = []
   loadedClips.value = 0
   videoCache.value = {}
+  thumbnailCache.value = {}
   videoErrors.value = {}
   loadSearchResults()
 }
@@ -292,6 +348,26 @@ const handleSave = async (index: number) => {
     await apiService.saveClip(query.value)
   } catch (err: any) {
     console.error('Save failed:', err)
+  }
+}
+
+const handleLoadVideo = async (index: number) => {
+  if (videoCache.value[index]) {
+    const items = videoReel.value?.querySelectorAll('.reel-item video') as NodeListOf<HTMLVideoElement>
+    if (items[index] && items[index].readyState >= 2) {
+      items[index].play().catch(() => {})
+    }
+    return
+  }
+
+  const clipPositionId = (index + 1).toString()
+  try {
+    const blob = await apiService.getVideo(clipPositionId)
+    const url = URL.createObjectURL(blob)
+    videoCache.value[index] = url
+  } catch (err) {
+    console.error(`Failed to load video for clip ${index}:`, err)
+    videoErrors.value[index] = true
   }
 }
 
@@ -361,6 +437,16 @@ const scrollToClip = (index: number) => {
 }
 
 const handleReelClick = (event: MouseEvent) => {
+  if (!userInteracted.value) {
+    userInteracted.value = true
+    const items = videoReel.value?.querySelectorAll('.reel-item video') as NodeListOf<HTMLVideoElement>
+    items.forEach((video, index) => {
+      if (index === activeIndex.value && video.paused) {
+        video.play().catch(() => {})
+      }
+    })
+  }
+
   if (editingClipIndex.value === null) return
 
   const target = event.target as HTMLElement
@@ -385,13 +471,28 @@ const handleClipClick = (index: number, event: MouseEvent) => {
   if (index === activeIndex.value) {
     const video = (event.currentTarget as HTMLElement).querySelector('video')
     if (video) {
-      if (video.paused) {
+      if (video.muted) {
+        userUnmutedOnce.value = true
+        userInteracted.value = true
+        if (video.paused) {
+          video.play().catch(() => {})
+        }
+      } else if (video.paused) {
         video.play().catch(() => {})
       } else {
         video.pause()
       }
     }
+
+    if (scrollTimeout.value) {
+      clearTimeout(scrollTimeout.value)
+      scrollTimeout.value = null
+    }
+    isManualScroll.value = false
   } else {
+    if (!userInteracted.value) {
+      userInteracted.value = true
+    }
     scrollToClip(index)
   }
 }
@@ -399,12 +500,10 @@ const handleClipClick = (index: number, event: MouseEvent) => {
 const onVideoLoaded = (event: Event, index: number) => {
   const video = event.target as HTMLVideoElement
 
-  video.load()
-
-  if (index === activeIndex.value) {
+  if (index === activeIndex.value && video.paused && userInteracted.value) {
     setTimeout(() => {
       video.play().catch((err) => {
-        console.log('Autoplay prevented:', err)
+        console.log('Autoplay prevented on video loaded:', err)
       })
     }, 100)
   }
@@ -426,31 +525,29 @@ watch(activeIndex, async (newIndex, oldIndex) => {
     }
   })
 
+  if (isScrolling.value) {
+    return
+  }
+
   await new Promise(resolve => setTimeout(resolve, 150))
 
-  if (items[newIndex]) {
-    try {
-      const video = items[newIndex]
+  if (!isMobile && items[newIndex]) {
+    const video = items[newIndex]
 
-      if (video.paused) {
-        if (video.readyState >= 3) {
-          await video.play()
-        } else {
-          video.load()
-          const playWhenReady = () => {
-            if (video.readyState >= 3) {
-              video.play().catch(() => {})
-            } else {
-              video.addEventListener('canplay', () => {
-                video.play().catch(() => {})
-              }, { once: true })
-            }
+    if (video.paused && userInteracted.value && !isScrolling.value) {
+      if (video.readyState >= 2) {
+        video.play().catch((err) => {
+          console.log('Autoplay prevented in watch:', err)
+        })
+      } else {
+        video.addEventListener('canplay', () => {
+          if (video.paused && userInteracted.value && !isScrolling.value) {
+            video.play().catch((err) => {
+              console.log('Autoplay prevented on canplay:', err)
+            })
           }
-          setTimeout(playWhenReady, 200)
-        }
+        }, { once: true })
       }
-    } catch (err) {
-      console.log('Autoplay prevented for clip', newIndex)
     }
   }
 })
@@ -481,23 +578,27 @@ watch(activeIndex, async (newIndex, oldIndex) => {
       class="editing-backdrop"
     ></div>
 
-    <div v-if="videoCache[0] || videoErrors[0]" class="video-reel" :class="{ 'watch-reel': isWatchView }" ref="videoReel" @click="handleReelClick">
+    <div v-if="videoCache[0] || thumbnailCache[0] || videoErrors[0]" class="video-reel" :class="{ 'watch-reel': isWatchView }" ref="videoReel" @click="handleReelClick">
       <VideoReelItem
         v-for="(result, index) in displayedResults"
         :key="index"
         :index="index"
         :video-url="videoCache[index]"
+        :thumbnail-url="thumbnailCache[index]"
         :has-error="videoErrors[index] || false"
         :is-active="index === activeIndex"
         :is-last-loaded="index === loadedClips - 1 && loadedClips < results.length"
         :is-editing="index === editingClipIndex"
         :search-query="query"
+        :user-unmuted="userUnmutedOnce"
+        :user-interacted="userInteracted"
         @click="handleClipClick"
         @adjust="handleAdjust"
         @download="handleDownload"
         @save="handleSave"
         @loaded="onVideoLoaded"
         @close-editor="closeEditor"
+        @load-video="handleLoadVideo"
       />
 
       <div
@@ -524,6 +625,8 @@ watch(activeIndex, async (newIndex, oldIndex) => {
           <p class="load-more-count">{{ results.length - loadedClips }} clips remaining</p>
         </div>
       </div>
+
+      <div v-if="!isWatchView" class="scroll-spacer"></div>
     </div>
   </main>
 
@@ -610,6 +713,13 @@ watch(activeIndex, async (newIndex, oldIndex) => {
   display: none;
 }
 
+.scroll-spacer {
+  width: 100%;
+  height: 50vh;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
 
 
 @media (min-width: 481px) {
@@ -630,7 +740,12 @@ watch(activeIndex, async (newIndex, oldIndex) => {
     overflow-x: scroll;
     overflow-y: hidden;
     flex-direction: row;
-    padding: 140px 0 0;
+    padding: 140px 0 0 0;
+  }
+
+  .scroll-spacer {
+    width: 50vw;
+    height: 100%;
   }
 
   .video-reel.watch-reel {

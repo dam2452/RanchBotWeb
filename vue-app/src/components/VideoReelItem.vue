@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import LoadingSpinner from './LoadingSpinner.vue'
 import ClipActionButton from './ClipActionButton.vue'
 import ClipEditor from './ClipEditor.vue'
@@ -17,6 +17,7 @@ interface Emits {
   (e: 'save', index: number): void
   (e: 'loaded', event: Event, index: number): void
   (e: 'close-editor'): void
+  (e: 'load-video', index: number): void
 }
 
 const props = defineProps<Props>()
@@ -26,7 +27,12 @@ const wasEditing = ref(false)
 const showSaveModal = ref(false)
 const isAdjustedSave = ref(false)
 const videoRef = ref<HTMLVideoElement | null>(null)
-const isVideoLoading = ref(true)
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+const isVideoLoading = ref(false)
+const isVideoMuted = ref(isMobile)
+const shouldLoadVideo = ref(false)
+const thumbnailLoaded = ref(false)
+const isVideoPlaying = ref(false)
 
 const {
   leftAdjust,
@@ -51,6 +57,7 @@ const { download, save } = useClipActions({
   searchQuery: props.searchQuery
 })
 
+
 watch(() => props.isEditing, (editing, wasEditingBefore) => {
   if (editing) {
     resetAdjustments()
@@ -64,7 +71,40 @@ watch(() => props.isEditing, (editing, wasEditingBefore) => {
 })
 
 const handleClick = (event: MouseEvent) => {
+  if (props.thumbnailUrl && thumbnailLoaded.value) {
+    event.stopPropagation()
+
+    if (!shouldLoadVideo.value) {
+      shouldLoadVideo.value = true
+      isVideoLoading.value = true
+      emit('load-video', props.index)
+
+      if (isMobile && videoRef.value) {
+        videoRef.value.muted = false
+        isVideoMuted.value = false
+      }
+      return
+    }
+
+    if (videoRef.value) {
+      if (isVideoPlaying.value) {
+        videoRef.value.pause()
+      } else {
+        if (isMobile) {
+          videoRef.value.muted = false
+          isVideoMuted.value = false
+        }
+        videoRef.value.play().catch(() => {})
+      }
+    }
+    return
+  }
   emit('click', props.index, event)
+}
+
+const handleThumbnailLoaded = () => {
+  thumbnailLoaded.value = true
+  isVideoLoading.value = false
 }
 
 const handleAdjust = () => {
@@ -89,8 +129,39 @@ const handleSave = async () => {
 }
 
 const handleLoaded = (event: Event) => {
-  isVideoLoading.value = false
   emit('loaded', event, props.index)
+
+  if (videoRef.value) {
+    videoRef.value.addEventListener('volumechange', () => {
+      if (videoRef.value) {
+        isVideoMuted.value = videoRef.value.muted
+      }
+    })
+  }
+}
+
+const handleCanPlay = (event: Event) => {
+  isVideoLoading.value = false
+
+  if (shouldLoadVideo.value && videoRef.value && videoRef.value.paused) {
+    if (isMobile) {
+      videoRef.value.muted = false
+      isVideoMuted.value = false
+    }
+    videoRef.value.play().catch(() => {})
+    isVideoPlaying.value = true
+  } else if (props.isActive && props.userInteracted && videoRef.value && videoRef.value.paused) {
+    videoRef.value.play().catch(() => {})
+    isVideoPlaying.value = true
+  }
+}
+
+const handlePlaying = () => {
+  isVideoPlaying.value = true
+}
+
+const handlePause = () => {
+  isVideoPlaying.value = false
 }
 
 const handleCloseEditor = () => {
@@ -134,28 +205,27 @@ const handleModalClose = () => {
   showSaveModal.value = false
 }
 
-const handleVideoClick = async (event: MouseEvent) => {
-  if (!videoRef.value) return
-
-  const video = videoRef.value
-
-  if (video.muted) {
-    video.muted = false
-    try {
-      await video.play()
-    } catch (err) {
-      console.log('Play failed:', err)
-    }
+watch(() => props.videoUrl, (newUrl) => {
+  if (newUrl && shouldLoadVideo.value) {
+    isVideoLoading.value = true
   }
-}
-
-watch(() => props.videoUrl, () => {
-  isVideoLoading.value = true
 })
 
 watch(() => previewUrl.value, () => {
   if (previewUrl.value) {
     isVideoLoading.value = true
+  }
+})
+
+watch(() => props.isActive, (active) => {
+  if (active && !shouldLoadVideo.value && thumbnailLoaded.value && props.videoUrl) {
+    shouldLoadVideo.value = true
+  }
+})
+
+watch(() => props.thumbnailUrl, (newThumbUrl) => {
+  if (newThumbUrl && !shouldLoadVideo.value) {
+    isVideoLoading.value = false
   }
 })
 </script>
@@ -179,22 +249,42 @@ watch(() => previewUrl.value, () => {
     @click="handleClick"
   >
     <div
-      v-if="videoUrl"
+      v-if="!hasError"
       class="clip-wrapper"
       :class="{ 'editing-wrapper': isEditing }"
     >
       <div class="video-container">
         <div class="video-wrapper">
+          <div v-if="!videoUrl && !thumbnailLoaded" class="thumbnail-placeholder" :class="{ 'active-video': isActive && !isEditing }"></div>
+
+          <img
+            v-if="thumbnailUrl"
+            v-show="!isVideoPlaying"
+            :src="thumbnailUrl"
+            @load="handleThumbnailLoaded"
+            @click="handleClick"
+            class="clip-video thumbnail-preview"
+            :class="{
+              'active-video': isActive && !isEditing
+            }"
+            alt="Video thumbnail"
+          />
+
           <video
+            v-if="videoUrl || shouldLoadVideo"
+            v-show="!thumbnailUrl || isVideoPlaying"
             ref="videoRef"
             loop
             playsinline
             webkit-playsinline
-            muted
+            :muted="isMobile"
             preload="auto"
             :src="previewUrl || videoUrl"
+            @click="handleClick"
             @loadeddata="handleLoaded"
-            @click.stop="handleVideoClick"
+            @canplay="handleCanPlay"
+            @playing="handlePlaying"
+            @pause="handlePause"
             class="clip-video"
             :class="{
               'editing-video': isEditing,
@@ -202,17 +292,8 @@ watch(() => previewUrl.value, () => {
             }"
           ></video>
 
-          <div v-if="isVideoLoading" class="video-loading-overlay">
+          <div v-if="isVideoLoading && shouldLoadVideo && !videoUrl" class="video-loading-overlay">
             <LoadingSpinner size="small" />
-          </div>
-
-          <div v-if="isActive && !isEditing && videoRef?.muted" class="sound-indicator" @click.stop="handleVideoClick">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-              <line x1="23" y1="9" x2="17" y2="15"></line>
-              <line x1="17" y1="9" x2="23" y2="15"></line>
-            </svg>
-            <span>Tap for sound</span>
           </div>
         </div>
 
@@ -273,10 +354,6 @@ watch(() => previewUrl.value, () => {
       </svg>
       <p class="error-title">Failed to load clip</p>
       <p class="error-subtitle">Clip #{{ index + 1 }} is unavailable</p>
-    </div>
-
-    <div v-else class="loading-state">
-      <LoadingSpinner size="small" :message="`Loading clip #${index + 1}...`" />
     </div>
 
     <SaveClipModal
@@ -475,44 +552,36 @@ watch(() => previewUrl.value, () => {
   pointer-events: none;
 }
 
-.sound-indicator {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 12px 20px;
+.thumbnail-preview {
+  cursor: pointer;
+}
+
+.thumbnail-placeholder {
+  width: 100%;
+  height: 100%;
+  max-height: 100vh;
+  max-width: 100vw;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
   border-radius: 24px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  z-index: 200;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-  animation: pulse 2s ease-in-out infinite;
+  justify-content: center;
+  position: relative;
 }
 
-.sound-indicator:hover {
-  background: rgba(0, 0, 0, 0.85);
-  transform: translateX(-50%) scale(1.05);
+.thumbnail-placeholder::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border: 3px solid rgba(242, 169, 76, 0.3);
+  border-radius: 50%;
+  border-top-color: rgba(242, 169, 76, 0.8);
+  animation: spin 1s linear infinite;
 }
 
-.sound-indicator svg {
-  width: 20px;
-  height: 20px;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 0.8;
-  }
-  50% {
-    opacity: 1;
-  }
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .clip-video {
@@ -568,13 +637,16 @@ watch(() => previewUrl.value, () => {
     border-radius: 32px;
   }
 
-  .reel-item:not(.active) {
+  .reel-item:not(.active):not(.z-editing) {
     opacity: 0.5;
     transform: scale(0.85);
     pointer-events: auto;
   }
 
-  .reel-item.active {
+  .reel-item.active,
+  .reel-item.z-editing {
+    opacity: 1;
+    transform: scale(1);
     box-shadow: none;
   }
 

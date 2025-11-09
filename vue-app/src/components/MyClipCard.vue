@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { Clip } from '@/types'
 import ClipActionButton from './ClipActionButton.vue'
 import ConfirmModal from './ConfirmModal.vue'
@@ -8,8 +8,11 @@ import LoadingSpinner from './LoadingSpinner.vue'
 interface Props {
   clip: Clip
   videoUrl: string
+  thumbnailUrl?: string
   isActive: boolean
   hasError?: boolean
+  userUnmuted?: boolean
+  userInteracted?: boolean
 }
 
 interface Emits {
@@ -20,7 +23,9 @@ interface Emits {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  hasError: false
+  hasError: false,
+  userUnmuted: false,
+  userInteracted: false
 })
 
 const emit = defineEmits<Emits>()
@@ -28,8 +33,47 @@ const emit = defineEmits<Emits>()
 const showDeleteConfirm = ref(false)
 const videoRef = ref<HTMLVideoElement | null>(null)
 const isLoading = ref(true)
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+const isVideoMuted = ref(isMobile)
+const shouldLoadVideo = ref(false)
+const thumbnailLoaded = ref(false)
+const isVideoPlaying = ref(false)
 
-const handleVideoClick = (event: Event) => {
+
+const handleThumbnailLoaded = () => {
+  thumbnailLoaded.value = true
+  isLoading.value = false
+}
+
+const handleThumbnailOrVideoClick = (event: Event) => {
+  if (props.thumbnailUrl && thumbnailLoaded.value) {
+    event.stopPropagation()
+
+    if (!shouldLoadVideo.value) {
+      shouldLoadVideo.value = true
+      isLoading.value = true
+
+      if (isMobile && videoRef.value) {
+        videoRef.value.muted = false
+        isVideoMuted.value = false
+      }
+      return
+    }
+
+    if (videoRef.value) {
+      if (isVideoPlaying.value) {
+        videoRef.value.pause()
+      } else {
+        if (isMobile) {
+          videoRef.value.muted = false
+          isVideoMuted.value = false
+        }
+        videoRef.value.play().catch(() => {})
+      }
+    }
+    return
+  }
+
   if (!props.hasError) {
     emit('video-click', event)
   }
@@ -73,7 +117,38 @@ const handleVideoError = (event: Event) => {
 
 const handleVideoLoaded = () => {
   console.log('Video loaded:', props.clip.id)
+  if (!props.thumbnailUrl) {
+    isLoading.value = false
+  }
+
+  if (videoRef.value) {
+    videoRef.value.addEventListener('volumechange', () => {
+      if (videoRef.value) {
+        isVideoMuted.value = videoRef.value.muted
+      }
+    })
+  }
+}
+
+const handleCanPlay = () => {
   isLoading.value = false
+
+  if (shouldLoadVideo.value && videoRef.value && videoRef.value.paused) {
+    if (isMobile) {
+      videoRef.value.muted = false
+      isVideoMuted.value = false
+    }
+    videoRef.value.play().catch(() => {})
+    isVideoPlaying.value = true
+  }
+}
+
+const handlePlaying = () => {
+  isVideoPlaying.value = true
+}
+
+const handlePause = () => {
+  isVideoPlaying.value = false
 }
 
 </script>
@@ -82,19 +157,35 @@ const handleVideoLoaded = () => {
   <div class="clip-card">
     <div class="video-container">
       <div v-if="!hasError" class="video-wrapper">
+        <img
+          v-if="thumbnailUrl"
+          v-show="!isVideoPlaying"
+          :src="thumbnailUrl"
+          @load="handleThumbnailLoaded"
+          @click="handleThumbnailOrVideoClick"
+          class="clip-video thumbnail-preview"
+          :class="{ active: isActive }"
+          alt="Video thumbnail"
+        />
+
         <video
+          v-if="!thumbnailUrl || shouldLoadVideo"
+          v-show="!thumbnailUrl || isVideoPlaying"
           ref="videoRef"
           loop
           playsinline
-          muted
-          preload="metadata"
+          :muted="isMobile"
+          preload="auto"
           :src="videoUrl"
           class="clip-video"
           :class="{ active: isActive }"
-          @click="handleVideoClick"
+          @click="handleThumbnailOrVideoClick"
           @error="handleVideoError"
           @loadstart="() => console.log('Loading video:', clip.id)"
           @loadeddata="handleVideoLoaded"
+          @canplay="handleCanPlay"
+          @playing="handlePlaying"
+          @pause="handlePause"
         ></video>
 
         <div v-if="isLoading" class="loading-overlay">
@@ -206,6 +297,11 @@ const handleVideoLoaded = () => {
 
 .clip-video.active {
   box-shadow: 0 0 0 3px #f2a94c, 0 0 20px rgba(242, 169, 76, 0.6);
+}
+
+.thumbnail-preview {
+  cursor: pointer;
+  object-fit: cover;
 }
 
 .error-placeholder {

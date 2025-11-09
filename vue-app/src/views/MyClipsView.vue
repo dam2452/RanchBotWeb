@@ -16,6 +16,8 @@ const activePage = ref(0)
 const activeClipId = ref<string | null>(null)
 const pageReel = ref<HTMLElement | null>(null)
 const clipErrors = ref<{ [key: string]: boolean }>({})
+const userUnmutedOnce = ref(false)
+const userInteracted = ref(false)
 
 const windowWidth = ref(window.innerWidth)
 const isAppleWatch = computed(() => windowWidth.value <= 196)
@@ -28,7 +30,7 @@ const updateWindowWidth = () => {
   windowWidth.value = window.innerWidth
 }
 
-const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTimeout, isManualScroll } = useHorizontalScroll({
+const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTimeout, isManualScroll, isScrolling } = useHorizontalScroll({
   containerRef: pageReel,
   activeIndex: activePage,
   totalItems: totalPages,
@@ -145,12 +147,29 @@ const getVideoUrl = (clipName: string) => {
   return apiService.getVideoUrl(clipName)
 }
 
+const getThumbnailUrl = (clipName: string) => {
+  return apiService.getThumbnailUrl(clipName)
+}
+
 const handleVideoClick = (clip: Clip, event: Event) => {
   const video = (event.target as HTMLVideoElement)
 
+  if (!userInteracted.value) {
+    userInteracted.value = true
+  }
+
   if (activeClipId.value === clip.id) {
-    video.pause()
-    activeClipId.value = null
+    if (video.muted) {
+      video.muted = false
+      userUnmutedOnce.value = true
+      if (video.paused) {
+        video.play().catch(() => {})
+      }
+    } else if (video.paused) {
+      video.play().catch(() => {})
+    } else {
+      video.pause()
+    }
   } else {
     document.querySelectorAll('.clip-video').forEach((v) => {
       (v as HTMLVideoElement).pause()
@@ -188,7 +207,9 @@ const pauseInactivePageVideos = () => {
 }
 
 watch(activePage, () => {
-  pauseInactivePageVideos()
+  if (!isScrolling.value) {
+    pauseInactivePageVideos()
+  }
 })
 </script>
 
@@ -233,8 +254,11 @@ watch(activePage, () => {
             :key="clip.id"
             :clip="clip"
             :video-url="getVideoUrl(clip.name)"
+            :thumbnail-url="getThumbnailUrl(clip.name)"
             :is-active="activeClipId === clip.id"
             :has-error="!!clipErrors[clip.id]"
+            :user-unmuted="userUnmutedOnce"
+            :user-interacted="userInteracted"
             @video-click="(e) => handleVideoClick(clip, e)"
             @download="handleDownload(clip)"
             @delete="handleDelete(clip.name)"
@@ -242,6 +266,8 @@ watch(activePage, () => {
           />
         </div>
       </div>
+
+      <div v-if="!isAppleWatch" class="scroll-spacer"></div>
     </div>
   </main>
 </template>
@@ -333,6 +359,13 @@ watch(activePage, () => {
   backdrop-filter: none;
 }
 
+.scroll-spacer {
+  width: 100%;
+  height: 50vh;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
 @media (min-width: 851px) {
   .page-reel {
     flex-direction: row;
@@ -341,6 +374,11 @@ watch(activePage, () => {
     scroll-snap-type: x mandatory;
     padding: 0 10vw;
     align-items: center;
+  }
+
+  .scroll-spacer {
+    width: 50vw;
+    height: 100%;
   }
 
   .page-item {
@@ -363,12 +401,20 @@ watch(activePage, () => {
     height: 70vh;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+    grid-auto-rows: 1fr;
     gap: 1.5rem;
     padding: 2rem;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 32px;
     backdrop-filter: blur(8px);
+  }
+
+  .clips-grid:has(> :nth-child(1):nth-last-child(1)),
+  .clips-grid:has(> :nth-child(1):nth-last-child(2)),
+  .clips-grid:has(> :nth-child(1):nth-last-child(3)) {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    justify-items: center;
+    align-items: center;
   }
 }
 

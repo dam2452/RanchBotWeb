@@ -59,6 +59,7 @@ const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTim
 
 let loadMoreObserver: IntersectionObserver | null = null
 let lastClipObserver: IntersectionObserver | null = null
+let lastLoadTime = 0
 
 const displayedResults = computed(() => {
   return results.value.slice(0, loadedClips.value)
@@ -177,7 +178,10 @@ const setupLoadMoreObserver = () => {
       loadMoreObserver = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (entry.isIntersecting && !loadingClips.value && loadedClips.value < results.value.length && !isManualScroll.value && editingClipIndex.value === null) {
+            const now = Date.now()
+            const timeSinceLastLoad = now - lastLoadTime
+
+            if (entry.isIntersecting && !loadingClips.value && loadedClips.value < results.value.length && !isManualScroll.value && editingClipIndex.value === null && activeIndex.value >= displayedResults.value.length - 2 && timeSinceLastLoad > 1000) {
               loadNextClips()
             }
           })
@@ -317,6 +321,7 @@ const loadNextClips = async (batchSize = 2) => {
   }
 
   loadingClips.value = false
+  lastLoadTime = Date.now()
 
   if (loadedClips.value < results.value.length) {
     setupLoadMoreObserver()

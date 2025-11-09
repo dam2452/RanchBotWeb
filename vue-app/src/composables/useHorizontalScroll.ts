@@ -144,6 +144,8 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
         let scrollTop
         if (isLast) {
           scrollTop = containerRef.value.scrollTop + (itemRect.top - containerRect.top) - 50
+        } else if (editing) {
+          scrollTop = containerRef.value.scrollTop + (itemRect.top - containerRect.top) - 300
         } else {
           scrollTop = containerRef.value.scrollTop + (itemRect.top - containerRect.top) - (containerRect.height - itemRect.height) / 2
         }

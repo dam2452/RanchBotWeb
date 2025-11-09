@@ -448,6 +448,8 @@ const scrollToClip = (index: number) => {
       let scrollTop
       if (isLastLoaded) {
         scrollTop = videoReel.value.scrollTop + (itemRect.top - containerRect.top) - 50
+      } else if (isEditing) {
+        scrollTop = videoReel.value.scrollTop + (itemRect.top - containerRect.top) - 150
       } else {
         scrollTop = videoReel.value.scrollTop + (itemRect.top - containerRect.top) - (containerRect.height - itemRect.height) / 2
       }
@@ -500,6 +502,7 @@ const handleClipClick = (index: number, event: MouseEvent) => {
   }
 
   if (editingClipIndex.value !== null && index !== editingClipIndex.value) {
+    closeEditor()
     return
   }
 

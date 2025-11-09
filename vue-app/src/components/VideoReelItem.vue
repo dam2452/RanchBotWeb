@@ -71,6 +71,11 @@ watch(() => props.isEditing, (editing, wasEditingBefore) => {
 })
 
 const handleClick = (event: MouseEvent) => {
+  if (!props.isActive) {
+    emit('click', props.index, event)
+    return
+  }
+
   if (props.thumbnailUrl && thumbnailLoaded.value) {
     event.stopPropagation()
 
@@ -148,9 +153,6 @@ const handleCanPlay = (event: Event) => {
       videoRef.value.muted = false
       isVideoMuted.value = false
     }
-    videoRef.value.play().catch(() => {})
-    isVideoPlaying.value = true
-  } else if (props.isActive && props.userInteracted && videoRef.value && videoRef.value.paused) {
     videoRef.value.play().catch(() => {})
     isVideoPlaying.value = true
   }
@@ -612,6 +614,16 @@ watch(() => props.thumbnailUrl, (newThumbUrl) => {
   margin-bottom: 0;
 }
 
+@media (max-width: 850px) {
+  .editing-wrapper {
+    padding-top: 80px;
+  }
+
+  .editing-video {
+    max-height: 50vh;
+  }
+}
+
 .panel-slide-enter-active,
 .panel-slide-leave-active {
   transition: all 0.3s ease;
@@ -697,12 +709,12 @@ watch(() => props.thumbnailUrl, (newThumbUrl) => {
   }
 
   .reel-item[data-idx="0"]:not(.z-editing) {
-    margin-left: 80px;
+    margin-left: 20px;
     margin-top: 0;
   }
 
   .reel-item[data-idx="0"].z-editing {
-    margin-left: 400px;
+    margin-left: 20px;
     margin-top: 0;
   }
 }

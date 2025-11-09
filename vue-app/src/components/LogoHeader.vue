@@ -49,7 +49,7 @@ onUnmounted(() => {
 }
 
 .logo-brand {
-  transform: scale(0.4);
+  transform: scale(0.44);
   filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.3));
 }
 
@@ -70,7 +70,7 @@ onUnmounted(() => {
   }
 
   .logo-brand {
-    transform: scale(0.7);
+    transform: scale(0.77);
   }
 
   .logo-text {

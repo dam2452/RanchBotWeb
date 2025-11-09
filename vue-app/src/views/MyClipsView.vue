@@ -8,16 +8,20 @@ import LogoHeader from '@/components/LogoHeader.vue'
 import MyClipCard from '@/components/MyClipCard.vue'
 import AppFooter from '@/components/AppFooter.vue'
 import { useHorizontalScroll } from '@/composables/useHorizontalScroll'
+import { useVideoControl } from '@/composables/useVideoControl'
 
 const clips = ref<Clip[]>([])
 const loading = ref(true)
 const error = ref('')
 const activePage = ref(0)
-const activeClipId = ref<string | null>(null)
 const pageReel = ref<HTMLElement | null>(null)
 const clipErrors = ref<{ [key: string]: boolean }>({})
 const userUnmutedOnce = ref(false)
-const userInteracted = ref(false)
+
+const { activeVideoId, userInteracted, pauseAllVideos, toggleVideo } = useVideoControl({
+  containerRef: pageReel,
+  videoSelector: 'video.clip-video'
+})
 
 const windowWidth = ref(window.innerWidth)
 const isAppleWatch = computed(() => windowWidth.value <= 196)
@@ -38,6 +42,16 @@ const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTim
 })
 
 const handleKeyDown = (e: KeyboardEvent) => {
+  if (e.key === ' ') {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (activeVideoId.value) {
+      toggleVideo(activeVideoId.value)
+    }
+    return
+  }
+
   if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
     e.preventDefault()
     e.stopPropagation()
@@ -152,31 +166,35 @@ const getThumbnailUrl = (clipName: string) => {
 }
 
 const handleVideoClick = (clip: Clip, event: Event) => {
-  const video = (event.target as HTMLVideoElement)
+  const activePageElement = pageReel.value?.querySelector('.page-item.active-page')
+  if (!activePageElement) return
 
-  if (!userInteracted.value) {
-    userInteracted.value = true
+  const clipCards = activePageElement.querySelectorAll('.clip-card')
+  let targetVideo: HTMLVideoElement | null = null
+
+  for (const card of clipCards) {
+    const video = card.querySelector('video') as HTMLVideoElement
+    if (video && video.dataset.clipId === String(clip.id)) {
+      targetVideo = video
+      break
+    }
   }
 
-  if (activeClipId.value === clip.id) {
-    if (video.muted) {
-      video.muted = false
-      userUnmutedOnce.value = true
-      if (video.paused) {
-        video.play().catch(() => {})
-      }
-    } else if (video.paused) {
-      video.play().catch(() => {})
+  if (!targetVideo) return
+
+  if (activeVideoId.value === String(clip.id)) {
+    if (targetVideo.paused) {
+      targetVideo.play().catch(() => {})
     } else {
-      video.pause()
+      targetVideo.pause()
     }
   } else {
-    document.querySelectorAll('.clip-video').forEach((v) => {
-      (v as HTMLVideoElement).pause()
-    })
+    pauseAllVideos()
+    activeVideoId.value = String(clip.id)
 
-    activeClipId.value = clip.id
-    video.play().catch(() => {})
+    if (targetVideo.readyState >= 2) {
+      targetVideo.play().catch(() => {})
+    }
   }
 }
 
@@ -186,30 +204,11 @@ const handleVideoError = (clipId: string) => {
 }
 
 const pauseInactivePageVideos = () => {
-  if (!pageReel.value) return
-
-  const pages = pageReel.value.querySelectorAll('.page-item')
-  pages.forEach((page, pageIndex) => {
-    if (pageIndex !== activePage.value) {
-      const videos = page.querySelectorAll('video')
-      videos.forEach((video) => {
-        if (!video.paused) {
-          video.pause()
-          video.currentTime = 0
-        }
-      })
-    }
-  })
-
-  if (activeClipId.value) {
-    activeClipId.value = null
-  }
+  pauseAllVideos()
 }
 
 watch(activePage, () => {
-  if (!isScrolling.value) {
-    pauseInactivePageVideos()
-  }
+  pauseInactivePageVideos()
 })
 </script>
 
@@ -267,7 +266,7 @@ watch(activePage, () => {
             :clip="clip"
             :video-url="getVideoUrl(clip.name)"
             :thumbnail-url="getThumbnailUrl(clip.name)"
-            :is-active="activeClipId === clip.id"
+            :is-active="activeVideoId === String(clip.id)"
             :has-error="!!clipErrors[clip.id]"
             :user-unmuted="userUnmutedOnce"
             :user-interacted="userInteracted"
@@ -413,7 +412,7 @@ watch(activePage, () => {
     height: 70vh;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr;
+    grid-template-rows: repeat(2, 1fr);
     gap: 1.5rem;
     padding: 2rem;
     background: rgba(255, 255, 255, 0.1);
@@ -423,10 +422,19 @@ watch(activePage, () => {
 
   .clips-grid:has(> :nth-child(1):nth-last-child(1)),
   .clips-grid:has(> :nth-child(1):nth-last-child(2)),
-  .clips-grid:has(> :nth-child(1):nth-last-child(3)) {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  .clips-grid:has(> :nth-child(1):nth-last-child(3)),
+  .clips-grid:has(> :nth-child(1):nth-last-child(4)),
+  .clips-grid:has(> :nth-child(1):nth-last-child(5)) {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
     justify-items: center;
     align-items: center;
+  }
+
+  .clips-grid:has(> :nth-child(1):nth-last-child(1)),
+  .clips-grid:has(> :nth-child(1):nth-last-child(2)),
+  .clips-grid:has(> :nth-child(1):nth-last-child(3)) {
+    grid-template-rows: 1fr;
   }
 }
 

@@ -19,6 +19,7 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
 
   const handleWheel = (event: WheelEvent) => {
     if (!containerRef.value) return
+    if (isEditing && isEditing()) return
 
     if (Math.abs(event.deltaY) > 0) {
       event.preventDefault()
@@ -42,6 +43,7 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
 
   const handleScroll = () => {
     if (isManualScroll.value || navigationLock.value) return
+    if (isEditing && isEditing()) return
 
     isScrolling.value = true
 
@@ -59,6 +61,7 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
 
   const updateActiveFromScroll = () => {
     if (!containerRef.value) return
+    if (isEditing && isEditing()) return
 
     const container = containerRef.value
     const isMobile = window.innerWidth <= 850
@@ -97,23 +100,20 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    console.log('Key pressed:', e.key, 'Target:', e.target)
+    if (isEditing && isEditing()) return
 
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
       e.preventDefault()
       e.stopPropagation()
       const newIndex = Math.max(0, activeIndex.value - 1)
-      console.log('Arrow Left/Up - changing from', activeIndex.value, 'to', newIndex, 'totalItems:', totalItems.value)
       scrollToItem(newIndex)
     } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       e.preventDefault()
       e.stopPropagation()
       if (activeIndex.value >= totalItems.value - 1) {
-        console.log('Arrow Right/Down - already at last valid item')
         return
       }
       const newIndex = Math.min(totalItems.value - 1, activeIndex.value + 1)
-      console.log('Arrow Right/Down - changing from', activeIndex.value, 'to', newIndex, 'totalItems:', totalItems.value)
       scrollToItem(newIndex)
     }
   }
@@ -128,7 +128,6 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
     navigationLock.value = true
     isManualScroll.value = true
     activeIndex.value = index
-    console.log('scrollToItem - activeIndex set to:', index)
 
     const items = containerRef.value.querySelectorAll(itemSelector)
     const targetItem = items[index] as HTMLElement
@@ -156,7 +155,7 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
       } else {
         let scrollLeft
         if (isLast) {
-          scrollLeft = containerRef.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) * 0.1
+          scrollLeft = containerRef.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) * 0.3
         } else if (isFirstEditing) {
           scrollLeft = containerRef.value.scrollLeft + (itemRect.left - containerRect.left) - 350
         } else {
@@ -173,7 +172,6 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
         navigationLock.value = false
         isManualScroll.value = false
         isScrolling.value = false
-        console.log('navigationLock released, activeIndex:', activeIndex.value)
       }, 800)
     }
   }
@@ -185,20 +183,18 @@ export function useHorizontalScroll(options: UseHorizontalScrollOptions) {
         return
       }
     }
+    if (isEditing && isEditing()) return
     scrollToItem(index)
   }
 
   const setupScrollListeners = () => {
     if (!containerRef.value) {
-      console.warn('setupScrollListeners - containerRef is null!')
       return
     }
 
-    console.log('setupScrollListeners - adding event listeners')
     containerRef.value.addEventListener('wheel', handleWheel, { passive: false })
     containerRef.value.addEventListener('scroll', handleScroll)
     document.addEventListener('keydown', handleKeyDown)
-    console.log('setupScrollListeners - keydown listener added to document')
   }
 
   const cleanupScrollListeners = () => {

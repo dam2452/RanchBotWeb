@@ -46,32 +46,14 @@ const handleThumbnailLoaded = () => {
 }
 
 const handleThumbnailOrVideoClick = (event: Event) => {
-  if (props.thumbnailUrl && thumbnailLoaded.value) {
-    event.stopPropagation()
+  if (props.thumbnailUrl && !shouldLoadVideo.value) {
+    shouldLoadVideo.value = true
+    isLoading.value = true
 
-    if (!shouldLoadVideo.value) {
-      shouldLoadVideo.value = true
-      isLoading.value = true
-
-      if (isMobile && videoRef.value) {
-        videoRef.value.muted = false
-        isVideoMuted.value = false
-      }
-      return
+    if (isMobile && videoRef.value) {
+      videoRef.value.muted = false
+      isVideoMuted.value = false
     }
-
-    if (videoRef.value) {
-      if (isVideoPlaying.value) {
-        videoRef.value.pause()
-      } else {
-        if (isMobile) {
-          videoRef.value.muted = false
-          isVideoMuted.value = false
-        }
-        videoRef.value.play().catch(() => {})
-      }
-    }
-    return
   }
 
   if (!props.hasError) {
@@ -116,7 +98,6 @@ const handleVideoError = (event: Event) => {
 }
 
 const handleVideoLoaded = () => {
-  console.log('Video loaded:', props.clip.id)
   if (!props.thumbnailUrl) {
     isLoading.value = false
   }
@@ -133,7 +114,7 @@ const handleVideoLoaded = () => {
 const handleCanPlay = () => {
   isLoading.value = false
 
-  if (shouldLoadVideo.value && videoRef.value && videoRef.value.paused) {
+  if (shouldLoadVideo.value && props.isActive && videoRef.value && videoRef.value.paused) {
     if (isMobile) {
       videoRef.value.muted = false
       isVideoMuted.value = false
@@ -154,12 +135,11 @@ const handlePause = () => {
 </script>
 
 <template>
-  <div class="clip-card">
+  <div class="clip-card" :data-clip-id="clip.id">
     <div class="video-container">
       <div v-if="!hasError" class="video-wrapper">
         <img
-          v-if="thumbnailUrl"
-          v-show="!isVideoPlaying"
+          v-if="thumbnailUrl && !shouldLoadVideo"
           :src="thumbnailUrl"
           @load="handleThumbnailLoaded"
           @click="handleThumbnailOrVideoClick"
@@ -170,8 +150,8 @@ const handlePause = () => {
 
         <video
           v-if="!thumbnailUrl || shouldLoadVideo"
-          v-show="!thumbnailUrl || isVideoPlaying"
           ref="videoRef"
+          :data-clip-id="clip.id"
           loop
           playsinline
           :muted="isMobile"
@@ -181,7 +161,6 @@ const handlePause = () => {
           :class="{ active: isActive }"
           @click="handleThumbnailOrVideoClick"
           @error="handleVideoError"
-          @loadstart="() => console.log('Loading video:', clip.id)"
           @loadeddata="handleVideoLoaded"
           @canplay="handleCanPlay"
           @playing="handlePlaying"

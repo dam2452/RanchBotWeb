@@ -616,7 +616,7 @@ watch(() => props.thumbnailUrl, (newThumbUrl) => {
 
 @media (max-width: 850px) {
   .editing-wrapper {
-    padding-top: 80px;
+    padding-top: 200px;
   }
 
   .editing-video {

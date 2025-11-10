@@ -22,9 +22,7 @@ Dla polskiej wersji dokumentacji, zobacz [README.pl.md](README.pl.md).
 [![Desktop Demo](https://img.youtube.com/vi/NYQvrILlGaU/maxresdefault.jpg)](https://youtu.be/NYQvrILlGaU)
 
 ### 📱 Mobile Version
-<a href="https://youtube.com/shorts/m9J0WIAAyxs">
-  <img src="https://img.youtube.com/vi/m9J0WIAAyxs/maxresdefault.jpg" alt="Mobile Demo" width="300"/>
-</a>
+[![Mobile Demo](https://img.youtube.com/vi/m9J0WIAAyxs/maxresdefault.jpg)](https://youtube.com/shorts/m9J0WIAAyxs)
 
 ### 📸 Screenshots
 

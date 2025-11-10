@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import LogoHeader from '@/components/LogoHeader.vue'
 import AppFooter from '@/components/AppFooter.vue'
 </script>
 
 <template>
-  <LogoHeader />
   <AppFooter />
 
   <main class="flex items-center justify-center min-h-screen p-5">
-    <div class="bg-[#dcae75] rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-12 max-w-[700px] w-full text-center border-[3px] border-[#aa9169]">
+    <div class="bg-[#dcae75] rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-12 pb-[60px] max-w-[700px] w-full text-center border-[3px] border-[#aa9169]">
       <h1 class="text-5xl font-bold mb-6 text-[#8B4513]">Password Recovery</h1>
       <div class="bg-[#fdda9f] border-2 border-[#c58b4f] p-5 mb-6 rounded-[24px]">
         <p class="text-xl font-bold text-[#8B4513] mb-2">The password recovery feature is currently disabled.</p>

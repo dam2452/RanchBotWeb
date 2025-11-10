@@ -321,5 +321,5 @@ GitHub: [@dam2452](https://github.com/dam2452)
 
 If you like this project and would like to support its development, consider getting me a mamrot!
 
-[![Kup mi Mamrota](Kup_mi_Mamrota.png)](https://buymeacoffee.com/dam2452)
+[![Get me a Mamrot](Get_me_a_Mamrot.png)](https://buymeacoffee.com/dam2452)
 

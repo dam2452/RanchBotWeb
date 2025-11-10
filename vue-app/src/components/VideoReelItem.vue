@@ -267,6 +267,7 @@ watch(() => props.thumbnailUrl, (newThumbUrl) => {
             @click="handleClick"
             class="clip-video thumbnail-preview"
             :class="{
+              'editing-video': isEditing,
               'active-video': isActive && !isEditing
             }"
             alt="Video thumbnail"
@@ -371,9 +372,9 @@ watch(() => props.thumbnailUrl, (newThumbUrl) => {
   scroll-snap-align: center;
   transition: all 0.5s ease;
   flex-shrink: 0;
-  width: 100vw;
+  width: calc(100vw - 20px);
   height: 100vh;
-  max-width: 100vw;
+  max-width: calc(100vw - 20px);
   margin: 0;
   padding: 0;
   position: relative;
@@ -562,7 +563,7 @@ watch(() => props.thumbnailUrl, (newThumbUrl) => {
   width: 100%;
   height: 100%;
   max-height: 100vh;
-  max-width: 100vw;
+  max-width: calc(100vw - 20px);
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
   border-radius: 24px;
   display: flex;
@@ -590,7 +591,7 @@ watch(() => props.thumbnailUrl, (newThumbUrl) => {
   width: 100%;
   height: 100%;
   max-height: 100vh;
-  max-width: 100vw;
+  max-width: calc(100vw - 20px);
   object-fit: contain;
   border-radius: 24px;
   display: block;

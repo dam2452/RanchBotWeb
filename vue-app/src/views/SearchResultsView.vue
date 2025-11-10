@@ -35,7 +35,7 @@ const editingClipIndex = ref<number | null>(null)
 const userUnmutedOnce = ref(false)
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
-const { activeVideoId, userInteracted, pauseAllVideos, playVideoAtIndex, toggleVideoAtIndex } = useVideoControl({
+const { activeVideoId, userInteracted, pauseAllVideos, toggleVideoAtIndex } = useVideoControl({
   containerRef: videoReel,
   videoSelector: 'video'
 })
@@ -568,10 +568,6 @@ watch(activeIndex, async (newIndex, oldIndex) => {
   }
 
   pauseAllVideos()
-
-  await nextTick()
-
-  playVideoAtIndex(newIndex)
 })
 </script>
 
@@ -644,6 +640,13 @@ watch(activeIndex, async (newIndex, oldIndex) => {
         </div>
       </div>
 
+      <div v-if="loadedClips >= results.length && !isWatchView" class="end-of-clips">
+        <svg class="end-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <p>That's all clips!</p>
+      </div>
+
       <div v-if="!isWatchView" class="scroll-spacer"></div>
     </div>
   </main>
@@ -706,6 +709,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
   margin: 0;
   padding: 0;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -723,9 +727,34 @@ watch(activeIndex, async (newIndex, oldIndex) => {
   display: none;
 }
 
+.end-of-clips {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: rgba(242, 169, 76, 0.6);
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.end-icon {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 12px;
+  stroke-width: 2.5;
+}
+
+.end-of-clips p {
+  margin: 0;
+}
+
 .scroll-spacer {
   width: 100%;
-  height: 50vh;
+  height: 70vh;
   flex-shrink: 0;
   pointer-events: none;
 }
@@ -751,6 +780,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
     overflow-y: hidden;
     flex-direction: row;
     padding: 140px 10vw 0 10vw;
+    overscroll-behavior-x: auto;
   }
 
   .scroll-spacer {
@@ -785,6 +815,20 @@ watch(activeIndex, async (newIndex, oldIndex) => {
     z-index: 50;
     opacity: 1;
     transform: scale(1);
+  }
+
+  .end-of-clips {
+    height: 55vh;
+    padding: 0 40px;
+    margin: 0 20px;
+    opacity: 0.5;
+    transform: scale(0.85);
+    scroll-snap-align: center;
+  }
+
+  .end-icon {
+    width: 40px;
+    height: 40px;
   }
 
   .load-more-item.clickable {

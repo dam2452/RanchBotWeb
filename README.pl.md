@@ -19,37 +19,37 @@ For English documentation, see [README.md](README.md).
 ## 📺 Demo
 
 ### 🖥️ Wersja Desktopowa
-> 🎥 [Wkrótce - wideo demo dla PC]
+[![Demo Desktop](https://img.youtube.com/vi/NYQvrILlGaU/maxresdefault.jpg)](https://youtu.be/NYQvrILlGaU)
 
 ### 📱 Wersja Mobilna
-> 🎥 [Wkrótce - wideo demo dla telefonu]
+<a href="https://youtube.com/shorts/m9J0WIAAyxs">
+  <img src="https://img.youtube.com/vi/m9J0WIAAyxs/maxresdefault.jpg" alt="Demo Mobilne" width="300"/>
+</a>
 
 ### 📸 Zrzuty ekranu
 
 <table>
   <tr>
     <td align="center">
-      <img src="screenshots/desktop-home.png" alt="Desktop Home" width="400"/><br/>
+      <img src="screenshots/Desktop Home.png" alt="Desktop Home" width="400"/><br/>
       <sub><b>Desktop - Strona główna</b></sub>
     </td>
     <td align="center">
-      <img src="screenshots/mobile-search.png" alt="Mobile Search" width="200"/><br/>
+      <img src="screenshots/Mobile Search.png" alt="Mobile Search" width="200"/><br/>
       <sub><b>Mobile - Wyszukiwanie</b></sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="screenshots/desktop-clips.png" alt="Desktop Clips" width="400"/><br/>
+      <img src="screenshots/Desktop My Clips.png" alt="Desktop My Clips" width="400"/><br/>
       <sub><b>Desktop - Zapisane klipy</b></sub>
     </td>
     <td align="center">
-      <img src="screenshots/mobile-player.png" alt="Mobile Player" width="200"/><br/>
-      <sub><b>Mobile - Odtwarzacz</b></sub>
+      <img src="screenshots/Mobile Search Results.png" alt="Mobile Search Results" width="200"/><br/>
+      <sub><b>Mobile - Wyniki wyszukiwania</b></sub>
     </td>
   </tr>
 </table>
-
-> 📁 Dodaj swoje screenshoty do katalogu `screenshots/`
 
 ---
 

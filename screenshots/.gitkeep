@@ -1,0 +1,12 @@
+# Screenshots Directory
+
+Add your application screenshots here:
+
+- `desktop-home.png` - Desktop homepage view
+- `desktop-clips.png` - Desktop saved clips view
+- `mobile-search.png` - Mobile search interface
+- `mobile-player.png` - Mobile video player
+
+Recommended screenshot sizes:
+- Desktop: 1920x1080 or 1440x900
+- Mobile: 375x812 (iPhone X) or 360x640 (Android)

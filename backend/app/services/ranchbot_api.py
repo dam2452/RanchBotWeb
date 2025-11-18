@@ -123,7 +123,7 @@ class RanchBotAPIClient:
     ) -> bytes:
         """Adjust video timing"""
         return await self.call_api_for_blob(
-            "d",
+            "ad",
             [clip_index, str(left_adjust), str(right_adjust)],
             token
         )

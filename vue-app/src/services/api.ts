@@ -114,7 +114,7 @@ class ApiService {
     const response = await this.client.post(
       '/api/video',
       {
-        endpoint: 'd',
+        endpoint: 'ad',
         args: [clipIndex, leftAdjust.toString(), rightAdjust.toString()],
       },
       {
@@ -145,7 +145,7 @@ class ApiService {
     const response = await this.client.post(
       '/api/video',
       {
-        endpoint: 'd',
+        endpoint: 'ad',
         args: [params.clipId.toString(), params.leftAdjust.toString(), params.rightAdjust.toString()],
       },
       {

@@ -1,20 +1,93 @@
 version: '3.8'
 
 services:
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: ranchbot-rabbitmq
+    restart: unless-stopped
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS}
+    networks:
+      - ranchbot-network
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   backend:
-    image: dam245222/ranchbot-backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: ranchbot-backend
     restart: unless-stopped
     environment:
-      - RANCHBOT_API_URL=http://192.168.1.210:8077/api/v1
-      - SECRET_KEY=change-this-to-your-secret-key
-      - SESSION_MAX_AGE=86400
-      - ALLOWED_ORIGINS=https://ranchbot.pl,http://localhost:8880
+      - RANCHBOT_API_URL=${RANCHBOT_API_URL}
+      - SECRET_KEY=${SECRET_KEY}
+      - SESSION_MAX_AGE=${SESSION_MAX_AGE}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
+    volumes:
+      - thumbnail-cache:/tmp/thumbnails
+      - adjusted-video-cache:/tmp/adjusted_videos
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - ranchbot-network
+
+  worker-thumbnail:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ranchbot-worker-thumbnail
+    restart: unless-stopped
+    command: python -u workers/thumbnail_worker.py
+    environment:
+      - PYTHONUNBUFFERED=1
+      - RANCHBOT_API_URL=${RANCHBOT_API_URL}
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
+    volumes:
+      - thumbnail-cache:/tmp/thumbnails
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - ranchbot-network
+
+  worker-adjustment:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ranchbot-worker-adjustment
+    restart: unless-stopped
+    command: python -u workers/adjustment_worker.py
+    environment:
+      - PYTHONUNBUFFERED=1
+      - RANCHBOT_API_URL=${RANCHBOT_API_URL}
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
+    volumes:
+      - adjusted-video-cache:/tmp/adjusted_videos
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     networks:
       - ranchbot-network
 
   frontend:
-    image: dam245222/ranchbot-frontend:latest
+    build:
+      context: ./vue-app
+      dockerfile: Dockerfile
     container_name: ranchbot-frontend
     restart: unless-stopped
     ports:
@@ -27,3 +100,7 @@ services:
 networks:
   ranchbot-network:
     driver: bridge
+
+volumes:
+  thumbnail-cache:
+  adjusted-video-cache:

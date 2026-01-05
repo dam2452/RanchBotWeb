@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from fastapi.responses import StreamingResponse, Response
+from pydantic import BaseModel
 from app.services.ranchbot_api import api_client
 from app.services.thumbnail import thumbnail_service
 from app.core.dependencies import get_current_user
@@ -105,6 +106,56 @@ async def get_clip_thumbnail(
         )
     except Exception as e:
         print(f"Get clip thumbnail error for '{decoded_clip_name}': {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+class ClipOperationRequest(BaseModel):
+    clip_name: str
+
+
+@router.post("/save")
+async def save_clip(
+    request: ClipOperationRequest,
+    user: UserSession = Depends(get_current_user)
+):
+    """Save clip (synchronous)"""
+    try:
+        print(f"Saving clip '{request.clip_name}'")
+        result = await api_client.save_clip(request.clip_name, user.jwt_token)
+
+        return {
+            "status": "success",
+            "message": f"Clip '{request.clip_name}' saved successfully",
+            "data": result
+        }
+
+    except Exception as e:
+        print(f"Save clip error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/delete")
+async def delete_clip(
+    request: ClipOperationRequest,
+    user: UserSession = Depends(get_current_user)
+):
+    """Delete clip (synchronous)"""
+    try:
+        print(f"Deleting clip '{request.clip_name}'")
+        result = await api_client.delete_clip(request.clip_name, user.jwt_token)
+
+        return {
+            "status": "success",
+            "message": f"Clip '{request.clip_name}' deleted successfully",
+            "data": result
+        }
+
+    except Exception as e:
+        print(f"Delete clip error: {e}")
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

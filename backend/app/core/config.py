@@ -19,6 +19,38 @@ class Settings(BaseSettings):
     port: int = 8000
     reload: bool = True
 
+    # RabbitMQ
+    rabbitmq_host: str = "localhost"
+    rabbitmq_port: int = 5672
+    rabbitmq_user: str = ""
+    rabbitmq_pass: str = ""
+
+    # Cache directories
+    thumbnail_cache_dir: str = "/tmp/thumbnails"
+    adjusted_video_cache_dir: str = "/tmp/adjusted_videos"
+    batch_video_cache_dir: str = "/tmp/batch_videos"
+
+    # Worker settings
+    thumbnail_worker_prefetch: int = 3
+    adjustment_worker_prefetch: int = 2
+    loader_worker_prefetch: int = 5
+    clip_worker_prefetch: int = 2
+    maintenance_worker_prefetch: int = 1
+
+    # Job polling settings
+    thumbnail_max_wait: int = 30
+    thumbnail_poll_interval: float = 0.2
+    adjustment_max_wait: int = 30
+    adjustment_poll_interval: float = 0.3
+    clip_operation_max_wait: int = 10
+    clip_operation_poll_interval: float = 0.2
+
+    # Maintenance settings
+    maintenance_interval_seconds: int = 300
+    thumbnail_cache_max_age_days: int = 7
+    thumbnail_cache_max_size_mb: int = 500
+    video_cache_max_age_hours: int = 1
+
     class Config:
         env_file = ".env"
         case_sensitive = False

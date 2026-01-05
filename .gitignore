@@ -36,3 +36,4 @@ update_password_dam2452.sql
 *.bak
 *.tmp
 .cache/
+QUEUE_ARCHITECTURE.md

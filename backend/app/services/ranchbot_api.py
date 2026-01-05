@@ -4,9 +4,25 @@ from app.core.config import settings
 
 
 class RanchBotAPIClient:
+    ALLOWED_ENDPOINTS = {
+        'sz', 'w', 'ad', 'z', 'uk', 'mk', 'wys',
+        '/auth/login', '/auth/logout-all'
+    }
+
     def __init__(self):
         self.base_url = settings.ranchbot_api_url
         self.default_token = settings.dev_jwt_token
+
+    def _build_url(self, endpoint: str) -> str:
+        """Builds full API URL from base URL and endpoint, handling leading/trailing slashes."""
+        normalized_endpoint = endpoint.lstrip('/')
+
+        if normalized_endpoint not in self.ALLOWED_ENDPOINTS and endpoint not in self.ALLOWED_ENDPOINTS:
+            raise ValueError(f"Endpoint '{endpoint}' is not allowed")
+
+        base = self.base_url.rstrip('/')
+        path = normalized_endpoint
+        return f"{base}/{path}"
 
     async def call_api(
         self,
@@ -16,7 +32,7 @@ class RanchBotAPIClient:
         timeout: int = 60
     ) -> Dict[str, Any]:
         """Call RanchBot API with JSON response"""
-        url = f"{self.base_url}/{endpoint}"
+        url = self._build_url(endpoint)
         jwt_token = token or self.default_token
 
         if not jwt_token:
@@ -42,7 +58,7 @@ class RanchBotAPIClient:
         timeout: int = 60
     ) -> bytes:
         """Call RanchBot API with binary response (video)"""
-        url = f"{self.base_url}/{endpoint}"
+        url = self._build_url(endpoint)
         jwt_token = token or self.default_token
 
         if not jwt_token:
@@ -62,7 +78,7 @@ class RanchBotAPIClient:
 
     async def authenticate(self, login: str, password: str) -> Dict[str, Any]:
         """Authenticate user and get JWT token"""
-        url = f"{self.base_url}/auth/login"
+        url = self._build_url("/auth/login")
 
         payload = {
             "username": login,
@@ -91,7 +107,7 @@ class RanchBotAPIClient:
 
     async def logout_all_sessions(self, login: str, password: str) -> Dict[str, Any]:
         """Logout from all sessions by revoking all refresh tokens"""
-        url = f"{self.base_url}/auth/logout-all"
+        url = self._build_url("/auth/logout-all")
 
         payload = {
             "username": login,

@@ -129,9 +129,41 @@ const handleFilters = () => {
   }
 
   .content-wrapper {
-    transform: translateY(-12vh);
+    transform: translateY(-5vh);
     width: clamp(500px, 60vw, 720px);
     max-width: 90vw;
+  }
+
+  .content-wrapper :deep(.logo-section) {
+    transform: scale(0.75);
+    margin-bottom: 0.5rem;
+  }
+
+  .content-wrapper :deep(.title) {
+    font-size: clamp(4rem, 6vw, 6.5rem) !important;
+    margin: 0 0 2rem 0 !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .content-wrapper {
+    transform: translateY(-8vh);
+  }
+
+  .content-wrapper :deep(.logo-section) {
+    transform: scale(0.85);
+    margin-bottom: 1rem;
+  }
+
+  .content-wrapper :deep(.title) {
+    font-size: clamp(5rem, 7vw, 7.5rem) !important;
+    margin: 0 0 2.5rem 0 !important;
+  }
+}
+
+@media (min-width: 1800px) {
+  .content-wrapper {
+    transform: translateY(-10vh);
   }
 
   .content-wrapper :deep(.logo-section) {
@@ -141,7 +173,7 @@ const handleFilters = () => {
 
   .content-wrapper :deep(.title) {
     font-size: clamp(5rem, 8vw, 8.8rem) !important;
-    margin: 0 0 3.75rem 0 !important;
+    margin: 0 0 3rem 0 !important;
   }
 }
 </style>

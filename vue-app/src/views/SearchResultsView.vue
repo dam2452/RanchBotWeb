@@ -771,7 +771,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
   .search-bar-container {
     width: clamp(280px, 60vw, 720px);
     max-width: 90vw;
-    top: 100px;
+    top: 80px;
   }
 
   .video-reel {
@@ -779,7 +779,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
     overflow-x: scroll;
     overflow-y: hidden;
     flex-direction: row;
-    padding: 140px 10vw 0 10vw;
+    padding: 120px 10vw 0 10vw;
     overscroll-behavior-x: auto;
   }
 
@@ -887,6 +887,26 @@ watch(activeIndex, async (newIndex, oldIndex) => {
     color: #9ca3af;
     font-size: 12px;
     margin-top: 4px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .search-bar-container {
+    top: 90px;
+  }
+
+  .video-reel {
+    padding: 130px 10vw 0 10vw;
+  }
+}
+
+@media (min-width: 1800px) {
+  .search-bar-container {
+    top: 100px;
+  }
+
+  .video-reel {
+    padding: 140px 10vw 0 10vw;
   }
 }
 </style>

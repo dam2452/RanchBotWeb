@@ -7,6 +7,7 @@ Nowoczesna aplikacja webowa do wyszukiwania i tworzenia klipów wideo z popularn
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Vue 3](https://img.shields.io/badge/Vue-3.5-brightgreen.svg)](https://vuejs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg)](https://fastapi.tiangolo.com/)
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.13-FF6600.svg)](https://www.rabbitmq.com/)
 
 ---
 
@@ -85,6 +86,11 @@ For English documentation, see [README.md](README.md).
 - Proxy API dla bezpiecznej komunikacji
 - Konfiguracja CORS
 
+### 7. ⚡ Przetwarzanie Asynchroniczne (RabbitMQ)
+- Przetwarzanie w tle miniatur i dostosowań wideo
+- Operacje nieblokujące
+- Wiele workerów do przetwarzania równoległego
+
 ---
 
 ## 🛠️ Stack Technologiczny
@@ -104,6 +110,13 @@ For English documentation, see [README.md](README.md).
 - **httpx** - Asynchroniczny klient HTTP
 - **Pillow** - Przetwarzanie obrazów
 - **python-jose** - Obsługa JWT
+- **RabbitMQ** - Broker komunikatów do przetwarzania kolejek
+- **pika** - Klient RabbitMQ dla Python
+
+### Infrastruktura
+- **RabbitMQ** - Kolejka komunikatów do asynchronicznego przetwarzania zadań
+- **Docker** - Konteneryzacja
+- **Caddy** - Serwer webowy dla produkcji
 
 ---
 
@@ -112,10 +125,11 @@ For English documentation, see [README.md](README.md).
 **System:**
 - Node.js 20.19+ lub 22.12+
 - Python 3.10+
-- Docker (opcjonalnie)
+- RabbitMQ 3.13+
+- Docker (opcjonalny, ale zalecany)
 
 **Zależności Backend:**
-- FastAPI, Uvicorn, Pydantic, httpx, Pillow, python-jose, passlib
+- FastAPI, Uvicorn, Pydantic, httpx, Pillow, python-jose, passlib, pika
 
 **Zależności Frontend:**
 - Vue 3, TypeScript, Vite, Pinia, Vue Router, Axios, Tailwind CSS
@@ -124,38 +138,99 @@ For English documentation, see [README.md](README.md).
 
 ## 🚀 Szybki Start
 
-### Instalacja
+### Opcja 1: Docker (Zalecane)
 
 ```bash
 # 1. Sklonuj repozytorium
 git clone https://github.com/dam2452/RanchBotWeb.git
 cd RanchBotWeb
 
-# 2. Konfiguracja Backendu
+# 2. Konfiguracja środowiska
+cp .env.example .env
+# Edytuj .env z własnymi ustawieniami
+
+# 3. Zbuduj i uruchom wszystkie serwisy (backend, frontend, RabbitMQ, workery)
+docker-compose up -d
+
+# Zobacz logi
+docker-compose logs -f
+
+# Zatrzymaj serwisy
+docker-compose down
+```
+
+**Dostęp:**
+- Aplikacja: http://localhost:8880
+- Backend API: http://localhost:8000
+- Zarządzanie RabbitMQ: http://localhost:15672 (guest/guest)
+
+### Opcja 2: Instalacja Manualna
+
+#### Wymagania wstępne
+1. Zainstaluj i uruchom RabbitMQ:
+```bash
+# Ubuntu/Debian
+sudo apt-get install rabbitmq-server
+sudo systemctl start rabbitmq-server
+
+# macOS
+brew install rabbitmq
+brew services start rabbitmq
+
+# Windows - pobierz z https://www.rabbitmq.com/download.html
+```
+
+#### Instalacja
+
+```bash
+# 1. Sklonuj repozytorium
+git clone https://github.com/dam2452/RanchBotWeb.git
+cd RanchBotWeb
+
+# 2. Konfiguracja Backend
 cd backend
 python -m venv ../.venv
 source ../.venv/bin/activate  # Windows: ..\.venv\Scripts\activate
 pip install -r requirements.txt
 
-# Skonfiguruj środowisko
+# Konfiguracja środowiska
 cp .env.example .env
-# Edytuj .env z własnymi ustawieniami
+# Edytuj .env z własnymi ustawieniami (w tym dane RabbitMQ)
 
-# 3. Konfiguracja Frontendu
+# 3. Konfiguracja Frontend
 cd ../vue-app
 npm install
 ```
 
-### Uruchamianie
+#### Uruchamianie
 
-**Terminal 1 - Backend:**
+**Terminal 1 - RabbitMQ (jeśli nie działa jako usługa):**
+```bash
+rabbitmq-server
+```
+
+**Terminal 2 - Backend API:**
 ```bash
 cd backend
 source ../.venv/bin/activate  # Windows: ..\.venv\Scripts\activate
 python -m uvicorn app.main:app --reload --port 8000
 ```
 
-**Terminal 2 - Frontend:**
+**Terminal 3 - Worker Miniatur:**
+```bash
+cd backend
+source ../.venv/bin/activate
+python workers/thumbnail_worker.py
+```
+
+**Terminal 4 - Worker Dostosowań:**
+```bash
+cd backend
+source ../.venv/bin/activate
+python workers/adjustment_worker.py
+```
+
+**Terminal 5 - Frontend:**
 ```bash
 cd vue-app
 npm run dev
@@ -164,21 +239,40 @@ npm run dev
 **Dostęp:**
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:8000
-- Dokumentacja API: http://localhost:8000/docs
+- Zarządzanie RabbitMQ: http://localhost:15672
 
 ---
 
 ## 🐳 Wdrożenie Docker
 
+Aplikacja używa Docker Compose z następującymi serwisami:
+
+- **rabbitmq** - Broker komunikatów do asynchronicznego przetwarzania zadań
+- **backend** - Serwer aplikacji FastAPI
+- **worker-thumbnail** - Worker w tle do generowania miniatur
+- **worker-adjustment** - Worker w tle do dostosowywania wideo
+- **frontend** - Serwer webowy Caddy serwujący aplikację Vue.js
+
 ```bash
-# Zbuduj i uruchom wszystkie usługi
+# Zbuduj i uruchom wszystkie serwisy (produkcja)
 docker-compose up -d
 
-# Zobacz logi
-docker-compose logs -f
+# Zbuduj i uruchom w trybie deweloperskim (eksponuje port backendu 8000)
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
-# Zatrzymaj usługi
+# Zobacz logi konkretnego serwisu
+docker-compose logs -f backend
+docker-compose logs -f worker-thumbnail
+docker-compose logs -f worker-adjustment
+
+# Zrestartuj konkretny serwis
+docker-compose restart backend
+
+# Zatrzymaj wszystkie serwisy
 docker-compose down
+
+# Przebuduj po zmianach w kodzie
+docker-compose up -d --build
 ```
 
 ---
@@ -186,54 +280,46 @@ docker-compose down
 ## 📡 Endpointy API
 
 ### 🔐 Autentykacja (`/auth`)
-- `POST /auth/login` - Logowanie użytkownika i utworzenie sesji
-- `GET /auth/logout` - Wylogowanie z bieżącej sesji
-- `POST /auth/logout-all` - Wylogowanie ze wszystkich sesji
+- `POST /auth/login` - Zaloguj użytkownika i utwórz sesję
+- `GET /auth/logout` - Wyloguj bieżącą sesję
+- `POST /auth/logout-all` - Wyloguj ze wszystkich sesji
 - `GET /auth/user` - Pobierz informacje o bieżącym użytkowniku
 
 ### 🎬 Zarządzanie Klipami (`/clips`)
 - `GET /clips?action=get_clips` - Pobierz zapisane klipy użytkownika
 - `GET /clips/video/{clip_id}` - Pobierz plik wideo dla konkretnego klipu
 - `GET /clips/thumbnail/{clip_id}` - Pobierz miniaturę dla konkretnego klipu
+- `POST /clips/save` - Zapisz klip do kolekcji użytkownika
+- `POST /clips/delete` - Usuń klip z kolekcji użytkownika
 
 ### 🔄 Proxy API (`/api`)
-- `POST /api/json` - Przekaż żądania JSON API
-- `POST /api/video` - Przekaż żądania wideo API (zwraca blob)
-- `POST /api/thumbnail` - Wygeneruj miniaturę z wideo
+- `POST /api/json` - Proxy żądań JSON API
+- `POST /api/video` - Proxy żądań wideo API (zwraca blob)
+- `POST /api/thumbnail` - Generuj miniaturę z wideo (asynchronicznie z RabbitMQ)
+- `POST /api/adjust-preview` - Dostosuj timing wideo (asynchronicznie z RabbitMQ)
+- `POST /api/batch-load` - Równoległe wsadowe ładowanie klipów
 
-Pełna dokumentacja API dostępna pod adresem http://localhost:8000/docs po uruchomieniu backendu.
+### 📚 Dokumentacja API
+
+Ustaw `ENABLE_API_DOCS=True` w `backend/.env` aby uzyskać dostęp:
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
 
 ---
 
 ## 🏗️ Architektura
 
-Aplikacja wykorzystuje architekturę trójwarstwową:
-
-1. **Warstwa Frontendowa (Vue 3)** - Interfejs użytkownika działający na porcie 5173
-   - Obsługuje całe renderowanie UI i interakcje użytkownika
-   - Zarządza stanem po stronie klienta za pomocą Pinia
-   - Komunikuje się z backendem przez Axios używając ciasteczek sesji
-
-2. **Warstwa Backendowa (FastAPI)** - Serwer API działający na porcie 8000
-   - Obsługuje autentykację i zarządzanie sesjami
-   - Przekazuje żądania do zewnętrznego API RanchBot
-   - Zarządza cache'owaniem miniatur i przetwarzaniem obrazów
-   - Waliduje żądania i obsługuje logikę biznesową
-
-3. **Zewnętrzne API (RANCZO_KLIPY)** - Usługa przetwarzania wideo
-   - Zapewnia funkcjonalność wyszukiwania cytatów
-   - Generuje i przechowuje klipy wideo
-   - Zarządza kolekcjami klipów użytkowników
-
-Frontend i backend komunikują się przez HTTP z autentykacją opartą na sesjach, podczas gdy backend komunikuje się z zewnętrznym API używając tokenów JWT.
-
-Zobacz [backend/README.md](backend/README.md) i [vue-app/README.md](vue-app/README.md) dla szczegółowej dokumentacji komponentów.
+- **Frontend (Vue 3)** - Interfejs użytkownika na porcie 5173/8880
+- **Backend (FastAPI)** - Serwer API na porcie 8000, proxy do zewnętrznego API
+- **RabbitMQ** - Kolejka komunikatów do przetwarzania asynchronicznego (miniatury, dostosowania wideo)
+- **Workery** - Procesy w tle konsumujące zadania z RabbitMQ
+- **Zewnętrzne API (RANCZO_KLIPY)** - Serwis przetwarzania wideo
 
 ---
 
 ## 🔧 Rozwój
 
-### Rozwój Backendu
+### Rozwój Backend
 
 ```bash
 cd backend
@@ -243,11 +329,15 @@ pytest tests/ -v
 
 # Uruchom konkretny test
 pytest tests/test_auth.py -v
+
+# Włącz dokumentację API
+echo "ENABLE_API_DOCS=True" >> .env
+
+# Uruchom z hot reload
+python -m uvicorn app.main:app --reload
 ```
 
-Zobacz [backend/README.md](backend/README.md) dla więcej szczegółów.
-
-### Rozwój Frontendu
+### Rozwój Frontend
 
 ```bash
 cd vue-app
@@ -255,14 +345,28 @@ cd vue-app
 # Sprawdzanie typów
 npm run type-check
 
-# Linting i naprawa
+# Lint i naprawa
 npm run lint
 
-# Build produkcyjny
+# Budowa produkcyjna
 npm run build
+
+# Podgląd produkcyjnej budowy
+npm run preview
 ```
 
-Zobacz [vue-app/README.md](vue-app/README.md) dla więcej szczegółów.
+### Rozwój Workerów
+
+```bash
+cd backend
+source ../.venv/bin/activate
+
+# Uruchom thumbnail worker z debugowaniem
+PYTHONUNBUFFERED=1 python workers/thumbnail_worker.py
+
+# Uruchom adjustment worker
+PYTHONUNBUFFERED=1 python workers/adjustment_worker.py
+```
 
 ---
 
@@ -270,48 +374,79 @@ Zobacz [vue-app/README.md](vue-app/README.md) dla więcej szczegółów.
 
 ### Backend (`.env`)
 ```env
-RANCHBOT_API_URL=http://your-api-url:8077
-SECRET_KEY=your-secret-key-here
+# RanchBot API
+RANCHBOT_API_URL=http://twoj-api-url:8077/api/v1
+DEV_JWT_TOKEN=twoj_jwt_token_tutaj
+
+# Sesja i Bezpieczeństwo
+SECRET_KEY=twoj-sekretny-klucz-tutaj
 SESSION_MAX_AGE=86400
-CORS_ORIGINS=["http://localhost:5173"]
+
+# CORS
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+
+# Serwer
+HOST=0.0.0.0
+PORT=8000
+RELOAD=True
+ENABLE_API_DOCS=False  # Ustaw na True dla dokumentacji API
+
+# RabbitMQ
+RABBITMQ_HOST=localhost
+RABBITMQ_PORT=5672
+RABBITMQ_USER=guest
+RABBITMQ_PASS=guest
 ```
 
-### Frontend (`.env`)
+### Docker Compose (`.env`)
 ```env
-VITE_API_URL=http://localhost:8000
+# RanchBot API
+RANCHBOT_API_URL=http://twoj-api-url:8077/api/v1
+
+# Bezpieczeństwo
+SECRET_KEY=twoj-sekretny-klucz-tutaj
+SESSION_MAX_AGE=86400
+
+# CORS
+ALLOWED_ORIGINS=http://localhost:8880
+
+# RabbitMQ
+RABBITMQ_USER=guest
+RABBITMQ_PASS=guest
 ```
 
 ---
 
 ## 🤝 Współpraca
 
-Wkład jest mile widziany! Zapraszamy do przesyłania Pull Requestów.
+Wkłady są mile widziane! Śmiało przesyłaj Pull Request.
 
-1. Zforkuj repozytorium
-2. Utwórz branch dla swojej funkcji (`git checkout -b feature/NowaFunkcja`)
-3. Zatwierdź swoje zmiany (`git commit -m 'Dodaj nową funkcję'`)
-4. Wypchnij do brancha (`git push origin feature/NowaFunkcja`)
+1. Sforkuj repozytorium
+2. Utwórz gałąź funkcji (`git checkout -b feature/NowaCecha`)
+3. Zatwierdź zmiany (`git commit -m 'Dodaj nową cechę'`)
+4. Wypchnij do gałęzi (`git push origin feature/NowaCecha`)
 5. Otwórz Pull Request
 
 ---
 
 ## 📜 Historia Wersji
 
-- **v2.0.4** - Najnowsze obrazy Docker z optymalizacjami
+- **v2.0.5** - Dodano przetwarzanie kolejek RabbitMQ, asynchroniczne generowanie miniatur/dostosowań
+- **v2.0.4** - Zoptymalizowane buildy Docker i cache'owanie
 - **v2.0.0** - Kompletne przepisanie z Vue.js + FastAPI
-- **v1.0.0** - Oryginalna wersja PHP (zarchiwizowana w branchu `PHP-v1-Version`)
+- **v1.0.0** - Oryginalna wersja PHP (zarchiwizowana w gałęzi `PHP-v1-Version`)
 
 ---
 
 ## 📄 Licencja
 
-Ten projekt jest objęty licencją MIT - zobacz plik [LICENSE](LICENSE) dla szczegółów.
+Ten projekt jest licencjonowany na licencji MIT - zobacz plik [LICENSE](LICENSE) po szczegóły.
 
 ---
 
 ## 🚀 Dostęp
 
-Zainteresowany używaniem RanchBot Web? Skontaktuj się przez Telegram: [@dam2452](https://t.me/dam2452)
+Zainteresowany używaniem RanchBot Web? Kontakt przez Telegram: [@dam2452](https://t.me/dam2452)
 
 GitHub: [@dam2452](https://github.com/dam2452)
 
@@ -319,8 +454,6 @@ GitHub: [@dam2452](https://github.com/dam2452)
 
 ## ☕ Wsparcie
 
-Jeśli podoba Ci się ten projekt i chciałbyś wesprzeć jego rozwój, rozważ postawienie mi mamrota!
+Jeśli podoba Ci się ten projekt i chciałbyś wesprzeć jego rozwój, rozważ kupienie mi mamrota!
 
 [![Kup mi Mamrota](Kup_mi_Mamrota.png)](https://buymeacoffee.com/dam2452)
-
-

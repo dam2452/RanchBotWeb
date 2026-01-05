@@ -7,6 +7,7 @@ Modern web application for searching and creating video clips from the popular P
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Vue 3](https://img.shields.io/badge/Vue-3.5-brightgreen.svg)](https://vuejs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg)](https://fastapi.tiangolo.com/)
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.13-FF6600.svg)](https://www.rabbitmq.com/)
 
 ---
 
@@ -85,6 +86,11 @@ Dla polskiej wersji dokumentacji, zobacz [README.pl.md](README.pl.md).
 - API proxy for secure communication
 - CORS configuration
 
+### 7. ⚡ Asynchronous Processing (RabbitMQ)
+- Background processing for thumbnails and video adjustments
+- Non-blocking operations
+- Multiple workers for parallel processing
+
 ---
 
 ## 🛠️ Technology Stack
@@ -104,6 +110,13 @@ Dla polskiej wersji dokumentacji, zobacz [README.pl.md](README.pl.md).
 - **httpx** - Async HTTP client
 - **Pillow** - Image processing
 - **python-jose** - JWT handling
+- **RabbitMQ** - Message broker for queue processing
+- **pika** - RabbitMQ client for Python
+
+### Infrastructure
+- **RabbitMQ** - Message queue for asynchronous task processing
+- **Docker** - Containerization
+- **Caddy** - Web server for production
 
 ---
 
@@ -112,10 +125,11 @@ Dla polskiej wersji dokumentacji, zobacz [README.pl.md](README.pl.md).
 **System:**
 - Node.js 20.19+ or 22.12+
 - Python 3.10+
-- Docker (optional)
+- RabbitMQ 3.13+
+- Docker (optional, but recommended)
 
 **Backend Dependencies:**
-- FastAPI, Uvicorn, Pydantic, httpx, Pillow, python-jose, passlib
+- FastAPI, Uvicorn, Pydantic, httpx, Pillow, python-jose, passlib, pika
 
 **Frontend Dependencies:**
 - Vue 3, TypeScript, Vite, Pinia, Vue Router, Axios, Tailwind CSS
@@ -124,7 +138,49 @@ Dla polskiej wersji dokumentacji, zobacz [README.pl.md](README.pl.md).
 
 ## 🚀 Quick Start
 
-### Installation
+### Option 1: Docker (Recommended)
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/dam2452/RanchBotWeb.git
+cd RanchBotWeb
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env with your settings
+
+# 3. Build and start all services (backend, frontend, RabbitMQ, workers)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+**Access:**
+- Application: http://localhost:8880
+- Backend API: http://localhost:8000
+- RabbitMQ Management: http://localhost:15672 (guest/guest)
+
+### Option 2: Manual Setup
+
+#### Prerequisites
+1. Install and start RabbitMQ:
+```bash
+# Ubuntu/Debian
+sudo apt-get install rabbitmq-server
+sudo systemctl start rabbitmq-server
+
+# macOS
+brew install rabbitmq
+brew services start rabbitmq
+
+# Windows - download from https://www.rabbitmq.com/download.html
+```
+
+#### Installation
 
 ```bash
 # 1. Clone the repository
@@ -139,23 +195,42 @@ pip install -r requirements.txt
 
 # Configure environment
 cp .env.example .env
-# Edit .env with your settings
+# Edit .env with your settings (including RabbitMQ credentials)
 
 # 3. Setup Frontend
 cd ../vue-app
 npm install
 ```
 
-### Running
+#### Running
 
-**Terminal 1 - Backend:**
+**Terminal 1 - RabbitMQ (if not running as service):**
+```bash
+rabbitmq-server
+```
+
+**Terminal 2 - Backend API:**
 ```bash
 cd backend
 source ../.venv/bin/activate  # Windows: ..\.venv\Scripts\activate
 python -m uvicorn app.main:app --reload --port 8000
 ```
 
-**Terminal 2 - Frontend:**
+**Terminal 3 - Thumbnail Worker:**
+```bash
+cd backend
+source ../.venv/bin/activate
+python workers/thumbnail_worker.py
+```
+
+**Terminal 4 - Adjustment Worker:**
+```bash
+cd backend
+source ../.venv/bin/activate
+python workers/adjustment_worker.py
+```
+
+**Terminal 5 - Frontend:**
 ```bash
 cd vue-app
 npm run dev
@@ -164,21 +239,40 @@ npm run dev
 **Access:**
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:8000
-- API Docs: http://localhost:8000/docs
+- RabbitMQ Management: http://localhost:15672
 
 ---
 
 ## 🐳 Docker Deployment
 
+The application uses Docker Compose with the following services:
+
+- **rabbitmq** - Message broker for asynchronous task processing
+- **backend** - FastAPI application server
+- **worker-thumbnail** - Background worker for thumbnail generation
+- **worker-adjustment** - Background worker for video adjustments
+- **frontend** - Caddy web server serving Vue.js application
+
 ```bash
-# Build and start all services
+# Build and start all services (production)
 docker-compose up -d
 
-# View logs
-docker-compose logs -f
+# Build and start with development mode (exposes backend port 8000)
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
-# Stop services
+# View logs for specific service
+docker-compose logs -f backend
+docker-compose logs -f worker-thumbnail
+docker-compose logs -f worker-adjustment
+
+# Restart specific service
+docker-compose restart backend
+
+# Stop all services
 docker-compose down
+
+# Rebuild after code changes
+docker-compose up -d --build
 ```
 
 ---
@@ -195,39 +289,31 @@ docker-compose down
 - `GET /clips?action=get_clips` - Get user's saved clips
 - `GET /clips/video/{clip_id}` - Get video file for a specific clip
 - `GET /clips/thumbnail/{clip_id}` - Get thumbnail for a specific clip
+- `POST /clips/save` - Save clip to user collection
+- `POST /clips/delete` - Delete clip from user collection
 
 ### 🔄 API Proxy (`/api`)
 - `POST /api/json` - Proxy JSON API requests
 - `POST /api/video` - Proxy video API requests (returns blob)
-- `POST /api/thumbnail` - Generate thumbnail from video
+- `POST /api/thumbnail` - Generate thumbnail from video (async with RabbitMQ)
+- `POST /api/adjust-preview` - Adjust video timing (async with RabbitMQ)
+- `POST /api/batch-load` - Parallel batch loading of clips
 
-Full API documentation available at http://localhost:8000/docs after starting the backend.
+### 📚 API Documentation
+
+Set `ENABLE_API_DOCS=True` in `backend/.env` to access:
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
 
 ---
 
 ## 🏗️ Architecture
 
-The application follows a three-tier architecture:
-
-1. **Frontend Layer (Vue 3)** - User interface running on port 5173
-   - Handles all UI rendering and user interactions
-   - Manages client-side state with Pinia
-   - Communicates with backend via Axios using session cookies
-
-2. **Backend Layer (FastAPI)** - API server running on port 8000
-   - Handles authentication and session management
-   - Proxies requests to the external RanchBot API
-   - Manages thumbnail caching and image processing
-   - Validates requests and handles business logic
-
-3. **External API (RANCZO_KLIPY)** - Video processing service
-   - Provides quote search functionality
-   - Generates and stores video clips
-   - Manages user clip collections
-
-The frontend and backend communicate via HTTP with session-based authentication, while the backend communicates with the external API using JWT tokens.
-
-See [backend/README.md](backend/README.md) and [vue-app/README.md](vue-app/README.md) for detailed component documentation.
+- **Frontend (Vue 3)** - User interface on port 5173/8880
+- **Backend (FastAPI)** - API server on port 8000, proxies to external API
+- **RabbitMQ** - Message queue for async processing (thumbnails, video adjustments)
+- **Workers** - Background processes consuming jobs from RabbitMQ
+- **External API (RANCZO_KLIPY)** - Video processing service
 
 ---
 
@@ -243,9 +329,13 @@ pytest tests/ -v
 
 # Run specific test
 pytest tests/test_auth.py -v
-```
 
-See [backend/README.md](backend/README.md) for more details.
+# Enable API documentation
+echo "ENABLE_API_DOCS=True" >> .env
+
+# Start with hot reload
+python -m uvicorn app.main:app --reload
+```
 
 ### Frontend Development
 
@@ -260,9 +350,23 @@ npm run lint
 
 # Build for production
 npm run build
+
+# Preview production build
+npm run preview
 ```
 
-See [vue-app/README.md](vue-app/README.md) for more details.
+### Worker Development
+
+```bash
+cd backend
+source ../.venv/bin/activate
+
+# Run thumbnail worker with debug output
+PYTHONUNBUFFERED=1 python workers/thumbnail_worker.py
+
+# Run adjustment worker
+PYTHONUNBUFFERED=1 python workers/adjustment_worker.py
+```
 
 ---
 
@@ -270,15 +374,45 @@ See [vue-app/README.md](vue-app/README.md) for more details.
 
 ### Backend (`.env`)
 ```env
-RANCHBOT_API_URL=http://your-api-url:8077
+# RanchBot API
+RANCHBOT_API_URL=http://your-api-url:8077/api/v1
+DEV_JWT_TOKEN=your_jwt_token_here
+
+# Session & Security
 SECRET_KEY=your-secret-key-here
 SESSION_MAX_AGE=86400
-CORS_ORIGINS=["http://localhost:5173"]
+
+# CORS
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+
+# Server
+HOST=0.0.0.0
+PORT=8000
+RELOAD=True
+ENABLE_API_DOCS=False  # Set to True for API documentation
+
+# RabbitMQ
+RABBITMQ_HOST=localhost
+RABBITMQ_PORT=5672
+RABBITMQ_USER=guest
+RABBITMQ_PASS=guest
 ```
 
-### Frontend (`.env`)
+### Docker Compose (`.env`)
 ```env
-VITE_API_URL=http://localhost:8000
+# RanchBot API
+RANCHBOT_API_URL=http://your-api-url:8077/api/v1
+
+# Security
+SECRET_KEY=your-secret-key-here
+SESSION_MAX_AGE=86400
+
+# CORS
+ALLOWED_ORIGINS=http://localhost:8880
+
+# RabbitMQ
+RABBITMQ_USER=guest
+RABBITMQ_PASS=guest
 ```
 
 ---
@@ -297,7 +431,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📜 Version History
 
-- **v2.0.4** - Latest Docker images with optimized builds
+- **v2.0.5** - Added RabbitMQ queue processing, async thumbnail/adjustment generation
+- **v2.0.4** - Optimized Docker builds and caching
 - **v2.0.0** - Complete rewrite with Vue.js + FastAPI
 - **v1.0.0** - Original PHP version (archived in `PHP-v1-Version` branch)
 
@@ -322,4 +457,3 @@ GitHub: [@dam2452](https://github.com/dam2452)
 If you like this project and would like to support its development, consider getting me a mamrot!
 
 [![Get me a Mamrot](Get_me_a_Mamrot.png)](https://buymeacoffee.com/dam2452)
-

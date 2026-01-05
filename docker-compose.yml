@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
@@ -33,6 +31,7 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASS=${RABBITMQ_PASS}
+      - ENABLE_API_DOCS=${ENABLE_API_DOCS:-False}
     volumes:
       - thumbnail-cache:/tmp/thumbnails
       - adjusted-video-cache:/tmp/adjusted_videos

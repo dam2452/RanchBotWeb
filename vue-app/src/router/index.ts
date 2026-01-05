@@ -46,6 +46,16 @@ const router = createRouter({
       component: () => import('../views/MyClipsView.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/error',
+      name: 'error',
+      component: () => import('../views/ErrorView.vue'),
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../views/ErrorView.vue'),
+    },
   ],
 })
 

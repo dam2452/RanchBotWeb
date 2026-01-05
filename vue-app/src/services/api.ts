@@ -10,8 +10,20 @@ class ApiService {
       headers: {
         'Content-Type': 'application/json',
       },
-      withCredentials: true, // Important for session cookies
+      withCredentials: true,
     })
+
+    this.client.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status >= 500) {
+          if (typeof window !== 'undefined') {
+            window.location.href = '/error'
+          }
+        }
+        return Promise.reject(error)
+      }
+    )
   }
 
   // Authentication - using FastAPI backend

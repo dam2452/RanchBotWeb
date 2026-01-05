@@ -8,7 +8,7 @@ const route = useRoute()
 const authStore = useAuthStore()
 
 const showHeader = computed(() => {
-  const noHeaderRoutes = ['home', 'login', 'register', 'forgot-password', 'search', 'search-results', 'my-clips']
+  const noHeaderRoutes = ['home', 'login', 'register', 'forgot-password', 'search', 'search-results', 'my-clips', 'error', 'not-found']
   return !noHeaderRoutes.includes(route.name as string)
 })
 

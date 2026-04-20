@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import UserButtons from '@/components/UserButtons.vue'
-import LogoSection from '@/components/LogoSection.vue'
-import SearchBar from '@/components/SearchBar.vue'
-import AppFooter from '@/components/AppFooter.vue'
+import UserButtons from '@/components/layout/UserButtons.vue'
+import LogoSection from '@/components/layout/LogoSection.vue'
+import SearchBar from '@/components/search/SearchBar.vue'
+import AppFooter from '@/components/layout/AppFooter.vue'
 
 const router = useRouter()
 const windowWidth = ref(window.innerWidth)

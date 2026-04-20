@@ -1,5 +1,5 @@
 import { ref, watch, toValue, type Ref, type MaybeRefOrGetter } from 'vue'
-import { apiService } from '@/services/api'
+import { clipService } from '@/services/clipService'
 import { formatAdjustmentValue } from '@/utils/formatters'
 
 const _DEFAULT_STATUS = 'Move sliders: negative values trim, positive extend'
@@ -50,7 +50,7 @@ export function useClipPreview(options: UseClipPreviewOptions) {
     try {
       isUpdatingPreview.value = true
       statusMessage.value = 'Updating preview...'
-      const blob = await apiService.adjustVideo(
+      const blob = await clipService.adjustVideo(
         (options.clipIndex + 1).toString(),
         leftAdjust.value,
         rightAdjust.value

@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { apiService } from '@/services/api'
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
+import { useClipPreview } from '@/composables/useClipPreview'
+import { useClipActions } from '@/composables/useClipActions'
+import { formatAdjustmentValue } from '@/utils/formatters'
 
 interface Props {
   clipIndex: number
@@ -14,161 +16,78 @@ const emit = defineEmits<{
 }>()
 
 const video = ref<HTMLVideoElement | null>(null)
-const leftAdjust = ref(0)
-const rightAdjust = ref(0)
-const duration = ref(0)
-const status = ref('Adjust the sliders to extend or trim your clip')
-const isDownloading = ref(false)
 const showSaveForm = ref(false)
 const clipName = ref('')
-const isUpdatingPreview = ref(false)
-const currentPreviewUrl = ref<string | null>(null)
-const originalUrl = ref('')
-const previewTimeout = ref<number | null>(null)
+const isDownloading = ref(false)
+const duration = ref(0)
+
+const _isEditing = computed(() => props.visible)
+const _videoRef = computed(() => video.value)
+
+const {
+  leftAdjust,
+  rightAdjust,
+  statusMessage,
+  isUpdatingPreview,
+  previewUrl,
+  resetAdjustments,
+  validateAdjustment,
+} = useClipPreview({
+  clipIndex: props.clipIndex,
+  isEditing: _isEditing,
+  videoRef: _videoRef,
+})
+
+const { download, downloadAdjusted, save, saveAdjusted } = useClipActions({
+  clipIndex: props.clipIndex,
+  videoUrl: props.clipUrl,
+})
+
+watch(previewUrl, (newUrl) => {
+  if (!video.value) return
+  const currentTime = video.value.currentTime
+  const wasPlaying = !video.value.paused
+
+  video.value.src = newUrl || props.clipUrl
+  video.value.load()
+
+  video.value.onloadeddata = () => {
+    if (video.value) {
+      video.value.currentTime = currentTime
+      if (wasPlaying) video.value.play().catch(() => {})
+    }
+  }
+})
 
 watch(() => props.visible, async (newVal) => {
   if (newVal) {
-    leftAdjust.value = 0
-    rightAdjust.value = 0
-    originalUrl.value = props.clipUrl
+    resetAdjustments()
     if (video.value) {
       video.value.src = props.clipUrl
       await video.value.load()
       await video.value.play().catch(() => {})
     }
   } else {
-    cleanupPreview()
+    resetAdjustments()
   }
-})
-
-watch([leftAdjust, rightAdjust], () => {
-  const left = leftAdjust.value
-  const right = rightAdjust.value
-  status.value = `Left: ${left >= 0 ? '+' : ''}${left.toFixed(1)}s | Right: ${right >= 0 ? '+' : ''}${right.toFixed(1)}s`
-
-  if (previewTimeout.value) {
-    clearTimeout(previewTimeout.value)
-  }
-
-  previewTimeout.value = window.setTimeout(() => {
-    updatePreview()
-  }, 1000)
 })
 
 const handleLoadedMetadata = () => {
   if (video.value) {
     duration.value = video.value.duration
-    status.value = `Duration: ${duration.value.toFixed(2)}s - Adjust sliders to extend/trim`
   }
-}
-
-const updatePreview = async () => {
-  if (isUpdatingPreview.value) return
-
-  const left = leftAdjust.value
-  const right = rightAdjust.value
-
-  if (left === 0 && right === 0) {
-    if (currentPreviewUrl.value) {
-      URL.revokeObjectURL(currentPreviewUrl.value)
-      currentPreviewUrl.value = null
-    }
-    if (video.value) {
-      video.value.src = originalUrl.value
-      video.value.load()
-    }
-    return
-  }
-
-  try {
-    isUpdatingPreview.value = true
-    status.value = 'Updating preview...'
-
-    const blob = await apiService.adjustVideo(
-      (props.clipIndex + 1).toString(),
-      left,
-      right
-    )
-
-    const oldUrl = currentPreviewUrl.value
-    const newUrl = URL.createObjectURL(blob)
-    currentPreviewUrl.value = newUrl
-
-    if (video.value) {
-      const currentTime = video.value.currentTime
-      const wasPlaying = !video.value.paused
-
-      video.value.src = newUrl
-      video.value.load()
-
-      video.value.onloadeddata = () => {
-        if (video.value) {
-          video.value.currentTime = currentTime
-          if (wasPlaying) {
-            video.value.play().catch(() => {})
-          }
-        }
-      }
-    }
-
-    if (oldUrl) {
-      URL.revokeObjectURL(oldUrl)
-    }
-
-    status.value = `Left: ${left >= 0 ? '+' : ''}${left.toFixed(1)}s | Right: ${right >= 0 ? '+' : ''}${right.toFixed(1)}s`
-  } catch (err: any) {
-    status.value = 'Preview failed: ' + err.message
-    console.error('Preview update failed:', err)
-  } finally {
-    isUpdatingPreview.value = false
-  }
-}
-
-const cleanupPreview = () => {
-  if (previewTimeout.value) {
-    clearTimeout(previewTimeout.value)
-    previewTimeout.value = null
-  }
-  if (currentPreviewUrl.value) {
-    URL.revokeObjectURL(currentPreviewUrl.value)
-    currentPreviewUrl.value = null
-  }
-  isUpdatingPreview.value = false
 }
 
 const handleDownloadAdjusted = async () => {
+  if (!validateAdjustment()) return
+
   try {
     isDownloading.value = true
-    status.value = 'Preparing download...'
-
-    let blob: Blob
-    let filename: string
-
-    if (leftAdjust.value === 0 && rightAdjust.value === 0) {
-      blob = await apiService.getVideo((props.clipIndex + 1).toString())
-      filename = `clip_${props.clipIndex + 1}.mp4`
-    } else {
-      blob = await apiService.adjustVideo(
-        (props.clipIndex + 1).toString(),
-        leftAdjust.value,
-        rightAdjust.value
-      )
-      const formatAdjust = (val: number) => val >= 0 ? `+${val.toFixed(1)}` : `${val.toFixed(1)}`
-      filename = `clip_${props.clipIndex + 1}_L${formatAdjust(leftAdjust.value)}_R${formatAdjust(rightAdjust.value)}.mp4`
-    }
-
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-
-    status.value = 'Download complete!'
-  } catch (err: any) {
-    status.value = 'Download failed: ' + err.message
+    statusMessage.value = 'Preparing download...'
+    await downloadAdjusted(leftAdjust.value, rightAdjust.value)
+    statusMessage.value = 'Download complete!'
+  } catch (err: unknown) {
+    statusMessage.value = 'Download failed: ' + (err instanceof Error ? err.message : String(err))
     console.error('Download failed:', err)
   } finally {
     isDownloading.value = false
@@ -176,32 +95,23 @@ const handleDownloadAdjusted = async () => {
 }
 
 const handleSaveClip = async () => {
-  if (!clipName.value.trim()) {
-    return
-  }
+  if (!clipName.value.trim()) return
 
   try {
-    status.value = 'Saving clip...'
+    statusMessage.value = 'Saving clip...'
 
     if (leftAdjust.value !== 0 || rightAdjust.value !== 0) {
-      await apiService.saveAdjustedClip({
-        clipId: props.clipIndex + 1,
-        clipName: clipName.value,
-        leftAdjust: leftAdjust.value,
-        rightAdjust: rightAdjust.value
-      })
+      await saveAdjusted(clipName.value, leftAdjust.value, rightAdjust.value)
     } else {
-      await apiService.saveClip(clipName.value)
+      await save(clipName.value)
     }
 
-    status.value = 'Clip saved successfully!'
+    statusMessage.value = 'Clip saved successfully!'
     showSaveForm.value = false
     clipName.value = ''
-    setTimeout(() => {
-      emit('close')
-    }, 1000)
-  } catch (err: any) {
-    status.value = 'Save failed: ' + err.message
+    setTimeout(() => emit('close'), 1000)
+  } catch (err: unknown) {
+    statusMessage.value = 'Save failed: ' + (err instanceof Error ? err.message : String(err))
     console.error('Save clip failed:', err)
   }
 }
@@ -218,7 +128,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
-  cleanupPreview()
+  resetAdjustments()
 })
 </script>
 
@@ -248,7 +158,7 @@ onUnmounted(() => {
         <div class="inspector-controls">
           <div class="slider-group">
             <label class="slider-label">
-              Left side <span class="slider-value">{{ leftAdjust >= 0 ? '+' : '' }}{{ leftAdjust.toFixed(1) }}s</span>
+              Left side <span class="slider-value">{{ formatAdjustmentValue(leftAdjust) }}</span>
             </label>
             <input
               v-model.number="leftAdjust"
@@ -262,7 +172,7 @@ onUnmounted(() => {
 
           <div class="slider-group">
             <label class="slider-label">
-              Right side <span class="slider-value">{{ rightAdjust >= 0 ? '+' : '' }}{{ rightAdjust.toFixed(1) }}s</span>
+              Right side <span class="slider-value">{{ formatAdjustmentValue(rightAdjust) }}</span>
             </label>
             <input
               v-model.number="rightAdjust"
@@ -274,7 +184,7 @@ onUnmounted(() => {
             />
           </div>
 
-          <div class="inspector-status">{{ status }}</div>
+          <div class="inspector-status">{{ statusMessage }}</div>
 
           <div class="button-group">
             <button

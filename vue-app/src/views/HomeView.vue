@@ -2,12 +2,12 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import UserButtons from '@/components/UserButtons.vue'
-import AppFooter from '@/components/AppFooter.vue'
-import BrandLogo from '@/components/BrandLogo.vue'
-import PrimaryButton from '@/components/PrimaryButton.vue'
-import AnimatedArrow from '@/components/AnimatedArrow.vue'
-import HeroImage from '@/components/HeroImage.vue'
+import UserButtons from '@/components/layout/UserButtons.vue'
+import AppFooter from '@/components/layout/AppFooter.vue'
+import BrandLogo from '@/components/layout/BrandLogo.vue'
+import PrimaryButton from '@/components/common/PrimaryButton.vue'
+import AnimatedArrow from '@/components/common/AnimatedArrow.vue'
+import HeroImage from '@/components/search/HeroImage.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

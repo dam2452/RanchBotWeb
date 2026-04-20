@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance } from 'axios'
+import axios, { isAxiosError, type AxiosInstance } from 'axios'
 import type { User, Clip, SearchResult, LoginCredentials } from '@/types'
 
 class ApiService {
@@ -64,8 +64,8 @@ class ApiService {
         return response.data.user
       }
       return null
-    } catch (err: any) {
-      if (err.response?.status === 401) {
+    } catch (err: unknown) {
+      if (isAxiosError(err) && err.response?.status === 401) {
         return null
       }
       throw err

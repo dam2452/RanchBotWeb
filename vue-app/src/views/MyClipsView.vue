@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, nextTick, onUnmounted, watch } from 'vue'
-import { apiService } from '@/services/api'
+import { clipService } from '@/services/clipService'
 import type { Clip } from '@/types'
-import UserButtons from '@/components/UserButtons.vue'
-import LoadingSpinner from '@/components/LoadingSpinner.vue'
-import LogoHeader from '@/components/LogoHeader.vue'
-import MyClipCard from '@/components/MyClipCard.vue'
-import AppFooter from '@/components/AppFooter.vue'
+import UserButtons from '@/components/layout/UserButtons.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import LogoHeader from '@/components/layout/LogoHeader.vue'
+import MyClipCard from '@/components/clips/MyClipCard.vue'
+import AppFooter from '@/components/layout/AppFooter.vue'
 import { useHorizontalScroll } from '@/composables/useHorizontalScroll'
 import { useVideoControl } from '@/composables/useVideoControl'
 import { useWindowWidth } from '@/composables/useWindowWidth'
@@ -117,7 +117,7 @@ const loadClips = async (): Promise<void> => {
   error.value = ''
 
   try {
-    clips.value = await apiService.getUserClips()
+    clips.value = await clipService.getUserClips()
   } catch (err: unknown) {
     error.value = err instanceof Error ? err.message : 'Failed to load clips'
   } finally {
@@ -133,7 +133,7 @@ const getClipsForPage = (pageIndex: number) => {
 
 const handleDelete = async (clipName: string): Promise<void> => {
   try {
-    await apiService.deleteClip(clipName)
+    await clipService.deleteClip(clipName)
     clips.value = clips.value.filter((clip) => clip.name !== clipName)
   } catch (err: unknown) {
     console.error('Failed to delete clip:', err)
@@ -141,15 +141,15 @@ const handleDelete = async (clipName: string): Promise<void> => {
 }
 
 const handleDownload = (clip: Clip): void => {
-  downloadFile(apiService.getVideoUrl(clip.name), `${clip.name}.mp4`)
+  downloadFile(clipService.getVideoUrl(clip.name), `${clip.name}.mp4`)
 }
 
 const getVideoUrl = (clipName: string) => {
-  return apiService.getVideoUrl(clipName)
+  return clipService.getVideoUrl(clipName)
 }
 
 const getThumbnailUrl = (clipName: string) => {
-  return apiService.getThumbnailUrl(clipName)
+  return clipService.getThumbnailUrl(clipName)
 }
 
 const handleVideoClick = (clip: Clip, event: Event) => {

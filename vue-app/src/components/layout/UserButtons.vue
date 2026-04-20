@@ -59,7 +59,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
-import SubscriptionTooltip from './SubscriptionTooltip.vue'
+import SubscriptionTooltip from '../clips/SubscriptionTooltip.vue'
 
 interface Props {
   fixed?: boolean

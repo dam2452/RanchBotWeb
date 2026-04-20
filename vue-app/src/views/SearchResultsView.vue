@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { apiService } from '@/services/api'
+import { clipService } from '@/services/clipService'
 import type { SearchResult } from '@/types'
-import UserButtons from '@/components/UserButtons.vue'
-import SearchBar from '@/components/SearchBar.vue'
-import LoadingSpinner from '@/components/LoadingSpinner.vue'
-import LogoHeader from '@/components/LogoHeader.vue'
-import AppFooter from '@/components/AppFooter.vue'
-import VideoReel from '@/components/VideoReel.vue'
+import UserButtons from '@/components/layout/UserButtons.vue'
+import SearchBar from '@/components/search/SearchBar.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import LogoHeader from '@/components/layout/LogoHeader.vue'
+import AppFooter from '@/components/layout/AppFooter.vue'
+import VideoReel from '@/components/clips/VideoReel.vue'
 import { useClipLoader } from '@/composables/useClipLoader'
 import { useWindowWidth } from '@/composables/useWindowWidth'
 import { DESKTOP_BREAKPOINT } from '@/utils/formatters'
@@ -46,7 +46,7 @@ const _loadSearchResults = async (): Promise<void> => {
   error.value = ''
 
   try {
-    results.value = await apiService.searchClips(query.value)
+    results.value = await clipService.searchClips(query.value)
     loading.value = false
     if (results.value.length > 0) {
       await loadNextClips(2)

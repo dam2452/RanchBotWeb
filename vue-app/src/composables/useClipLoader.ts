@@ -1,5 +1,5 @@
 import { ref, type Ref } from 'vue'
-import { apiService } from '@/services/api'
+import { clipService } from '@/services/clipService'
 import type { SearchResult } from '@/types'
 
 export interface ClipState {
@@ -51,11 +51,11 @@ export function useClipLoader(options: UseClipLoaderOptions) {
       const clipPositionId = (i + 1).toString()
 
       try {
-        const thumbnailBlob = await apiService.getThumbnail(clipPositionId, clipResult.id || undefined)
+        const thumbnailBlob = await clipService.getThumbnail(clipPositionId, clipResult.id || undefined)
         if (searchId.value !== currentSearchId) break
 
         const thumbnailUrl = URL.createObjectURL(thumbnailBlob)
-        const videoBlob = await apiService.getVideo(clipPositionId)
+        const videoBlob = await clipService.getVideo(clipPositionId)
 
         if (searchId.value !== currentSearchId) {
           URL.revokeObjectURL(thumbnailUrl)
@@ -84,7 +84,7 @@ export function useClipLoader(options: UseClipLoaderOptions) {
 
     const clipPositionId = (index + 1).toString()
     try {
-      const blob = await apiService.getVideo(clipPositionId)
+      const blob = await clipService.getVideo(clipPositionId)
       clips.value[index] = { ...clips.value[index], videoUrl: URL.createObjectURL(blob), hasError: false }
     } catch (err) {
       console.error(`Failed to load video for clip ${index}:`, err)

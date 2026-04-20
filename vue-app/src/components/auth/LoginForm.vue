@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import FormInput from './FormInput.vue'
-import ErrorMessage from './ErrorMessage.vue'
-import PrimaryButton from './PrimaryButton.vue'
+import FormInput from '../common/FormInput.vue'
+import ErrorMessage from '../common/ErrorMessage.vue'
+import PrimaryButton from '../common/PrimaryButton.vue'
 
 interface Props {
   loading?: boolean

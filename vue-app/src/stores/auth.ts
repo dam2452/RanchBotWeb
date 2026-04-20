@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { apiService } from '@/services/api'
+import { isAxiosError } from 'axios'
+import { authService } from '@/services/authService'
 import type { User, LoginCredentials } from '@/types'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -15,15 +16,15 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
 
     try {
-      const response = await apiService.login(credentials)
+      const response = await authService.login(credentials)
       if (response.success) {
         user.value = response.user
         return true
       }
       error.value = 'Invalid username or password'
       return false
-    } catch (err: any) {
-      error.value = err.response?.data?.detail || 'Invalid username or password'
+    } catch (err: unknown) {
+      error.value = isAxiosError(err) ? (err.response?.data?.detail || 'Invalid username or password') : 'Invalid username or password'
       return false
     } finally {
       loading.value = false
@@ -32,7 +33,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function logout() {
     try {
-      await apiService.logout()
+      await authService.logout()
     } catch (err) {
       console.error('Logout error:', err)
     } finally {
@@ -42,7 +43,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function checkAuth() {
     try {
-      const currentUser = await apiService.getCurrentUser()
+      const currentUser = await authService.getCurrentUser()
       if (currentUser) {
         user.value = currentUser
         return true
@@ -55,21 +56,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function register(data: any) {
-    loading.value = true
-    error.value = null
-
-    try {
-      throw new Error('Registration is currently disabled')
-      return true
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Registration failed'
-      return false
-    } finally {
-      loading.value = false
-    }
-  }
-
   return {
     user,
     loading,
@@ -78,6 +64,5 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     logout,
     checkAuth,
-    register,
   }
 })

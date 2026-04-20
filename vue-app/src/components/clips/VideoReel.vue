@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import VideoReelItem from './VideoReelItem.vue'
-import LoadingSpinner from './LoadingSpinner.vue'
+import LoadingSpinner from '../common/LoadingSpinner.vue'
 import { useVideoControl } from '@/composables/useVideoControl'
 import { useHorizontalScroll } from '@/composables/useHorizontalScroll'
 import { useLoadMoreObserver } from '@/composables/useLoadMoreObserver'

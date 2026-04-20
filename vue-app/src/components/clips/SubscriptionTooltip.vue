@@ -1,18 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { apiService } from '@/services/api'
-import LoadingSpinner from './LoadingSpinner.vue'
+import { authService } from '@/services/authService'
+import { formatDate, getSubscriptionStatus } from '@/utils/subscription'
+import LoadingSpinner from '../common/LoadingSpinner.vue'
 
 interface Props {
   visible: boolean
 }
 
-interface Emits {
-  (e: 'close'): void
-}
-
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
 
 const loading = ref(false)
 const error = ref('')
@@ -26,52 +22,13 @@ const loadSubscription = async () => {
   error.value = ''
 
   try {
-    const data = await apiService.getSubscription()
+    const data = await authService.getSubscription()
     subscriptionEnd.value = data.subscriptionEnd
     daysRemaining.value = data.daysRemaining
-  } catch (err: any) {
-    error.value = err.message || 'Failed to fetch subscription data'
+  } catch (err: unknown) {
+    error.value = (err instanceof Error ? err.message : null) || 'Failed to fetch subscription data'
   } finally {
     loading.value = false
-  }
-}
-
-const formatDate = (dateStr: string): string => {
-  try {
-    const date = new Date(dateStr)
-    if (!isNaN(date.getTime())) {
-      return date.toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      })
-    }
-  } catch {
-    return dateStr
-  }
-  return dateStr
-}
-
-const getDaysText = (days: number | null): { text: string; className: string } => {
-  if (days === null) {
-    return { text: 'Unknown', className: '' }
-  }
-
-  if (days > 1) {
-    return {
-      text: `Ends in ${days} days`,
-      className: days <= 7 ? 'expiring' : ''
-    }
-  } else if (days === 1) {
-    return { text: 'Ends tomorrow', className: 'expiring' }
-  } else if (days === 0) {
-    return { text: 'Ends today', className: 'expiring' }
-  } else {
-    const absDays = Math.abs(days)
-    return {
-      text: `Expired ${absDays} ${absDays === 1 ? 'day' : 'days'} ago`,
-      className: 'expired'
-    }
   }
 }
 
@@ -91,8 +48,8 @@ defineExpose({
     </div>
     <div v-else-if="subscriptionEnd">
       <div>Subscription active until: <strong>{{ formatDate(subscriptionEnd) }}</strong></div>
-      <div class="days-remaining" :class="getDaysText(daysRemaining).className">
-        {{ getDaysText(daysRemaining).text }}
+      <div class="days-remaining" :class="getSubscriptionStatus(daysRemaining).className">
+        {{ getSubscriptionStatus(daysRemaining).text }}
       </div>
     </div>
     <div v-else class="error">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import LoadingSpinner from './LoadingSpinner.vue'
+import LoadingSpinner from '../common/LoadingSpinner.vue'
 import { IS_MOBILE } from '@/utils/formatters'
 
 interface Props {

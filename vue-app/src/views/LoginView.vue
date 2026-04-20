@@ -2,10 +2,10 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import LogoSection from '@/components/LogoSection.vue'
-import LoginForm from '@/components/LoginForm.vue'
-import ActionButtons from '@/components/ActionButtons.vue'
-import AppFooter from '@/components/AppFooter.vue'
+import LogoSection from '@/components/layout/LogoSection.vue'
+import LoginForm from '@/components/auth/LoginForm.vue'
+import ActionButtons from '@/components/common/ActionButtons.vue'
+import AppFooter from '@/components/layout/AppFooter.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

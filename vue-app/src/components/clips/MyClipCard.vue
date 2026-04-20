@@ -2,8 +2,8 @@
 import { ref, watch, onBeforeUnmount } from 'vue'
 import type { Clip } from '@/types'
 import ClipActionButton from './ClipActionButton.vue'
-import ConfirmModal from './ConfirmModal.vue'
-import LoadingSpinner from './LoadingSpinner.vue'
+import ConfirmModal from '../common/ConfirmModal.vue'
+import LoadingSpinner from '../common/LoadingSpinner.vue'
 import { IS_MOBILE } from '@/utils/formatters'
 
 interface Props {

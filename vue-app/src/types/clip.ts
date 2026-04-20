@@ -7,8 +7,6 @@ export interface ClipInfo {
   isLastLoaded?: boolean
   isEditing?: boolean
   searchQuery?: string
-  userUnmuted?: boolean
-  userInteracted?: boolean
 }
 
 export interface ClipAdjustmentState {

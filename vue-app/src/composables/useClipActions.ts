@@ -1,5 +1,5 @@
 import { apiService } from '@/services/api'
-import { createClipFilename, downloadFile } from '@/utils/formatters'
+import { createClipFilename, downloadBlob, downloadFile } from '@/utils/formatters'
 
 interface UseClipActionsOptions {
   clipIndex: number
@@ -8,40 +8,37 @@ interface UseClipActionsOptions {
 }
 
 export function useClipActions(options: UseClipActionsOptions) {
-  const download = async () => {
-    try {
-      const filename = createClipFilename(options.clipIndex, 0, 0, options.searchQuery)
+  const _clipId = (): string => (options.clipIndex + 1).toString()
 
-      if (options.videoUrl) {
-        downloadFile(options.videoUrl, filename)
-      } else {
-        const blob = await apiService.getVideo((options.clipIndex + 1).toString())
-        const url = URL.createObjectURL(blob)
-        downloadFile(url, filename)
-        URL.revokeObjectURL(url)
-      }
-    } catch (err: any) {
-      console.error('Download failed:', err)
-      throw new Error('Download failed: ' + err.message)
+  const download = async (): Promise<void> => {
+    const filename = createClipFilename(options.clipIndex, 0, 0, options.searchQuery)
+    if (options.videoUrl) {
+      downloadFile(options.videoUrl, filename)
+      return
     }
+    const blob = await apiService.getVideo(_clipId())
+    downloadBlob(blob, filename)
+  }
+
+  const downloadAdjusted = async (leftAdjust: number, rightAdjust: number): Promise<void> => {
+    const filename = createClipFilename(options.clipIndex, leftAdjust, rightAdjust, options.searchQuery)
+    const blob = leftAdjust === 0 && rightAdjust === 0
+      ? await apiService.getVideo(_clipId())
+      : await apiService.adjustVideo(_clipId(), leftAdjust, rightAdjust)
+    downloadBlob(blob, filename)
   }
 
   const save = async (clipName: string): Promise<void> => {
-    if (!clipName || !clipName.trim()) {
-      throw new Error('Clip name is required')
-    }
-
-    try {
-      await apiService.adjustVideo((options.clipIndex + 1).toString(), 0, 0)
-      await apiService.saveClip(clipName.trim())
-    } catch (err: any) {
-      console.error('Save failed:', err)
-      throw new Error('Save failed: ' + err.message)
-    }
+    if (!clipName?.trim()) throw new Error('Clip name is required')
+    await apiService.adjustVideo(_clipId(), 0, 0) // triggers server-side clip processing before save
+    await apiService.saveClip(clipName.trim())
   }
 
-  return {
-    download,
-    save
+  const saveAdjusted = async (clipName: string, leftAdjust: number, rightAdjust: number): Promise<void> => {
+    if (!clipName?.trim()) throw new Error('Clip name is required')
+    await apiService.adjustVideo(_clipId(), leftAdjust, rightAdjust)
+    await apiService.saveClip(clipName.trim())
   }
+
+  return { download, downloadAdjusted, save, saveAdjusted }
 }

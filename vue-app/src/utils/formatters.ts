@@ -1,4 +1,5 @@
 export const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+export const DESKTOP_BREAKPOINT = 850
 
 export function formatAdjustmentValue(value: number): string {
   const sign = value >= 0 ? '+' : ''
@@ -30,4 +31,10 @@ export function downloadFile(url: string, filename: string): void {
   document.body.appendChild(anchor)
   anchor.click()
   document.body.removeChild(anchor)
+}
+
+export function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob)
+  downloadFile(url, filename)
+  URL.revokeObjectURL(url)
 }

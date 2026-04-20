@@ -30,55 +30,47 @@ export function useLoadMoreObserver(options: UseLoadMoreObserverOptions) {
     loadedClips.value < results.value.length &&
     editingClipIndex.value === null
 
-  const _setupDesktopObserver = () => {
-    if (!loadMoreElementRef.value || !containerRef.value) return
-
-    desktopObserver?.disconnect()
-
-    desktopObserver = new IntersectionObserver(
+  const _createObserver = (
+    element: HTMLElement,
+    condition: () => boolean,
+    threshold: number
+  ): IntersectionObserver => {
+    const observer = new IntersectionObserver(
       (entries) => {
-        for (const entry of entries) {
-          if (
-            entry.isIntersecting &&
-            _canLoadMore() &&
-            !isManualScroll.value &&
-            activeIndex.value >= loadedClips.value - 2 &&
-            Date.now() - getLastLoadTime() > 1000
-          ) {
-            onLoadMore()
-          }
+        if (entries.some(e => e.isIntersecting) && condition()) {
+          onLoadMore()
         }
       },
-      { root: containerRef.value, threshold: 0.5 }
+      { root: containerRef.value, threshold }
     )
-
-    desktopObserver.observe(loadMoreElementRef.value)
+    observer.observe(element)
+    return observer
   }
 
-  const _setupMobileObserver = () => {
+  const _setupDesktopObserver = (): void => {
+    if (!loadMoreElementRef.value || !containerRef.value) return
+    desktopObserver?.disconnect()
+    desktopObserver = _createObserver(
+      loadMoreElementRef.value,
+      () =>
+        _canLoadMore() &&
+        !isManualScroll.value &&
+        activeIndex.value >= loadedClips.value - 2 &&
+        Date.now() - getLastLoadTime() > 1000,
+      0.5
+    )
+  }
+
+  const _setupMobileObserver = (): void => {
     if (!containerRef.value || loadedClips.value >= results.value.length) return
-
     mobileObserver?.disconnect()
-
     const items = containerRef.value.querySelectorAll('.reel-item:not(.load-more-item)')
     const lastItem = items[loadedClips.value - 1] as HTMLElement | undefined
     if (!lastItem) return
-
-    mobileObserver = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting && _canLoadMore()) {
-            onLoadMore()
-          }
-        }
-      },
-      { root: containerRef.value, threshold: 0.3 }
-    )
-
-    mobileObserver.observe(lastItem)
+    mobileObserver = _createObserver(lastItem, _canLoadMore, 0.3)
   }
 
-  const setup = () => {
+  const setup = (): void => {
     nextTick(() => {
       if (IS_MOBILE) {
         _setupMobileObserver()
@@ -88,7 +80,7 @@ export function useLoadMoreObserver(options: UseLoadMoreObserverOptions) {
     })
   }
 
-  const cleanup = () => {
+  const cleanup = (): void => {
     desktopObserver?.disconnect()
     mobileObserver?.disconnect()
     desktopObserver = null

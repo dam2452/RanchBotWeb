@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, watch, onBeforeUnmount } from 'vue'
 import type { Clip } from '@/types'
 import ClipActionButton from './ClipActionButton.vue'
 import ConfirmModal from './ConfirmModal.vue'
 import LoadingSpinner from './LoadingSpinner.vue'
+import { IS_MOBILE } from '@/utils/formatters'
 
 interface Props {
   clip: Clip
@@ -11,8 +12,6 @@ interface Props {
   thumbnailUrl?: string
   isActive: boolean
   hasError?: boolean
-  userUnmuted?: boolean
-  userInteracted?: boolean
 }
 
 interface Emits {
@@ -23,9 +22,7 @@ interface Emits {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  hasError: false,
-  userUnmuted: false,
-  userInteracted: false
+  hasError: false
 })
 
 const emit = defineEmits<Emits>()
@@ -33,11 +30,23 @@ const emit = defineEmits<Emits>()
 const showDeleteConfirm = ref(false)
 const videoRef = ref<HTMLVideoElement | null>(null)
 const isLoading = ref(true)
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-const isVideoMuted = ref(isMobile)
+const isVideoMuted = ref(IS_MOBILE)
 const shouldLoadVideo = ref(false)
 const thumbnailLoaded = ref(false)
 const isVideoPlaying = ref(false)
+
+const _onVolumeChange = (): void => {
+  if (videoRef.value) isVideoMuted.value = videoRef.value.muted
+}
+
+watch(videoRef, (newRef, oldRef) => {
+  if (oldRef) oldRef.removeEventListener('volumechange', _onVolumeChange)
+  if (newRef) newRef.addEventListener('volumechange', _onVolumeChange)
+})
+
+onBeforeUnmount(() => {
+  if (videoRef.value) videoRef.value.removeEventListener('volumechange', _onVolumeChange)
+})
 
 
 const handleThumbnailLoaded = () => {
@@ -50,7 +59,7 @@ const handleThumbnailOrVideoClick = (event: Event) => {
     shouldLoadVideo.value = true
     isLoading.value = true
 
-    if (isMobile && videoRef.value) {
+    if (IS_MOBILE && videoRef.value) {
       videoRef.value.muted = false
       isVideoMuted.value = false
     }
@@ -97,25 +106,17 @@ const handleVideoError = (event: Event) => {
   emit('video-error')
 }
 
-const handleVideoLoaded = () => {
+const handleVideoLoaded = (): void => {
   if (!props.thumbnailUrl) {
     isLoading.value = false
   }
-
-  if (videoRef.value) {
-    videoRef.value.addEventListener('volumechange', () => {
-      if (videoRef.value) {
-        isVideoMuted.value = videoRef.value.muted
-      }
-    })
-  }
 }
 
-const handleCanPlay = () => {
+const handleCanPlay = (): void => {
   isLoading.value = false
 
   if (shouldLoadVideo.value && props.isActive && videoRef.value && videoRef.value.paused) {
-    if (isMobile) {
+    if (IS_MOBILE) {
       videoRef.value.muted = false
       isVideoMuted.value = false
     }
@@ -154,7 +155,7 @@ const handlePause = () => {
           :data-clip-id="clip.id"
           loop
           playsinline
-          :muted="isMobile"
+          :muted="IS_MOBILE"
           preload="auto"
           :src="videoUrl"
           class="clip-video"

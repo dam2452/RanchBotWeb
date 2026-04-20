@@ -4,7 +4,7 @@ import ClipActionButton from './ClipActionButton.vue'
 import ClipEditor from './ClipEditor.vue'
 import SaveClipModal from './SaveClipModal.vue'
 import VideoPlayer from './VideoPlayer.vue'
-import { useClipAdjustment } from '@/composables/useClipAdjustment'
+import { useClipPreview } from '@/composables/useClipPreview'
 import { useClipActions } from '@/composables/useClipActions'
 import { IS_MOBILE } from '@/utils/formatters'
 import type { ClipInfo } from '@/types/clip'
@@ -17,6 +17,7 @@ interface Emits {
   (e: 'loaded', event: Event, index: number): void
   (e: 'close-editor'): void
   (e: 'load-video', index: number): void
+  (e: 'pause-all'): void
 }
 
 const props = defineProps<Props>()
@@ -36,17 +37,14 @@ const {
   isUpdatingPreview,
   previewUrl,
   resetAdjustments,
-  downloadAdjusted,
-  saveAdjusted
-} = useClipAdjustment({
+  validateAdjustment
+} = useClipPreview({
   clipIndex: props.index,
-  originalVideoUrl: props.videoUrl,
   isEditing: () => props.isEditing || false,
-  searchQuery: props.searchQuery,
   videoRef: _videoRef
 })
 
-const { download, save } = useClipActions({
+const { download, downloadAdjusted, save, saveAdjusted } = useClipActions({
   clipIndex: props.index,
   videoUrl: props.videoUrl,
   searchQuery: props.searchQuery
@@ -87,26 +85,45 @@ const handleClick = (event: MouseEvent) => {
   emit('click', props.index, event)
 }
 
-const _openSaveModal = (isAdjusted: boolean) => {
-  document.querySelectorAll('video').forEach(v => v.pause())
+const _openSaveModal = (isAdjusted: boolean): void => {
+  emit('pause-all')
   isAdjustedSave.value = isAdjusted
   showSaveModal.value = true
 }
 
-const handleDownload = async () => {
-  try { await download() } catch (err: any) { console.error('Download failed:', err) }
+const handleDownload = async (): Promise<void> => {
+  try {
+    await download()
+  } catch (err: unknown) {
+    console.error('Download failed:', err)
+  }
 }
 
-const handleModalSave = async (clipName: string) => {
+const _handleDownloadAdjusted = async (): Promise<void> => {
+  if (!validateAdjustment()) return
+  try {
+    statusMessage.value = 'Preparing download...'
+    await downloadAdjusted(leftAdjust.value, rightAdjust.value)
+    statusMessage.value = 'Download complete!'
+  } catch (err: unknown) {
+    statusMessage.value = 'Download failed: ' + (err instanceof Error ? err.message : String(err))
+    console.error('Download failed:', err)
+  }
+}
+
+const handleModalSave = async (clipName: string): Promise<void> => {
   showSaveModal.value = false
   try {
     if (isAdjustedSave.value) {
-      const success = await saveAdjusted(clipName)
-      if (success) setTimeout(() => { resetAdjustments(); emit('close-editor') }, 1500)
+      statusMessage.value = 'Saving clip...'
+      await saveAdjusted(clipName, leftAdjust.value, rightAdjust.value)
+      statusMessage.value = 'Clip saved successfully!'
+      setTimeout(() => { resetAdjustments(); emit('close-editor') }, 1500)
     } else {
       await save(clipName)
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
+    statusMessage.value = 'Save failed: ' + (err instanceof Error ? err.message : String(err))
     console.error('Save failed:', err)
   }
 }
@@ -167,7 +184,7 @@ const handleModalSave = async (clipName: string) => {
           @update:left-adjust="leftAdjust = $event"
           @update:right-adjust="rightAdjust = $event"
           @close="() => { resetAdjustments(); emit('close-editor') }"
-          @download="downloadAdjusted"
+          @download="_handleDownloadAdjusted"
           @save="_openSaveModal(true)"
         />
       </Transition>

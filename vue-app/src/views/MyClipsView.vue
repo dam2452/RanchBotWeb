@@ -9,6 +9,8 @@ import MyClipCard from '@/components/MyClipCard.vue'
 import AppFooter from '@/components/AppFooter.vue'
 import { useHorizontalScroll } from '@/composables/useHorizontalScroll'
 import { useVideoControl } from '@/composables/useVideoControl'
+import { useWindowWidth } from '@/composables/useWindowWidth'
+import { downloadFile } from '@/utils/formatters'
 
 const clips = ref<Clip[]>([])
 const loading = ref(true)
@@ -16,29 +18,25 @@ const error = ref('')
 const activePage = ref(0)
 const pageReel = ref<HTMLElement | null>(null)
 const clipErrors = ref<{ [key: string]: boolean }>({})
-const userUnmutedOnce = ref(false)
 
-const { activeVideoId, userInteracted, pauseAllVideos, toggleVideo } = useVideoControl({
+const { activeVideoId, pauseAllVideos, toggleVideo } = useVideoControl({
   containerRef: pageReel,
   videoSelector: 'video.clip-video'
 })
 
-const windowWidth = ref(window.innerWidth)
+const { windowWidth } = useWindowWidth()
 const isAppleWatch = computed(() => windowWidth.value <= 196)
 const isMobile = computed(() => windowWidth.value <= 850)
 const clipsPerPage = computed(() => isMobile.value ? 2 : 6)
 
 const totalPages = computed(() => Math.ceil(clips.value.length / clipsPerPage.value))
 
-const updateWindowWidth = () => {
-  windowWidth.value = window.innerWidth
-}
-
-const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTimeout, isManualScroll, isScrolling } = useHorizontalScroll({
+const { setupScrollListeners, cleanupScrollListeners, scrollTimeout, isManualScroll } = useHorizontalScroll({
   containerRef: pageReel,
   activeIndex: activePage,
   totalItems: totalPages,
-  itemSelector: '.page-item'
+  itemSelector: '.page-item',
+  enableKeyboard: false
 })
 
 const handleKeyDown = (e: KeyboardEvent) => {
@@ -66,7 +64,6 @@ const handleKeyDown = (e: KeyboardEvent) => {
 }
 
 onMounted(async () => {
-  window.addEventListener('resize', updateWindowWidth)
   await loadClips()
   await nextTick()
   if (clips.value.length > 0) {
@@ -78,9 +75,8 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', updateWindowWidth)
   cleanupScrollListeners()
-  document.removeEventListener('keydown', handleKeyDown, { capture: true } as any)
+  document.removeEventListener('keydown', handleKeyDown, { capture: true } as EventListenerOptions)
   if (scrollTimeout.value) {
     clearTimeout(scrollTimeout.value)
   }
@@ -112,18 +108,18 @@ const scrollToPage = (index: number) => {
   }
 }
 
-const handlePageClick = (pageIndex: number, event?: MouseEvent) => {
+const handlePageClick = (pageIndex: number): void => {
   scrollToPage(pageIndex)
 }
 
-const loadClips = async () => {
+const loadClips = async (): Promise<void> => {
   loading.value = true
   error.value = ''
 
   try {
     clips.value = await apiService.getUserClips()
-  } catch (err: any) {
-    error.value = err.message || 'Failed to load clips'
+  } catch (err: unknown) {
+    error.value = err instanceof Error ? err.message : 'Failed to load clips'
   } finally {
     loading.value = false
   }
@@ -135,26 +131,17 @@ const getClipsForPage = (pageIndex: number) => {
   return clips.value.slice(start, end)
 }
 
-const handleDelete = async (clipName: string) => {
+const handleDelete = async (clipName: string): Promise<void> => {
   try {
     await apiService.deleteClip(clipName)
     clips.value = clips.value.filter((clip) => clip.name !== clipName)
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Failed to delete clip:', err)
   }
 }
 
-const handleDownload = async (clip: Clip) => {
-  try {
-    const a = document.createElement('a')
-    a.href = apiService.getVideoUrl(clip.name)
-    a.download = `${clip.name}.mp4`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-  } catch (err: any) {
-    console.error('Failed to download clip:', err)
-  }
+const handleDownload = (clip: Clip): void => {
+  downloadFile(apiService.getVideoUrl(clip.name), `${clip.name}.mp4`)
 }
 
 const getVideoUrl = (clipName: string) => {
@@ -198,18 +185,12 @@ const handleVideoClick = (clip: Clip, event: Event) => {
   }
 }
 
-const handleVideoError = (clipId: string) => {
+const handleVideoError = (clipId: string): void => {
   console.error('Video error for clip:', clipId)
   clipErrors.value = { ...clipErrors.value, [clipId]: true }
 }
 
-const pauseInactivePageVideos = () => {
-  pauseAllVideos()
-}
-
-watch(activePage, () => {
-  pauseInactivePageVideos()
-})
+watch(activePage, pauseAllVideos)
 </script>
 
 <template>
@@ -268,8 +249,6 @@ watch(activePage, () => {
             :thumbnail-url="getThumbnailUrl(clip.name)"
             :is-active="activeVideoId === String(clip.id)"
             :has-error="!!clipErrors[clip.id]"
-            :user-unmuted="userUnmutedOnce"
-            :user-interacted="userInteracted"
             @video-click="(e) => handleVideoClick(clip, e)"
             @download="handleDownload(clip)"
             @delete="handleDelete(clip.name)"

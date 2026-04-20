@@ -1,34 +1,27 @@
-from fastapi import APIRouter, HTTPException, Depends, Query
-from fastapi.responses import StreamingResponse, Response
-from pydantic import BaseModel
+import traceback
+from urllib.parse import unquote
+
+from fastapi import APIRouter, HTTPException, Depends
+
+from app.core.dependencies import get_current_user
+from app.core.logger import setup_logger
+from app.core.responses import thumbnail_response, video_streaming_response
+from app.models.clip import ClipOperationRequest
+from app.models.user import UserSession
 from app.services.ranchbot_api import api_client
 from app.services.thumbnail import thumbnail_service
-from app.core.dependencies import get_current_user
-from app.models.user import UserSession
-from app.models.clip import ClipCreate
-import io
-from urllib.parse import unquote, quote
 
+logger = setup_logger(__name__)
 router = APIRouter(prefix="/clips", tags=["clips"])
 
 
 @router.get("")
-async def get_clips(
-    action: str = Query(...),
-    user: UserSession = Depends(get_current_user)
-):
-    """Get user's clips"""
-    if action != "get_clips":
-        raise HTTPException(status_code=400, detail="Invalid action")
-
+async def get_clips(user: UserSession = Depends(get_current_user)):
     try:
         clips = await api_client.get_user_clips(user.jwt_token)
-        return {
-            "status": "success",
-            "clips": clips
-        }
+        return {"status": "success", "clips": clips}
     except Exception as e:
-        print(f"Get clips error: {e}")
+        logger.error(f"Get clips error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -37,32 +30,16 @@ async def get_clip_video(
     clip_id: str,
     user: UserSession = Depends(get_current_user)
 ):
-    """Get video for a specific clip"""
+    decoded_clip_name = unquote(clip_id)
     try:
-        decoded_clip_name = unquote(clip_id)
-        print(f"Fetching clip video: {decoded_clip_name}")
-
+        logger.info(f"Fetching clip video: {decoded_clip_name}")
         video_data = await api_client.call_api_for_blob(
-            endpoint="wys",
-            args=[decoded_clip_name],
-            token=user.jwt_token
+            endpoint="wys", args=[decoded_clip_name], token=user.jwt_token
         )
-
-        encoded_filename = quote(decoded_clip_name)
-
-        return StreamingResponse(
-            io.BytesIO(video_data),
-            media_type="video/mp4",
-            headers={
-                "Content-Disposition": f"inline; filename*=UTF-8''{encoded_filename}.mp4",
-                "Content-Length": str(len(video_data)),
-                "Accept-Ranges": "bytes"
-            }
-        )
+        return video_streaming_response(video_data, filename=decoded_clip_name)
     except Exception as e:
-        print(f"Get clip video error for '{decoded_clip_name}': {e}")
-        import traceback
-        traceback.print_exc()
+        logger.error(f"Get clip video error for '{decoded_clip_name}': {e}")
+        logger.debug(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -71,48 +48,20 @@ async def get_clip_thumbnail(
     clip_id: str,
     user: UserSession = Depends(get_current_user)
 ):
-    """Get thumbnail (first frame) for a specific clip"""
+    decoded_clip_name = unquote(clip_id)
     try:
-        decoded_clip_name = unquote(clip_id)
-        print(f"Fetching clip thumbnail: {decoded_clip_name}")
-
-        cached_thumbnail = thumbnail_service.get_cached_thumbnail(decoded_clip_name)
-        if cached_thumbnail:
-            print(f"Returning cached thumbnail for: {decoded_clip_name}")
-            return Response(
-                content=cached_thumbnail,
-                media_type="image/webp",
-                headers={
-                    "Cache-Control": "public, max-age=86400",
-                    "Content-Length": str(len(cached_thumbnail))
-                }
+        logger.info(f"Fetching clip thumbnail: {decoded_clip_name}")
+        thumbnail_data = await thumbnail_service.get_or_generate(
+            decoded_clip_name,
+            lambda: api_client.call_api_for_blob(
+                endpoint="wys", args=[decoded_clip_name], token=user.jwt_token
             )
-
-        video_data = await api_client.call_api_for_blob(
-            endpoint="wys",
-            args=[decoded_clip_name],
-            token=user.jwt_token
         )
-
-        thumbnail_data = thumbnail_service.extract_thumbnail(video_data, decoded_clip_name)
-
-        return Response(
-            content=thumbnail_data,
-            media_type="image/webp",
-            headers={
-                "Cache-Control": "public, max-age=86400",
-                "Content-Length": str(len(thumbnail_data))
-            }
-        )
+        return thumbnail_response(thumbnail_data)
     except Exception as e:
-        print(f"Get clip thumbnail error for '{decoded_clip_name}': {e}")
-        import traceback
-        traceback.print_exc()
+        logger.error(f"Get clip thumbnail error for '{decoded_clip_name}': {e}")
+        logger.debug(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
-
-
-class ClipOperationRequest(BaseModel):
-    clip_name: str
 
 
 @router.post("/save")
@@ -120,21 +69,17 @@ async def save_clip(
     request: ClipOperationRequest,
     user: UserSession = Depends(get_current_user)
 ):
-    """Save clip (synchronous)"""
     try:
-        print(f"Saving clip '{request.clip_name}'")
+        logger.info(f"Saving clip '{request.clip_name}'")
         result = await api_client.save_clip(request.clip_name, user.jwt_token)
-
         return {
             "status": "success",
             "message": f"Clip '{request.clip_name}' saved successfully",
             "data": result
         }
-
     except Exception as e:
-        print(f"Save clip error: {e}")
-        import traceback
-        traceback.print_exc()
+        logger.error(f"Save clip error: {e}")
+        logger.debug(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -143,19 +88,15 @@ async def delete_clip(
     request: ClipOperationRequest,
     user: UserSession = Depends(get_current_user)
 ):
-    """Delete clip (synchronous)"""
     try:
-        print(f"Deleting clip '{request.clip_name}'")
+        logger.info(f"Deleting clip '{request.clip_name}'")
         result = await api_client.delete_clip(request.clip_name, user.jwt_token)
-
         return {
             "status": "success",
             "message": f"Clip '{request.clip_name}' deleted successfully",
             "data": result
         }
-
     except Exception as e:
-        print(f"Delete clip error: {e}")
-        import traceback
-        traceback.print_exc()
+        logger.error(f"Delete clip error: {e}")
+        logger.debug(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))

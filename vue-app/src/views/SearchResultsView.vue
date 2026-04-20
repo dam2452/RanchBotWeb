@@ -11,11 +11,13 @@ import LogoHeader from '@/components/LogoHeader.vue'
 import AppFooter from '@/components/AppFooter.vue'
 import { useHorizontalScroll } from '@/composables/useHorizontalScroll'
 import { useVideoControl } from '@/composables/useVideoControl'
+import { useClipLoader } from '@/composables/useClipLoader'
+import { useLoadMoreObserver } from '@/composables/useLoadMoreObserver'
+import { IS_MOBILE } from '@/utils/formatters'
 
 const route = useRoute()
 const router = useRouter()
 const windowWidth = ref(window.innerWidth)
-
 const isWatchView = computed(() => windowWidth.value <= 196)
 const isDesktop = computed(() => windowWidth.value > 850)
 
@@ -23,32 +25,33 @@ const query = ref('')
 const results = ref<SearchResult[]>([])
 const loading = ref(false)
 const error = ref('')
-const loadedClips = ref(0)
-const videoCache = ref<{ [key: number]: string }>({})
-const thumbnailCache = ref<{ [key: number]: string }>({})
-const videoErrors = ref<{ [key: number]: boolean }>({})
-const loadingClips = ref(false)
 const activeIndex = ref(0)
+const searchId = ref(0)
 const videoReel = ref<HTMLElement | null>(null)
 const loadMoreElement = ref<HTMLElement | null>(null)
 const editingClipIndex = ref<number | null>(null)
 const userUnmutedOnce = ref(false)
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
-const { activeVideoId, userInteracted, pauseAllVideos, toggleVideoAtIndex } = useVideoControl({
+const { userInteracted, pauseAllVideos, toggleVideoAtIndex } = useVideoControl({
   containerRef: videoReel,
   videoSelector: 'video'
 })
 
-const totalClips = computed(() => {
-  const hasLoadMore = loadedClips.value < results.value.length
-  if (hasLoadMore && !loadingClips.value) {
-    return displayedResults.value.length + 1
-  }
-  return displayedResults.value.length
+const { clips, loadedClips, loadingClips, loadNextClips, loadVideoForClip, revokeAll, reset, getLastLoadTime } = useClipLoader({
+  results,
+  searchId
 })
 
-const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTimeout, isManualScroll, isScrolling } = useHorizontalScroll({
+const displayedResults = computed(() => results.value.slice(0, loadedClips.value))
+
+const totalClips = computed(() => {
+  const hasLoadMore = loadedClips.value < results.value.length
+  return hasLoadMore && !loadingClips.value
+    ? displayedResults.value.length + 1
+    : displayedResults.value.length
+})
+
+const { setupScrollListeners, cleanupScrollListeners, scrollToItem, scrollTimeout, isManualScroll } = useHorizontalScroll({
   containerRef: videoReel,
   activeIndex,
   totalItems: totalClips,
@@ -57,194 +60,69 @@ const { setupScrollListeners, cleanupScrollListeners, handleItemClick, scrollTim
   isEditing: () => editingClipIndex.value !== null
 })
 
-let loadMoreObserver: IntersectionObserver | null = null
-let lastClipObserver: IntersectionObserver | null = null
-let lastLoadTime = 0
-
-const displayedResults = computed(() => {
-  return results.value.slice(0, loadedClips.value)
+const observer = useLoadMoreObserver({
+  containerRef: videoReel,
+  loadMoreElementRef: loadMoreElement,
+  loadedClips,
+  results,
+  loadingClips,
+  isManualScroll,
+  editingClipIndex,
+  activeIndex,
+  getLastLoadTime,
+  onLoadMore: () => loadNextClips()
 })
 
-let keydownTimeout: number | null = null
-let canNavigate = true
+let firstClipInitialized = false
 
-const handleKeydown = (event: KeyboardEvent) => {
-  if (!canNavigate) return
-  if (editingClipIndex.value !== null) return
+watch(loadedClips, async (count) => {
+  if (count === 0) return
 
-  if (event.key === ' ' || event.key === 'Enter') {
-    event.preventDefault()
-
-    if (activeIndex.value === displayedResults.value.length && loadedClips.value < results.value.length) {
-      loadNextClips()
-      return
-    }
-
-    if (event.key === ' ' && activeIndex.value < displayedResults.value.length) {
-      toggleVideoAtIndex(activeIndex.value)
-    }
+  if (!firstClipInitialized) {
+    firstClipInitialized = true
+    await nextTick()
+    setupScrollListeners()
+    observer.setup()
+    setTimeout(() => scrollToItem(0), 50)
     return
   }
 
-  if (event.key === 'ArrowLeft') {
-    if (activeIndex.value > 0) {
-      const videos = videoReel.value?.querySelectorAll('video') as NodeListOf<HTMLVideoElement>
-      videos?.forEach(video => {
-        if (!video.paused) {
-          video.pause()
-          video.currentTime = 0
-        }
-      })
-      scrollToClip(activeIndex.value - 1)
-      canNavigate = false
-      setTimeout(() => {
-        canNavigate = true
-      }, 1000)
-    }
-  } else if (event.key === 'ArrowRight') {
-    const videos = videoReel.value?.querySelectorAll('video') as NodeListOf<HTMLVideoElement>
-    videos?.forEach(video => {
-      if (!video.paused) {
-        video.pause()
-        video.currentTime = 0
-      }
-    })
-    if (activeIndex.value < displayedResults.value.length - 1) {
-      scrollToClip(activeIndex.value + 1)
-      canNavigate = false
-      setTimeout(() => {
-        canNavigate = true
-      }, 1000)
-    } else if (activeIndex.value === displayedResults.value.length - 1 && loadedClips.value < results.value.length) {
-      scrollToClip(displayedResults.value.length)
-      canNavigate = false
-      setTimeout(() => {
-        canNavigate = true
-      }, 1000)
-    }
+  if (loadedClips.value < results.value.length) {
+    observer.setup()
   }
-}
+})
 
-let wheelTimeout: number | null = null
-const handleWheel = (event: WheelEvent) => {
-  if (!videoReel.value) return
+const handleResize = () => { windowWidth.value = window.innerWidth }
+
+const handleSpaceEnter = (event: KeyboardEvent) => {
   if (editingClipIndex.value !== null) return
+  if (event.key !== ' ' && event.key !== 'Enter') return
 
-  pauseAllVideos()
+  event.preventDefault()
 
-  if (wheelTimeout) {
-    clearTimeout(wheelTimeout)
+  if (activeIndex.value === displayedResults.value.length && loadedClips.value < results.value.length) {
+    loadNextClips()
+    return
   }
 
-  wheelTimeout = window.setTimeout(() => {
-    if (event.deltaY > 0) {
-      if (activeIndex.value < displayedResults.value.length - 1) {
-        scrollToClip(activeIndex.value + 1)
-      } else if (activeIndex.value === displayedResults.value.length - 1 && loadedClips.value < results.value.length) {
-        scrollToClip(displayedResults.value.length)
-      }
-    } else if (event.deltaY < 0) {
-      if (activeIndex.value > 0) {
-        scrollToClip(activeIndex.value - 1)
-      }
-    }
-  }, 50)
-}
-
-const handleResize = () => {
-  windowWidth.value = window.innerWidth
+  if (event.key === ' ' && activeIndex.value < displayedResults.value.length) {
+    toggleVideoAtIndex(activeIndex.value)
+  }
 }
 
 onMounted(async () => {
   query.value = (route.query.query as string) || ''
   await loadSearchResults()
-  window.addEventListener('keydown', handleKeydown)
+  window.addEventListener('keydown', handleSpaceEnter)
   window.addEventListener('resize', handleResize)
-
-  nextTick(() => {
-    if (videoReel.value) {
-      videoReel.value.addEventListener('wheel', handleWheel, { passive: true })
-    }
-  })
 })
-
-const setupLoadMoreObserver = () => {
-  nextTick(() => {
-    if (loadMoreElement.value && videoReel.value && !isMobile) {
-      if (loadMoreObserver) {
-        loadMoreObserver.disconnect()
-      }
-
-      loadMoreObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            const now = Date.now()
-            const timeSinceLastLoad = now - lastLoadTime
-
-            if (entry.isIntersecting && !loadingClips.value && loadedClips.value < results.value.length && !isManualScroll.value && editingClipIndex.value === null && activeIndex.value >= displayedResults.value.length - 2 && timeSinceLastLoad > 1000) {
-              loadNextClips()
-            }
-          })
-        },
-        {
-          root: videoReel.value,
-          threshold: 0.5
-        }
-      )
-
-      loadMoreObserver.observe(loadMoreElement.value)
-    }
-
-    if (isMobile && videoReel.value && loadedClips.value < results.value.length) {
-      if (lastClipObserver) {
-        lastClipObserver.disconnect()
-      }
-
-      const lastClipIndex = loadedClips.value - 1
-      const items = videoReel.value.querySelectorAll('.reel-item:not(.load-more-item)')
-      const lastClipElement = items[lastClipIndex] as HTMLElement
-
-      if (lastClipElement) {
-        lastClipObserver = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting && !loadingClips.value && loadedClips.value < results.value.length && editingClipIndex.value === null) {
-                loadNextClips()
-              }
-            })
-          },
-          {
-            root: videoReel.value,
-            threshold: 0.3
-          }
-        )
-
-        lastClipObserver.observe(lastClipElement)
-      }
-    }
-  })
-}
 
 onUnmounted(() => {
   cleanupScrollListeners()
-  window.removeEventListener('keydown', handleKeydown)
+  observer.cleanup()
+  revokeAll()
+  window.removeEventListener('keydown', handleSpaceEnter)
   window.removeEventListener('resize', handleResize)
-
-  if (videoReel.value) {
-    videoReel.value.removeEventListener('wheel', handleWheel)
-  }
-
-  if (wheelTimeout) {
-    clearTimeout(wheelTimeout)
-  }
-
-  if (loadMoreObserver) {
-    loadMoreObserver.disconnect()
-  }
-
-  if (lastClipObserver) {
-    lastClipObserver.disconnect()
-  }
 
   if (scrollTimeout.value) {
     clearTimeout(scrollTimeout.value)
@@ -262,8 +140,8 @@ const loadSearchResults = async () => {
     loading.value = false
 
     if (results.value.length > 0) {
-      loadNextClips(2)
-      setupLoadMoreObserver()
+      await loadNextClips(2)
+      observer.setup()
     }
   } catch (err: any) {
     error.value = err.message || 'Failed to load search results'
@@ -271,75 +149,19 @@ const loadSearchResults = async () => {
   }
 }
 
-const loadNextClips = async (batchSize = 2) => {
-  if (loadingClips.value) return
-
-  loadingClips.value = true
-  const startIdx = loadedClips.value
-  const endIdx = Math.min(startIdx + batchSize, results.value.length)
-
-  for (let i = startIdx; i < endIdx; i++) {
-    const clipIndex = i
-    const clipPositionId = (clipIndex + 1).toString()
-    const clipResult = results.value[clipIndex]
-    if (!clipResult) continue
-    const clipUniqueId = clipResult.id
-
-    try {
-      console.log(`Loading clip ${clipIndex}:`, clipResult)
-      console.log(`Loading thumbnail - Position: ${clipPositionId}, ID: ${clipUniqueId}, Type: ${typeof clipUniqueId}`)
-
-      const thumbnailBlob = await apiService.getThumbnail(clipPositionId, String(clipUniqueId))
-      const thumbnailUrl = URL.createObjectURL(thumbnailBlob)
-      thumbnailCache.value[clipIndex] = thumbnailUrl
-      videoErrors.value[clipIndex] = false
-
-      const blob = await apiService.getVideo(clipPositionId)
-      const url = URL.createObjectURL(blob)
-      videoCache.value[clipIndex] = url
-      loadedClips.value = clipIndex + 1
-
-      if (startIdx === 0 && clipIndex === 0) {
-        await nextTick()
-        setupScrollListeners()
-        setupLoadMoreObserver()
-        setTimeout(() => {
-          scrollToClip(0)
-        }, 50)
-      }
-    } catch (err: any) {
-      console.error(`Failed to load clip ${clipIndex}:`, err)
-      if (err.response?.data instanceof Blob) {
-        const text = await err.response.data.text()
-        console.error('Error details (parsed):', JSON.parse(text))
-      } else {
-        console.error('Error details:', err.response?.data)
-      }
-      videoErrors.value[clipIndex] = true
-      loadedClips.value = clipIndex + 1
-    }
-  }
-
-  loadingClips.value = false
-  lastLoadTime = Date.now()
-
-  if (loadedClips.value < results.value.length) {
-    setupLoadMoreObserver()
-  }
+const resetSearchState = () => {
+  searchId.value++
+  reset()
+  results.value = []
+  activeIndex.value = 0
+  editingClipIndex.value = null
+  firstClipInitialized = false
 }
 
 const handleSearch = (newQuery: string) => {
-  router.push({
-    name: 'search-results',
-    query: { query: newQuery },
-  })
-
+  resetSearchState()
+  router.push({ name: 'search-results', query: { query: newQuery } })
   query.value = newQuery
-  results.value = []
-  loadedClips.value = 0
-  videoCache.value = {}
-  thumbnailCache.value = {}
-  videoErrors.value = {}
   loadSearchResults()
 }
 
@@ -353,7 +175,7 @@ const handleAdjust = (index: number) => {
   } else {
     editingClipIndex.value = index
     activeIndex.value = index
-    scrollToClip(index)
+    scrollToItem(index)
   }
 }
 
@@ -361,123 +183,20 @@ const closeEditor = () => {
   editingClipIndex.value = null
 }
 
-const handleDownload = async (index: number) => {
-  try {
-    const { createClipFilename, downloadFile } = await import('@/utils/formatters')
-    const filename = createClipFilename(index, 0, 0, query.value)
-
-    if (videoCache.value[index]) {
-      downloadFile(videoCache.value[index], filename)
-    } else {
-      const blob = await apiService.getVideo((index + 1).toString())
-      const url = URL.createObjectURL(blob)
-      downloadFile(url, filename)
-      URL.revokeObjectURL(url)
-    }
-  } catch (err: any) {
-    console.error('Download failed:', err)
-  }
-}
-
-const handleSave = async (index: number) => {
-  if (!query.value) {
-    console.error('No search query to use as clip name')
-    return
-  }
-
-  try {
-    await apiService.adjustVideo((index + 1).toString(), 0, 0)
-    await apiService.saveClip(query.value)
-  } catch (err: any) {
-    console.error('Save failed:', err)
-  }
-}
-
 const handleLoadVideo = async (index: number) => {
-  if (videoCache.value[index]) {
-    const items = videoReel.value?.querySelectorAll('.reel-item video') as NodeListOf<HTMLVideoElement>
-    if (items[index] && items[index].readyState >= 2) {
-      items[index].play().catch(() => {})
+  if (clips.value[index]?.videoUrl) {
+    const videos = videoReel.value?.querySelectorAll('.reel-item video') as NodeListOf<HTMLVideoElement>
+    const video = videos?.[index]
+    if (video && video.readyState >= 2) {
+      video.play().catch(() => {})
     }
     return
   }
-
-  const clipPositionId = (index + 1).toString()
-  try {
-    const blob = await apiService.getVideo(clipPositionId)
-    const url = URL.createObjectURL(blob)
-    videoCache.value[index] = url
-  } catch (err) {
-    console.error(`Failed to load video for clip ${index}:`, err)
-    videoErrors.value[index] = true
-  }
+  await loadVideoForClip(index)
 }
 
 const handleLoadMore = () => {
   loadNextClips()
-}
-
-const scrollToClip = (index: number) => {
-  if (!videoReel.value) return
-
-  if (scrollTimeout.value) {
-    clearTimeout(scrollTimeout.value)
-  }
-
-  isManualScroll.value = true
-  activeIndex.value = index
-
-  let targetItem: HTMLElement | null = null
-
-  if (index === displayedResults.value.length && loadMoreElement.value) {
-    targetItem = loadMoreElement.value
-  } else {
-    const items = videoReel.value.querySelectorAll('.reel-item:not(.load-more-item)')
-    targetItem = items[index] as HTMLElement
-  }
-
-  if (targetItem) {
-    const containerRect = videoReel.value.getBoundingClientRect()
-    const itemRect = targetItem.getBoundingClientRect()
-    const isMobile = window.innerWidth <= 850
-    const isEditing = editingClipIndex.value !== null
-    const isFirstClipEditing = isEditing && index === 0
-    const isLastLoaded = !isEditing && index === loadedClips.value - 1 && loadedClips.value < results.value.length
-
-    if (isMobile) {
-      let scrollTop
-      if (isLastLoaded) {
-        scrollTop = videoReel.value.scrollTop + (itemRect.top - containerRect.top) - 50
-      } else if (isEditing) {
-        scrollTop = videoReel.value.scrollTop + (itemRect.top - containerRect.top) - 150
-      } else {
-        scrollTop = videoReel.value.scrollTop + (itemRect.top - containerRect.top) - (containerRect.height - itemRect.height) / 2
-      }
-
-      videoReel.value.scrollTo({
-        top: scrollTop,
-        behavior: 'smooth'
-      })
-    } else {
-      let scrollLeft
-      if (isLastLoaded) {
-        scrollLeft = videoReel.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) * 0.3
-      } else if (isFirstClipEditing) {
-        scrollLeft = videoReel.value.scrollLeft + (itemRect.left - containerRect.left) - 350
-      } else {
-        scrollLeft = videoReel.value.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width - itemRect.width) / 2
-      }
-
-      videoReel.value.scrollTo({
-        left: scrollLeft,
-        behavior: 'smooth'
-      })
-    }
-
-    scrollTimeout.value = window.setTimeout(() => {
-      isManualScroll.value = false
-    }, 1000)
-  }
 }
 
 const handleReelClick = (event: MouseEvent) => {
@@ -488,7 +207,6 @@ const handleReelClick = (event: MouseEvent) => {
   if (editingClipIndex.value === null) return
 
   const target = event.target as HTMLElement
-
   if (!target.closest('.reel-item') || (!target.closest('.clip-video') && !target.closest('.edit-panel'))) {
     closeEditor()
   }
@@ -509,11 +227,7 @@ const handleClipClick = (index: number, event: MouseEvent) => {
   if (editingClipIndex.value !== null && index === editingClipIndex.value) {
     const video = (event.currentTarget as HTMLElement).querySelector('video')
     if (video) {
-      if (video.paused) {
-        video.play().catch(() => {})
-      } else {
-        video.pause()
-      }
+      video.paused ? video.play().catch(() => {}) : video.pause()
     }
     return
   }
@@ -524,7 +238,7 @@ const handleClipClick = (index: number, event: MouseEvent) => {
 
     if (video) {
       if (video.paused) {
-        videos.forEach((v, i) => {
+        videos?.forEach((v, i) => {
           if (i !== index && !v.paused) {
             v.pause()
             v.currentTime = 0
@@ -548,26 +262,23 @@ const handleClipClick = (index: number, event: MouseEvent) => {
     }
     isManualScroll.value = false
   } else {
-    if (!userInteracted.value) {
-      userInteracted.value = true
-    }
-    scrollToClip(index)
+    userInteracted.value = true
+    scrollToItem(index)
   }
 }
 
-const onVideoLoaded = (event: Event, index: number) => {
-  // Video loaded, no autoplay
-}
-
-watch(activeIndex, async (newIndex, oldIndex) => {
-  if (!videoReel.value) return
-  if (newIndex === oldIndex) return
+watch(activeIndex, (newIndex, oldIndex) => {
+  if (!videoReel.value || newIndex === oldIndex) return
 
   if (editingClipIndex.value !== null && editingClipIndex.value !== newIndex) {
     editingClipIndex.value = null
   }
 
   pauseAllVideos()
+
+  if (IS_MOBILE && !loadingClips.value && editingClipIndex.value === null && newIndex >= loadedClips.value - 1 && loadedClips.value < results.value.length) {
+    loadNextClips()
+  }
 })
 </script>
 
@@ -581,7 +292,7 @@ watch(activeIndex, async (newIndex, oldIndex) => {
       <SearchBar :initial-query="query" @search="handleSearch" @filters="handleFilters" />
     </div>
 
-    <div v-if="loading || (results.length > 0 && !videoCache[0] && !thumbnailCache[0] && !videoErrors[0])" class="loading-overlay">
+    <div v-if="loading || (results.length > 0 && !clips[0])" class="loading-overlay">
       <LoadingSpinner message="Loading results..." />
     </div>
 
@@ -592,14 +303,14 @@ watch(activeIndex, async (newIndex, oldIndex) => {
     </div>
 
 
-    <div v-if="!loading && (videoCache[0] || thumbnailCache[0] || videoErrors[0])" class="video-reel" :class="{ 'watch-reel': isWatchView }" ref="videoReel" @click="handleReelClick">
+    <div v-if="!loading && clips[0]" class="video-reel" :class="{ 'watch-reel': isWatchView }" ref="videoReel" @click="handleReelClick">
       <VideoReelItem
         v-for="(result, index) in displayedResults"
         :key="index"
         :index="index"
-        :video-url="videoCache[index]"
-        :thumbnail-url="thumbnailCache[index]"
-        :has-error="videoErrors[index] || false"
+        :video-url="clips[index]?.videoUrl"
+        :thumbnail-url="clips[index]?.thumbnailUrl"
+        :has-error="clips[index]?.hasError || false"
         :is-active="index === activeIndex"
         :is-last-loaded="index === loadedClips - 1 && loadedClips < results.length"
         :is-editing="index === editingClipIndex"
@@ -608,9 +319,6 @@ watch(activeIndex, async (newIndex, oldIndex) => {
         :user-interacted="userInteracted"
         @click="handleClipClick"
         @adjust="handleAdjust"
-        @download="handleDownload"
-        @save="handleSave"
-        @loaded="onVideoLoaded"
         @close-editor="closeEditor"
         @load-video="handleLoadVideo"
       />

@@ -60,7 +60,7 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
 
     try {
-      await apiService.register(data)
+      throw new Error('Registration is currently disabled')
       return true
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Registration failed'

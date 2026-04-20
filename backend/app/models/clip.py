@@ -12,3 +12,7 @@ class Clip(BaseModel):
 
 class ClipCreate(BaseModel):
     name: str
+
+
+class ClipOperationRequest(BaseModel):
+    clip_name: str

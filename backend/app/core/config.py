@@ -20,31 +20,10 @@ class Settings(BaseSettings):
     reload: bool = True
     enable_api_docs: bool = False
 
-    # RabbitMQ
-    rabbitmq_host: str = "localhost"
-    rabbitmq_port: int = 5672
-    rabbitmq_user: str = ""
-    rabbitmq_pass: str = ""
-
     # Cache directories
     thumbnail_cache_dir: str = "/tmp/thumbnails"
     adjusted_video_cache_dir: str = "/tmp/adjusted_videos"
     batch_video_cache_dir: str = "/tmp/batch_videos"
-
-    # Worker settings
-    thumbnail_worker_prefetch: int = 3
-    adjustment_worker_prefetch: int = 2
-    loader_worker_prefetch: int = 5
-    clip_worker_prefetch: int = 2
-    maintenance_worker_prefetch: int = 1
-
-    # Job polling settings
-    thumbnail_max_wait: int = 30
-    thumbnail_poll_interval: float = 0.2
-    adjustment_max_wait: int = 30
-    adjustment_poll_interval: float = 0.3
-    clip_operation_max_wait: int = 10
-    clip_operation_poll_interval: float = 0.2
 
     # Maintenance settings
     maintenance_interval_seconds: int = 300

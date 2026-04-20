@@ -1,5 +1,6 @@
 import httpx
 from typing import Any, Dict, List, Optional
+
 from app.core.config import settings
 
 
@@ -14,15 +15,32 @@ class RanchBotAPIClient:
         self.default_token = settings.dev_jwt_token
 
     def _build_url(self, endpoint: str) -> str:
-        """Builds full API URL from base URL and endpoint, handling leading/trailing slashes."""
-        normalized_endpoint = endpoint.lstrip('/')
-
-        if normalized_endpoint not in self.ALLOWED_ENDPOINTS and endpoint not in self.ALLOWED_ENDPOINTS:
+        normalized = endpoint.lstrip('/')
+        if normalized not in self.ALLOWED_ENDPOINTS and endpoint not in self.ALLOWED_ENDPOINTS:
             raise ValueError(f"Endpoint '{endpoint}' is not allowed")
+        return f"{self.base_url.rstrip('/')}/{normalized}"
 
-        base = self.base_url.rstrip('/')
-        path = normalized_endpoint
-        return f"{base}/{path}"
+    def _build_headers(self, token: str) -> Dict[str, str]:
+        return {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {token}"
+        }
+
+    async def _make_request(
+        self,
+        endpoint: str,
+        args: List[Any],
+        token: Optional[str],
+        timeout: int
+    ) -> httpx.Response:
+        url = self._build_url(endpoint)
+        jwt_token = token or self.default_token
+        if not jwt_token:
+            raise ValueError("JWT token is required")
+        async with httpx.AsyncClient(timeout=timeout) as client:
+            response = await client.post(url, json={"args": args}, headers=self._build_headers(jwt_token))
+            response.raise_for_status()
+            return response
 
     async def call_api(
         self,
@@ -31,24 +49,8 @@ class RanchBotAPIClient:
         token: Optional[str] = None,
         timeout: int = 60
     ) -> Dict[str, Any]:
-        """Call RanchBot API with JSON response"""
-        url = self._build_url(endpoint)
-        jwt_token = token or self.default_token
-
-        if not jwt_token:
-            raise ValueError("JWT token is required")
-
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {jwt_token}"
-        }
-
-        payload = {"args": args}
-
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            response = await client.post(url, json=payload, headers=headers)
-            response.raise_for_status()
-            return response.json()
+        response = await self._make_request(endpoint, args, token, timeout)
+        return response.json()
 
     async def call_api_for_blob(
         self,
@@ -57,36 +59,13 @@ class RanchBotAPIClient:
         token: Optional[str] = None,
         timeout: int = 60
     ) -> bytes:
-        """Call RanchBot API with binary response (video)"""
-        url = self._build_url(endpoint)
-        jwt_token = token or self.default_token
-
-        if not jwt_token:
-            raise ValueError("JWT token is required")
-
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {jwt_token}"
-        }
-
-        payload = {"args": args}
-
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            response = await client.post(url, json=payload, headers=headers)
-            response.raise_for_status()
-            return response.content
+        response = await self._make_request(endpoint, args, token, timeout)
+        return response.content
 
     async def authenticate(self, login: str, password: str) -> Dict[str, Any]:
-        """Authenticate user and get JWT token"""
         url = self._build_url("/auth/login")
-
-        payload = {
-            "username": login,
-            "password": password
-        }
-
         async with httpx.AsyncClient() as client:
-            response = await client.post(url, json=payload)
+            response = await client.post(url, json={"username": login, "password": password})
 
             if response.status_code == 429:
                 try:
@@ -102,32 +81,23 @@ class RanchBotAPIClient:
 
             try:
                 return response.json()
-            except Exception as e:
+            except Exception:
                 raise Exception(f"Invalid JSON response from authentication API: {response.text}")
 
     async def logout_all_sessions(self, login: str, password: str) -> Dict[str, Any]:
-        """Logout from all sessions by revoking all refresh tokens"""
         url = self._build_url("/auth/logout-all")
-
-        payload = {
-            "username": login,
-            "password": password
-        }
-
         async with httpx.AsyncClient() as client:
-            response = await client.post(url, json=payload)
+            response = await client.post(url, json={"username": login, "password": password})
             response.raise_for_status()
             return response.json()
 
     async def search_clips(self, query: str, token: str) -> List[Dict[str, Any]]:
-        """Search for clips"""
         result = await self.call_api("sz", [query], token)
         if result and result.get("data") and result["data"].get("results"):
             return result["data"]["results"]
         return []
 
     async def get_video(self, index: str, token: str) -> bytes:
-        """Get video blob"""
         return await self.call_api_for_blob("w", [index], token)
 
     async def adjust_video(
@@ -137,28 +107,19 @@ class RanchBotAPIClient:
         right_adjust: int,
         token: str
     ) -> bytes:
-        """Adjust video timing"""
-        return await self.call_api_for_blob(
-            "ad",
-            [clip_index, str(left_adjust), str(right_adjust)],
-            token
-        )
+        return await self.call_api_for_blob("ad", [clip_index, str(left_adjust), str(right_adjust)], token)
 
     async def save_clip(self, clip_name: str, token: str) -> Dict[str, Any]:
-        """Save clip"""
         return await self.call_api("z", [clip_name], token)
 
     async def delete_clip(self, clip_name: str, token: str) -> Dict[str, Any]:
-        """Delete clip"""
         return await self.call_api("uk", [clip_name], token)
 
     async def get_user_clips(self, token: str) -> List[Dict[str, Any]]:
-        """Get user's clips"""
         result = await self.call_api("mk", [], token)
         if result and result.get("status") == "success":
             return result.get("data", {}).get("clips", [])
         return []
 
 
-# Singleton instance
 api_client = RanchBotAPIClient()

@@ -1,3 +1,5 @@
+export const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+
 export function formatAdjustmentValue(value: number): string {
   const sign = value >= 0 ? '+' : ''
   return `${sign}${value.toFixed(1)}s`

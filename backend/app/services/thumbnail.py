@@ -1,3 +1,4 @@
+import hashlib
 import io
 import os
 import subprocess
@@ -17,19 +18,24 @@ class ThumbnailService:
         self._cache_dir = cache_dir
         os.makedirs(cache_dir, exist_ok=True)
 
-    def _cache_path(self, clip_id: str) -> str:
-        sanitized = "".join(c if c.isalnum() or c in "-_" else "_" for c in clip_id)
+    @staticmethod
+    def _content_hash(data: bytes) -> str:
+        return hashlib.md5(data).hexdigest()
+
+    def _cache_path(self, cache_key: str) -> str:
+        sanitized = "".join(c if c.isalnum() or c in "-_" else "_" for c in cache_key)
         return os.path.join(self._cache_dir, f"{sanitized}.webp")
 
-    async def get_or_generate(self, clip_id: str, fetch_video: Callable[[], Awaitable[bytes]]) -> bytes:
-        cached = self.get_cached_thumbnail(clip_id)
+    async def get_or_generate(self, _clip_id: str, fetch_video: Callable[[], Awaitable[bytes]]) -> bytes:
+        video_data = await fetch_video()
+        content_key = self._content_hash(video_data)
+        cached = self._get_cached_by_key(content_key)
         if cached:
             return cached
-        video_data = await fetch_video()
-        return self.extract_thumbnail(video_data, clip_id)
+        return self._extract_and_cache(video_data, content_key)
 
-    def get_cached_thumbnail(self, clip_id: str) -> Optional[bytes]:
-        path = self._cache_path(clip_id)
+    def _get_cached_by_key(self, cache_key: str) -> Optional[bytes]:
+        path = self._cache_path(cache_key)
         if not os.path.exists(path):
             return None
         try:
@@ -39,11 +45,7 @@ class ThumbnailService:
             logger.error(f"Cache read error: {e}")
             return None
 
-    def extract_thumbnail(self, video_data: bytes, clip_id: str) -> bytes:
-        cached = self.get_cached_thumbnail(clip_id)
-        if cached:
-            return cached
-
+    def _extract_and_cache(self, video_data: bytes, cache_key: str) -> bytes:
         with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp_video:
             tmp_video.write(video_data)
             tmp_video_path = tmp_video.name
@@ -68,7 +70,7 @@ class ThumbnailService:
                 img.save(output, format="WEBP", quality=85)
                 thumbnail_data = output.getvalue()
 
-            cache_path = self._cache_path(clip_id)
+            cache_path = self._cache_path(cache_key)
             try:
                 with open(cache_path, "wb") as f:
                     f.write(thumbnail_data)
@@ -88,6 +90,13 @@ class ThumbnailService:
                         os.remove(path)
                 except Exception:
                     pass
+
+    def extract_thumbnail(self, video_data: bytes, clip_id: str) -> bytes:
+        content_key = self._content_hash(video_data)
+        cached = self._get_cached_by_key(content_key)
+        if cached:
+            return cached
+        return self._extract_and_cache(video_data, content_key)
 
 
 thumbnail_service = ThumbnailService(settings.thumbnail_cache_dir)

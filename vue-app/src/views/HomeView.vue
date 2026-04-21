@@ -62,8 +62,8 @@ const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/l
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 100vh;
-  max-height: 100vh;
+  height: 100%;
+  max-height: 100%;
   overflow: hidden;
   box-sizing: border-box;
   position: relative;

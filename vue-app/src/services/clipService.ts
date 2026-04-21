@@ -55,17 +55,12 @@ class ClipService {
     return `/clips/thumbnail/${encodeURIComponent(clipId)}`
   }
 
-  async getThumbnail(clipPositionId: string, clipUniqueId?: string): Promise<Blob> {
-    const payload: { endpoint: string; args: string[]; cacheKey?: string } = {
-      endpoint: 'w',
-      args: [clipPositionId],
-    }
-
-    if (clipUniqueId) {
-      payload.cacheKey = clipUniqueId
-    }
-
-    const response = await client.post('/api/thumbnail', payload, { responseType: 'blob' })
+  async getThumbnail(clipPositionId: string): Promise<Blob> {
+    const response = await client.post(
+      '/api/thumbnail',
+      { endpoint: 'w', args: [clipPositionId] },
+      { responseType: 'blob' }
+    )
     return response.data
   }
 }

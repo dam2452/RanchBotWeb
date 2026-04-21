@@ -200,6 +200,7 @@ watch(activeIndex, handleActiveIndexChange)
   flex-direction: column;
   align-items: center;
   height: 100vh;
+  height: 100dvh;
   width: 100vw;
   position: fixed;
   top: 0;

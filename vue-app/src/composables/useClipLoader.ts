@@ -51,7 +51,7 @@ export function useClipLoader(options: UseClipLoaderOptions) {
       const clipPositionId = (i + 1).toString()
 
       try {
-        const thumbnailBlob = await clipService.getThumbnail(clipPositionId, clipResult.id || undefined)
+        const thumbnailBlob = await clipService.getThumbnail(clipPositionId)
         if (searchId.value !== currentSearchId) break
 
         const thumbnailUrl = URL.createObjectURL(thumbnailBlob)

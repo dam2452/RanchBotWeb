@@ -1,6 +1,6 @@
 import asyncio
 import traceback
-from typing import List, Any, Optional
+from typing import List, Any
 
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
@@ -21,7 +21,6 @@ router = APIRouter(prefix="/api", tags=["api-proxy"])
 class ApiRequest(BaseModel):
     endpoint: str
     args: List[Any]
-    cacheKey: Optional[str] = None
 
 
 class AdjustPreviewRequest(BaseModel):
@@ -73,12 +72,8 @@ async def api_thumbnail(
     user: UserSession = Depends(get_current_user)
 ):
     try:
-        position_key = str(request.args[0]) if request.args else "unknown"
-        cache_key = f"{request.cacheKey}_{position_key}" if request.cacheKey else position_key
-        logger.info(f"Thumbnail request - endpoint: {request.endpoint}, cacheKey: {cache_key}")
-
         thumbnail_data = await thumbnail_service.get_or_generate(
-            cache_key,
+            "",
             lambda: api_client.call_api_for_blob(
                 endpoint=request.endpoint, args=request.args, token=user.jwt_token
             )

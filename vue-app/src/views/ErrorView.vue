@@ -25,7 +25,7 @@ const isSmallDevice = computed(() => windowWidth.value <= 480)
   justify-content: center;
   align-items: center;
   width: 100%;
-  min-height: 100vh;
+  min-height: 100%;
   padding: 24px;
   box-sizing: border-box;
 }

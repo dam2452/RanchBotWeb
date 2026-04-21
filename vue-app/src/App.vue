@@ -38,8 +38,8 @@ html,
 body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  height: -webkit-fill-available;
+  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;
   color: #fff !important;
@@ -50,8 +50,7 @@ body {
 
 #app {
   width: 100%;
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
+  height: 100%;
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;

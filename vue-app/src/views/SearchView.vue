@@ -48,13 +48,13 @@ const handleFilters = () => {
   align-items: center;
   justify-content: flex-start;
   width: 100%;
-  min-height: 100vh;
-  height: 100vh;
+  min-height: 100%;
+  height: 100%;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: env(safe-area-inset-bottom);
   box-sizing: border-box;
   margin: auto;
   padding: 18vh 0 0;

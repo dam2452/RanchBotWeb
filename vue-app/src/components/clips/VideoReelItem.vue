@@ -184,6 +184,7 @@ const handleClick = (event: MouseEvent) => {
   flex-shrink: 0;
   width: calc(100vw - 20px);
   height: 100vh;
+  height: 100dvh;
   max-width: calc(100vw - 20px);
   margin: 0;
   padding: 0;
@@ -194,7 +195,7 @@ const handleClick = (event: MouseEvent) => {
   border-radius: 0;
   z-index: 1;
 
-  &.not-editing { height: 100vh; }
+  &.not-editing { height: 100vh; height: 100dvh; }
   &.editing-height { height: auto; }
 
   &:not(.active) {

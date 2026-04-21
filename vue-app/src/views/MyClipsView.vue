@@ -85,9 +85,15 @@ watch(activePage, pauseAllVideos)
 </script>
 
 <template>
-  <UserButtons fixed :show-my-clips="false" />
+  <UserButtons fixed compact :show-my-clips="false" />
   <LogoHeader v-if="!isMobile" />
   <AppFooter />
+
+  <button v-if="!isAppleWatch" class="back-button" @click="$router.back()">
+    <svg class="back-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6" />
+    </svg>
+  </button>
 
   <button
     v-if="!isAppleWatch && !loading && !error && clips.length > 0"
@@ -361,5 +367,47 @@ watch(activePage, pauseAllVideos)
 
 .search-button:hover .search-icon {
   transform: scaleX(-1);
+}
+
+.back-button {
+  position: fixed;
+  top: calc(20px + env(safe-area-inset-top));
+  left: calc(20px + env(safe-area-inset-left));
+  z-index: 1015;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(36px, 5vw, 44px);
+  height: clamp(36px, 5vw, 44px);
+  background: linear-gradient(145deg, #aaaaaa, #999999);
+  border: none;
+  border-radius: 15px;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
+
+  @include tablet-down {
+    top: calc(15px + env(safe-area-inset-top));
+    left: calc(15px + env(safe-area-inset-left));
+  }
+
+  @media (max-width: 400px) {
+    width: 32px;
+    height: 32px;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.back-chevron {
+  width: 22px;
+  height: 22px;
 }
 </style>

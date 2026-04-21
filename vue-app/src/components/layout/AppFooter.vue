@@ -1,9 +1,10 @@
 <script setup lang="ts">
+const year = new Date().getFullYear()
 </script>
 
 <template>
   <footer class="app-footer">
-    <p>© 2025 RanchBot. All rights reserved.</p>
+    <p>&copy; {{ year }} RanchBot. All rights reserved.</p>
   </footer>
 </template>
 

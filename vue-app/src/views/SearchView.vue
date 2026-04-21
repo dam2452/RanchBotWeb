@@ -26,7 +26,7 @@ const handleFilters = () => {
 </script>
 
 <template>
-  <UserButtons v-if="!isWatchView" fixed />
+  <UserButtons v-if="!isWatchView" fixed compact />
   <AppFooter v-if="!isWatchView" />
 
   <main class="search-page">

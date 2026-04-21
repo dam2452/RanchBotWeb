@@ -38,8 +38,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-  height: 100vh;
-  height: 100dvh;
+  height: 100%;
   overflow: hidden;
   background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;
   color: #fff !important;

@@ -1,27 +1,17 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import SecondaryButton from './SecondaryButton.vue'
+import { useWindowWidth } from '@/composables/useWindowWidth'
+import { WATCH_BREAKPOINT, MOBILE_BREAKPOINT } from '@/utils/formatters'
 
 const router = useRouter()
-const windowWidth = ref(window.innerWidth)
+const { windowWidth } = useWindowWidth()
 
 const buttonSize = computed(() => {
-  if (windowWidth.value <= 196) return 'small'
-  if (windowWidth.value >= 851) return 'large'
+  if (windowWidth.value <= WATCH_BREAKPOINT) return 'small'
+  if (windowWidth.value > MOBILE_BREAKPOINT) return 'large'
   return 'medium'
-})
-
-const handleResize = () => {
-  windowWidth.value = window.innerWidth
-}
-
-onMounted(() => {
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
 })
 
 const goToRegister = () => {
@@ -34,7 +24,7 @@ const goToForgotPassword = () => {
 </script>
 
 <template>
-  <div v-if="windowWidth > 196" class="action-buttons">
+  <div v-if="windowWidth > WATCH_BREAKPOINT" class="action-buttons">
     <SecondaryButton :size="buttonSize" @click="goToRegister">
       Create account ?
     </SecondaryButton>

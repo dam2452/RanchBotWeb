@@ -6,11 +6,12 @@ import LogoSection from '@/components/layout/LogoSection.vue'
 import SearchBar from '@/components/search/SearchBar.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import { useWindowWidth } from '@/composables/useWindowWidth'
+import { WATCH_BREAKPOINT } from '@/utils/formatters'
 
 const router = useRouter()
 const { windowWidth } = useWindowWidth()
 
-const isWatchView = computed(() => windowWidth.value <= 196)
+const isWatchView = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
 
 const handleSearch = (query: string) => {
   router.push({
@@ -20,7 +21,7 @@ const handleSearch = (query: string) => {
 }
 
 const handleFilters = () => {
-  console.log('Filters clicked')
+  // TODO: implement filters
 }
 </script>
 

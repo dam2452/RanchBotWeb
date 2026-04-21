@@ -1,4 +1,5 @@
 import { ref, type Ref } from 'vue'
+import { isScreenWidthMobile } from '@/utils/formatters'
 
 interface UseRubberBandOptions {
   activeIndex: Ref<number>
@@ -19,7 +20,7 @@ export function useRubberBand(options: UseRubberBandOptions) {
   const _touchStartY = ref(0)
   const _boundaryDir = ref<'top' | 'bottom' | null>(null)
 
-  const _isMobile = (): boolean => window.innerWidth <= 850
+  const _isMobile = isScreenWidthMobile
 
   const _rubberBand = (distance: number): number => {
     const abs = Math.abs(distance)

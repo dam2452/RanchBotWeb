@@ -1,4 +1,5 @@
 import { ref, type Ref } from 'vue'
+import { isScreenWidthMobile } from '@/utils/formatters'
 
 interface UseScrollTrackerOptions {
   containerRef: Ref<HTMLElement | null>
@@ -15,7 +16,7 @@ export function useScrollTracker(options: UseScrollTrackerOptions) {
   const isManualScroll = ref(false)
   const _navigationLock = ref(false)
 
-  const _isMobile = (): boolean => window.innerWidth <= 850
+  const _isMobile = isScreenWidthMobile
 
   const handleWheel = (event: WheelEvent): void => {
     if (!containerRef.value) return

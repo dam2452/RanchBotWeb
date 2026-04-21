@@ -10,14 +10,15 @@ import { useVideoControl } from '@/composables/useVideoControl'
 import { useWindowWidth } from '@/composables/useWindowWidth'
 import { useMyClips } from '@/composables/useMyClips'
 import { clipService } from '@/services/clipService'
+import { MOBILE_BREAKPOINT, WATCH_BREAKPOINT } from '@/utils/formatters'
 import type { Clip } from '@/types'
 
 const pageReel = ref<HTMLElement | null>(null)
 const activePage = ref(0)
 
 const { windowWidth } = useWindowWidth()
-const isAppleWatch = computed(() => windowWidth.value <= 196)
-const isMobile = computed(() => windowWidth.value <= 850)
+const isAppleWatch = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
+const isMobile = computed(() => windowWidth.value <= MOBILE_BREAKPOINT)
 
 const {
   clips, loading, error, clipErrors, totalPages,

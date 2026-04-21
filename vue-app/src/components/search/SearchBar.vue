@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import SearchInput from './SearchInput.vue'
 import FiltersButton from './FiltersButton.vue'
+import { useWindowWidth } from '@/composables/useWindowWidth'
+import { WATCH_BREAKPOINT } from '@/utils/formatters'
 
 interface Props {
   initialQuery?: string
@@ -12,26 +14,14 @@ interface Emits {
   (e: 'filters'): void
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   initialQuery: ''
 })
 
 const emit = defineEmits<Emits>()
-const windowWidth = ref(window.innerWidth)
+const { windowWidth } = useWindowWidth()
 
-const showFilters = computed(() => windowWidth.value > 196)
-
-const handleResize = () => {
-  windowWidth.value = window.innerWidth
-}
-
-onMounted(() => {
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
-})
+const showFilters = computed(() => windowWidth.value > WATCH_BREAKPOINT)
 
 const handleSearch = (query: string) => {
   emit('search', query)

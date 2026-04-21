@@ -1,25 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import BrandLogo from './BrandLogo.vue'
+import { useWindowWidth } from '@/composables/useWindowWidth'
+import { WATCH_BREAKPOINT, MOBILE_BREAKPOINT } from '@/utils/formatters'
 
-const windowWidth = ref(window.innerWidth)
+const { windowWidth } = useWindowWidth()
 
 const logoSize = computed(() => {
-  if (windowWidth.value <= 196) return 'small'
-  if (windowWidth.value >= 851) return 'large'
+  if (windowWidth.value <= WATCH_BREAKPOINT) return 'small'
+  if (windowWidth.value > MOBILE_BREAKPOINT) return 'large'
   return 'medium'
-})
-
-const handleResize = () => {
-  windowWidth.value = window.innerWidth
-}
-
-onMounted(() => {
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
 })
 </script>
 

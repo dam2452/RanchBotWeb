@@ -1,22 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import BrandLogo from './BrandLogo.vue'
+import { useWindowWidth } from '@/composables/useWindowWidth'
+import { WATCH_BREAKPOINT } from '@/utils/formatters'
 
-const windowWidth = ref(window.innerWidth)
+const { windowWidth } = useWindowWidth()
 
-const isWatchView = computed(() => windowWidth.value <= 196)
-
-const handleResize = () => {
-  windowWidth.value = window.innerWidth
-}
-
-onMounted(() => {
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
-})
+const isWatchView = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
 </script>
 
 <template>

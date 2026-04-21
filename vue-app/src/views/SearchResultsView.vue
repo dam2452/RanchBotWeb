@@ -11,12 +11,12 @@ import AppFooter from '@/components/layout/AppFooter.vue'
 import VideoReel from '@/components/clips/VideoReel.vue'
 import { useClipLoader } from '@/composables/useClipLoader'
 import { useWindowWidth } from '@/composables/useWindowWidth'
-import { DESKTOP_BREAKPOINT } from '@/utils/formatters'
+import { DESKTOP_BREAKPOINT, WATCH_BREAKPOINT } from '@/utils/formatters'
 
 const route = useRoute()
 const router = useRouter()
 const { windowWidth } = useWindowWidth()
-const isWatchView = computed(() => windowWidth.value <= 196)
+const isWatchView = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
 const isDesktop = computed(() => windowWidth.value > DESKTOP_BREAKPOINT)
 
 const query = ref('')
@@ -71,7 +71,7 @@ const handleSearch = (newQuery: string): void => {
 }
 
 const handleFilters = (): void => {
-  console.log('Filters clicked')
+  // TODO: implement filters
 }
 </script>
 

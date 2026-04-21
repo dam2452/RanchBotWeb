@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useWindowWidth } from '@/composables/useWindowWidth'
+import { WATCH_BREAKPOINT } from '@/utils/formatters'
 import UserButtons from '@/components/layout/UserButtons.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import BrandLogo from '@/components/layout/BrandLogo.vue'
@@ -30,11 +31,11 @@ const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/l
 </script>
 
 <template>
-  <UserButtons v-if="windowWidth > 196" fixed />
-  <AppFooter v-if="windowWidth > 196" />
+  <UserButtons v-if="windowWidth > WATCH_BREAKPOINT" fixed />
+  <AppFooter v-if="windowWidth > WATCH_BREAKPOINT" />
 
   <main class="home-main">
-    <div v-if="windowWidth <= 196" class="watch-view">
+    <div v-if="windowWidth <= WATCH_BREAKPOINT" class="watch-view">
       <PrimaryButton size="small" @click="goToSearch">{{ authStore.isAuthenticated ? 'Search' : 'Login' }}</PrimaryButton>
     </div>
 

@@ -6,7 +6,7 @@ import SaveClipModal from './SaveClipModal.vue'
 import VideoPlayer from './VideoPlayer.vue'
 import { useClipPreview } from '@/composables/useClipPreview'
 import { useClipActions } from '@/composables/useClipActions'
-import { IS_MOBILE } from '@/utils/formatters'
+import { useClipSave } from '@/composables/useClipSave'
 import type { ClipInfo } from '@/types/clip'
 
 type Props = ClipInfo
@@ -24,8 +24,6 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const wasEditing = ref(false)
-const showSaveModal = ref(false)
-const isAdjustedSave = ref(false)
 const playerRef = ref<InstanceType<typeof VideoPlayer> | null>(null)
 
 const _videoRef = computed(() => playerRef.value?.videoRef ?? null)
@@ -44,10 +42,30 @@ const {
   videoRef: _videoRef
 })
 
-const { download, downloadAdjusted, save, saveAdjusted } = useClipActions({
+const actions = useClipActions({
   clipIndex: props.index,
   videoUrl: props.videoUrl,
   searchQuery: props.searchQuery
+})
+
+const {
+  showSaveModal,
+  openSaveModal,
+  closeModal,
+  handleDownload,
+  handleDownloadAdjusted,
+  handleModalSave
+} = useClipSave({
+  download: actions.download,
+  downloadAdjusted: actions.downloadAdjusted,
+  save: actions.save,
+  saveAdjusted: actions.saveAdjusted,
+  leftAdjust,
+  rightAdjust,
+  statusMessage,
+  validateAdjustment,
+  resetAdjustments,
+  onCloseEditor: () => emit('close-editor')
 })
 
 watch(() => props.isEditing, (editing, wasEditingBefore) => {
@@ -83,49 +101,6 @@ const handleClick = (event: MouseEvent) => {
   }
 
   emit('click', props.index, event)
-}
-
-const _openSaveModal = (isAdjusted: boolean): void => {
-  emit('pause-all')
-  isAdjustedSave.value = isAdjusted
-  showSaveModal.value = true
-}
-
-const handleDownload = async (): Promise<void> => {
-  try {
-    await download()
-  } catch (err: unknown) {
-    console.error('Download failed:', err)
-  }
-}
-
-const _handleDownloadAdjusted = async (): Promise<void> => {
-  if (!validateAdjustment()) return
-  try {
-    statusMessage.value = 'Preparing download...'
-    await downloadAdjusted(leftAdjust.value, rightAdjust.value)
-    statusMessage.value = 'Download complete!'
-  } catch (err: unknown) {
-    statusMessage.value = 'Download failed: ' + (err instanceof Error ? err.message : String(err))
-    console.error('Download failed:', err)
-  }
-}
-
-const handleModalSave = async (clipName: string): Promise<void> => {
-  showSaveModal.value = false
-  try {
-    if (isAdjustedSave.value) {
-      statusMessage.value = 'Saving clip...'
-      await saveAdjusted(clipName, leftAdjust.value, rightAdjust.value)
-      statusMessage.value = 'Clip saved successfully!'
-      setTimeout(() => { resetAdjustments(); emit('close-editor') }, 1500)
-    } else {
-      await save(clipName)
-    }
-  } catch (err: unknown) {
-    statusMessage.value = 'Save failed: ' + (err instanceof Error ? err.message : String(err))
-    console.error('Save failed:', err)
-  }
 }
 </script>
 
@@ -168,7 +143,7 @@ const handleModalSave = async (clipName: string): Promise<void> => {
           Download
         </ClipActionButton>
 
-        <ClipActionButton v-if="!isEditing" variant="success" position="bottom-left" size="medium" class="save-btn" @click="_openSaveModal(false)">
+        <ClipActionButton v-if="!isEditing" variant="success" position="bottom-left" size="medium" class="save-btn" @click="openSaveModal(false, () => emit('pause-all'))">
           Save
         </ClipActionButton>
       </div>
@@ -184,8 +159,8 @@ const handleModalSave = async (clipName: string): Promise<void> => {
           @update:left-adjust="leftAdjust = $event"
           @update:right-adjust="rightAdjust = $event"
           @close="() => { resetAdjustments(); emit('close-editor') }"
-          @download="_handleDownloadAdjusted"
-          @save="_openSaveModal(true)"
+          @download="handleDownloadAdjusted"
+          @save="openSaveModal(true, () => emit('pause-all'))"
         />
       </Transition>
     </div>
@@ -198,7 +173,7 @@ const handleModalSave = async (clipName: string): Promise<void> => {
       <p class="error-subtitle">Clip #{{ index + 1 }} is unavailable</p>
     </div>
 
-    <SaveClipModal :show="showSaveModal" @close="showSaveModal = false" @save="handleModalSave" />
+    <SaveClipModal :show="showSaveModal" @close="closeModal" @save="handleModalSave" />
   </div>
 </template>
 

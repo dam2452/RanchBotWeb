@@ -1,5 +1,6 @@
 import { ref, type Ref } from 'vue'
 import { useVideoStore } from '@/stores/video'
+import { isScreenWidthMobile } from '@/utils/formatters'
 
 interface UseReelInteractionOptions {
   videoReel: Ref<HTMLElement | null>
@@ -126,7 +127,7 @@ export function useReelInteraction(options: UseReelInteractionOptions) {
 
     pauseAllVideos()
 
-    const isMobile = window.innerWidth <= 850
+    const isMobile = isScreenWidthMobile()
     if (isMobile && !loadingClips.value && editingClipIndex.value === null
       && newIndex >= loadedClips.value - 1 && loadedClips.value < resultsLength.value) {
       loadMore()

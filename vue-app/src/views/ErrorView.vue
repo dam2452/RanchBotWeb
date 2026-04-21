@@ -1,21 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
+import { useWindowWidth } from '@/composables/useWindowWidth'
 
-const windowWidth = ref(window.innerWidth)
-
+const { windowWidth } = useWindowWidth()
 const isSmallDevice = computed(() => windowWidth.value <= 480)
-
-const handleResize = () => {
-  windowWidth.value = window.innerWidth
-}
-
-onMounted(() => {
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
-})
 </script>
 
 <template>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useWindowWidth } from '@/composables/useWindowWidth'
 import LogoSection from '@/components/layout/LogoSection.vue'
 import LoginForm from '@/components/auth/LoginForm.vue'
 import ActionButtons from '@/components/common/ActionButtons.vue'
@@ -9,22 +10,10 @@ import AppFooter from '@/components/layout/AppFooter.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const errorMessage = ref('')
-const windowWidth = ref(window.innerWidth)
+const { windowWidth } = useWindowWidth()
 
 const isWatchView = computed(() => windowWidth.value <= 196)
-
-const handleResize = () => {
-  windowWidth.value = window.innerWidth
-}
-
-onMounted(() => {
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
-})
+const errorMessage = ref('')
 
 const handleSubmit = async (credentials: { login: string; password: string }) => {
   errorMessage.value = ''

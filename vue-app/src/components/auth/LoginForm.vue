@@ -115,7 +115,7 @@ const handleSubmit = () => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .watch-form {
   width: 100%;
   display: flex;
@@ -147,6 +147,18 @@ const handleSubmit = () => {
   max-width: 100%;
   position: relative;
   aspect-ratio: 1/1;
+
+  @include mobile {
+    width: clamp(320px, 65vw, 480px);
+  }
+
+  @include tablet {
+    width: clamp(390px, 52vw, 650px);
+  }
+
+  @include desktop-up {
+    width: clamp(416px, 42vw, 754px);
+  }
 }
 
 .bench-image {
@@ -193,16 +205,27 @@ const handleSubmit = () => {
   font-size: 14px;
   padding: 0 4px;
   transition: all var(--transition-default);
-}
 
-.overlay-input::placeholder {
-  color: #A0522D;
-  opacity: 0.8;
-}
+  &::placeholder {
+    color: #A0522D;
+    opacity: 0.8;
+  }
 
-.overlay-input:focus {
-  outline: 2px solid #c58b4f;
-  background-color: #ffe0a3;
+  &:focus {
+    outline: 2px solid #c58b4f;
+    background-color: #ffe0a3;
+  }
+
+  @include mobile {
+    left: 15%;
+    width: 70%;
+    height: 8%;
+    font-size: 16px;
+  }
+
+  @include tablet {
+    font-size: clamp(16px, 1.2vw, 18px);
+  }
 }
 
 .login-input {
@@ -228,49 +251,20 @@ const handleSubmit = () => {
   color: #8B4513;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
   transition: all var(--transition-default);
-}
 
-.overlay-button:hover:not(:disabled) {
-  transform: scale(1.04);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-}
-
-.overlay-button:active:not(:disabled) {
-  transform: scale(0.96);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.overlay-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-@media (min-width: 481px) {
-  .bench-container {
-    width: clamp(320px, 65vw, 480px);
+  &:hover:not(:disabled) {
+    transform: scale(1.04);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
   }
 
-  .overlay-input {
-    left: 15%;
-    width: 70%;
-    height: 8%;
-    font-size: 16px;
-  }
-}
-
-@media (min-width: 851px) {
-  .bench-container {
-    width: clamp(390px, 52vw, 650px);
+  &:active:not(:disabled) {
+    transform: scale(0.96);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 
-  .overlay-input {
-    font-size: clamp(16px, 1.2vw, 18px);
-  }
-}
-
-@media (min-width: 1201px) {
-  .bench-container {
-    width: clamp(416px, 42vw, 754px);
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }
 </style>

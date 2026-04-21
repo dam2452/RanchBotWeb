@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .hero-image-container {
   display: flex;
   align-items: center;
@@ -42,14 +42,14 @@ const props = withDefaults(defineProps<Props>(), {
   width: 85%;
   margin: 0 auto;
   transition: transform 0.3s;
-}
 
-.image-link:hover {
-  transform: scale(1.02);
-}
+  &:hover {
+    transform: scale(1.02);
+  }
 
-.image-link:active {
-  transform: scale(0.95);
+  &:active {
+    transform: scale(0.95);
+  }
 }
 
 .hero-image {
@@ -63,7 +63,7 @@ const props = withDefaults(defineProps<Props>(), {
   transition: all 0.4s;
 }
 
-@media (min-width: 481px) {
+@include mobile {
   .hero-image {
     border-radius: 30px;
     max-height: 400px;
@@ -81,7 +81,7 @@ const props = withDefaults(defineProps<Props>(), {
   }
 }
 
-@media (min-width: 1200px) {
+@include desktop-up {
   .image-link.image-large {
     max-width: 800px;
   }
@@ -97,7 +97,7 @@ const props = withDefaults(defineProps<Props>(), {
   }
 }
 
-@media (min-width: 1800px) {
+@include large {
   .image-link.image-large {
     max-width: 900px;
   }

@@ -1,27 +1,16 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import UserButtons from '@/components/layout/UserButtons.vue'
 import LogoSection from '@/components/layout/LogoSection.vue'
 import SearchBar from '@/components/search/SearchBar.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
+import { useWindowWidth } from '@/composables/useWindowWidth'
 
 const router = useRouter()
-const windowWidth = ref(window.innerWidth)
+const { windowWidth } = useWindowWidth()
 
 const isWatchView = computed(() => windowWidth.value <= 196)
-
-const handleResize = () => {
-  windowWidth.value = window.innerWidth
-}
-
-onMounted(() => {
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
-})
 
 const handleSearch = (query: string) => {
   router.push({
@@ -51,7 +40,7 @@ const handleFilters = () => {
   </main>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .search-page {
   display: flex;
   flex-direction: column;
@@ -70,6 +59,15 @@ const handleFilters = () => {
   padding: 18vh 0 0;
   text-align: center;
   transition: all var(--transition-default);
+
+  @include mobile {
+    padding-top: 15vh;
+  }
+
+  @include tablet {
+    justify-content: center;
+    padding: 0;
+  }
 }
 
 .watch-content {
@@ -88,6 +86,24 @@ const handleFilters = () => {
   gap: 0;
   width: 85vw;
   max-width: 500px;
+
+  @include mobile {
+    width: clamp(400px, 70vw, 550px);
+  }
+
+  @include tablet {
+    transform: translateY(-5vh);
+    width: clamp(500px, 60vw, 720px);
+    max-width: 90vw;
+  }
+
+  @include desktop-up {
+    transform: translateY(-8vh);
+  }
+
+  @include large {
+    transform: translateY(-10vh);
+  }
 }
 
 .content-wrapper :deep(.logo-section) {
@@ -95,83 +111,48 @@ const handleFilters = () => {
   flex: none;
   transform: scale(1.5);
   margin-bottom: 0.5rem;
+
+  @include mobile {
+    transform: scale(1.2);
+    margin-bottom: 1rem;
+  }
+
+  @include tablet {
+    transform: scale(0.75);
+    margin-bottom: 0.5rem;
+  }
+
+  @include desktop-up {
+    transform: scale(0.85);
+    margin-bottom: 1rem;
+  }
+
+  @include large {
+    transform: scale(0.9);
+    margin-bottom: 1.5rem;
+  }
 }
 
 .content-wrapper :deep(.title) {
   font-size: clamp(2.5rem, 5vw, 4.5rem) !important;
   margin: 0 0 3rem 0 !important;
-}
 
-@media (min-width: 481px) {
-  .search-page {
-    padding-top: 15vh;
-  }
-
-  .content-wrapper {
-    width: clamp(400px, 70vw, 550px);
-  }
-
-  .content-wrapper :deep(.logo-section) {
-    transform: scale(1.2);
-    margin-bottom: 1rem;
-  }
-
-  .content-wrapper :deep(.title) {
+  @include mobile {
     font-size: clamp(4rem, 6.5vw, 7.5rem) !important;
     margin: 0 0 2.5rem 0 !important;
   }
-}
 
-@media (min-width: 851px) {
-  .search-page {
-    justify-content: center;
-    padding: 0;
-  }
-
-  .content-wrapper {
-    transform: translateY(-5vh);
-    width: clamp(500px, 60vw, 720px);
-    max-width: 90vw;
-  }
-
-  .content-wrapper :deep(.logo-section) {
-    transform: scale(0.75);
-    margin-bottom: 0.5rem;
-  }
-
-  .content-wrapper :deep(.title) {
+  @include tablet {
     font-size: clamp(4rem, 6vw, 6.5rem) !important;
     margin: 0 0 2rem 0 !important;
   }
-}
 
-@media (min-width: 1200px) {
-  .content-wrapper {
-    transform: translateY(-8vh);
-  }
-
-  .content-wrapper :deep(.logo-section) {
-    transform: scale(0.85);
-    margin-bottom: 1rem;
-  }
-
-  .content-wrapper :deep(.title) {
+  @include desktop-up {
     font-size: clamp(5rem, 7vw, 7.5rem) !important;
     margin: 0 0 2.5rem 0 !important;
   }
-}
 
-@media (min-width: 1800px) {
-  .content-wrapper {
-    transform: translateY(-10vh);
-  }
-
-  .content-wrapper :deep(.logo-section) {
-    transform: scale(0.9);
-    margin-bottom: 1.5rem;
-  }
-
-  .content-wrapper :deep(.title) {
+  @include large {
     font-size: clamp(5rem, 8vw, 8.8rem) !important;
     margin: 0 0 3rem 0 !important;
   }

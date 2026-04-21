@@ -16,7 +16,7 @@ const handleClick = () => {
   </button>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .filters-button {
   position: absolute;
   bottom: -35px;
@@ -33,49 +33,45 @@ const handleClick = () => {
   transform: rotate(5deg);
   transition: all var(--transition-default);
   white-space: nowrap;
-}
 
-.filters-button:hover {
-  background: #666;
-  transform: rotate(5deg) scale(1.08);
-}
+  &:hover {
+    background: #666;
+    transform: rotate(5deg) scale(1.08);
+  }
 
-.filters-button:active {
-  transform: rotate(5deg) scale(0.95);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
+  &:active {
+    transform: rotate(5deg) scale(0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
 
-@media (min-width: 481px) {
-  .filters-button {
+  @include mobile {
     bottom: -40px;
     padding: clamp(10px, 1.5vw, 12px) clamp(18px, 2vw, 20px);
     font-size: clamp(16px, 2.5vw, 1.3rem);
     transform: rotate(5deg) translateY(-5px);
+
+    &:hover {
+      transform: rotate(5deg) translateY(-5px) scale(1.08);
+    }
+
+    &:active {
+      transform: rotate(5deg) translateY(-5px) scale(0.95);
+    }
   }
 
-  .filters-button:hover {
-    transform: rotate(5deg) translateY(-5px) scale(1.08);
-  }
-
-  .filters-button:active {
-    transform: rotate(5deg) translateY(-5px) scale(0.95);
-  }
-}
-
-@media (min-width: 851px) {
-  .filters-button {
+  @include tablet {
     bottom: -50px;
     padding: clamp(12px, 1.5vw, 14px) clamp(20px, 2vw, 24px);
     font-size: clamp(1.3rem, 2.5vw, 1.6rem);
     transform: rotate(5deg);
-  }
 
-  .filters-button:hover {
-    transform: rotate(5deg) scale(1.08);
-  }
+    &:hover {
+      transform: rotate(5deg) scale(1.08);
+    }
 
-  .filters-button:active {
-    transform: rotate(5deg) scale(0.95);
+    &:active {
+      transform: rotate(5deg) scale(0.95);
+    }
   }
 }
 </style>

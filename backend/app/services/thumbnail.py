@@ -1,4 +1,3 @@
-import hashlib
 import io
 import os
 import subprocess
@@ -18,11 +17,9 @@ class ThumbnailService:
         self._cache_dir = cache_dir
         os.makedirs(cache_dir, exist_ok=True)
 
-    def _cache_key(self, clip_id: str) -> str:
-        return hashlib.md5(clip_id.encode()).hexdigest()
-
     def _cache_path(self, clip_id: str) -> str:
-        return os.path.join(self._cache_dir, f"{self._cache_key(clip_id)}.webp")
+        sanitized = "".join(c if c.isalnum() or c in "-_" else "_" for c in clip_id)
+        return os.path.join(self._cache_dir, f"{sanitized}.webp")
 
     async def get_or_generate(self, clip_id: str, fetch_video: Callable[[], Awaitable[bytes]]) -> bytes:
         cached = self.get_cached_thumbnail(clip_id)

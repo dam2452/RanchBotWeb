@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useWindowWidth } from '@/composables/useWindowWidth'
 import UserButtons from '@/components/layout/UserButtons.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import BrandLogo from '@/components/layout/BrandLogo.vue'
@@ -11,13 +12,7 @@ import HeroImage from '@/components/search/HeroImage.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
-
-const windowWidth = ref(window.innerWidth)
-const windowHeight = ref(window.innerHeight)
-
-const isPortrait = computed(() => {
-  return windowHeight.value > windowWidth.value
-})
+const { windowWidth, windowHeight } = useWindowWidth()
 
 const arrowSize = computed(() => {
   if (windowWidth.value >= 1200) return 'large'
@@ -26,30 +21,12 @@ const arrowSize = computed(() => {
 })
 
 const arrowDirection = computed(() => {
-  if (isPortrait.value) return 'vertical'
+  const isPortrait = windowHeight.value > windowWidth.value
+  if (isPortrait) return 'vertical'
   return windowWidth.value >= 1200 ? 'horizontal' : 'vertical'
 })
 
-const handleResize = () => {
-  windowWidth.value = window.innerWidth
-  windowHeight.value = window.innerHeight
-}
-
-onMounted(() => {
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
-})
-
-const goToLogin = () => {
-  router.push('/login')
-}
-
-const goToSearch = () => {
-  router.push('/search')
-}
+const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/login')
 </script>
 
 <template>
@@ -58,8 +35,7 @@ const goToSearch = () => {
 
   <main class="home-main">
     <div v-if="windowWidth <= 196" class="watch-view">
-      <PrimaryButton v-if="!authStore.isAuthenticated" size="small" @click="goToLogin">Login</PrimaryButton>
-      <PrimaryButton v-else size="small" @click="goToSearch">Search</PrimaryButton>
+      <PrimaryButton size="small" @click="goToSearch">{{ authStore.isAuthenticated ? 'Search' : 'Login' }}</PrimaryButton>
     </div>
 
     <div v-else class="full-view">
@@ -79,7 +55,7 @@ const goToSearch = () => {
   </main>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .home-main {
   display: flex;
   align-items: center;
@@ -94,6 +70,10 @@ const goToSearch = () => {
   margin: 0 auto;
   background: var(--gradient-main);
   text-align: center;
+
+  @include desktop-up {
+    max-width: 1500px;
+  }
 }
 
 .watch-view {
@@ -112,6 +92,21 @@ const goToSearch = () => {
   padding: 0 var(--spacing-sm) var(--spacing-sm);
   padding-top: 0;
   gap: 4px;
+
+  @include mobile {
+    padding: var(--spacing-lg) var(--spacing-md);
+    padding-top: var(--spacing-lg);
+    gap: 12px;
+  }
+
+  @include desktop-up {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-xl);
+    gap: 30px;
+    text-align: left;
+  }
 }
 
 .content-section {
@@ -122,11 +117,30 @@ const goToSearch = () => {
   align-items: center;
   padding: 0 var(--spacing-sm);
   transition: all var(--transition-default);
+
+  @include mobile {
+    max-width: 600px;
+    padding: 0;
+  }
+
+  @include desktop-up {
+    max-width: 480px;
+    padding-right: 0;
+  }
 }
 
 .logo {
   margin-top: -110px;
   transform: scale(0.7);
+
+  @include mobile {
+    transform: scale(0.85);
+  }
+
+  @include desktop-up {
+    margin-top: 0;
+    transform: scale(1);
+  }
 }
 
 .title {
@@ -134,16 +148,44 @@ const goToSearch = () => {
   margin: 3px 15px 2px;
   font-size: 1.6rem;
   transition: all var(--transition-default);
+
+  @include mobile {
+    margin: var(--spacing-lg) 0 10px;
+    font-size: clamp(2.2rem, 8vw, 5rem);
+  }
+
+  @include desktop-up {
+    font-size: clamp(3rem, 5vw, 5.5rem);
+    margin: 15px 0 10px;
+  }
+
+  @include large {
+    font-size: clamp(4rem, 5vw, 8rem);
+  }
 }
 
 .tagline {
   text-align: center;
   margin: 0 15px 3px;
   font-size: 0.8rem;
+
+  @include mobile {
+    margin: var(--spacing-lg) 0;
+    font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+  }
+
+  @include desktop-up {
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    margin: 10px 0 15px;
+  }
 }
 
 .cta-button {
   margin-bottom: 3px;
+
+  @include desktop-up {
+    margin-bottom: 0;
+  }
 }
 
 .arrow-section {
@@ -154,6 +196,14 @@ const goToSearch = () => {
   flex-shrink: 0;
   position: relative;
   z-index: 10;
+
+  @include desktop-up {
+    flex: 0 0 auto;
+    position: relative;
+    transform: none;
+    z-index: 20;
+    margin: 0 20px;
+  }
 }
 
 .image-section {
@@ -164,100 +214,19 @@ const goToSearch = () => {
   align-items: center;
   justify-content: center;
   transition: all var(--transition-default);
-}
 
-@media (min-width: 481px) {
-  .full-view {
-    padding: var(--spacing-lg) var(--spacing-md);
-    padding-top: var(--spacing-lg);
-    gap: 12px;
-  }
-
-  .content-section {
-    max-width: 600px;
-    padding: 0;
-  }
-
-  .logo {
-    transform: scale(0.85);
-  }
-
-  .title {
-    margin: var(--spacing-lg) 0 10px;
-    font-size: clamp(2.2rem, 8vw, 5rem);
-  }
-
-  .tagline {
-    margin: var(--spacing-lg) 0;
-    font-size: clamp(1.1rem, 2.5vw, 1.8rem);
-  }
-
-  .image-section {
+  @include mobile {
     max-width: 600px;
     margin-top: 15px;
   }
-}
 
-@media (min-width: 1200px) {
-  .home-main {
-    max-width: 1500px;
-  }
-
-  .full-view {
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: var(--spacing-xl);
-    gap: 30px;
-    text-align: left;
-  }
-
-  .content-section {
-    flex: 0 0 auto;
-    max-width: 480px;
-    padding-right: 0;
-  }
-
-  .logo {
-    margin-top: 0;
-    transform: scale(1);
-  }
-
-  .title {
-    font-size: clamp(3rem, 5vw, 5.5rem);
-    margin: 15px 0 10px;
-  }
-
-  .tagline {
-    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
-    margin: 10px 0 15px;
-  }
-
-  .cta-button {
-    margin-bottom: 0;
-  }
-
-  .arrow-section {
-    flex: 0 0 auto;
-    position: relative;
-    transform: none;
-    z-index: 20;
-    margin: 0 20px;
-  }
-
-  .image-section {
+  @include desktop-up {
     flex: 0 0 auto;
     max-width: 800px;
     margin-right: 0;
     margin-top: 0;
     position: relative;
     z-index: 1;
-  }
-}
-
-@media (min-width: 1800px) {
-  .title {
-    font-size: clamp(4rem, 5vw, 8rem);
   }
 }
 

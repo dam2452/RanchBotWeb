@@ -112,16 +112,14 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .auth-buttons-container.fixed {
   position: fixed !important;
   top: calc(20px + env(safe-area-inset-top)) !important;
   right: calc(20px + env(safe-area-inset-right)) !important;
   z-index: 10000 !important;
-}
 
-@media (max-width: 850px) {
-  .auth-buttons-container.fixed {
+  @include tablet-down {
     top: calc(15px + env(safe-area-inset-top)) !important;
     right: calc(15px + env(safe-area-inset-right)) !important;
   }

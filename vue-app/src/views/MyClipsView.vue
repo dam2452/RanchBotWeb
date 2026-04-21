@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, nextTick, onUnmounted, watch } from 'vue'
-import { clipService } from '@/services/clipService'
-import type { Clip } from '@/types'
 import UserButtons from '@/components/layout/UserButtons.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import LogoHeader from '@/components/layout/LogoHeader.vue'
@@ -10,28 +8,28 @@ import AppFooter from '@/components/layout/AppFooter.vue'
 import { useHorizontalScroll } from '@/composables/useHorizontalScroll'
 import { useVideoControl } from '@/composables/useVideoControl'
 import { useWindowWidth } from '@/composables/useWindowWidth'
-import { downloadFile } from '@/utils/formatters'
+import { useMyClips } from '@/composables/useMyClips'
+import { clipService } from '@/services/clipService'
+import type { Clip } from '@/types'
 
-const clips = ref<Clip[]>([])
-const loading = ref(true)
-const error = ref('')
-const activePage = ref(0)
 const pageReel = ref<HTMLElement | null>(null)
-const clipErrors = ref<{ [key: string]: boolean }>({})
-
-const { activeVideoId, pauseAllVideos, toggleVideo } = useVideoControl({
-  containerRef: pageReel,
-  videoSelector: 'video.clip-video'
-})
+const activePage = ref(0)
 
 const { windowWidth } = useWindowWidth()
 const isAppleWatch = computed(() => windowWidth.value <= 196)
 const isMobile = computed(() => windowWidth.value <= 850)
-const clipsPerPage = computed(() => isMobile.value ? 2 : 6)
 
-const totalPages = computed(() => Math.ceil(clips.value.length / clipsPerPage.value))
+const {
+  clips, loading, error, clipErrors, totalPages,
+  getClipsForPage, loadClips, deleteClip, downloadClip, markVideoError,
+} = useMyClips({ isMobile })
 
-const { setupScrollListeners, cleanupScrollListeners, scrollTimeout, isManualScroll } = useHorizontalScroll({
+const { activeVideoId, pauseAllVideos, toggleByClipId, toggleVideo } = useVideoControl({
+  containerRef: pageReel,
+  videoSelector: 'video.clip-video'
+})
+
+const { setupScrollListeners, cleanupScrollListeners, scrollTimeout, scrollToItem } = useHorizontalScroll({
   containerRef: pageReel,
   activeIndex: activePage,
   totalItems: totalPages,
@@ -39,28 +37,30 @@ const { setupScrollListeners, cleanupScrollListeners, scrollTimeout, isManualScr
   enableKeyboard: false
 })
 
-const handleKeyDown = (e: KeyboardEvent) => {
+const _handleKeyDown = (e: KeyboardEvent) => {
   if (e.key === ' ') {
     e.preventDefault()
     e.stopPropagation()
-
-    if (activeVideoId.value) {
-      toggleVideo(activeVideoId.value)
-    }
+    if (activeVideoId.value) toggleVideo(activeVideoId.value)
     return
   }
 
   if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
     e.preventDefault()
     e.stopPropagation()
-    const newIndex = Math.max(0, activePage.value - 1)
-    scrollToPage(newIndex)
+    scrollToItem(Math.max(0, activePage.value - 1))
   } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
     e.preventDefault()
     e.stopPropagation()
-    const newIndex = Math.min(totalPages.value - 1, activePage.value + 1)
-    scrollToPage(newIndex)
+    scrollToItem(Math.min(totalPages.value - 1, activePage.value + 1))
   }
+}
+
+const handleVideoClick = (clip: Clip, _event: Event) => {
+  const activePageElement = pageReel.value?.querySelector('.page-item.active-page')
+  if (!activePageElement) return
+
+  toggleByClipId(String(clip.id), '.page-item.active-page')
 }
 
 onMounted(async () => {
@@ -69,126 +69,16 @@ onMounted(async () => {
   if (clips.value.length > 0) {
     setupScrollListeners()
     await nextTick()
-    document.addEventListener('keydown', handleKeyDown, { capture: true })
-    scrollToPage(0)
+    document.addEventListener('keydown', _handleKeyDown, { capture: true })
+    scrollToItem(0)
   }
 })
 
 onUnmounted(() => {
   cleanupScrollListeners()
-  document.removeEventListener('keydown', handleKeyDown, { capture: true } as EventListenerOptions)
-  if (scrollTimeout.value) {
-    clearTimeout(scrollTimeout.value)
-  }
+  document.removeEventListener('keydown', _handleKeyDown, { capture: true } as EventListenerOptions)
+  if (scrollTimeout.value) clearTimeout(scrollTimeout.value)
 })
-
-const scrollToPage = (index: number) => {
-  if (!pageReel.value) return
-
-  if (scrollTimeout.value) {
-    clearTimeout(scrollTimeout.value)
-  }
-
-  isManualScroll.value = true
-  activePage.value = index
-
-  const items = pageReel.value.querySelectorAll('.page-item')
-  const targetItem = items[index] as HTMLElement
-
-  if (targetItem) {
-    targetItem.scrollIntoView({
-      behavior: 'smooth',
-      block: isMobile.value ? 'center' : 'nearest',
-      inline: isMobile.value ? 'nearest' : 'center'
-    })
-
-    scrollTimeout.value = window.setTimeout(() => {
-      isManualScroll.value = false
-    }, 300)
-  }
-}
-
-const handlePageClick = (pageIndex: number): void => {
-  scrollToPage(pageIndex)
-}
-
-const loadClips = async (): Promise<void> => {
-  loading.value = true
-  error.value = ''
-
-  try {
-    clips.value = await clipService.getUserClips()
-  } catch (err: unknown) {
-    error.value = err instanceof Error ? err.message : 'Failed to load clips'
-  } finally {
-    loading.value = false
-  }
-}
-
-const getClipsForPage = (pageIndex: number) => {
-  const start = pageIndex * clipsPerPage.value
-  const end = start + clipsPerPage.value
-  return clips.value.slice(start, end)
-}
-
-const handleDelete = async (clipName: string): Promise<void> => {
-  try {
-    await clipService.deleteClip(clipName)
-    clips.value = clips.value.filter((clip) => clip.name !== clipName)
-  } catch (err: unknown) {
-    console.error('Failed to delete clip:', err)
-  }
-}
-
-const handleDownload = (clip: Clip): void => {
-  downloadFile(clipService.getVideoUrl(clip.name), `${clip.name}.mp4`)
-}
-
-const getVideoUrl = (clipName: string) => {
-  return clipService.getVideoUrl(clipName)
-}
-
-const getThumbnailUrl = (clipName: string) => {
-  return clipService.getThumbnailUrl(clipName)
-}
-
-const handleVideoClick = (clip: Clip, event: Event) => {
-  const activePageElement = pageReel.value?.querySelector('.page-item.active-page')
-  if (!activePageElement) return
-
-  const clipCards = activePageElement.querySelectorAll('.clip-card')
-  let targetVideo: HTMLVideoElement | null = null
-
-  for (const card of clipCards) {
-    const video = card.querySelector('video') as HTMLVideoElement
-    if (video && video.dataset.clipId === String(clip.id)) {
-      targetVideo = video
-      break
-    }
-  }
-
-  if (!targetVideo) return
-
-  if (activeVideoId.value === String(clip.id)) {
-    if (targetVideo.paused) {
-      targetVideo.play().catch(() => {})
-    } else {
-      targetVideo.pause()
-    }
-  } else {
-    pauseAllVideos()
-    activeVideoId.value = String(clip.id)
-
-    if (targetVideo.readyState >= 2) {
-      targetVideo.play().catch(() => {})
-    }
-  }
-}
-
-const handleVideoError = (clipId: string): void => {
-  console.error('Video error for clip:', clipId)
-  clipErrors.value = { ...clipErrors.value, [clipId]: true }
-}
 
 watch(activePage, pauseAllVideos)
 </script>
@@ -238,21 +128,21 @@ watch(activePage, pauseAllVideos)
         :data-page-idx="pageIndex - 1"
         class="page-item"
         :class="{ 'active-page': activePage === pageIndex - 1 }"
-        @click="handlePageClick(pageIndex - 1)"
+        @click="scrollToItem(pageIndex - 1)"
       >
         <div class="clips-grid">
           <MyClipCard
             v-for="clip in getClipsForPage(pageIndex - 1)"
             :key="clip.id"
             :clip="clip"
-            :video-url="getVideoUrl(clip.name)"
-            :thumbnail-url="getThumbnailUrl(clip.name)"
+            :video-url="clipService.getVideoUrl(clip.name)"
+            :thumbnail-url="clipService.getThumbnailUrl(clip.name)"
             :is-active="activeVideoId === String(clip.id)"
             :has-error="!!clipErrors[clip.id]"
             @video-click="(e) => handleVideoClick(clip, e)"
-            @download="handleDownload(clip)"
-            @delete="handleDelete(clip.name)"
-            @video-error="handleVideoError(clip.id)"
+            @download="downloadClip(clip)"
+            @delete="deleteClip(clip.name)"
+            @video-error="markVideoError(clip.id)"
           />
         </div>
       </div>
@@ -262,7 +152,7 @@ watch(activePage, pauseAllVideos)
   </main>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .main-container {
   position: relative;
   width: 100vw;
@@ -306,10 +196,19 @@ watch(activePage, pauseAllVideos)
   -ms-overflow-style: none;
   padding: 140px 0 60px 0;
   align-items: flex-start;
-}
 
-.page-reel::-webkit-scrollbar {
-  display: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @include tablet {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    padding: 0 10vw;
+    align-items: center;
+  }
 }
 
 .page-item {
@@ -329,13 +228,28 @@ watch(activePage, pauseAllVideos)
   cursor: pointer;
   z-index: 1;
   pointer-events: none;
-}
 
-.page-item.active-page {
-  opacity: 1;
-  transform: scale(1);
-  z-index: 50;
-  pointer-events: auto;
+  &.active-page {
+    opacity: 1;
+    transform: scale(1);
+    z-index: 50;
+    pointer-events: auto;
+  }
+
+  @include tablet {
+    width: auto;
+    height: 100%;
+    min-width: auto;
+    max-width: none;
+    margin: 0 2rem;
+    pointer-events: auto;
+
+    &:not(.active-page) {
+      opacity: 0.5;
+      transform: scale(0.9);
+      pointer-events: auto;
+    }
+  }
 }
 
 .clips-grid {
@@ -347,46 +261,8 @@ watch(activePage, pauseAllVideos)
   padding: 0;
   background: transparent;
   backdrop-filter: none;
-}
 
-.scroll-spacer {
-  width: 100%;
-  height: 50vh;
-  flex-shrink: 0;
-  pointer-events: none;
-}
-
-@media (min-width: 851px) {
-  .page-reel {
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    padding: 0 10vw;
-    align-items: center;
-  }
-
-  .scroll-spacer {
-    width: 50vw;
-    height: 100%;
-  }
-
-  .page-item {
-    width: auto;
-    height: 100%;
-    min-width: auto;
-    max-width: none;
-    margin: 0 2rem;
-    pointer-events: auto;
-  }
-
-  .page-item:not(.active-page) {
-    opacity: 0.5;
-    transform: scale(0.9);
-    pointer-events: auto;
-  }
-
-  .clips-grid {
+  @include tablet {
     width: 70vw;
     height: 70vh;
     display: grid;
@@ -397,29 +273,39 @@ watch(activePage, pauseAllVideos)
     background: rgba(255, 255, 255, 0.1);
     border-radius: 32px;
     backdrop-filter: blur(8px);
+
+    &:has(> :nth-child(1):nth-last-child(1)),
+    &:has(> :nth-child(1):nth-last-child(2)),
+    &:has(> :nth-child(1):nth-last-child(3)),
+    &:has(> :nth-child(1):nth-last-child(4)),
+    &:has(> :nth-child(1):nth-last-child(5)) {
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      justify-items: center;
+      align-items: center;
+    }
+
+    &:has(> :nth-child(1):nth-last-child(1)),
+    &:has(> :nth-child(1):nth-last-child(2)),
+    &:has(> :nth-child(1):nth-last-child(3)) {
+      grid-template-rows: 1fr;
+    }
   }
 
-  .clips-grid:has(> :nth-child(1):nth-last-child(1)),
-  .clips-grid:has(> :nth-child(1):nth-last-child(2)),
-  .clips-grid:has(> :nth-child(1):nth-last-child(3)),
-  .clips-grid:has(> :nth-child(1):nth-last-child(4)),
-  .clips-grid:has(> :nth-child(1):nth-last-child(5)) {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    justify-items: center;
-    align-items: center;
-  }
-
-  .clips-grid:has(> :nth-child(1):nth-last-child(1)),
-  .clips-grid:has(> :nth-child(1):nth-last-child(2)),
-  .clips-grid:has(> :nth-child(1):nth-last-child(3)) {
-    grid-template-rows: 1fr;
+  @include desktop {
+    width: 80vw;
   }
 }
 
-@media (min-width: 851px) and (max-width: 1200px) {
-  .clips-grid {
-    width: 80vw;
+.scroll-spacer {
+  width: 100%;
+  height: 50vh;
+  flex-shrink: 0;
+  pointer-events: none;
+
+  @include tablet {
+    width: 50vw;
+    height: 100%;
   }
 }
 
@@ -443,16 +329,27 @@ watch(activePage, pauseAllVideos)
   gap: 0.4rem;
   cursor: pointer;
   width: fit-content;
-}
 
-.search-button:hover {
-  transform: translateX(-50%) scale(1.05);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
-}
+  &:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+  }
 
-.search-button:active {
-  transform: translateX(-50%) scale(0.95);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  &:active {
+    transform: translateX(-50%) scale(0.95);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  @include tablet-down {
+    top: calc(65px + env(safe-area-inset-top));
+    padding: 8px 14px;
+    font-size: 14px;
+  }
+
+  @include small-mobile {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
 }
 
 .search-icon {
@@ -464,20 +361,4 @@ watch(activePage, pauseAllVideos)
 .search-button:hover .search-icon {
   transform: scaleX(-1);
 }
-
-@media (max-width: 850px) {
-  .search-button {
-    top: calc(65px + env(safe-area-inset-top));
-    padding: 8px 14px;
-    font-size: 14px;
-  }
-}
-
-@media (max-width: 400px) {
-  .search-button {
-    padding: 6px 12px;
-    font-size: 13px;
-  }
-}
 </style>
-

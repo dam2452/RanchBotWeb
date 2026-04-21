@@ -202,7 +202,7 @@ const handleModalSave = async (clipName: string): Promise<void> => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .reel-item {
   scroll-snap-align: center;
   transition: all 0.5s ease;
@@ -218,38 +218,72 @@ const handleModalSave = async (clipName: string): Promise<void> => {
   justify-content: center;
   border-radius: 0;
   z-index: 1;
-}
 
-.reel-item.not-editing { height: 100vh; }
-.reel-item.editing-height { height: auto; }
+  &.not-editing { height: 100vh; }
+  &.editing-height { height: auto; }
 
-.reel-item:not(.active) {
-  opacity: 1;
-  transform: scale(1);
-  pointer-events: none;
-}
+  &:not(.active) {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: none;
+  }
 
-.reel-item.active {
-  opacity: 1;
-  transform: scale(1);
-  pointer-events: auto;
-}
+  &.active {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
 
-.reel-item.z-active { z-index: 1001; }
-.reel-item.z-editing { z-index: 1060; pointer-events: auto; }
-.reel-item.clickable { cursor: pointer; }
+  &.z-active { z-index: 1001; }
+  &.z-editing { z-index: 1060; pointer-events: auto; }
+  &.clickable { cursor: pointer; }
 
-.reel-item.last-loaded {
-  z-index: 10;
-  opacity: 0.75;
-  transform: scale(0.9);
+  &.last-loaded {
+    z-index: 10;
+    opacity: 0.75;
+    transform: scale(0.9);
+  }
+
+  &.clip-loading { opacity: 0; pointer-events: none; }
+
+  @include tablet {
+    width: auto;
+    height: 50vh;
+    max-width: none;
+    margin: 0 20px;
+    border-radius: 32px;
+
+    &:not(.active):not(.z-editing) {
+      opacity: 0.5;
+      transform: scale(0.85);
+      pointer-events: auto;
+    }
+
+    &.active,
+    &.z-editing {
+      opacity: 1;
+      transform: scale(1);
+      box-shadow: none;
+    }
+
+    &.last-loaded { box-shadow: none; }
+    &.editing-height { height: auto; }
+  }
 }
 
 .reel-item.last-loaded :deep(.clip-video) {
   box-shadow: 0 0 16px rgba(242, 169, 76, 0.4);
 }
 
-.reel-item.clip-loading { opacity: 0; pointer-events: none; }
+.reel-item[data-idx="0"]:not(.z-editing) { margin-left: 0; margin-top: 0; }
+
+@include tablet {
+  .reel-item[data-idx="0"]:not(.z-editing),
+  .reel-item[data-idx="0"].z-editing {
+    margin-left: 20px;
+    margin-top: 0;
+  }
+}
 
 .error-state {
   display: flex;
@@ -317,6 +351,15 @@ const handleModalSave = async (clipName: string): Promise<void> => {
   position: relative;
   transform: translateY(0) scale(1);
   filter: none;
+
+  @include tablet-down {
+    padding-top: 200px;
+  }
+
+  @include tablet {
+    transform: translateY(-5vh) scale(1.08);
+    filter: drop-shadow(0 0 50px rgba(242, 169, 76, 1));
+  }
 }
 
 .video-container {
@@ -326,6 +369,16 @@ const handleModalSave = async (clipName: string): Promise<void> => {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  @include tablet {
+    width: auto;
+  }
+}
+
+.clip-wrapper {
+  @include tablet {
+    width: auto;
+  }
 }
 
 .panel-slide-enter-active,
@@ -333,50 +386,4 @@ const handleModalSave = async (clipName: string): Promise<void> => {
 
 .panel-slide-enter-from,
 .panel-slide-leave-to { opacity: 0; transform: translateY(-10px); }
-
-.reel-item[data-idx="0"]:not(.z-editing) { margin-left: 0; margin-top: 0; }
-
-@media (max-width: 850px) {
-  .editing-wrapper { padding-top: 200px; }
-}
-
-@media (min-width: 851px) {
-  .reel-item {
-    width: auto;
-    height: 50vh;
-    max-width: none;
-    margin: 0 20px;
-    border-radius: 32px;
-  }
-
-  .reel-item:not(.active):not(.z-editing) {
-    opacity: 0.5;
-    transform: scale(0.85);
-    pointer-events: auto;
-  }
-
-  .reel-item.active,
-  .reel-item.z-editing {
-    opacity: 1;
-    transform: scale(1);
-    box-shadow: none;
-  }
-
-  .reel-item.last-loaded { box-shadow: none; }
-  .reel-item.editing-height { height: auto; }
-
-  .clip-wrapper { width: auto; }
-  .video-container { width: auto; }
-
-  .editing-wrapper {
-    transform: translateY(-5vh) scale(1.08);
-    filter: drop-shadow(0 0 50px rgba(242, 169, 76, 1));
-  }
-
-  .reel-item[data-idx="0"]:not(.z-editing),
-  .reel-item[data-idx="0"].z-editing {
-    margin-left: 20px;
-    margin-top: 0;
-  }
-}
 </style>

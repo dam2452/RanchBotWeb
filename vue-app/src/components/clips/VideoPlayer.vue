@@ -155,7 +155,7 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .video-wrapper {
   position: relative;
   width: 100%;
@@ -196,17 +196,17 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
   align-items: center;
   justify-content: center;
   position: relative;
-}
 
-.thumbnail-placeholder::after {
-  content: '';
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  border: 3px solid rgba(242, 169, 76, 0.3);
-  border-radius: 50%;
-  border-top-color: rgba(242, 169, 76, 0.8);
-  animation: spin 1s linear infinite;
+  &::after {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 3px solid rgba(242, 169, 76, 0.3);
+    border-radius: 50%;
+    border-top-color: rgba(242, 169, 76, 0.8);
+    animation: spin 1s linear infinite;
+  }
 }
 
 @keyframes spin {
@@ -234,15 +234,18 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
   max-height: 70vh;
   border-radius: 24px 24px 0 0;
   margin-bottom: 0;
-}
 
-@media (max-width: 850px) {
-  .editing-video {
+  @include tablet-down {
     max-height: 50vh;
+  }
+
+  @include tablet {
+    max-height: 48vh;
+    border-radius: 32px 32px 0 0;
   }
 }
 
-@media (min-width: 851px) {
+@include tablet {
   .clip-video {
     width: auto;
     height: auto;
@@ -253,11 +256,6 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
 
   .video-loading-overlay {
     border-radius: 32px;
-  }
-
-  .editing-video {
-    max-height: 48vh;
-    border-radius: 32px 32px 0 0;
   }
 }
 </style>

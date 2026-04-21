@@ -30,7 +30,7 @@ onUnmounted(() => {
   </section>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .logo-section {
   display: flex;
   flex-direction: column;
@@ -53,7 +53,7 @@ onUnmounted(() => {
   transition: all var(--transition-default);
 }
 
-@media (min-width: 481px) {
+@include mobile {
   .logo-section {
     margin: 2rem auto 0.2rem auto;
   }
@@ -63,7 +63,7 @@ onUnmounted(() => {
   }
 }
 
-@media (min-width: 851px) {
+@include tablet {
   .logo-section {
     flex: 1;
     max-width: 50%;

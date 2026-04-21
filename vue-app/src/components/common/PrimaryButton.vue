@@ -18,7 +18,7 @@ defineEmits<{
   </button>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .primary-button {
   background-color: #888;
   color: #fff;
@@ -28,14 +28,14 @@ defineEmits<{
   cursor: pointer;
   font-weight: bold;
   transition: all 0.2s;
-}
 
-.primary-button:hover {
-  transform: scale(1.05);
-}
+  &:hover {
+    transform: scale(1.05);
+  }
 
-.primary-button:active {
-  transform: scale(0.95);
+  &:active {
+    transform: scale(0.95);
+  }
 }
 
 .button-small {
@@ -51,10 +51,8 @@ defineEmits<{
 .button-large {
   padding: 16px 32px;
   font-size: clamp(1.2rem, 2vw, 2rem);
-}
 
-@media (min-width: 1200px) {
-  .button-large {
+  @include desktop-up {
     padding: 20px 40px;
   }
 }

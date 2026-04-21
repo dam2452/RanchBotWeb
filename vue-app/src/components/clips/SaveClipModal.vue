@@ -78,7 +78,7 @@ const handleKeydown = (event: KeyboardEvent) => {
   </Teleport>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -106,6 +106,10 @@ const handleKeydown = (event: KeyboardEvent) => {
   width: 95%;
   max-width: 500px;
   overflow: hidden;
+
+  @media (min-width: 601px) {
+    width: 90%;
+  }
 }
 
 .modal-header {
@@ -115,13 +119,17 @@ const handleKeydown = (event: KeyboardEvent) => {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #e0e0e0;
   background: #f8f8f8;
-}
 
-.modal-header h2 {
-  margin: 0;
-  color: #333;
-  font-size: 1.5rem;
-  font-weight: 600;
+  h2 {
+    margin: 0;
+    color: #333;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  @media (min-width: 601px) {
+    padding: 1.25rem 1.75rem;
+  }
 }
 
 .close-btn {
@@ -139,14 +147,18 @@ const handleKeydown = (event: KeyboardEvent) => {
   transition: all 0.2s;
   padding: 0;
   line-height: 1;
-}
 
-.close-btn:hover {
-  background: #d0d0d0;
+  &:hover {
+    background: #d0d0d0;
+  }
 }
 
 .modal-body {
   padding: 1.5rem;
+
+  @media (min-width: 601px) {
+    padding: 1.75rem;
+  }
 }
 
 .input-label {
@@ -167,16 +179,20 @@ const handleKeydown = (event: KeyboardEvent) => {
   color: #333;
   box-sizing: border-box;
   transition: all var(--transition-default);
-}
 
-.clip-input:focus {
-  outline: none;
-  border-color: #f2a94c;
-  box-shadow: 0 0 0 3px rgba(242, 169, 76, 0.2);
-}
+  &:focus {
+    outline: none;
+    border-color: #f2a94c;
+    box-shadow: 0 0 0 3px rgba(242, 169, 76, 0.2);
+  }
 
-.clip-input::placeholder {
-  color: #999;
+  &::placeholder {
+    color: #999;
+  }
+
+  @media (min-width: 601px) {
+    font-size: 1rem;
+  }
 }
 
 .modal-footer {
@@ -186,6 +202,10 @@ const handleKeydown = (event: KeyboardEvent) => {
   border-top: 1px solid #e0e0e0;
   justify-content: flex-end;
   background: #f8f8f8;
+
+  @media (min-width: 601px) {
+    padding: 1.25rem 1.75rem;
+  }
 }
 
 .cancel-btn,
@@ -197,29 +217,34 @@ const handleKeydown = (event: KeyboardEvent) => {
   border-radius: 8px;
   cursor: pointer;
   transition: all var(--transition-default);
+
+  @media (min-width: 601px) {
+    padding: 0.625rem 1.75rem;
+    font-size: 0.95rem;
+  }
 }
 
 .cancel-btn {
   background: #e0e0e0;
   color: #333;
-}
 
-.cancel-btn:hover {
-  background: #d0d0d0;
+  &:hover {
+    background: #d0d0d0;
+  }
 }
 
 .save-btn {
   background: #4CAF50;
   color: white;
-}
 
-.save-btn:hover:not(:disabled) {
-  background: #45a049;
-}
+  &:hover:not(:disabled) {
+    background: #45a049;
+  }
 
-.save-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .modal-fade-enter-active,
@@ -240,33 +265,5 @@ const handleKeydown = (event: KeyboardEvent) => {
 .modal-fade-enter-from .modal-container,
 .modal-fade-leave-to .modal-container {
   transform: scale(0.9);
-}
-
-@media (min-width: 601px) {
-  .modal-container {
-    width: 90%;
-  }
-
-  .modal-header {
-    padding: 1.25rem 1.75rem;
-  }
-
-  .modal-body {
-    padding: 1.75rem;
-  }
-
-  .modal-footer {
-    padding: 1.25rem 1.75rem;
-  }
-
-  .cancel-btn,
-  .save-btn {
-    padding: 0.625rem 1.75rem;
-    font-size: 0.95rem;
-  }
-
-  .clip-input {
-    font-size: 1rem;
-  }
 }
 </style>

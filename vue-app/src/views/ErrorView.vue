@@ -31,7 +31,7 @@ onUnmounted(() => {
   </main>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .error-page {
   display: flex;
   justify-content: center;
@@ -50,6 +50,16 @@ onUnmounted(() => {
   gap: 16px;
   max-width: 1000px;
   width: 100%;
+
+  @include mobile {
+    gap: 20px;
+    max-width: 1100px;
+  }
+
+  @include tablet {
+    gap: 24px;
+    max-width: 1200px;
+  }
 }
 
 .error-message {
@@ -59,6 +69,14 @@ onUnmounted(() => {
   margin: 0;
   line-height: 1.3;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  @include mobile {
+    font-size: 2rem;
+  }
+
+  @include tablet {
+    font-size: 2.5rem;
+  }
 }
 
 .error-image {
@@ -66,34 +84,12 @@ onUnmounted(() => {
   max-width: 600px;
   height: auto;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
-}
 
-@media (min-width: 481px) {
-  .error-content {
-    gap: 20px;
-    max-width: 1100px;
-  }
-
-  .error-message {
-    font-size: 2rem;
-  }
-
-  .error-image {
+  @include mobile {
     max-width: 700px;
   }
-}
 
-@media (min-width: 851px) {
-  .error-content {
-    gap: 24px;
-    max-width: 1200px;
-  }
-
-  .error-message {
-    font-size: 2.5rem;
-  }
-
-  .error-image {
+  @include tablet {
     max-width: 800px;
   }
 }

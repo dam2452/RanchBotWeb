@@ -5,8 +5,9 @@ import LoadingSpinner from '../common/LoadingSpinner.vue'
 import { useVideoControl } from '@/composables/useVideoControl'
 import { useHorizontalScroll } from '@/composables/useHorizontalScroll'
 import { useLoadMoreObserver } from '@/composables/useLoadMoreObserver'
+import { useReelInteraction } from '@/composables/useReelInteraction'
+import { useReelKeyboard } from '@/composables/useReelKeyboard'
 import { useVideoStore } from '@/stores/video'
-import { IS_MOBILE } from '@/utils/formatters'
 import type { SearchResult } from '@/types'
 import type { ClipState } from '@/composables/useClipLoader'
 
@@ -31,19 +32,12 @@ const emit = defineEmits<Emits>()
 const videoReel = ref<HTMLElement | null>(null)
 const loadMoreElement = ref<HTMLElement | null>(null)
 const activeIndex = ref(0)
-const editingClipIndex = ref<number | null>(null)
 
 const loadedClipsRef = computed(() => props.loadedClips)
 const resultsRef = computed(() => props.results)
 const loadingClipsRef = computed(() => props.loadingClips)
-
-const videoStore = useVideoStore()
-const { pauseAllVideos, toggleVideoAtIndex } = useVideoControl({
-  containerRef: videoReel,
-  videoSelector: 'video'
-})
-
 const displayedResults = computed(() => props.results.slice(0, props.loadedClips))
+const resultsLength = computed(() => props.results.length)
 
 const totalClips = computed(() => {
   const hasLoadMore = props.loadedClips < props.results.length
@@ -52,13 +46,52 @@ const totalClips = computed(() => {
     : displayedResults.value.length
 })
 
-const { setupScrollListeners, cleanupScrollListeners, scrollToItem, scrollTimeout, isManualScroll } = useHorizontalScroll({
+const videoStore = useVideoStore()
+const { pauseAllVideos, toggleVideoAtIndex } = useVideoControl({
+  containerRef: videoReel,
+  videoSelector: 'video'
+})
+
+const { setupScrollListeners, cleanupScrollListeners, scrollToItem, scrollTimeout, isManualScroll, bounceOffset, isBouncing } = useHorizontalScroll({
   containerRef: videoReel,
   activeIndex,
   totalItems: totalClips,
   itemSelector: '.reel-item',
   isLastItem: (index: number) => editingClipIndex.value === null && index === props.loadedClips - 1 && props.loadedClips < props.results.length,
   isEditing: () => editingClipIndex.value !== null
+})
+
+const {
+  editingClipIndex,
+  handleClipClick,
+  handleAdjust,
+  handleReelClick,
+  handleLoadVideo,
+  handleActiveIndexChange,
+  closeEditor
+} = useReelInteraction({
+  videoReel,
+  activeIndex,
+  pauseAllVideos,
+  scrollToItem,
+  displayedCount: computed(() => displayedResults.value.length),
+  loadedClips: loadedClipsRef,
+  resultsLength,
+  loadingClips: loadingClipsRef,
+  scrollTimeout,
+  isManualScroll,
+  loadMore: () => emit('load-more'),
+  loadVideo: (index: number) => emit('load-video', index)
+})
+
+useReelKeyboard({
+  isEditing: editingClipIndex,
+  activeIndex,
+  displayedCount: computed(() => displayedResults.value.length),
+  loadedClips: loadedClipsRef,
+  resultsLength,
+  toggleVideoAtIndex,
+  loadMore: () => emit('load-more')
 })
 
 const observer = useLoadMoreObserver({
@@ -84,7 +117,6 @@ onUnmounted(() => {
   cleanupScrollListeners()
   observer.cleanup()
   if (scrollTimeout.value) clearTimeout(scrollTimeout.value)
-  window.removeEventListener('keydown', _handleSpaceEnter)
 })
 
 watch(() => props.loadedClips, (count, prev) => {
@@ -93,126 +125,16 @@ watch(() => props.loadedClips, (count, prev) => {
   }
 })
 
-watch(activeIndex, (newIndex, oldIndex) => {
-  if (!videoReel.value || newIndex === oldIndex) return
-
-  if (editingClipIndex.value !== null && editingClipIndex.value !== newIndex) {
-    editingClipIndex.value = null
-  }
-
-  pauseAllVideos()
-
-  if (IS_MOBILE && !props.loadingClips && editingClipIndex.value === null && newIndex >= props.loadedClips - 1 && props.loadedClips < props.results.length) {
-    emit('load-more')
-  }
-})
-
-const _handleSpaceEnter = (event: KeyboardEvent): void => {
-  if (editingClipIndex.value !== null) return
-  if (event.key !== ' ' && event.key !== 'Enter') return
-
-  event.preventDefault()
-
-  if (activeIndex.value === displayedResults.value.length && props.loadedClips < props.results.length) {
-    emit('load-more')
-    return
-  }
-
-  if (event.key === ' ' && activeIndex.value < displayedResults.value.length) {
-    toggleVideoAtIndex(activeIndex.value)
-  }
-}
-
-window.addEventListener('keydown', _handleSpaceEnter)
-
-const _handleReelClick = (event: MouseEvent): void => {
-  videoStore.markInteracted()
-  if (editingClipIndex.value === null) return
-
-  const target = event.target as HTMLElement
-  if (!target.closest('.reel-item') || (!target.closest('.clip-video') && !target.closest('.edit-panel'))) {
-    editingClipIndex.value = null
-  }
-}
-
-const _handleClipClick = (index: number, event: MouseEvent): void => {
-  const target = event.target as HTMLElement
-  if (target.closest('.adjust-btn') || target.closest('.download-btn') || target.closest('button')) return
-
-  if (editingClipIndex.value !== null && index !== editingClipIndex.value) {
-    editingClipIndex.value = null
-    return
-  }
-
-  if (editingClipIndex.value !== null && index === editingClipIndex.value) {
-    const video = (event.currentTarget as HTMLElement).querySelector('video')
-    if (video) {
-      video.paused ? video.play().catch(() => {}) : video.pause()
-    }
-    return
-  }
-
-  if (index === activeIndex.value) {
-    const videos = videoReel.value?.querySelectorAll('.reel-item video') as NodeListOf<HTMLVideoElement>
-    const video = (event.currentTarget as HTMLElement).querySelector('video')
-
-    if (video) {
-      if (video.paused) {
-        videos?.forEach((v, i) => {
-          if (i !== index && !v.paused) {
-            v.pause()
-            v.currentTime = 0
-          }
-        })
-        if (video.muted) video.muted = false
-        videoStore.markInteracted()
-        video.play().catch(() => {})
-      } else {
-        video.pause()
-      }
-    }
-
-    if (scrollTimeout.value) {
-      clearTimeout(scrollTimeout.value)
-      scrollTimeout.value = null
-    }
-    isManualScroll.value = false
-  } else {
-    videoStore.markInteracted()
-    scrollToItem(index)
-  }
-}
-
-const _handleAdjust = (index: number): void => {
-  if (editingClipIndex.value === index) {
-    editingClipIndex.value = null
-  } else {
-    editingClipIndex.value = index
-    activeIndex.value = index
-    scrollToItem(index)
-  }
-}
-
-const _handleLoadVideo = (index: number): void => {
-  const clip = props.clips[index]
-  if (clip?.videoUrl) {
-    const videos = videoReel.value?.querySelectorAll('.reel-item video') as NodeListOf<HTMLVideoElement>
-    const video = videos?.[index]
-    if (video && video.readyState >= 2) {
-      video.play().catch(() => {})
-    }
-    return
-  }
-  emit('load-video', index)
-}
+watch(activeIndex, handleActiveIndexChange)
 </script>
 
 <template>
   <div
     class="video-reel"
-    :class="{ 'watch-reel': isWatchView }"
+    :class="{ 'watch-reel': isWatchView, 'bounce-back': isBouncing }"
+    :style="{ '--bounce-y': `${bounceOffset}px` }"
     ref="videoReel"
-    @click="_handleReelClick"
+    @click="handleReelClick"
   >
     <VideoReelItem
       v-for="(result, index) in displayedResults"
@@ -225,10 +147,10 @@ const _handleLoadVideo = (index: number): void => {
       :is-last-loaded="index === loadedClips - 1 && loadedClips < results.length"
       :is-editing="index === editingClipIndex"
       :search-query="searchQuery"
-      @click="_handleClipClick"
-      @adjust="_handleAdjust"
-      @close-editor="editingClipIndex = null"
-      @load-video="_handleLoadVideo"
+      @click="handleClipClick"
+      @adjust="handleAdjust"
+      @close-editor="closeEditor"
+      @load-video="handleLoadVideo"
       @pause-all="pauseAllVideos"
     />
 
@@ -268,7 +190,7 @@ const _handleLoadVideo = (index: number): void => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .video-reel {
   scroll-behavior: smooth;
   scroll-snap-type: y mandatory;
@@ -285,58 +207,25 @@ const _handleLoadVideo = (index: number): void => {
   margin: 0;
   padding: 0;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: auto;
+  overscroll-behavior-y: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
-}
+  transform: translateY(var(--bounce-y, 0px));
 
-.video-reel::-webkit-scrollbar {
-  display: none;
-}
+  &.bounce-back {
+    transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  }
 
-.video-reel.watch-reel {
-  padding: 0;
-  justify-content: center;
-}
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
-.load-more-item {
-  display: none;
-}
+  &.watch-reel {
+    padding: 0;
+    justify-content: center;
+  }
 
-.end-of-clips {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  color: rgba(242, 169, 76, 0.6);
-  font-size: 16px;
-  font-weight: 500;
-  text-align: center;
-  width: 100%;
-  flex-shrink: 0;
-}
-
-.end-icon {
-  width: 32px;
-  height: 32px;
-  margin-bottom: 12px;
-  stroke-width: 2.5;
-}
-
-.end-of-clips p {
-  margin: 0;
-}
-
-.scroll-spacer {
-  width: 100%;
-  height: 70vh;
-  flex-shrink: 0;
-  pointer-events: none;
-}
-
-@media (min-width: 851px) {
-  .video-reel {
+  @include tablet {
     scroll-snap-type: x mandatory;
     overflow-x: scroll;
     overflow-y: hidden;
@@ -345,16 +234,19 @@ const _handleLoadVideo = (index: number): void => {
     overscroll-behavior-x: auto;
   }
 
-  .scroll-spacer {
-    width: 50vw;
-    height: 100%;
+  @include desktop-up {
+    padding: 130px 10vw 0 10vw;
   }
 
-  .video-reel.watch-reel {
-    padding: 0;
+  @include large {
+    padding: 140px 10vw 0 10vw;
   }
+}
 
-  .load-more-item {
+.load-more-item {
+  display: none;
+
+  @include tablet {
     display: flex;
     width: auto;
     height: 55vh;
@@ -371,15 +263,41 @@ const _handleLoadVideo = (index: number): void => {
     align-items: center;
     justify-content: center;
     z-index: 1;
+
+    &.active {
+      z-index: 50;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    &.clickable {
+      cursor: pointer;
+    }
+
+    &.loading-state {
+      pointer-events: none;
+    }
+  }
+}
+
+.end-of-clips {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: rgba(242, 169, 76, 0.6);
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  width: 100%;
+  flex-shrink: 0;
+
+  p {
+    margin: 0;
   }
 
-  .load-more-item.active {
-    z-index: 50;
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  .end-of-clips {
+  @include tablet {
     height: 55vh;
     padding: 0 40px;
     margin: 0 20px;
@@ -387,21 +305,34 @@ const _handleLoadVideo = (index: number): void => {
     transform: scale(0.85);
     scroll-snap-align: center;
   }
+}
 
-  .end-icon {
+.end-icon {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 12px;
+  stroke-width: 2.5;
+
+  @include tablet {
     width: 40px;
     height: 40px;
   }
+}
 
-  .load-more-item.clickable {
-    cursor: pointer;
+.scroll-spacer {
+  width: 100%;
+  height: 70vh;
+  flex-shrink: 0;
+  pointer-events: none;
+
+  @include tablet {
+    width: 50vw;
+    height: 100%;
   }
+}
 
-  .load-more-item.loading-state {
-    pointer-events: none;
-  }
-
-  .load-more-content {
+.load-more-content {
+  @include tablet {
     width: auto;
     height: 100%;
     max-height: 55vh;
@@ -414,53 +345,51 @@ const _handleLoadVideo = (index: number): void => {
     background: #f5f5f5;
     aspect-ratio: 16 / 9;
     transform: scale(0.99);
-  }
 
-  .load-more-content.active-border {
-    box-shadow: 0 0 0 3px #f2a94c, 0 0 32px rgba(242, 169, 76, 0.8);
-    box-sizing: border-box;
+    &.active-border {
+      box-shadow: 0 0 0 3px #f2a94c, 0 0 32px rgba(242, 169, 76, 0.8);
+      box-sizing: border-box;
+    }
   }
+}
 
-  .load-more-prompt {
+.load-more-prompt {
+  @include tablet {
     background: linear-gradient(135deg, #fafafa, #f5f5f5);
     cursor: pointer;
   }
+}
 
-  .load-more-icon {
+.load-more-icon {
+  @include tablet {
     width: 80px;
     height: 80px;
     margin-bottom: 16px;
     color: #9ca3af;
   }
+}
 
-  .load-more-title {
+.load-more-title {
+  @include tablet {
     color: #374151;
     font-weight: bold;
     font-size: 24px;
     margin-bottom: 8px;
   }
+}
 
-  .load-more-subtitle {
+.load-more-subtitle {
+  @include tablet {
     color: #6b7280;
     font-size: 14px;
   }
+}
 
-  .load-more-count {
+.load-more-count {
+  @include tablet {
     color: #9ca3af;
     font-size: 12px;
     margin-top: 4px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .video-reel {
-    padding: 130px 10vw 0 10vw;
-  }
-}
-
-@media (min-width: 1800px) {
-  .video-reel {
-    padding: 140px 10vw 0 10vw;
   }
 }
 </style>

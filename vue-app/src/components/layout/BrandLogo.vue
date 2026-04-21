@@ -18,17 +18,17 @@ const props = withDefaults(defineProps<Props>(), {
   </router-link>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .logo-link {
   display: inline-block;
 }
 
 .logo {
   transition: transform 0.4s;
-}
 
-.logo:hover {
-  transform: scale(1.05);
+  &:hover {
+    transform: scale(1.05);
+  }
 }
 
 .logo-small {
@@ -41,17 +41,13 @@ const props = withDefaults(defineProps<Props>(), {
 
 .logo-large {
   width: clamp(240px, 60vw, 360px);
-}
 
-@media (min-width: 1200px) {
-  .logo-large {
+  @include desktop-up {
     min-width: 240px;
     width: clamp(300px, 30vw, 450px);
   }
-}
 
-@media (min-width: 1800px) {
-  .logo-large {
+  @include large {
     width: clamp(375px, 22.5vw, 525px);
   }
 }

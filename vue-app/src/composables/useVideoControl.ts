@@ -99,6 +99,35 @@ export function useVideoControl(options: UseVideoControlOptions) {
     return true
   }
 
+  const toggleByClipId = (clipId: string, containerSelector: string = ''): boolean => {
+    const root = containerSelector && containerRef.value
+      ? containerRef.value.querySelector(containerSelector) : containerRef.value
+    if (!root) return false
+
+    const videos = root.querySelectorAll(videoSelector) as NodeListOf<HTMLVideoElement>
+    let targetVideo: HTMLVideoElement | null = null
+
+    for (const video of videos) {
+      const card = video.closest('[data-clip-id]')
+      const cardId = card?.getAttribute('data-clip-id')
+      if ((card && cardId === String(clipId)) || video.dataset.clipId === String(clipId)) {
+        targetVideo = video
+        break
+      }
+    }
+
+    if (!targetVideo) return false
+
+    if (activeVideoId.value === String(clipId)) {
+      targetVideo.paused ? targetVideo.play().catch(() => {}) : targetVideo.pause()
+    } else {
+      pauseAllVideos()
+      activeVideoId.value = String(clipId)
+      if (targetVideo.readyState >= 2) targetVideo.play().catch(() => {})
+    }
+    return true
+  }
+
   return {
     activeVideoId,
     pauseAllVideos,
@@ -106,6 +135,7 @@ export function useVideoControl(options: UseVideoControlOptions) {
     pauseVideo,
     toggleVideo,
     playVideoAtIndex,
-    toggleVideoAtIndex
+    toggleVideoAtIndex,
+    toggleByClipId
   }
 }

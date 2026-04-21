@@ -63,7 +63,7 @@ const handleKeydown = (event: KeyboardEvent) => {
   </Teleport>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -208,10 +208,10 @@ const handleKeydown = (event: KeyboardEvent) => {
 
   .modal-header {
     padding: 1.25rem 1.5rem;
-  }
 
-  .modal-header h2 {
-    font-size: 1.5rem;
+    h2 {
+      font-size: 1.5rem;
+    }
   }
 
   .modal-body {

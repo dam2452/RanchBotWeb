@@ -39,7 +39,7 @@ const handleInput = (event: Event) => {
   />
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .form-input {
   width: 100%;
   padding: 12px 16px;
@@ -52,10 +52,8 @@ const handleInput = (event: Event) => {
   font-size: 16px;
   box-sizing: border-box;
   transition: all var(--transition-default);
-}
 
-@media (min-width: 481px) {
-  .form-input {
+  @include mobile {
     font-size: clamp(16px, 1.2vw, 18px);
   }
 }

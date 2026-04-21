@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { ref, watch, onBeforeUnmount } from 'vue'
 import type { Clip } from '@/types'
 import ClipActionButton from './ClipActionButton.vue'
 import ConfirmModal from '../common/ConfirmModal.vue'
-import LoadingSpinner from '../common/LoadingSpinner.vue'
-import { IS_MOBILE } from '@/utils/formatters'
+import VideoPlayer from './VideoPlayer.vue'
 
 interface Props {
   clip: Clip
@@ -14,163 +12,37 @@ interface Props {
   hasError?: boolean
 }
 
-interface Emits {
-  (e: 'video-click', event: Event): void
-  (e: 'download'): void
-  (e: 'delete'): void
-  (e: 'video-error'): void
-}
-
 const props = withDefaults(defineProps<Props>(), {
   hasError: false
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  (e: 'video-click', event: Event): void
+  (e: 'download'): void
+  (e: 'delete'): void
+  (e: 'video-error'): void
+}>()
 
-const showDeleteConfirm = ref(false)
-const videoRef = ref<HTMLVideoElement | null>(null)
-const isLoading = ref(true)
-const isVideoMuted = ref(IS_MOBILE)
-const shouldLoadVideo = ref(false)
-const thumbnailLoaded = ref(false)
-const isVideoPlaying = ref(false)
+const showDeleteConfirm = defineModel<boolean>('showDeleteConfirm', { default: false })
 
-const _onVolumeChange = (): void => {
-  if (videoRef.value) isVideoMuted.value = videoRef.value.muted
-}
-
-watch(videoRef, (newRef, oldRef) => {
-  if (oldRef) oldRef.removeEventListener('volumechange', _onVolumeChange)
-  if (newRef) newRef.addEventListener('volumechange', _onVolumeChange)
-})
-
-onBeforeUnmount(() => {
-  if (videoRef.value) videoRef.value.removeEventListener('volumechange', _onVolumeChange)
-})
-
-
-const handleThumbnailLoaded = () => {
-  thumbnailLoaded.value = true
-  isLoading.value = false
-}
-
-const handleThumbnailOrVideoClick = (event: Event) => {
-  if (props.thumbnailUrl && !shouldLoadVideo.value) {
-    shouldLoadVideo.value = true
-    isLoading.value = true
-
-    if (IS_MOBILE && videoRef.value) {
-      videoRef.value.muted = false
-      isVideoMuted.value = false
-    }
-  }
-
-  if (!props.hasError) {
-    emit('video-click', event)
-  }
-}
-
-const handleDownload = () => {
-  emit('download')
-}
-
-const handleDelete = () => {
-  document.querySelectorAll('video').forEach((video) => {
-    video.pause()
-  })
-
+const _handleDeleteClick = (): void => {
+  document.querySelectorAll('video').forEach((v: HTMLVideoElement) => v.pause())
   showDeleteConfirm.value = true
 }
-
-const handleConfirmDelete = () => {
-  showDeleteConfirm.value = false
-  emit('delete')
-}
-
-const handleCancelDelete = () => {
-  showDeleteConfirm.value = false
-}
-
-const handleVideoError = (event: Event) => {
-  const videoElement = event.target as HTMLVideoElement
-  const error = videoElement.error
-
-  console.error('Video error for clip:', props.clip.id)
-  console.error('URL:', props.videoUrl)
-  console.error('Error code:', error?.code)
-  console.error('Error message:', error?.message)
-  console.error('Network state:', videoElement.networkState)
-  console.error('Ready state:', videoElement.readyState)
-
-  isLoading.value = false
-  emit('video-error')
-}
-
-const handleVideoLoaded = (): void => {
-  if (!props.thumbnailUrl) {
-    isLoading.value = false
-  }
-}
-
-const handleCanPlay = (): void => {
-  isLoading.value = false
-
-  if (shouldLoadVideo.value && props.isActive && videoRef.value && videoRef.value.paused) {
-    if (IS_MOBILE) {
-      videoRef.value.muted = false
-      isVideoMuted.value = false
-    }
-    videoRef.value.play().catch(() => {})
-    isVideoPlaying.value = true
-  }
-}
-
-const handlePlaying = () => {
-  isVideoPlaying.value = true
-}
-
-const handlePause = () => {
-  isVideoPlaying.value = false
-}
-
 </script>
 
 <template>
   <div class="clip-card" :data-clip-id="clip.id">
     <div class="video-container">
       <div v-if="!hasError" class="video-wrapper">
-        <img
-          v-if="thumbnailUrl && !shouldLoadVideo"
-          :src="thumbnailUrl"
-          @load="handleThumbnailLoaded"
-          @click="handleThumbnailOrVideoClick"
-          class="clip-video thumbnail-preview"
-          :class="{ active: isActive }"
-          alt="Video thumbnail"
+        <VideoPlayer
+          :video-url="videoUrl"
+          :thumbnail-url="thumbnailUrl"
+          :preview-url="null"
+          :is-active="isActive"
+          :is-editing="false"
+          @click="emit('video-click', $event)"
         />
-
-        <video
-          v-if="!thumbnailUrl || shouldLoadVideo"
-          ref="videoRef"
-          :data-clip-id="clip.id"
-          loop
-          playsinline
-          :muted="IS_MOBILE"
-          preload="auto"
-          :src="videoUrl"
-          class="clip-video"
-          :class="{ active: isActive }"
-          @click="handleThumbnailOrVideoClick"
-          @error="handleVideoError"
-          @loadeddata="handleVideoLoaded"
-          @canplay="handleCanPlay"
-          @playing="handlePlaying"
-          @pause="handlePause"
-        ></video>
-
-        <div v-if="isLoading" class="loading-overlay">
-          <LoadingSpinner size="small" />
-        </div>
       </div>
 
       <div v-else class="error-placeholder">
@@ -186,7 +58,7 @@ const handlePause = () => {
         position="top-right"
         size="small"
         :class="['action-button', { 'error-download-button': hasError }]"
-        @click="handleDownload"
+        @click="emit('download')"
       >
         Download
       </ClipActionButton>
@@ -196,7 +68,7 @@ const handlePause = () => {
         position="bottom-right"
         size="small"
         :class="['action-button', { 'error-delete-button': hasError }]"
-        @click="handleDelete"
+        @click="_handleDeleteClick"
       >
         Delete
       </ClipActionButton>
@@ -212,18 +84,23 @@ const handlePause = () => {
       :message="`Are you sure you want to delete '${clip.name}'? This action cannot be undone.`"
       confirm-text="Delete"
       cancel-text="Cancel"
-      @confirm="handleConfirmDelete"
-      @close="handleCancelDelete"
+      @confirm="showDeleteConfirm = false; emit('delete')"
+      @close="showDeleteConfirm = false"
     />
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .clip-card {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
   height: auto;
+
+  @include tablet {
+    gap: 0.5rem;
+    height: 100%;
+  }
 }
 
 .video-container {
@@ -237,6 +114,12 @@ const handlePause = () => {
   min-height: 200px;
   max-height: 35vh;
   transition: all 0.3s;
+
+  @include tablet {
+    border-radius: 16px;
+    min-height: initial;
+    max-height: none;
+  }
 }
 
 .video-wrapper {
@@ -246,42 +129,6 @@ const handlePause = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(2px);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  pointer-events: none;
-}
-
-.clip-video {
-  width: 100%;
-  height: auto;
-  max-height: 35vh;
-  object-fit: contain;
-  border-radius: 12px;
-  display: block;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.clip-video.active {
-  box-shadow: 0 0 0 3px #f2a94c, 0 0 20px rgba(242, 169, 76, 0.6);
-}
-
-.thumbnail-preview {
-  cursor: pointer;
-  object-fit: cover;
 }
 
 .error-placeholder {
@@ -294,6 +141,11 @@ const handlePause = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  @include tablet {
+    min-height: initial;
+    border-radius: 16px;
+  }
 }
 
 .error-icon {
@@ -301,6 +153,12 @@ const handlePause = () => {
   height: 2.5rem;
   color: #d1d5db;
   margin-bottom: 0.4rem;
+
+  @include tablet {
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 0.75rem;
+  }
 }
 
 .error-text {
@@ -308,6 +166,10 @@ const handlePause = () => {
   font-size: 0.85rem;
   font-weight: bold;
   margin: 0;
+
+  @include tablet {
+    font-size: 1rem;
+  }
 }
 
 .error-subtext {
@@ -326,11 +188,10 @@ const handlePause = () => {
 .error-download-button {
   opacity: 0.9 !important;
   pointer-events: auto !important;
-}
 
-.error-delete-button:hover,
-.error-download-button:hover {
-  opacity: 1 !important;
+  &:hover {
+    opacity: 1 !important;
+  }
 }
 
 .video-container:hover .action-button {
@@ -352,63 +213,24 @@ const handlePause = () => {
   flex-shrink: 0;
   background: linear-gradient(145deg, #aaaaaa, #999999);
   max-width: 90%;
-}
 
-.clip-name p {
-  color: white;
-  font-size: 0.95rem;
-  font-weight: bold;
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-@media (min-width: 851px) {
-  .clip-card {
-    gap: 0.5rem;
-    height: 100%;
-  }
-
-  .video-container {
-    border-radius: 16px;
-    min-height: initial;
-    max-height: none;
-  }
-
-  .clip-video {
-    height: 100%;
-    max-height: none;
-    object-fit: cover;
-    border-radius: 16px;
-  }
-
-  .loading-overlay {
-    border-radius: 16px;
-  }
-
-  .error-placeholder {
-    min-height: initial;
-    border-radius: 16px;
-  }
-
-  .error-icon {
-    width: 4rem;
-    height: 4rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .error-text {
-    font-size: 1rem;
-  }
-
-  .clip-name {
+  @include tablet {
     padding: 0.5rem 1.25rem;
     border-radius: 12px;
   }
 
-  .clip-name p {
-    font-size: 1.125rem;
+  p {
+    color: white;
+    font-size: 0.95rem;
+    font-weight: bold;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    @include tablet {
+      font-size: 1.125rem;
+    }
   }
 }
 </style>

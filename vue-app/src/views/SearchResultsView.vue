@@ -110,7 +110,7 @@ const handleFilters = (): void => {
   </main>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .results-main {
   position: relative;
   width: 100vw;
@@ -128,6 +128,24 @@ const handleFilters = (): void => {
   z-index: 1000;
   width: 85vw;
   max-width: 500px;
+
+  @include mobile {
+    width: clamp(400px, 60vw, 550px);
+  }
+
+  @include tablet {
+    width: clamp(280px, 60vw, 720px);
+    max-width: 90vw;
+    top: 80px;
+  }
+
+  @include desktop-up {
+    top: 90px;
+  }
+
+  @include large {
+    top: 100px;
+  }
 }
 
 .loading-overlay,
@@ -148,31 +166,5 @@ const handleFilters = (): void => {
 
 .no-results-overlay {
   font-size: 20px;
-}
-
-@media (min-width: 481px) {
-  .search-bar-container {
-    width: clamp(400px, 60vw, 550px);
-  }
-}
-
-@media (min-width: 851px) {
-  .search-bar-container {
-    width: clamp(280px, 60vw, 720px);
-    max-width: 90vw;
-    top: 80px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .search-bar-container {
-    top: 90px;
-  }
-}
-
-@media (min-width: 1800px) {
-  .search-bar-container {
-    top: 100px;
-  }
 }
 </style>

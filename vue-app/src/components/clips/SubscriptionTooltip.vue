@@ -58,7 +58,7 @@ defineExpose({
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .subscription-tooltip {
   visibility: visible;
   opacity: 1;
@@ -78,17 +78,22 @@ defineExpose({
   transform: translateX(-50%);
   margin-top: 8px;
   transition: opacity 0.3s ease;
-}
 
-.subscription-tooltip::after {
-  content: "";
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  margin-left: -6px;
-  border-width: 6px;
-  border-style: solid;
-  border-color: transparent transparent #333 transparent;
+  &::after {
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent #333 transparent;
+  }
+
+  @include tablet-down {
+    min-width: 200px;
+    font-size: 0.85em;
+  }
 }
 
 .loading {
@@ -105,20 +110,13 @@ defineExpose({
 .days-remaining {
   margin-top: 4px;
   font-weight: 500;
-}
 
-.days-remaining.expiring {
-  color: #ffb142;
-}
+  &.expiring {
+    color: #ffb142;
+  }
 
-.days-remaining.expired {
-  color: #ff6b6b;
-}
-
-@media (max-width: 850px) {
-  .subscription-tooltip {
-    min-width: 200px;
-    font-size: 0.85em;
+  &.expired {
+    color: #ff6b6b;
   }
 }
 </style>

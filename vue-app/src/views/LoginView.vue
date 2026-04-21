@@ -57,7 +57,7 @@ const handleSubmit = async (credentials: { login: string; password: string }) =>
   </main>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .login-page {
   display: flex;
   flex-direction: column;
@@ -70,6 +70,19 @@ const handleSubmit = async (credentials: { login: string; password: string }) =>
   gap: 0;
   overflow-y: auto;
   overflow-x: hidden;
+
+  @include mobile {
+    padding: 32px 24px 32px;
+    gap: 0;
+  }
+
+  @include tablet {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px;
+    gap: 48px;
+  }
 }
 
 .login-section {
@@ -82,25 +95,8 @@ const handleSubmit = async (credentials: { login: string; password: string }) =>
   width: 100%;
   box-sizing: border-box;
   gap: 0;
-}
 
-@media (min-width: 481px) {
-  .login-page {
-    padding: 32px 24px 32px;
-    gap: 0;
-  }
-}
-
-@media (min-width: 851px) {
-  .login-page {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 40px;
-    gap: 48px;
-  }
-
-  .login-section {
+  @include tablet {
     flex: 1;
     max-width: 50%;
     justify-content: center;

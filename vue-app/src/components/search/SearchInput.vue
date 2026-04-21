@@ -48,7 +48,7 @@ const handleSubmit = () => {
   </form>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .search-form {
   position: relative;
   width: 100%;
@@ -67,12 +67,12 @@ const handleSubmit = () => {
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
   transition: all var(--transition-default);
   box-sizing: border-box;
-}
 
-.search-input:focus {
-  outline: none;
-  box-shadow: 0 0 30px rgba(255, 184, 92, 0.8), 0 12px 28px rgba(0, 0, 0, 0.4);
-  border-color: #f2a94c;
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 30px rgba(255, 184, 92, 0.8), 0 12px 28px rgba(0, 0, 0, 0.4);
+    border-color: #f2a94c;
+  }
 }
 
 .search-button {
@@ -90,10 +90,10 @@ const handleSubmit = () => {
   cursor: pointer;
   padding: 0;
   transition: transform var(--transition-fast);
-}
 
-.search-button:active {
-  transform: translateY(-50%) scale(0.95);
+  &:active {
+    transform: translateY(-50%) scale(0.95);
+  }
 }
 
 .search-icon {
@@ -108,7 +108,7 @@ const handleSubmit = () => {
   transform: scale(1.15);
 }
 
-@media (min-width: 481px) {
+@include mobile {
   .search-input {
     padding: clamp(16px, 2vw, 20px) clamp(50px, 6vw, 60px);
     font-size: clamp(16px, 2.5vw, 1.6rem);
@@ -125,7 +125,7 @@ const handleSubmit = () => {
   }
 }
 
-@media (min-width: 851px) {
+@include tablet {
   .search-input {
     padding: clamp(18px, 2vw, 24px) clamp(60px, 6vw, 70px);
     font-size: clamp(1.6rem, 2.5vw, 2rem);

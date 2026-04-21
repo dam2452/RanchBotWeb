@@ -19,12 +19,14 @@ def video_streaming_response(data: bytes, filename: Optional[str] = None) -> Str
     )
 
 
-def thumbnail_response(data: bytes) -> Response:
+def thumbnail_response(data: bytes, cacheable: bool = True) -> Response:
+    headers: dict[str, str] = {"Content-Length": str(len(data))}
+    if cacheable:
+        headers["Cache-Control"] = "public, max-age=86400"
+    else:
+        headers["Cache-Control"] = "no-store"
     return Response(
         content=data,
         media_type="image/webp",
-        headers={
-            "Cache-Control": "public, max-age=86400",
-            "Content-Length": str(len(data))
-        }
+        headers=headers
     )

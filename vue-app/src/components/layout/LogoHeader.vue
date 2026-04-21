@@ -26,7 +26,7 @@ onUnmounted(() => {
   </router-link>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .logo-header {
   position: fixed;
   top: 1.5rem;
@@ -37,15 +37,15 @@ onUnmounted(() => {
   gap: 1.5rem;
   text-decoration: none;
   transition: opacity var(--transition-default);
-}
 
-.logo-header:hover {
-  opacity: 0.8;
-}
+  &:hover {
+    opacity: 0.8;
+  }
 
-.logo-header:active,
-.logo-header:visited {
-  text-decoration: none;
+  &:active,
+  &:visited {
+    text-decoration: none;
+  }
 }
 
 .logo-brand {
@@ -62,7 +62,7 @@ onUnmounted(() => {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-@media (min-width: 851px) {
+@include tablet {
   .logo-header {
     top: 2rem;
     left: 2rem;

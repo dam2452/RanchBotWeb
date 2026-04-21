@@ -73,7 +73,8 @@ async def api_thumbnail(
     user: UserSession = Depends(get_current_user)
 ):
     try:
-        cache_key = request.cacheKey or (request.args[0] if request.args else "unknown")
+        position_key = str(request.args[0]) if request.args else "unknown"
+        cache_key = f"{request.cacheKey}_{position_key}" if request.cacheKey else position_key
         logger.info(f"Thumbnail request - endpoint: {request.endpoint}, cacheKey: {cache_key}")
 
         thumbnail_data = await thumbnail_service.get_or_generate(
@@ -82,7 +83,7 @@ async def api_thumbnail(
                 endpoint=request.endpoint, args=request.args, token=user.jwt_token
             )
         )
-        return thumbnail_response(thumbnail_data)
+        return thumbnail_response(thumbnail_data, cacheable=False)
     except Exception as e:
         logger.error(f"API Thumbnail error: {e}")
         logger.debug(traceback.format_exc())

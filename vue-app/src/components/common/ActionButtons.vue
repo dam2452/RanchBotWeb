@@ -45,7 +45,7 @@ const goToForgotPassword = () => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .action-buttons {
   margin-top: 2px;
   display: flex;
@@ -57,14 +57,14 @@ const goToForgotPassword = () => {
   box-sizing: border-box;
 }
 
-@media (min-width: 481px) {
+@include mobile {
   .action-buttons {
     margin-top: 6px;
     gap: 18px;
   }
 }
 
-@media (min-width: 851px) {
+@include tablet {
   .action-buttons {
     flex-direction: row;
     gap: 20px;

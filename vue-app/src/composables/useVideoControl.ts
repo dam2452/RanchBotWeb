@@ -1,5 +1,6 @@
 import { ref, type Ref } from 'vue'
 import { useVideoStore } from '@/stores/video'
+import { IS_MOBILE } from '@/utils/formatters'
 
 interface UseVideoControlOptions {
   containerRef: Ref<HTMLElement | null>
@@ -11,6 +12,11 @@ export function useVideoControl(options: UseVideoControlOptions) {
   const videoStore = useVideoStore()
 
   const activeVideoId = ref<string | null>(null)
+
+  const _playWithUnmute = (video: HTMLVideoElement): void => {
+    if (IS_MOBILE) video.muted = false
+    video.play().catch(() => {})
+  }
 
   const pauseAllVideos = (): void => {
     if (!containerRef.value) return
@@ -37,7 +43,7 @@ export function useVideoControl(options: UseVideoControlOptions) {
   const playVideo = (identifier: string): boolean => {
     const video = _findVideoByIdentifier(identifier)
     if (!video) return false
-    video.play().catch(() => {})
+    _playWithUnmute(video)
     activeVideoId.value = identifier
     return true
   }
@@ -56,14 +62,14 @@ export function useVideoControl(options: UseVideoControlOptions) {
 
     if (activeVideoId.value === String(identifier)) {
       if (video.paused) {
-        video.play().catch(() => {})
+        _playWithUnmute(video)
       } else {
         video.pause()
       }
     } else {
       pauseAllVideos()
       activeVideoId.value = String(identifier)
-      video.play().catch(() => {})
+      _playWithUnmute(video)
     }
     return true
   }
@@ -75,7 +81,7 @@ export function useVideoControl(options: UseVideoControlOptions) {
     pauseAllVideos()
     const video = videos[index]
     if (video && video.readyState >= 2) {
-      video.play().catch(() => {})
+      _playWithUnmute(video)
       activeVideoId.value = video.dataset.clipId || video.src
       return true
     }
@@ -91,7 +97,7 @@ export function useVideoControl(options: UseVideoControlOptions) {
 
     if (video.paused) {
       pauseAllVideos()
-      video.play().catch(() => {})
+      _playWithUnmute(video)
       activeVideoId.value = video.dataset.clipId || video.src
     } else {
       video.pause()
@@ -119,11 +125,15 @@ export function useVideoControl(options: UseVideoControlOptions) {
     if (!targetVideo) return false
 
     if (activeVideoId.value === String(clipId)) {
-      targetVideo.paused ? targetVideo.play().catch(() => {}) : targetVideo.pause()
+      if (targetVideo.paused) {
+        _playWithUnmute(targetVideo)
+      } else {
+        targetVideo.pause()
+      }
     } else {
       pauseAllVideos()
       activeVideoId.value = String(clipId)
-      if (targetVideo.readyState >= 2) targetVideo.play().catch(() => {})
+      if (targetVideo.readyState >= 2) _playWithUnmute(targetVideo)
     }
     return true
   }

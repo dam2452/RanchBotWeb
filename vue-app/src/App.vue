@@ -34,13 +34,21 @@ onMounted(async () => {
   font-weight: 600;
 }
 
-html,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #f2a94c;
+  color-scheme: light only;
+}
+
 body {
   margin: 0;
   padding: 0;
   height: 100%;
   overflow: hidden;
   background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;
+  background-attachment: fixed !important;
   color: #fff !important;
   position: fixed;
   width: 100%;
@@ -58,7 +66,11 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
-  html,
+  html {
+    background-color: #f2a94c !important;
+    filter: none !important;
+  }
+
   body,
   #app {
     background: linear-gradient(to bottom, #1aa899, #f2a94c) !important;

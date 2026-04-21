@@ -123,7 +123,7 @@ const handleFilters = (): void => {
 .search-bar-container {
   position: fixed;
   left: 50%;
-  top: 80px;
+  top: calc(80px + env(safe-area-inset-top));
   transform: translateX(-50%);
   z-index: 1000;
   width: 85vw;
@@ -136,15 +136,14 @@ const handleFilters = (): void => {
   @include tablet {
     width: clamp(280px, 60vw, 720px);
     max-width: 90vw;
-    top: 80px;
   }
 
   @include desktop-up {
-    top: 90px;
+    top: calc(90px + env(safe-area-inset-top));
   }
 
   @include large {
-    top: 100px;
+    top: calc(100px + env(safe-area-inset-top));
   }
 }
 

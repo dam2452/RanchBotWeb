@@ -2,14 +2,16 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { clipService } from '@/services/clipService'
-import type { SearchResult } from '@/types'
+import type { SearchResult, ActiveFilters } from '@/types'
 import UserButtons from '@/components/layout/UserButtons.vue'
 import SearchBar from '@/components/search/SearchBar.vue'
+import FilterModal from '@/components/search/FilterModal.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import LogoHeader from '@/components/layout/LogoHeader.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import VideoReel from '@/components/clips/VideoReel.vue'
 import { useClipLoader } from '@/composables/useClipLoader'
+import { useFilters } from '@/composables/useFilters'
 import { useWindowWidth } from '@/composables/useWindowWidth'
 import { DESKTOP_BREAKPOINT, WATCH_BREAKPOINT } from '@/utils/formatters'
 
@@ -24,6 +26,16 @@ const results = ref<SearchResult[]>([])
 const loading = ref(false)
 const error = ref('')
 const searchId = ref(0)
+const showFilterModal = ref(false)
+
+const {
+  characters, objects, emotions, seasons, episodes,
+  selectedFilters, appliedFilters,
+  hasActiveFilters, activeFilterCount,
+  optionsLoading, applyLoading,
+  loadFilterOptions, loadEpisodes,
+  applyFilters, resetFilters, fetchFilterInfo
+} = useFilters()
 
 const { clips, loadedClips, loadingClips, loadNextClips, loadVideoForClip, revokeAll, reset, getLastLoadTime } = useClipLoader({
   results,
@@ -32,7 +44,7 @@ const { clips, loadedClips, loadingClips, loadNextClips, loadVideoForClip, revok
 
 onMounted(async () => {
   query.value = (route.query.query as string) || ''
-  await _loadSearchResults()
+  await Promise.all([_loadSearchResults(), fetchFilterInfo()])
 })
 
 onUnmounted(() => {
@@ -71,7 +83,75 @@ const handleSearch = (newQuery: string): void => {
 }
 
 const handleFilters = (): void => {
-  // TODO: implement filters
+  showFilterModal.value = true
+  loadFilterOptions()
+}
+
+const handleFilterToggle = (category: keyof ActiveFilters, value: string): void => {
+  const current = selectedFilters.value[category]
+  if (category === 'season') {
+    selectedFilters.value = {
+      ...selectedFilters.value,
+      season: current.includes(value) ? [] : [value]
+    }
+    if (!current.includes(value)) {
+      loadEpisodes(value)
+      selectedFilters.value.episode = []
+    } else {
+      episodes.value.length = 0
+      selectedFilters.value.episode = []
+    }
+  } else {
+    const updated = current.includes(value)
+      ? current.filter(v => v !== value)
+      : [...current, value]
+    selectedFilters.value = { ...selectedFilters.value, [category]: updated }
+  }
+}
+
+const handleFilterRemove = (category: keyof ActiveFilters, value: string): void => {
+  const updated = appliedFilters.value[category].filter(v => v !== value)
+  const newFilters = { ...appliedFilters.value, [category]: updated }
+  selectedFilters.value = { ...newFilters }
+  appliedFilters.value = { ...newFilters }
+
+  const filterString = Object.entries(newFilters)
+    .filter(([, v]) => v.length > 0)
+    .map(([k, vals]) => {
+      const keyMap: Record<string, string> = {
+        season: 'sezon', episode: 'odcinek', character: 'postac',
+        emotion: 'emocja', object: 'obiekt'
+      }
+      return `${keyMap[k]}:${vals.join(',')}`
+    })
+    .join(' ')
+
+  if (filterString) {
+    clipService.setFilters(filterString)
+  } else {
+    clipService.resetFilters()
+  }
+
+  _resetSearchState()
+  _loadSearchResults()
+}
+
+const handleFilterSelectSeason = (season: string): void => {
+  loadEpisodes(season)
+}
+
+const handleFilterApply = async (): Promise<void> => {
+  await applyFilters()
+  showFilterModal.value = false
+  _resetSearchState()
+  _loadSearchResults()
+}
+
+const handleFilterReset = async (): Promise<void> => {
+  await resetFilters()
+  showFilterModal.value = false
+  _resetSearchState()
+  _loadSearchResults()
 }
 </script>
 
@@ -88,8 +168,34 @@ const handleFilters = (): void => {
 
   <main class="results-main">
     <div v-if="!isWatchView" class="search-bar-container">
-      <SearchBar :initial-query="query" @search="handleSearch" @filters="handleFilters" />
+      <SearchBar
+        :initial-query="query"
+        :active-filter-count="activeFilterCount"
+        :applied-filters="appliedFilters"
+        @search="handleSearch"
+        @filters="handleFilters"
+        @remove-filter="handleFilterRemove"
+      />
     </div>
+
+    <FilterModal
+      :show="showFilterModal"
+      :selected-filters="selectedFilters"
+      :seasons="seasons"
+      :episodes="episodes"
+      :characters="characters"
+      :objects="objects"
+      :emotions="emotions"
+      :loading="optionsLoading"
+      :apply-loading="applyLoading"
+      @close="showFilterModal = false"
+      @applied="handleFilterApply"
+      @toggle="handleFilterToggle"
+      @remove="handleFilterToggle"
+      @select-season="handleFilterSelectSeason"
+      @apply="handleFilterApply"
+      @reset="handleFilterReset"
+    />
 
     <div v-if="loading || (results.length > 0 && !clips[0])" class="loading-overlay">
       <LoadingSpinner message="Loading results..." />

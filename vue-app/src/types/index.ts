@@ -35,3 +35,27 @@ export interface ApiResponse<T> {
   data?: T
   message?: string
 }
+
+export interface FilterOption {
+  name: string
+  label?: string
+  episode_count?: number
+  scene_count?: number
+}
+
+export interface SeasonInfo {
+  [seasonNumber: string]: number
+}
+
+export interface EpisodeInfo {
+  number: number
+  title?: string
+}
+
+export interface ActiveFilters {
+  season: string[]
+  episode: string[]
+  character: string[]
+  emotion: string[]
+  object: string[]
+}

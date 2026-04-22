@@ -2,26 +2,34 @@
 import { computed } from 'vue'
 import SearchInput from './SearchInput.vue'
 import FiltersButton from './FiltersButton.vue'
+import FilterChips from './FilterChips.vue'
 import { useWindowWidth } from '@/composables/useWindowWidth'
 import { WATCH_BREAKPOINT } from '@/utils/formatters'
+import type { ActiveFilters } from '@/types'
 
 interface Props {
   initialQuery?: string
+  activeFilterCount?: number
+  appliedFilters?: ActiveFilters
 }
 
 interface Emits {
   (e: 'search', query: string): void
   (e: 'filters'): void
+  (e: 'remove-filter', category: keyof ActiveFilters, value: string): void
 }
 
-withDefaults(defineProps<Props>(), {
-  initialQuery: ''
+const props = withDefaults(defineProps<Props>(), {
+  initialQuery: '',
+  activeFilterCount: 0,
+  appliedFilters: undefined
 })
 
 const emit = defineEmits<Emits>()
 const { windowWidth } = useWindowWidth()
 
 const showFilters = computed(() => windowWidth.value > WATCH_BREAKPOINT)
+const showChips = computed(() => props.appliedFilters && props.activeFilterCount > 0)
 
 const handleSearch = (query: string) => {
   emit('search', query)
@@ -30,12 +38,17 @@ const handleSearch = (query: string) => {
 const handleFilters = () => {
   emit('filters')
 }
+
+const handleRemoveFilter = (category: keyof ActiveFilters, value: string) => {
+  emit('remove-filter', category, value)
+}
 </script>
 
 <template>
   <div class="search-container">
     <SearchInput :initial-query="initialQuery" @search="handleSearch" />
-    <FiltersButton v-if="showFilters" @click="handleFilters" />
+    <FiltersButton v-if="showFilters" :active-count="activeFilterCount" @click="handleFilters" />
+    <FilterChips v-if="showChips && appliedFilters" :filters="appliedFilters" @remove="handleRemoveFilter" />
   </div>
 </template>
 

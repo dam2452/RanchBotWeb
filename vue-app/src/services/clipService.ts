@@ -1,15 +1,20 @@
 import { client } from './http'
-import type { Clip, SearchResult } from '@/types'
+import {
+  characterParser,
+  emotionParser,
+  episodeListParser,
+  filterInfoParser,
+  objectParser,
+  searchResultsParser,
+  seasonInfoParser
+} from './clipParsers'
+import type { Clip, EpisodeInfo, FilterOption, SearchResult, SeasonInfo } from '@/types'
+
 
 class ClipService {
   async searchClips(query: string): Promise<SearchResult[]> {
     const response = await client.post('/api/json', { endpoint: 'sz', args: [query] })
-
-    if (response.data?.data?.results) {
-      return response.data.data.results
-    }
-
-    throw new Error('Unexpected response structure from search endpoint')
+    return searchResultsParser.parse(response.data)
   }
 
   async getVideo(index: string): Promise<Blob> {
@@ -32,7 +37,6 @@ class ClipService {
 
   async getUserClips(): Promise<Clip[]> {
     const response = await client.get('/clips')
-
     if (response.data.status === 'success' && response.data.clips) {
       return response.data.clips
     }
@@ -62,6 +66,44 @@ class ClipService {
       { responseType: 'blob' }
     )
     return response.data
+  }
+
+  async getCharacters(): Promise<FilterOption[]> {
+    const response = await client.post('/api/json', { endpoint: 'p', args: [] })
+    return characterParser.parse(response.data)
+  }
+
+  async getObjects(): Promise<FilterOption[]> {
+    const response = await client.post('/api/json', { endpoint: 'obj', args: [] })
+    return objectParser.parse(response.data)
+  }
+
+  async getEmotions(): Promise<FilterOption[]> {
+    const response = await client.post('/api/json', { endpoint: 'e', args: [] })
+    return emotionParser.parse(response.data)
+  }
+
+  async getSeasons(): Promise<SeasonInfo> {
+    const response = await client.post('/api/json', { endpoint: 'odcinki', args: [] })
+    return seasonInfoParser.parse(response.data)
+  }
+
+  async getEpisodes(season: string): Promise<EpisodeInfo[]> {
+    const response = await client.post('/api/json', { endpoint: 'odcinki', args: [season] })
+    return episodeListParser.parse(response.data)
+  }
+
+  async setFilters(filterString: string): Promise<void> {
+    await client.post('/api/json', { endpoint: 'f', args: [filterString] })
+  }
+
+  async resetFilters(): Promise<void> {
+    await client.post('/api/json', { endpoint: 'f', args: ['reset'] })
+  }
+
+  async getFilterInfo(): Promise<string> {
+    const response = await client.post('/api/json', { endpoint: 'f', args: ['info'] })
+    return filterInfoParser.parse(response.data)
   }
 }
 

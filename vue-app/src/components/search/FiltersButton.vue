@@ -1,7 +1,15 @@
 <script setup lang="ts">
+interface Props {
+  activeCount?: number
+}
+
 interface Emits {
   (e: 'click'): void
 }
+
+withDefaults(defineProps<Props>(), {
+  activeCount: 0
+})
 
 const emit = defineEmits<Emits>()
 
@@ -13,6 +21,7 @@ const handleClick = () => {
 <template>
   <button type="button" class="filters-button" @click="handleClick">
     Filters
+    <span v-if="activeCount > 0" class="filter-badge">{{ activeCount }}</span>
   </button>
 </template>
 
@@ -73,5 +82,21 @@ const handleClick = () => {
       transform: rotate(5deg) scale(0.95);
     }
   }
+}
+
+.filter-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch } from 'vue'
 import type { ActiveFilters } from '@/types'
+import SeasonTab from './SeasonTab.vue'
+import ChipTab from './ChipTab.vue'
+import SearchableTab from './SearchableTab.vue'
 
 interface Props {
   show: boolean
@@ -17,7 +20,6 @@ interface Props {
 interface Emits {
   (e: 'close'): void
   (e: 'applied'): void
-  (e: 'select-season', season: string): void
   (e: 'toggle', category: keyof ActiveFilters, value: string): void
   (e: 'remove', category: keyof ActiveFilters, value: string): void
   (e: 'apply'): void
@@ -37,29 +39,6 @@ const tabs: { key: keyof ActiveFilters; label: string }[] = [
   { key: 'object', label: 'Obiekty' }
 ]
 
-const characterSearch = ref('')
-const objectSearch = ref('')
-
-const filteredCharacters = computed(() => {
-  const q = characterSearch.value.toLowerCase()
-  const selected = props.selectedFilters.character
-  if (!q) return props.characters.filter(c => !selected.includes(c.name))
-  return props.characters.filter(c =>
-    !selected.includes(c.name) && c.name.toLowerCase().includes(q)
-  )
-})
-
-const filteredObjects = computed(() => {
-  const q = objectSearch.value.toLowerCase()
-  const selected = props.selectedFilters.object.map(o => o.replace(/[><=]+\d*$/, ''))
-  if (!q) return props.objects.filter(o => !selected.includes(o.name))
-  return props.objects.filter(o =>
-    !selected.includes(o.name) && o.name.toLowerCase().includes(q)
-  )
-})
-
-const seasonKeys = computed(() => Object.keys(props.seasons).sort((a, b) => Number(a) - Number(b)))
-
 const handleKeydown = (event: KeyboardEvent): void => {
   if (event.key === 'Escape') emit('close')
 }
@@ -68,21 +47,8 @@ const isSelected = (category: keyof ActiveFilters, value: string): boolean => {
   return props.selectedFilters[category].includes(value)
 }
 
-const toggle = (category: keyof ActiveFilters, value: string): void => {
-  if (category === 'season') {
-    emit('select-season', value)
-  }
-  emit('toggle', category, value)
-}
-
-const remove = (category: keyof ActiveFilters, value: string): void => {
-  emit('remove', category, value)
-}
-
 watch(() => props.show, (val) => {
   if (val) {
-    characterSearch.value = ''
-    objectSearch.value = ''
     activeTab.value = 'season'
   }
 })
@@ -121,20 +87,13 @@ watch(() => props.show, (val) => {
             <div v-if="loading" class="loading">Loading...</div>
 
             <template v-else>
-              <!-- Season -->
-              <div v-if="activeTab === 'season'" class="chip-grid">
-                <button
-                  v-for="key in seasonKeys"
-                  :key="key"
-                  :class="['chip', { selected: isSelected('season', key) }]"
-                  @click="toggle('season', key)"
-                >
-                  Sezon {{ key }}
-                </button>
-                <div v-if="!seasonKeys.length" class="empty-msg">Brak sezonow</div>
-              </div>
+              <SeasonTab
+                v-if="activeTab === 'season'"
+                :selected-filters="selectedFilters"
+                :seasons="seasons"
+                @toggle="(cat, val) => emit('toggle', cat, val)"
+              />
 
-              <!-- Episode -->
               <div v-if="activeTab === 'episode'" class="chip-grid">
                 <template v-if="!selectedFilters.season.length">
                   <div class="empty-msg">Najpierw wybierz sezon</div>
@@ -144,7 +103,7 @@ watch(() => props.show, (val) => {
                     v-for="ep in episodes"
                     :key="ep.number"
                     :class="['chip', { selected: isSelected('episode', String(ep.number)) }]"
-                    @click="toggle('episode', String(ep.number))"
+                    @click="emit('toggle', 'episode', String(ep.number))"
                   >
                     {{ ep.title ? `E${ep.number} - ${ep.title}` : `Odcinek ${ep.number}` }}
                   </button>
@@ -152,78 +111,33 @@ watch(() => props.show, (val) => {
                 </template>
               </div>
 
-              <!-- Characters -->
-              <div v-if="activeTab === 'character'" class="search-section">
-                <div class="selected-chips">
-                  <span
-                    v-for="name in selectedFilters.character"
-                    :key="name"
-                    class="selected-chip"
-                  >
-                    {{ name }}
-                    <button class="chip-remove" @click="remove('character', name)">&times;</button>
-                  </span>
-                </div>
-                <input
-                  v-model="characterSearch"
-                  class="search-input"
-                  placeholder="Szukaj postaci..."
-                />
-                <div class="option-list">
-                  <button
-                    v-for="char in filteredCharacters"
-                    :key="char.name"
-                    class="option-item"
-                    @click="toggle('character', char.name)"
-                  >
-                    {{ char.name }}
-                  </button>
-                  <div v-if="!filteredCharacters.length" class="empty-msg">Brak wynikow</div>
-                </div>
-              </div>
+              <SearchableTab
+                v-if="activeTab === 'character'"
+                :selected-filters="selectedFilters"
+                category="character"
+                :items="characters"
+                search-placeholder="Szukaj postaci..."
+                @toggle="(cat, val) => emit('toggle', cat, val)"
+                @remove="(cat, val) => emit('remove', cat, val)"
+              />
 
-              <!-- Emotions -->
-              <div v-if="activeTab === 'emotion'" class="chip-grid">
-                <button
-                  v-for="emt in emotions"
-                  :key="emt.name"
-                  :class="['chip', { selected: isSelected('emotion', emt.name) }]"
-                  @click="toggle('emotion', emt.name)"
-                >
-                  {{ emt.name }}
-                </button>
-                <div v-if="!emotions.length" class="empty-msg">Brak emocji</div>
-              </div>
+              <ChipTab
+                v-if="activeTab === 'emotion'"
+                :selected-filters="selectedFilters"
+                category="emotion"
+                :items="emotions"
+                @toggle="(cat, val) => emit('toggle', cat, val)"
+              />
 
-              <!-- Objects -->
-              <div v-if="activeTab === 'object'" class="search-section">
-                <div class="selected-chips">
-                  <span
-                    v-for="obj in selectedFilters.object"
-                    :key="obj"
-                    class="selected-chip"
-                  >
-                    {{ obj }}
-                    <button class="chip-remove" @click="remove('object', obj)">&times;</button>
-                  </span>
-                </div>
-                <input
-                  v-model="objectSearch"
-                  class="search-input"
-                  placeholder="Szukaj obiektu..."
-                />
-                <div class="option-list">
-                  <button
-                    v-for="obj in filteredObjects"
-                    :key="obj.name"
-                    class="option-item"
-                    @click="toggle('object', obj.name)"
-                  >
-                    {{ obj.name }}
-                  </button>
-                  <div v-if="!filteredObjects.length" class="empty-msg">Brak wynikow</div>
-                </div>
-              </div>
+              <SearchableTab
+                v-if="activeTab === 'object'"
+                :selected-filters="selectedFilters"
+                category="object"
+                :items="objects"
+                search-placeholder="Szukaj obiektu..."
+                @toggle="(cat, val) => emit('toggle', cat, val)"
+                @remove="(cat, val) => emit('remove', cat, val)"
+              />
             </template>
           </div>
 
@@ -397,85 +311,6 @@ watch(() => props.show, (val) => {
     background: var(--color-primary);
     border-color: var(--color-primary);
     color: #fff;
-  }
-}
-
-.search-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.selected-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  min-height: 1.5rem;
-}
-
-.selected-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.3rem 0.7rem;
-  border-radius: 16px;
-  background: var(--color-primary);
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.chip-remove {
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1rem;
-  padding: 0;
-  line-height: 1;
-  opacity: 0.8;
-
-  &:hover {
-    opacity: 1;
-  }
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.6rem 1rem;
-  border-radius: 12px;
-  border: 2px solid #d0d0d0;
-  font-size: 0.9rem;
-  outline: none;
-  transition: border-color 0.2s;
-  box-sizing: border-box;
-
-  &:focus {
-    border-color: var(--color-primary);
-  }
-}
-
-.option-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.option-item {
-  text-align: left;
-  padding: 0.5rem 1rem;
-  border: none;
-  background: #fff;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  color: #333;
-  transition: all 0.15s;
-
-  &:hover {
-    background: #e8e8e8;
   }
 }
 

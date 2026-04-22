@@ -128,12 +128,49 @@ export function useFilters() {
     }
   }
 
+  function toggleFilter(category: keyof ActiveFilters, value: string): void {
+    const current = selectedFilters.value[category]
+    if (category === 'season') {
+      selectedFilters.value = {
+        ...selectedFilters.value,
+        season: current.includes(value) ? [] : [value]
+      }
+      if (!current.includes(value)) {
+        loadEpisodes(value)
+        selectedFilters.value.episode = []
+      } else {
+        episodes.value = []
+        selectedFilters.value.episode = []
+      }
+    } else {
+      const updated = current.includes(value)
+        ? current.filter(v => v !== value)
+        : [...current, value]
+      selectedFilters.value = { ...selectedFilters.value, [category]: updated }
+    }
+  }
+
+  async function removeAppliedFilter(category: keyof ActiveFilters, value: string): Promise<void> {
+    const updated = appliedFilters.value[category].filter(v => v !== value)
+    const newFilters: ActiveFilters = { ...appliedFilters.value, [category]: updated }
+    selectedFilters.value = { ...newFilters }
+    appliedFilters.value = { ...newFilters }
+
+    const filterString = buildFilterString(newFilters)
+    if (filterString) {
+      await clipService.setFilters(filterString)
+    } else {
+      await clipService.resetFilters()
+    }
+  }
+
   return {
     characters, objects, emotions, seasons, episodes,
     selectedFilters, appliedFilters,
     hasActiveFilters, activeFilterCount,
     optionsLoading, applyLoading,
     loadFilterOptions, loadEpisodes,
-    applyFilters, resetFilters, fetchFilterInfo
+    applyFilters, resetFilters, fetchFilterInfo,
+    toggleFilter, removeAppliedFilter
   }
 }

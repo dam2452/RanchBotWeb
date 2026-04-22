@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { ActiveFilters } from '@/types'
 
 interface Props {
@@ -11,30 +12,28 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+
+const categories: { key: keyof ActiveFilters; prefix: string }[] = [
+  { key: 'season', prefix: 'S' },
+  { key: 'episode', prefix: 'E' },
+  { key: 'character', prefix: '' },
+  { key: 'emotion', prefix: '' },
+  { key: 'object', prefix: '' }
+]
+
+const activeCategories = computed(() =>
+  categories.filter(cat => props.filters[cat.key].length > 0)
+)
 </script>
 
 <template>
-  <div v-if="filters.season.length || filters.episode.length || filters.character.length || filters.emotion.length || filters.object.length" class="filter-chips">
-    <span v-for="s in filters.season" :key="`s-${s}`" class="chip">
-      S{{ s }}
-      <button class="chip-x" @click="emit('remove', 'season', s)">&times;</button>
-    </span>
-    <span v-for="ep in filters.episode" :key="`ep-${ep}`" class="chip">
-      E{{ ep }}
-      <button class="chip-x" @click="emit('remove', 'episode', ep)">&times;</button>
-    </span>
-    <span v-for="c in filters.character" :key="c" class="chip">
-      {{ c }}
-      <button class="chip-x" @click="emit('remove', 'character', c)">&times;</button>
-    </span>
-    <span v-for="em in filters.emotion" :key="em" class="chip">
-      {{ em }}
-      <button class="chip-x" @click="emit('remove', 'emotion', em)">&times;</button>
-    </span>
-    <span v-for="obj in filters.object" :key="obj" class="chip">
-      {{ obj }}
-      <button class="chip-x" @click="emit('remove', 'object', obj)">&times;</button>
-    </span>
+  <div v-if="activeCategories.length" class="filter-chips">
+    <template v-for="cat in activeCategories" :key="cat.key">
+      <span v-for="val in filters[cat.key]" :key="`${cat.key}-${val}`" class="chip">
+        {{ cat.prefix ? `${cat.prefix}${val}` : val }}
+        <button class="chip-x" @click="emit('remove', cat.key, val)">&times;</button>
+      </span>
+    </template>
   </div>
 </template>
 

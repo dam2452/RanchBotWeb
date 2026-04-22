@@ -8,7 +8,6 @@ import FilterModal from '@/components/search/FilterModal.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import { useWindowWidth } from '@/composables/useWindowWidth'
 import { useFilters } from '@/composables/useFilters'
-import { clipService } from '@/services/clipService'
 import { WATCH_BREAKPOINT } from '@/utils/formatters'
 import type { ActiveFilters } from '@/types'
 
@@ -24,7 +23,8 @@ const {
   hasActiveFilters, activeFilterCount,
   optionsLoading, applyLoading,
   loadFilterOptions, loadEpisodes,
-  applyFilters, resetFilters, fetchFilterInfo
+  applyFilters, resetFilters, fetchFilterInfo,
+  toggleFilter, removeAppliedFilter
 } = useFilters()
 
 const handleSearch = (query: string) => {
@@ -41,29 +41,7 @@ const handleFilters = () => {
 }
 
 const handleFilterToggle = (category: keyof ActiveFilters, value: string): void => {
-  const current = selectedFilters.value[category]
-  if (category === 'season') {
-    selectedFilters.value = {
-      ...selectedFilters.value,
-      season: current.includes(value) ? [] : [value]
-    }
-    if (!current.includes(value)) {
-      loadEpisodes(value)
-      selectedFilters.value.episode = []
-    } else {
-      episodes.value.length = 0
-      selectedFilters.value.episode = []
-    }
-  } else {
-    const updated = current.includes(value)
-      ? current.filter(v => v !== value)
-      : [...current, value]
-    selectedFilters.value = { ...selectedFilters.value, [category]: updated }
-  }
-}
-
-const handleFilterSelectSeason = (season: string): void => {
-  loadEpisodes(season)
+  toggleFilter(category, value)
 }
 
 const handleFilterApply = async (): Promise<void> => {
@@ -76,28 +54,8 @@ const handleFilterReset = async (): Promise<void> => {
   showFilterModal.value = false
 }
 
-const handleFilterRemove = (category: keyof ActiveFilters, value: string): void => {
-  const updated = appliedFilters.value[category].filter(v => v !== value)
-  const newFilters = { ...appliedFilters.value, [category]: updated }
-  selectedFilters.value = { ...newFilters }
-  appliedFilters.value = { ...newFilters }
-
-  const filterString = Object.entries(newFilters)
-    .filter(([, v]) => v.length > 0)
-    .map(([k, vals]) => {
-      const keyMap: Record<string, string> = {
-        season: 'sezon', episode: 'odcinek', character: 'postac',
-        emotion: 'emocja', object: 'obiekt'
-      }
-      return `${keyMap[k]}:${vals.join(',')}`
-    })
-    .join(' ')
-
-  if (filterString) {
-    clipService.setFilters(filterString)
-  } else {
-    clipService.resetFilters()
-  }
+const handleFilterRemove = async (category: keyof ActiveFilters, value: string): Promise<void> => {
+  await removeAppliedFilter(category, value)
 }
 </script>
 
@@ -141,7 +99,6 @@ const handleFilterRemove = (category: keyof ActiveFilters, value: string): void 
       @applied="handleFilterApply"
       @toggle="handleFilterToggle"
       @remove="handleFilterToggle"
-      @select-season="handleFilterSelectSeason"
       @apply="handleFilterApply"
       @reset="handleFilterReset"
     />

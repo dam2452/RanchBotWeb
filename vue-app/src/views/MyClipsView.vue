@@ -39,6 +39,8 @@ const { setupScrollListeners, cleanupScrollListeners, scrollTimeout, scrollToIte
 })
 
 const _handleKeyDown = (e: KeyboardEvent) => {
+  const tag = (e.target as HTMLElement)?.tagName
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return
   if (e.key === ' ') {
     e.preventDefault()
     e.stopPropagation()

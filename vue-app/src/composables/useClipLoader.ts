@@ -34,6 +34,37 @@ export function useClipLoader(options: UseClipLoaderOptions) {
     loadedClips.value = 0
   }
 
+  const _loadSingleClip = async (i: number, currentSearchId: number): Promise<void> => {
+    const clipResult = results.value[i]
+    if (!clipResult) return
+
+    const clipPositionId = (i + 1).toString()
+
+    clips.value[i] = { hasError: false }
+
+    try {
+      const thumbnailPromise = clipService.getThumbnail(clipPositionId)
+      const videoPromise = clipService.getVideo(clipPositionId)
+
+      const thumbnailBlob = await thumbnailPromise
+      if (searchId.value !== currentSearchId) return
+
+      clips.value[i] = { ...clips.value[i], thumbnailUrl: URL.createObjectURL(thumbnailBlob) }
+
+      const videoBlob = await videoPromise
+      if (searchId.value !== currentSearchId) {
+        const thumb = clips.value[i]?.thumbnailUrl
+        if (thumb) URL.revokeObjectURL(thumb)
+        return
+      }
+
+      clips.value[i] = { ...clips.value[i], videoUrl: URL.createObjectURL(videoBlob) }
+    } catch (err) {
+      console.error(`Failed to load clip ${i}:`, err)
+      clips.value[i] = { ...clips.value[i], hasError: true }
+    }
+  }
+
   const loadNextClips = async (batchSize = 2) => {
     if (loadingClips.value) return
 
@@ -42,38 +73,13 @@ export function useClipLoader(options: UseClipLoaderOptions) {
     const startIdx = loadedClips.value
     const endIdx = Math.min(startIdx + batchSize, results.value.length)
 
-    for (let i = startIdx; i < endIdx; i++) {
-      if (searchId.value !== currentSearchId) break
+    loadedClips.value = endIdx
 
-      const clipResult = results.value[i]
-      if (!clipResult) continue
-
-      const clipPositionId = (i + 1).toString()
-
-      try {
-        const thumbnailBlob = await clipService.getThumbnail(clipPositionId)
-        if (searchId.value !== currentSearchId) break
-
-        const thumbnailUrl = URL.createObjectURL(thumbnailBlob)
-        const videoBlob = await clipService.getVideo(clipPositionId)
-
-        if (searchId.value !== currentSearchId) {
-          URL.revokeObjectURL(thumbnailUrl)
-          break
-        }
-
-        clips.value[i] = {
-          videoUrl: URL.createObjectURL(videoBlob),
-          thumbnailUrl,
-          hasError: false
-        }
-        loadedClips.value = i + 1
-      } catch (err) {
-        console.error(`Failed to load clip ${i}:`, err)
-        clips.value[i] = { hasError: true }
-        loadedClips.value = i + 1
-      }
-    }
+    await Promise.all(
+      Array.from({ length: endIdx - startIdx }, (_, offset) =>
+        _loadSingleClip(startIdx + offset, currentSearchId)
+      )
+    )
 
     loadingClips.value = false
     lastLoadTime = Date.now()

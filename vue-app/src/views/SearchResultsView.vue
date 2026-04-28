@@ -124,8 +124,6 @@ const handleFilterRemove = async (category: keyof ActiveFilters, value: string):
 const handleFilterApply = async (): Promise<void> => {
   await applyFilters()
   showFilterModal.value = false
-  _resetSearchState()
-  _loadSearchResults()
 }
 
 const handleFilterReset = async (): Promise<void> => {
@@ -193,7 +191,7 @@ watch(() => route.query.mode, async () => {
       @select-series="selectSeries"
     />
 
-    <div v-if="loading || (results.length > 0 && !clips[0])" class="loading-overlay">
+    <div v-if="loading || (results.length > 0 && !clips[0]?.thumbnailUrl && !clips[0]?.hasError)" class="loading-overlay">
       <LoadingSpinner message="Loading results..." />
     </div>
 
@@ -206,7 +204,7 @@ watch(() => route.query.mode, async () => {
     </div>
 
     <VideoReel
-      v-if="!loading && clips[0]"
+      v-if="!loading && (clips[0]?.thumbnailUrl || clips[0]?.hasError)"
       :clips="clips"
       :results="results"
       :loaded-clips="loadedClips"

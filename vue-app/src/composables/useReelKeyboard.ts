@@ -17,6 +17,8 @@ export function useReelKeyboard(options: UseReelKeyboardOptions) {
   } = options
 
   const _handleKey = (event: KeyboardEvent): void => {
+    const tag = (event.target as HTMLElement)?.tagName
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return
     if (isEditing.value !== null) return
     if (event.key !== ' ' && event.key !== 'Enter') return
 

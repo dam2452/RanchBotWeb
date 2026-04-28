@@ -53,7 +53,6 @@ const handleFilterToggle = (category: keyof ActiveFilters, value: string): void 
 const handleFilterApply = async (): Promise<void> => {
   await applyFilters()
   showFilterModal.value = false
-  router.push({ name: 'search-results', query: {} })
 }
 
 const handleFilterReset = async (): Promise<void> => {

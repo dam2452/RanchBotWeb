@@ -152,6 +152,10 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
     <div v-if="isVideoLoading && shouldLoadVideo && !videoUrl" class="video-loading-overlay">
       <LoadingSpinner size="small" />
     </div>
+
+    <div v-if="thumbnailLoaded && !videoUrl && !shouldLoadVideo" class="video-fetching-badge">
+      <span class="fetching-dot"></span>
+    </div>
   </div>
 </template>
 
@@ -181,8 +185,51 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
   pointer-events: none;
 }
 
+.video-fetching-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  border-radius: 12px;
+  padding: 4px 8px;
+  pointer-events: none;
+  z-index: 10;
+
+  &::after {
+    content: 'Ładowanie wideo…';
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.85);
+    white-space: nowrap;
+  }
+}
+
+.fetching-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  animation: pulse-dot 1.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
 .thumbnail-preview {
   cursor: pointer;
+}
+
+@include tablet {
+  .video-fetching-badge {
+    bottom: 14px;
+    right: 14px;
+  }
 }
 
 .thumbnail-placeholder {

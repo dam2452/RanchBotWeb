@@ -47,6 +47,9 @@ const tabs: { key: keyof ActiveFilters; label: string }[] = [
   { key: 'object', label: 'Obiekty' }
 ]
 
+const _formatSeriesName = (name: string): string =>
+  name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+
 const handleKeydown = (event: KeyboardEvent): void => {
   if (event.key === 'Escape') emit('close')
 }
@@ -85,7 +88,7 @@ watch(() => props.show, (val) => {
               :disabled="seriesLoading"
               @click="emit('select-series', s)"
             >
-              {{ s }}
+              {{ _formatSeriesName(s) }}
             </button>
           </div>
 
@@ -266,7 +269,6 @@ watch(() => props.show, (val) => {
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s;
-  text-transform: capitalize;
 
   &:hover:not(:disabled) {
     border-color: var(--color-primary);

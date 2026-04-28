@@ -1,0 +1,54 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+
+  # Python — backend
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.7
+    hooks:
+      - id: ruff
+        files: ^backend/
+        args: ["--fix"]
+      - id: ruff-format
+        files: ^backend/
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.15.0
+    hooks:
+      - id: mypy
+        files: ^backend/
+        args:
+          - "--ignore-missing-imports"
+          - "--strict"
+        additional_dependencies:
+          - "pydantic>=2.0"
+          - "fastapi>=0.115.0"
+
+  # Vue / TypeScript — frontend
+  - repo: local
+    hooks:
+      - id: eslint-vue
+        name: ESLint (vue-app)
+        language: node
+        entry: bash -c 'cd vue-app && npx eslint --max-warnings=0 "$@"' --
+        files: ^vue-app/src/.*\.(ts|vue)$
+        types_or: [ts, vue]
+        pass_filenames: true
+
+      - id: tsc-vue
+        name: TypeScript check (vue-app)
+        language: node
+        entry: bash -c 'cd vue-app && npx vue-tsc --noEmit'
+        files: ^vue-app/src/.*\.(ts|vue)$
+        types_or: [ts, vue]
+        pass_filenames: false

@@ -6,9 +6,11 @@ from app.core.config import settings
 
 class RanchBotAPIClient:
     ALLOWED_ENDPOINTS = {
-        'sz', 'w', 'ad', 'z', 'uk', 'mk', 'wys',
+        'sz', 'szf', 'kf', 'w', 'ad', 'z', 'uk', 'mk', 'wys',
         'f', 'p', 'obj', 'e', 'odcinki',
-        '/auth/login', '/auth/logout-all'
+        'klatka', 'frame', 'kl',
+        '/auth/login', '/auth/logout-all', '/auth/register',
+        '/auth/forgot-password', '/auth/reset-password', '/auth/link-telegram',
     }
 
     def __init__(self):
@@ -21,25 +23,38 @@ class RanchBotAPIClient:
             raise ValueError(f"Endpoint '{endpoint}' is not allowed")
         return f"{self.base_url.rstrip('/')}/{normalized}"
 
-    def _build_headers(self, token: str) -> Dict[str, str]:
+    @staticmethod
+    def _build_headers(token: str) -> Dict[str, str]:
         return {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {token}"
         }
+
+    @staticmethod
+    def _extract_api_error(response: httpx.Response) -> str:
+        try:
+            return response.json().get("detail", f"HTTP {response.status_code}")
+        except Exception:
+            return f"HTTP {response.status_code}"
 
     async def _make_request(
         self,
         endpoint: str,
         args: List[Any],
         token: Optional[str],
-        timeout: int
+        timeout: int,
+        reply_json: bool = True,
     ) -> httpx.Response:
         url = self._build_url(endpoint)
         jwt_token = token or self.default_token
         if not jwt_token:
             raise ValueError("JWT token is required")
         async with httpx.AsyncClient(timeout=timeout) as client:
-            response = await client.post(url, json={"args": args}, headers=self._build_headers(jwt_token))
+            response = await client.post(
+                url,
+                json={"args": args, "reply_json": reply_json},
+                headers=self._build_headers(jwt_token),
+            )
             response.raise_for_status()
             return response
 
@@ -50,7 +65,7 @@ class RanchBotAPIClient:
         token: Optional[str] = None,
         timeout: int = 60
     ) -> Dict[str, Any]:
-        response = await self._make_request(endpoint, args, token, timeout)
+        response = await self._make_request(endpoint, args, token, timeout, reply_json=True)
         return response.json()
 
     async def call_api_for_blob(
@@ -60,7 +75,22 @@ class RanchBotAPIClient:
         token: Optional[str] = None,
         timeout: int = 60
     ) -> bytes:
-        response = await self._make_request(endpoint, args, token, timeout)
+        response = await self._make_request(endpoint, args, token, timeout, reply_json=False)
+        if not response.content:
+            raise ValueError(f"Empty response from '{endpoint}'")
+        content_type = response.headers.get("content-type", "")
+        if "application/json" in content_type:
+            try:
+                error_data = response.json()
+                detail = (
+                    error_data.get("detail")
+                    or error_data.get("message")
+                    or error_data.get("content")
+                    or str(error_data)
+                )
+            except Exception:
+                detail = response.text[:200]
+            raise ValueError(f"Expected binary response from '{endpoint}', got JSON: {detail}")
         return response.content
 
     async def authenticate(self, login: str, password: str) -> Dict[str, Any]:
@@ -92,8 +122,51 @@ class RanchBotAPIClient:
             response.raise_for_status()
             return response.json()
 
+    async def register(
+        self,
+        username: str,
+        password: str,
+        full_name: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        url = self._build_url("/auth/register")
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                url,
+                json={"username": username, "password": password, "full_name": full_name},
+            )
+            if not response.is_success:
+                raise Exception(self._extract_api_error(response))
+            return response.json()
+
+    async def forgot_password(self, username: str) -> Dict[str, Any]:
+        url = self._build_url("/auth/forgot-password")
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, json={"username": username})
+            if not response.is_success:
+                raise Exception(self._extract_api_error(response))
+            return response.json()
+
+    async def reset_password(self, username: str, code: str, new_password: str) -> Dict[str, Any]:
+        url = self._build_url("/auth/reset-password")
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                url,
+                json={"username": username, "code": code, "new_password": new_password},
+            )
+            if not response.is_success:
+                raise Exception(self._extract_api_error(response))
+            return response.json()
+
+    async def link_telegram(self, jwt_token: str) -> Dict[str, Any]:
+        url = self._build_url("/auth/link-telegram")
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, headers={"Authorization": f"Bearer {jwt_token}"})
+            if not response.is_success:
+                raise Exception(self._extract_api_error(response))
+            return response.json()
+
     async def search_clips(self, query: str, token: str) -> List[Dict[str, Any]]:
-        result = await self.call_api("sz", [query], token)
+        result = await self.call_api("szf", [query], token)
         if result and result.get("data") and result["data"].get("results"):
             return result["data"]["results"]
         return []

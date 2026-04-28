@@ -1,8 +1,10 @@
 import base64
 import json
-from typing import Dict, Tuple
+import traceback
+from typing import Dict, Optional, Tuple
 
 from fastapi import APIRouter, HTTPException, Response, Depends, status, Form
+from pydantic import BaseModel, Field
 
 from app.core.config import settings
 from app.core.dependencies import get_current_user
@@ -13,6 +15,22 @@ from app.services.ranchbot_api import api_client
 
 logger = setup_logger(__name__)
 router = APIRouter(prefix="/auth", tags=["authentication"])
+
+
+class RegisterBody(BaseModel):
+    username: str = Field(..., min_length=3, max_length=64)
+    password: str = Field(..., min_length=8, max_length=128)
+    full_name: Optional[str] = None
+
+
+class ForgotPasswordBody(BaseModel):
+    username: str = Field(..., min_length=1, max_length=64)
+
+
+class ResetPasswordBody(BaseModel):
+    username: str = Field(..., min_length=1, max_length=64)
+    code: str = Field(..., min_length=6, max_length=6)
+    new_password: str = Field(..., min_length=8, max_length=128)
 
 
 def _decode_jwt_payload(token: str, fallback_username: str) -> Tuple[int, str]:
@@ -40,7 +58,14 @@ def _finalize_login(response: Response, token: str, login: str) -> Dict:
         samesite="lax"
     )
 
-    return {"status": "success", "user": {"id": user_id, "username": username}}
+    return {
+        "status": "success",
+        "user": {
+            "id": user_id,
+            "username": username,
+            "telegram_linked": user_id > 0,
+        },
+    }
 
 
 @router.post("/login")
@@ -62,7 +87,6 @@ async def login(
     except HTTPException:
         raise
     except Exception as e:
-        import traceback
         logger.error(f"Login error: {e}")
         logger.debug(f"Traceback: {traceback.format_exc()}")
 
@@ -88,6 +112,70 @@ async def login(
                 )
 
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication failed")
+
+
+@router.post("/register")
+async def register(data: RegisterBody, response: Response):
+    try:
+        api_response = await api_client.register(data.username, data.password, data.full_name)
+
+        if "access_token" not in api_response:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Registration failed: no token returned",
+            )
+
+        return _finalize_login(response, api_response["access_token"], data.username)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        error_msg = str(e)
+        logger.error(f"Registration error for '{data.username}': {error_msg}")
+
+        if "telegram_linked" in error_msg:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="telegram_linked")
+        if "already taken" in error_msg.lower() or "409" in error_msg:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username already taken")
+
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error_msg)
+
+
+@router.post("/forgot-password")
+async def forgot_password(data: ForgotPasswordBody):
+    try:
+        result = await api_client.forgot_password(data.username)
+        return {"status": "success", "message": result.get("message", "Reset code sent if account exists.")}
+    except Exception as e:
+        error_msg = str(e)
+        logger.error(f"Forgot password error for '{data.username}': {error_msg}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error_msg)
+
+
+@router.post("/reset-password")
+async def reset_password(data: ResetPasswordBody):
+    try:
+        result = await api_client.reset_password(data.username, data.code, data.new_password)
+        return {"status": "success", "message": result.get("message", "Password reset successfully.")}
+    except Exception as e:
+        error_msg = str(e)
+        logger.error(f"Reset password error for '{data.username}': {error_msg}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error_msg)
+
+
+@router.post("/link-telegram")
+async def link_telegram(user: UserSession = Depends(get_current_user)):
+    try:
+        result = await api_client.link_telegram(user.jwt_token)
+        return {
+            "status": "success",
+            "linking_code": result.get("linking_code"),
+            "message": result.get("message"),
+        }
+    except Exception as e:
+        error_msg = str(e)
+        logger.error(f"Link Telegram error for user '{user.username}': {error_msg}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error_msg)
 
 
 @router.get("/logout")
@@ -125,5 +213,10 @@ async def logout_all(
 async def get_user(user: UserSession = Depends(get_current_user)):
     return {
         "status": "success",
-        "user": {"id": user.user_id, "username": user.username, "email": ""}
+        "user": {
+            "id": user.user_id,
+            "username": user.username,
+            "email": "",
+            "telegram_linked": user.user_id > 0,
+        },
     }

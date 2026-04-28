@@ -50,27 +50,6 @@ export function useFilters() {
     return parts.join(' ')
   }
 
-  function parseFilterString(raw: string): ActiveFilters {
-    const result: ActiveFilters = { ...EMPTY_FILTERS }
-    const tokens = raw.split(/\s+/)
-    for (const token of tokens) {
-      const colonIdx = token.indexOf(':')
-      if (colonIdx === -1) continue
-      const key = token.slice(0, colonIdx)
-      const val = token.slice(colonIdx + 1)
-      if (!val) continue
-      const values = val.split(',')
-      switch (key) {
-        case 'sezon': case 's': result.season = values; break
-        case 'odcinek': case 'ep': result.episode = values; break
-        case 'postac': case 'p': result.character = values; break
-        case 'emocja': case 'e': result.emotion = values; break
-        case 'obiekt': case 'o': result.object = values; break
-      }
-    }
-    return result
-  }
-
   async function loadFilterOptions(): Promise<void> {
     if (optionsLoading.value) return
     optionsLoading.value = true
@@ -121,10 +100,10 @@ export function useFilters() {
   }
 
   async function fetchFilterInfo(): Promise<void> {
-    const raw = await clipService.getFilterInfo()
-    if (raw) {
-      selectedFilters.value = parseFilterString(raw)
-      appliedFilters.value = { ...selectedFilters.value }
+    const active = await clipService.getFilterInfo()
+    if (active) {
+      selectedFilters.value = active
+      appliedFilters.value = { ...active }
     }
   }
 

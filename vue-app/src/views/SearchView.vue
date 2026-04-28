@@ -47,6 +47,7 @@ const handleFilterToggle = (category: keyof ActiveFilters, value: string): void 
 const handleFilterApply = async (): Promise<void> => {
   await applyFilters()
   showFilterModal.value = false
+  router.push({ name: 'search-results', query: {} })
 }
 
 const handleFilterReset = async (): Promise<void> => {
@@ -68,6 +69,7 @@ const handleFilterRemove = async (category: keyof ActiveFilters, value: string):
       <SearchBar
         :active-filter-count="activeFilterCount"
         :applied-filters="appliedFilters"
+        :allow-empty-search="hasActiveFilters"
         @search="handleSearch"
         @filters="handleFilters"
         @remove-filter="handleFilterRemove"
@@ -79,6 +81,7 @@ const handleFilterRemove = async (category: keyof ActiveFilters, value: string):
       <SearchBar
         :active-filter-count="activeFilterCount"
         :applied-filters="appliedFilters"
+        :allow-empty-search="hasActiveFilters"
         @search="handleSearch"
         @filters="handleFilters"
         @remove-filter="handleFilterRemove"

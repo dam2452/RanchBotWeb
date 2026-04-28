@@ -8,12 +8,12 @@ import {
   searchResultsParser,
   seasonInfoParser
 } from './clipParsers'
-import type { Clip, EpisodeInfo, FilterOption, SearchResult, SeasonInfo } from '@/types'
+import type { ActiveFilters, Clip, EpisodeInfo, FilterOption, SearchResult, SeasonInfo } from '@/types'
 
 
 class ClipService {
   async searchClips(query: string): Promise<SearchResult[]> {
-    const response = await client.post('/api/json', { endpoint: 'sz', args: [query] })
+    const response = await client.post('/api/json', { endpoint: 'szf', args: query ? [query] : [] })
     return searchResultsParser.parse(response.data)
   }
 
@@ -62,7 +62,7 @@ class ClipService {
   async getThumbnail(clipPositionId: string): Promise<Blob> {
     const response = await client.post(
       '/api/thumbnail',
-      { endpoint: 'w', args: [clipPositionId] },
+      { endpoint: 'klatka', args: [clipPositionId, 'p'] },
       { responseType: 'blob' }
     )
     return response.data
@@ -101,7 +101,7 @@ class ClipService {
     await client.post('/api/json', { endpoint: 'f', args: ['reset'] })
   }
 
-  async getFilterInfo(): Promise<string> {
+  async getFilterInfo(): Promise<ActiveFilters | null> {
     const response = await client.post('/api/json', { endpoint: 'f', args: ['info'] })
     return filterInfoParser.parse(response.data)
   }

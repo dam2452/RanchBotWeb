@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 
 interface Props {
   initialQuery?: string
+  allowEmptySearch?: boolean
 }
 
 interface Emits {
@@ -10,7 +11,8 @@ interface Emits {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  initialQuery: ''
+  initialQuery: '',
+  allowEmptySearch: false
 })
 
 const emit = defineEmits<Emits>()
@@ -22,7 +24,7 @@ watch(() => props.initialQuery, (newValue) => {
 
 const handleSubmit = () => {
   const trimmedQuery = query.value.trim()
-  if (!trimmedQuery) return
+  if (!trimmedQuery && !props.allowEmptySearch) return
   emit('search', trimmedQuery)
 }
 </script>
@@ -34,7 +36,6 @@ const handleSubmit = () => {
       type="text"
       placeholder="Enter a quote"
       class="search-input"
-      required
       autocomplete="off"
     />
 

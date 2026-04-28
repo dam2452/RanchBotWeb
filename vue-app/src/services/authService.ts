@@ -1,13 +1,13 @@
 import { isAxiosError } from 'axios'
 import { client } from './http'
-import type { User, LoginCredentials } from '@/types'
+import type { User, LoginCredentials, RegisterData } from '@/types'
 
 class AuthService {
-  private static _makeFormData(credentials: LoginCredentials): FormData {
-    const formData = new FormData()
-    formData.append('login', credentials.login)
-    formData.append('password', credentials.password)
-    return formData
+  private static _makeFormData(credentials: LoginCredentials): URLSearchParams {
+    const params = new URLSearchParams()
+    params.append('login', credentials.login)
+    params.append('password', credentials.password)
+    return params
   }
 
   async login(credentials: LoginCredentials): Promise<{ user: User; success: boolean }> {
@@ -20,6 +20,42 @@ class AuthService {
     }
 
     throw new Error('Login failed')
+  }
+
+  async register(data: RegisterData): Promise<{ user: User; success: boolean }> {
+    const response = await client.post('/auth/register', {
+      username: data.username,
+      password: data.password,
+      full_name: data.full_name || null,
+    })
+
+    if (response.data.status === 'success') {
+      return { success: true, user: response.data.user }
+    }
+
+    throw new Error('Registration failed')
+  }
+
+  async forgotPassword(username: string): Promise<string> {
+    const response = await client.post('/auth/forgot-password', { username })
+    return response.data.message ?? ''
+  }
+
+  async resetPassword(username: string, code: string, newPassword: string): Promise<string> {
+    const response = await client.post('/auth/reset-password', {
+      username,
+      code,
+      new_password: newPassword,
+    })
+    return response.data.message ?? ''
+  }
+
+  async linkTelegram(): Promise<{ linking_code: string; message: string }> {
+    const response = await client.post('/auth/link-telegram')
+    return {
+      linking_code: response.data.linking_code,
+      message: response.data.message,
+    }
   }
 
   async logout(): Promise<void> {

@@ -4,7 +4,7 @@ from typing import List
 
 class Settings(BaseSettings):
     # API Configuration
-    ranchbot_api_url: str = "http://192.168.1.210:8077/api/v1"
+    ranchbot_api_url: str
     dev_jwt_token: str = ""
 
     # Security
@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     session_max_age: int = 86400  # 24 hours
 
     # CORS - will be split by comma if from env
-    allowed_origins: str = "http://127.0.0.1:5173,http://localhost:5173,http://localhost:3000"
+    allowed_origins: str = "http://127.0.0.1:5173,http://localhost:5173,http://localhost:3000,http://127.0.0.1:8880,http://localhost:8880"
 
     # Server
     host: str = "0.0.0.0"

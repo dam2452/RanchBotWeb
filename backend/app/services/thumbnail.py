@@ -45,7 +45,21 @@ class ThumbnailService:
             logger.error(f"Cache read error: {e}")
             return None
 
+    @staticmethod
+    def _validate_mp4(data: bytes) -> None:
+        if len(data) < 8:
+            raise ValueError(f"Video data too small ({len(data)} bytes) — likely not a valid MP4")
+        box_type = data[4:8]
+        valid_boxes = {b'ftyp', b'moov', b'mdat', b'wide', b'free', b'skip'}
+        if box_type not in valid_boxes:
+            preview = data[:64]
+            raise ValueError(
+                f"Video data does not look like MP4 (box={box_type!r}). "
+                f"First bytes: {preview!r}"
+            )
+
     def _extract_and_cache(self, video_data: bytes, cache_key: str) -> bytes:
+        self._validate_mp4(video_data)
         with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp_video:
             tmp_video.write(video_data)
             tmp_video_path = tmp_video.name

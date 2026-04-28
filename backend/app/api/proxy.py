@@ -66,23 +66,34 @@ async def api_video(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+_IMAGE_ENDPOINTS = {"klatka", "frame", "kl"}
+_JPEG_MAGIC = b"\xff\xd8\xff"
+
+
 @router.post("/thumbnail")
 async def api_thumbnail(
     request: ApiRequest,
     user: UserSession = Depends(get_current_user)
 ):
     try:
+        data = await api_client.call_api_for_blob(
+            endpoint=request.endpoint, args=request.args, token=user.jwt_token
+        )
+        if request.endpoint in _IMAGE_ENDPOINTS or data[:3] == _JPEG_MAGIC:
+            return thumbnail_response(data, cacheable=False, media_type="image/jpeg")
         thumbnail_data = await thumbnail_service.get_or_generate(
             "",
-            lambda: api_client.call_api_for_blob(
-                endpoint=request.endpoint, args=request.args, token=user.jwt_token
-            )
+            lambda: _resolve_bytes(data),
         )
         return thumbnail_response(thumbnail_data, cacheable=False)
     except Exception as e:
         logger.error(f"API Thumbnail error: {e}")
         logger.debug(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
+
+
+async def _resolve_bytes(data: bytes) -> bytes:
+    return data
 
 
 @router.post("/adjust-preview")

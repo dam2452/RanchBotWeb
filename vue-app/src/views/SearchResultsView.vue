@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { clipService } from '@/services/clipService'
 import type { SearchResult, ActiveFilters } from '@/types'
 import UserButtons from '@/components/layout/UserButtons.vue'
 import SearchBar from '@/components/search/SearchBar.vue'
@@ -44,7 +45,8 @@ const { clips, loadedClips, loadingClips, loadNextClips, loadVideoForClip, revok
 
 onMounted(async () => {
   query.value = (route.query.query as string) || ''
-  await Promise.all([_loadSearchResults(), fetchFilterInfo()])
+  await fetchFilterInfo()
+  await _loadSearchResults()
 })
 
 onUnmounted(() => {
@@ -52,7 +54,7 @@ onUnmounted(() => {
 })
 
 const _loadSearchResults = async (): Promise<void> => {
-  if (!query.value) return
+  if (!query.value && !hasActiveFilters.value) return
 
   loading.value = true
   error.value = ''
@@ -129,6 +131,7 @@ const handleFilterReset = async (): Promise<void> => {
         :initial-query="query"
         :active-filter-count="activeFilterCount"
         :applied-filters="appliedFilters"
+        :allow-empty-search="hasActiveFilters"
         @search="handleSearch"
         @filters="handleFilters"
         @remove-filter="handleFilterRemove"
@@ -160,7 +163,8 @@ const handleFilterReset = async (): Promise<void> => {
     <div v-else-if="error" class="error-overlay">{{ error }}</div>
 
     <div v-else-if="results.length === 0 && !loading" class="no-results-overlay">
-      No results found for "{{ query }}"
+      <template v-if="query">No results found for "{{ query }}"</template>
+      <template v-else>No results found for the selected filters</template>
     </div>
 
     <VideoReel

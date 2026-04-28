@@ -11,6 +11,7 @@ interface Props {
   initialQuery?: string
   activeFilterCount?: number
   appliedFilters?: ActiveFilters
+  allowEmptySearch?: boolean
 }
 
 interface Emits {
@@ -22,7 +23,8 @@ interface Emits {
 const props = withDefaults(defineProps<Props>(), {
   initialQuery: '',
   activeFilterCount: 0,
-  appliedFilters: undefined
+  appliedFilters: undefined,
+  allowEmptySearch: false
 })
 
 const emit = defineEmits<Emits>()
@@ -46,7 +48,7 @@ const handleRemoveFilter = (category: keyof ActiveFilters, value: string) => {
 
 <template>
   <div class="search-container">
-    <SearchInput :initial-query="initialQuery" @search="handleSearch" />
+    <SearchInput :initial-query="initialQuery" :allow-empty-search="allowEmptySearch" @search="handleSearch" />
     <FiltersButton v-if="showFilters" :active-count="activeFilterCount" @click="handleFilters" />
     <FilterChips v-if="showChips && appliedFilters" :filters="appliedFilters" @remove="handleRemoveFilter" />
   </div>

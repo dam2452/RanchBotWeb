@@ -45,12 +45,18 @@ export function useFilters() {
   })
 
   function buildFilterString(filters: ActiveFilters): string {
+    const _quoteIfNeeded = (value: string): string =>
+      value.includes(' ') ? `"${value}"` : value
+
+    const _buildValue = (values: string[]): string =>
+      values.map(_quoteIfNeeded).join(',')
+
     const parts: string[] = []
-    if (filters.season.length) parts.push(`sezon:${filters.season.join(',')}`)
-    if (filters.episode.length) parts.push(`odcinek:${filters.episode.join(',')}`)
-    if (filters.character.length) parts.push(`postac:${filters.character.join(',')}`)
-    if (filters.emotion.length) parts.push(`emocja:${filters.emotion.join(',')}`)
-    if (filters.object.length) parts.push(`obiekt:${filters.object.join(',')}`)
+    if (filters.season.length) parts.push(`sezon:${_buildValue(filters.season)}`)
+    if (filters.episode.length) parts.push(`odcinek:${_buildValue(filters.episode)}`)
+    if (filters.character.length) parts.push(`postac:${_buildValue(filters.character)}`)
+    if (filters.emotion.length) parts.push(`emocja:${_buildValue(filters.emotion)}`)
+    if (filters.object.length) parts.push(`obiekt:${_buildValue(filters.object)}`)
     return parts.join(' ')
   }
 
@@ -84,9 +90,15 @@ export function useFilters() {
     try {
       const result = await clipService.setSeries(name)
       currentSeries.value = result.currentSeries
+      characters.value = []
+      objects.value = []
+      emotions.value = []
+      seasons.value = {}
+      episodes.value = []
     } finally {
       seriesLoading.value = false
     }
+    await loadFilterOptions()
   }
 
   async function loadEpisodes(season: string): Promise<void> {

@@ -57,9 +57,11 @@ export const emotionParser = new EmotionParser()
 
 class SearchResultsParser implements ResponseParser<SearchResult[]> {
   parse(data: unknown): SearchResult[] {
-    const obj = _data(data)
-    const inner = _data(obj.data)
-    if (!Array.isArray(inner.results)) throw new Error('Unexpected response structure from search endpoint')
+    if (!data || typeof data !== 'object') return []
+    const obj = data as Record<string, unknown>
+    if (!obj.data || typeof obj.data !== 'object') return []
+    const inner = obj.data as Record<string, unknown>
+    if (!Array.isArray(inner.results)) return []
     return inner.results as SearchResult[]
   }
 }

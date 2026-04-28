@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { clipService } from '@/services/clipService'
 import type { SearchResult, ActiveFilters } from '@/types'
@@ -27,15 +27,17 @@ const loading = ref(false)
 const error = ref('')
 const searchId = ref(0)
 const showFilterModal = ref(false)
+const semanticMode = computed(() => route.query.mode === 'semantic')
 
 const {
   characters, objects, emotions, seasons, episodes,
+  availableSeries, currentSeries, seriesLoading,
   selectedFilters, appliedFilters,
   hasActiveFilters, activeFilterCount,
   optionsLoading, applyLoading,
   loadFilterOptions, loadEpisodes,
   applyFilters, resetFilters, fetchFilterInfo,
-  toggleFilter, removeAppliedFilter
+  toggleFilter, removeAppliedFilter, selectSeries,
 } = useFilters()
 
 const { clips, loadedClips, loadingClips, loadNextClips, loadVideoForClip, revokeAll, reset, getLastLoadTime } = useClipLoader({
@@ -45,7 +47,9 @@ const { clips, loadedClips, loadingClips, loadNextClips, loadVideoForClip, revok
 
 onMounted(async () => {
   query.value = (route.query.query as string) || ''
-  await fetchFilterInfo()
+  if (!semanticMode.value) {
+    await fetchFilterInfo()
+  }
   await _loadSearchResults()
 })
 
@@ -54,13 +58,19 @@ onUnmounted(() => {
 })
 
 const _loadSearchResults = async (): Promise<void> => {
-  if (!query.value && !hasActiveFilters.value) return
+  if (semanticMode.value) {
+    if (!query.value) return
+  } else if (!query.value && !hasActiveFilters.value) {
+    return
+  }
 
   loading.value = true
   error.value = ''
 
   try {
-    results.value = await clipService.searchClips(query.value)
+    results.value = semanticMode.value
+      ? await clipService.searchSemanticClips(query.value)
+      : await clipService.searchClips(query.value)
     loading.value = false
     if (results.value.length > 0) {
       await loadNextClips(2)
@@ -79,9 +89,21 @@ const _resetSearchState = (): void => {
 
 const handleSearch = (newQuery: string): void => {
   _resetSearchState()
-  router.push({ name: 'search-results', query: { query: newQuery } })
+  router.push({
+    name: 'search-results',
+    query: semanticMode.value ? { query: newQuery, mode: 'semantic' } : { query: newQuery },
+  })
   query.value = newQuery
   _loadSearchResults()
+}
+
+const handleToggleSemantic = (): void => {
+  _resetSearchState()
+  const newMode = !semanticMode.value
+  router.push({
+    name: 'search-results',
+    query: newMode ? { query: query.value, mode: 'semantic' } : { query: query.value },
+  })
 }
 
 const handleFilters = (): void => {
@@ -112,6 +134,15 @@ const handleFilterReset = async (): Promise<void> => {
   _resetSearchState()
   _loadSearchResults()
 }
+
+watch(() => route.query.mode, async () => {
+  query.value = (route.query.query as string) || ''
+  _resetSearchState()
+  if (!semanticMode.value) {
+    await fetchFilterInfo()
+  }
+  await _loadSearchResults()
+})
 </script>
 
 <template>
@@ -132,9 +163,11 @@ const handleFilterReset = async (): Promise<void> => {
         :active-filter-count="activeFilterCount"
         :applied-filters="appliedFilters"
         :allow-empty-search="hasActiveFilters"
+        :semantic-mode="semanticMode"
         @search="handleSearch"
         @filters="handleFilters"
         @remove-filter="handleFilterRemove"
+        @toggle-semantic="handleToggleSemantic"
       />
     </div>
 
@@ -148,12 +181,16 @@ const handleFilterReset = async (): Promise<void> => {
       :emotions="emotions"
       :loading="optionsLoading"
       :apply-loading="applyLoading"
+      :available-series="availableSeries"
+      :current-series="currentSeries"
+      :series-loading="seriesLoading"
       @close="showFilterModal = false"
       @applied="handleFilterApply"
       @toggle="handleFilterToggle"
       @remove="handleFilterToggle"
       @apply="handleFilterApply"
       @reset="handleFilterReset"
+      @select-series="selectSeries"
     />
 
     <div v-if="loading || (results.length > 0 && !clips[0])" class="loading-overlay">
@@ -164,6 +201,7 @@ const handleFilterReset = async (): Promise<void> => {
 
     <div v-else-if="results.length === 0 && !loading" class="no-results-overlay">
       <template v-if="query">No results found for "{{ query }}"</template>
+      <template v-else-if="semanticMode">Enter a query to search by image similarity</template>
       <template v-else>No results found for the selected filters</template>
     </div>
 

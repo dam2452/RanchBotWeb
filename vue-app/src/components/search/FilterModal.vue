@@ -15,6 +15,9 @@ interface Props {
   emotions: { name: string; label?: string }[]
   loading: boolean
   applyLoading: boolean
+  availableSeries?: string[]
+  currentSeries?: string
+  seriesLoading?: boolean
 }
 
 interface Emits {
@@ -24,9 +27,14 @@ interface Emits {
   (e: 'remove', category: keyof ActiveFilters, value: string): void
   (e: 'apply'): void
   (e: 'reset'): void
+  (e: 'select-series', series: string): void
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  availableSeries: () => [],
+  currentSeries: '',
+  seriesLoading: false,
+})
 const emit = defineEmits<Emits>()
 
 const activeTab = ref<keyof ActiveFilters>('season')
@@ -67,6 +75,18 @@ watch(() => props.show, (val) => {
           <div class="modal-header">
             <h2>Filters</h2>
             <button class="close-btn" aria-label="Close" @click="emit('close')">&times;</button>
+          </div>
+
+          <div v-if="availableSeries.length > 1" class="series-bar">
+            <button
+              v-for="s in availableSeries"
+              :key="s"
+              :class="['series-btn', { active: s === currentSeries, loading: seriesLoading && s === currentSeries }]"
+              :disabled="seriesLoading"
+              @click="emit('select-series', s)"
+            >
+              {{ s }}
+            </button>
           </div>
 
           <div class="tab-bar">
@@ -222,6 +242,46 @@ watch(() => props.show, (val) => {
 
   &:hover {
     background: #d0d0d0;
+  }
+}
+
+.series-bar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: #f0f0f0;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+.series-btn {
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  border: 2px solid #d0d0d0;
+  background: #fff;
+  color: #555;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  text-transform: capitalize;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  &.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
   }
 }
 

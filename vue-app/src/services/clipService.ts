@@ -6,14 +6,21 @@ import {
   filterInfoParser,
   objectParser,
   searchResultsParser,
-  seasonInfoParser
+  seasonInfoParser,
+  seriesInfoParser
 } from './clipParsers'
+import type { SeriesInfo } from './clipParsers'
 import type { ActiveFilters, Clip, EpisodeInfo, FilterOption, SearchResult, SeasonInfo } from '@/types'
 
 
 class ClipService {
   async searchClips(query: string): Promise<SearchResult[]> {
     const response = await client.post('/api/json', { endpoint: 'szf', args: query ? [query] : [] })
+    return searchResultsParser.parse(response.data)
+  }
+
+  async searchSemanticClips(query: string): Promise<SearchResult[]> {
+    const response = await client.post('/api/json', { endpoint: 'sensklatki', args: [query] })
     return searchResultsParser.parse(response.data)
   }
 
@@ -104,6 +111,16 @@ class ClipService {
   async getFilterInfo(): Promise<ActiveFilters | null> {
     const response = await client.post('/api/json', { endpoint: 'f', args: ['info'] })
     return filterInfoParser.parse(response.data)
+  }
+
+  async getSeries(): Promise<SeriesInfo> {
+    const response = await client.post('/api/json', { endpoint: 'serial', args: [] })
+    return seriesInfoParser.parse(response.data)
+  }
+
+  async setSeries(name: string): Promise<SeriesInfo> {
+    const response = await client.post('/api/json', { endpoint: 'serial', args: [name] })
+    return seriesInfoParser.parse(response.data)
   }
 }
 

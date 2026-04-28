@@ -6,7 +6,7 @@ from app.core.config import settings
 
 class RanchBotAPIClient:
     ALLOWED_ENDPOINTS = {
-        'sz', 'szf', 'kf', 'w', 'ad', 'z', 'uk', 'mk', 'wys',
+        'sz', 'szf', 'sensklatki', 'kf', 'w', 'ad', 'z', 'uk', 'mk', 'wys', 'serial',
         'f', 'p', 'obj', 'e', 'odcinki',
         'klatka', 'frame', 'kl',
         '/auth/login', '/auth/logout-all', '/auth/register',

@@ -12,26 +12,29 @@ interface Props {
   activeFilterCount?: number
   appliedFilters?: ActiveFilters
   allowEmptySearch?: boolean
+  semanticMode?: boolean
 }
 
 interface Emits {
   (e: 'search', query: string): void
   (e: 'filters'): void
   (e: 'remove-filter', category: keyof ActiveFilters, value: string): void
+  (e: 'toggle-semantic'): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
   initialQuery: '',
   activeFilterCount: 0,
   appliedFilters: undefined,
-  allowEmptySearch: false
+  allowEmptySearch: false,
+  semanticMode: false
 })
 
 const emit = defineEmits<Emits>()
 const { windowWidth } = useWindowWidth()
 
-const showFilters = computed(() => windowWidth.value > WATCH_BREAKPOINT)
-const showChips = computed(() => props.appliedFilters && props.activeFilterCount > 0)
+const showFilters = computed(() => windowWidth.value > WATCH_BREAKPOINT && !props.semanticMode)
+const showChips = computed(() => !props.semanticMode && props.appliedFilters && props.activeFilterCount > 0)
 
 const handleSearch = (query: string) => {
   emit('search', query)
@@ -44,11 +47,21 @@ const handleFilters = () => {
 const handleRemoveFilter = (category: keyof ActiveFilters, value: string) => {
   emit('remove-filter', category, value)
 }
+
+const handleToggleSemantic = () => {
+  emit('toggle-semantic')
+}
 </script>
 
 <template>
   <div class="search-container">
-    <SearchInput :initial-query="initialQuery" :allow-empty-search="allowEmptySearch" @search="handleSearch" />
+    <SearchInput
+      :initial-query="initialQuery"
+      :allow-empty-search="allowEmptySearch"
+      :semantic-mode="semanticMode"
+      @search="handleSearch"
+      @toggle-semantic="handleToggleSemantic"
+    />
     <FiltersButton v-if="showFilters" :active-count="activeFilterCount" @click="handleFilters" />
     <FilterChips v-if="showChips && appliedFilters" :filters="appliedFilters" @remove="handleRemoveFilter" />
   </div>

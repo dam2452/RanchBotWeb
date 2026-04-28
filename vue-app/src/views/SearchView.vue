@@ -16,22 +16,28 @@ const { windowWidth } = useWindowWidth()
 const isWatchView = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
 
 const showFilterModal = ref(false)
+const semanticMode = ref(false)
 
 const {
   characters, objects, emotions, seasons, episodes,
+  availableSeries, currentSeries, seriesLoading,
   selectedFilters, appliedFilters,
   hasActiveFilters, activeFilterCount,
   optionsLoading, applyLoading,
   loadFilterOptions, loadEpisodes,
   applyFilters, resetFilters, fetchFilterInfo,
-  toggleFilter, removeAppliedFilter
+  toggleFilter, removeAppliedFilter, selectSeries,
 } = useFilters()
 
 const handleSearch = (query: string) => {
   router.push({
     name: 'search-results',
-    query: { query },
+    query: semanticMode.value ? { query, mode: 'semantic' } : { query },
   })
+}
+
+const handleToggleSemantic = (): void => {
+  semanticMode.value = !semanticMode.value
 }
 
 const handleFilters = () => {
@@ -70,9 +76,11 @@ const handleFilterRemove = async (category: keyof ActiveFilters, value: string):
         :active-filter-count="activeFilterCount"
         :applied-filters="appliedFilters"
         :allow-empty-search="hasActiveFilters"
+        :semantic-mode="semanticMode"
         @search="handleSearch"
         @filters="handleFilters"
         @remove-filter="handleFilterRemove"
+        @toggle-semantic="handleToggleSemantic"
       />
     </div>
 
@@ -82,9 +90,11 @@ const handleFilterRemove = async (category: keyof ActiveFilters, value: string):
         :active-filter-count="activeFilterCount"
         :applied-filters="appliedFilters"
         :allow-empty-search="hasActiveFilters"
+        :semantic-mode="semanticMode"
         @search="handleSearch"
         @filters="handleFilters"
         @remove-filter="handleFilterRemove"
+        @toggle-semantic="handleToggleSemantic"
       />
     </div>
 
@@ -98,12 +108,16 @@ const handleFilterRemove = async (category: keyof ActiveFilters, value: string):
       :emotions="emotions"
       :loading="optionsLoading"
       :apply-loading="applyLoading"
+      :available-series="availableSeries"
+      :current-series="currentSeries"
+      :series-loading="seriesLoading"
       @close="showFilterModal = false"
       @applied="handleFilterApply"
       @toggle="handleFilterToggle"
       @remove="handleFilterToggle"
       @apply="handleFilterApply"
       @reset="handleFilterReset"
+      @select-series="selectSeries"
     />
   </main>
 </template>

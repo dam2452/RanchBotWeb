@@ -118,3 +118,22 @@ class FilterInfoParser implements ResponseParser<ActiveFilters | null> {
 }
 
 export const filterInfoParser = new FilterInfoParser()
+
+
+export interface SeriesInfo {
+  currentSeries: string
+  availableSeries: string[]
+}
+
+class SeriesInfoParser implements ResponseParser<SeriesInfo> {
+  parse(data: unknown): SeriesInfo {
+    const obj = _data(data)
+    const inner = _data(obj.data)
+    return {
+      currentSeries: inner.current_series as string,
+      availableSeries: _requireArray(inner, 'available_series') as string[],
+    }
+  }
+}
+
+export const seriesInfoParser = new SeriesInfoParser()

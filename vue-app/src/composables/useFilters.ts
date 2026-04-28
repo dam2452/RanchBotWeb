@@ -17,6 +17,10 @@ export function useFilters() {
   const seasons = ref<SeasonInfo>({})
   const episodes = ref<EpisodeInfo[]>([])
 
+  const availableSeries = ref<string[]>([])
+  const currentSeries = ref<string>('')
+  const seriesLoading = ref(false)
+
   const optionsLoading = ref(false)
   const applyLoading = ref(false)
 
@@ -54,18 +58,32 @@ export function useFilters() {
     if (optionsLoading.value) return
     optionsLoading.value = true
     try {
-      const [chars, objs, emts, seass] = await Promise.all([
+      const [chars, objs, emts, seass, seriesInfo] = await Promise.all([
         clipService.getCharacters(),
         clipService.getObjects(),
         clipService.getEmotions(),
-        clipService.getSeasons()
+        clipService.getSeasons(),
+        clipService.getSeries(),
       ])
       characters.value = chars
       objects.value = objs
       emotions.value = emts
       seasons.value = seass
+      availableSeries.value = seriesInfo.availableSeries
+      currentSeries.value = seriesInfo.currentSeries
     } finally {
       optionsLoading.value = false
+    }
+  }
+
+  async function selectSeries(name: string): Promise<void> {
+    if (seriesLoading.value || name === currentSeries.value) return
+    seriesLoading.value = true
+    try {
+      const result = await clipService.setSeries(name)
+      currentSeries.value = result.currentSeries
+    } finally {
+      seriesLoading.value = false
     }
   }
 
@@ -145,11 +163,12 @@ export function useFilters() {
 
   return {
     characters, objects, emotions, seasons, episodes,
+    availableSeries, currentSeries, seriesLoading,
     selectedFilters, appliedFilters,
     hasActiveFilters, activeFilterCount,
     optionsLoading, applyLoading,
     loadFilterOptions, loadEpisodes,
     applyFilters, resetFilters, fetchFilterInfo,
-    toggleFilter, removeAppliedFilter
+    toggleFilter, removeAppliedFilter, selectSeries,
   }
 }

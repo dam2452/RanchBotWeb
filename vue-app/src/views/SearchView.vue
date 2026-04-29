@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import UserButtons from '@/components/layout/UserButtons.vue'
 import LogoSection from '@/components/layout/LogoSection.vue'
@@ -63,6 +63,10 @@ const handleFilterReset = async (): Promise<void> => {
 const handleFilterRemove = async (category: keyof ActiveFilters, value: string): Promise<void> => {
   await removeAppliedFilter(category, value)
 }
+
+onMounted(() => {
+  fetchFilterInfo()
+})
 </script>
 
 <template>

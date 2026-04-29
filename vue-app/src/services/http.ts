@@ -9,9 +9,24 @@ const client: AxiosInstance = axios.create({
 client.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status >= 500 && typeof window !== 'undefined') {
-      window.location.href = '/error'
+    if (typeof window === 'undefined') {
+      return Promise.reject(error)
     }
+
+    const status = error.response?.status
+
+    if (status === 401) {
+      const authPaths = ['/login', '/register', '/forgot-password']
+      if (!authPaths.includes(window.location.pathname)) {
+        window.location.href = '/login'
+      }
+      return Promise.reject(error)
+    }
+
+    if (status >= 500) {
+      window.location.href = '/'
+    }
+
     return Promise.reject(error)
   }
 )

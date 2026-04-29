@@ -1,5 +1,6 @@
 import logging
 import sys
+
 from app.core.config import settings
 
 
@@ -15,8 +16,7 @@ def setup_logger(name: str) -> logging.Logger:
     handler.setLevel(logging.DEBUG if settings.reload else logging.INFO)
 
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S",
     )
     handler.setFormatter(formatter)
 

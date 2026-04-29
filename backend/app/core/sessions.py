@@ -1,14 +1,16 @@
+from datetime import (
+    datetime,
+    timedelta,
+)
 import secrets
-from datetime import datetime, timedelta
-from typing import Dict, Optional
 
 from app.models.user import UserSession
 
 
 class SessionStore:
     def __init__(self):
-        self._sessions: Dict[str, UserSession] = {}
-        self._expiry: Dict[str, datetime] = {}
+        self._sessions: dict[str, UserSession] = {}
+        self._expiry: dict[str, datetime] = {}
 
     def create_session(self, user_session: UserSession, max_age: int = 86400) -> str:
         session_id = secrets.token_urlsafe(32)
@@ -16,7 +18,7 @@ class SessionStore:
         self._expiry[session_id] = datetime.now() + timedelta(seconds=max_age)
         return session_id
 
-    def get_session(self, session_id: str) -> Optional[UserSession]:
+    def get_session(self, session_id: str) -> UserSession | None:
         if session_id not in self._sessions:
             return None
         if datetime.now() > self._expiry.get(session_id, datetime.now()):

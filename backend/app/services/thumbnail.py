@@ -1,12 +1,14 @@
+from collections.abc import (
+    Awaitable,
+    Callable,
+)
 import hashlib
 import io
 import os
 import subprocess
 import tempfile
-from typing import Callable, Awaitable, Optional
 
 from PIL import Image
-
 from app.core.config import settings
 from app.core.logger import setup_logger
 
@@ -26,7 +28,9 @@ class ThumbnailService:
         sanitized = "".join(c if c.isalnum() or c in "-_" else "_" for c in cache_key)
         return os.path.join(self._cache_dir, f"{sanitized}.webp")
 
-    async def get_or_generate(self, _clip_id: str, fetch_video: Callable[[], Awaitable[bytes]]) -> bytes:
+    async def get_or_generate(
+        self, _clip_id: str, fetch_video: Callable[[], Awaitable[bytes]],
+    ) -> bytes:
         video_data = await fetch_video()
         content_key = self._content_hash(video_data)
         cached = self._get_cached_by_key(content_key)
@@ -34,7 +38,7 @@ class ThumbnailService:
             return cached
         return self._extract_and_cache(video_data, content_key)
 
-    def _get_cached_by_key(self, cache_key: str) -> Optional[bytes]:
+    def _get_cached_by_key(self, cache_key: str) -> bytes | None:
         path = self._cache_path(cache_key)
         if not os.path.exists(path):
             return None
@@ -50,12 +54,11 @@ class ThumbnailService:
         if len(data) < 8:
             raise ValueError(f"Video data too small ({len(data)} bytes) — likely not a valid MP4")
         box_type = data[4:8]
-        valid_boxes = {b'ftyp', b'moov', b'mdat', b'wide', b'free', b'skip'}
+        valid_boxes = {b"ftyp", b"moov", b"mdat", b"wide", b"free", b"skip"}
         if box_type not in valid_boxes:
             preview = data[:64]
             raise ValueError(
-                f"Video data does not look like MP4 (box={box_type!r}). "
-                f"First bytes: {preview!r}"
+                f"Video data does not look like MP4 (box={box_type!r}). First bytes: {preview!r}",
             )
 
     def _extract_and_cache(self, video_data: bytes, cache_key: str) -> bytes:
@@ -68,9 +71,21 @@ class ThumbnailService:
 
         try:
             result = subprocess.run(
-                ['ffmpeg', '-i', tmp_video_path, '-vframes', '1', '-ss', '0', '-vf', 'scale=1280:-1', '-y', tmp_frame_path],
+                [
+                    "ffmpeg",
+                    "-i",
+                    tmp_video_path,
+                    "-vframes",
+                    "1",
+                    "-ss",
+                    "0",
+                    "-vf",
+                    "scale=1280:-1",
+                    "-y",
+                    tmp_frame_path,
+                ],
                 capture_output=True,
-                text=True
+                text=True,
             )
 
             if result.returncode != 0:

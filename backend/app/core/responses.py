@@ -1,6 +1,5 @@
 import io
 import re
-from typing import Optional
 from urllib.parse import quote
 
 from fastapi import Response
@@ -9,7 +8,7 @@ from fastapi.responses import StreamingResponse
 _RANGE_PATTERN = re.compile(r"^bytes=(\d*)-(\d*)$")
 
 
-def video_streaming_response(data: bytes, filename: Optional[str] = None) -> StreamingResponse:
+def video_streaming_response(data: bytes, filename: str | None = None) -> StreamingResponse:
     disposition = f"inline; filename*=UTF-8''{quote(filename)}.mp4" if filename else "inline"
     return StreamingResponse(
         io.BytesIO(data),
@@ -17,14 +16,14 @@ def video_streaming_response(data: bytes, filename: Optional[str] = None) -> Str
         headers={
             "Content-Disposition": disposition,
             "Content-Length": str(len(data)),
-            "Accept-Ranges": "bytes"
-        }
+            "Accept-Ranges": "bytes",
+        },
     )
 
 
 def range_video_response(
     data: bytes,
-    range_header: Optional[str],
+    range_header: str | None,
     content_type: str = "video/mp4",
 ) -> Response:
     total = len(data)
@@ -60,7 +59,7 @@ def range_video_response(
         )
 
     return Response(
-        content=data[start:end + 1],
+        content=data[start : end + 1],
         media_type=content_type,
         status_code=206,
         headers={
@@ -72,14 +71,12 @@ def range_video_response(
     )
 
 
-def thumbnail_response(data: bytes, cacheable: bool = True, media_type: str = "image/webp") -> Response:
+def thumbnail_response(
+    data: bytes, cacheable: bool = True, media_type: str = "image/webp",
+) -> Response:
     headers: dict[str, str] = {"Content-Length": str(len(data))}
     if cacheable:
         headers["Cache-Control"] = "public, max-age=86400"
     else:
         headers["Cache-Control"] = "no-store"
-    return Response(
-        content=data,
-        media_type=media_type,
-        headers=headers
-    )
+    return Response(content=data, media_type=media_type, headers=headers)

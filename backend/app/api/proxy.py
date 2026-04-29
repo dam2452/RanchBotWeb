@@ -1,19 +1,26 @@
 import asyncio
 import traceback
-from typing import List, Any
-
-from fastapi import APIRouter, HTTPException, Depends, Request
-from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
+from typing import Any
 
 from app.core.dependencies import get_current_user
 from app.core.logger import setup_logger
-from app.core.responses import thumbnail_response, video_streaming_response, range_video_response
+from app.core.responses import (
+    range_video_response,
+    thumbnail_response,
+    video_streaming_response,
+)
 from app.models.user import UserSession
 from app.services.adjusted_video import adjusted_video_service
 from app.services.ranchbot_api import api_client
 from app.services.thumbnail import thumbnail_service
 from app.services.video_cache import video_cache
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Request,
+)
+from pydantic import BaseModel
 
 logger = setup_logger(__name__)
 router = APIRouter(prefix="/api", tags=["api-proxy"])
@@ -21,7 +28,7 @@ router = APIRouter(prefix="/api", tags=["api-proxy"])
 
 class ApiRequest(BaseModel):
     endpoint: str
-    args: List[Any]
+    args: list[Any]
 
 
 class AdjustPreviewRequest(BaseModel):
@@ -37,19 +44,18 @@ class ClipLoadItem(BaseModel):
 
 
 class BatchLoadRequest(BaseModel):
-    clips: List[ClipLoadItem]
+    clips: list[ClipLoadItem]
 
 
 _CACHE_INVALIDATING_ENDPOINTS = {"szf", "sensklatki"}
 
 
 @router.post("/json")
-async def api_json(
-    request: ApiRequest,
-    user: UserSession = Depends(get_current_user)
-):
+async def api_json(request: ApiRequest, user: UserSession = Depends(get_current_user)):
     try:
-        result = await api_client.call_api(endpoint=request.endpoint, args=request.args, token=user.jwt_token)
+        result = await api_client.call_api(
+            endpoint=request.endpoint, args=request.args, token=user.jwt_token,
+        )
         if request.endpoint in _CACHE_INVALIDATING_ENDPOINTS:
             await video_cache.clear()
             logger.debug("Video cache cleared after search")
@@ -60,13 +66,10 @@ async def api_json(
 
 
 @router.post("/video")
-async def api_video(
-    request: ApiRequest,
-    user: UserSession = Depends(get_current_user)
-):
+async def api_video(request: ApiRequest, user: UserSession = Depends(get_current_user)):
     try:
         video_data = await api_client.call_api_for_blob(
-            endpoint=request.endpoint, args=request.args, token=user.jwt_token
+            endpoint=request.endpoint, args=request.args, token=user.jwt_token,
         )
         return video_streaming_response(video_data)
     except Exception as e:
@@ -87,7 +90,9 @@ async def api_video_stream(
         video_data = await video_cache.get_or_fetch(
             position_id,
             lambda: api_client.call_api_for_blob(
-                endpoint="w", args=[position_id], token=user.jwt_token,
+                endpoint="w",
+                args=[position_id],
+                token=user.jwt_token,
             ),
         )
         return range_video_response(video_data, request.headers.get("range"))
@@ -101,13 +106,10 @@ _JPEG_MAGIC = b"\xff\xd8\xff"
 
 
 @router.post("/thumbnail")
-async def api_thumbnail(
-    request: ApiRequest,
-    user: UserSession = Depends(get_current_user)
-):
+async def api_thumbnail(request: ApiRequest, user: UserSession = Depends(get_current_user)):
     try:
         data = await api_client.call_api_for_blob(
-            endpoint=request.endpoint, args=request.args, token=user.jwt_token
+            endpoint=request.endpoint, args=request.args, token=user.jwt_token,
         )
         if request.endpoint in _IMAGE_ENDPOINTS or data[:3] == _JPEG_MAGIC:
             return thumbnail_response(data, cacheable=False, media_type="image/jpeg")
@@ -128,12 +130,11 @@ async def _resolve_bytes(data: bytes) -> bytes:
 
 @router.post("/adjust-preview")
 async def api_adjust_preview(
-    request: AdjustPreviewRequest,
-    user: UserSession = Depends(get_current_user)
+    request: AdjustPreviewRequest, user: UserSession = Depends(get_current_user),
 ):
     try:
         cached = adjusted_video_service.get_cached(
-            request.clip_index, request.left_adjust, request.right_adjust
+            request.clip_index, request.left_adjust, request.right_adjust,
         )
         if cached:
             logger.debug(f"Returning cached adjusted video for clip {request.clip_index}")
@@ -142,11 +143,11 @@ async def api_adjust_preview(
         video_data = await api_client.call_api_for_blob(
             endpoint=request.endpoint,
             args=[request.clip_index, request.left_adjust, request.right_adjust],
-            token=user.jwt_token
+            token=user.jwt_token,
         )
 
         adjusted_video_service.save_to_cache(
-            request.clip_index, request.left_adjust, request.right_adjust, video_data
+            request.clip_index, request.left_adjust, request.right_adjust, video_data,
         )
         return video_streaming_response(video_data)
 
@@ -159,10 +160,7 @@ async def api_adjust_preview(
 
 
 @router.post("/batch-load")
-async def api_batch_load(
-    request: BatchLoadRequest,
-    user: UserSession = Depends(get_current_user)
-):
+async def api_batch_load(request: BatchLoadRequest, user: UserSession = Depends(get_current_user)):
     try:
         logger.info(f"Batch loading {len(request.clips)} clips...")
 
@@ -170,13 +168,15 @@ async def api_batch_load(
             clip_position_id = str(clip.index + 1)
             logger.debug(f"Loading clip {clip.index}...")
             video_data = await api_client.call_api_for_blob(
-                endpoint='/w', args=[clip_position_id], token=user.jwt_token
+                endpoint="/w", args=[clip_position_id], token=user.jwt_token,
             )
             thumbnail_service.extract_thumbnail(video_data, str(clip.id))
             logger.debug(f"Clip {clip.index} loaded ({len(video_data)} bytes)")
             return {"clip_id": clip.id, "clip_index": clip.index, "status": "loaded"}
 
-        results = await asyncio.gather(*[load_clip(clip) for clip in request.clips], return_exceptions=True)
+        results = await asyncio.gather(
+            *[load_clip(clip) for clip in request.clips], return_exceptions=True,
+        )
 
         successful = [r for r in results if not isinstance(r, Exception)]
         failed = [r for r in results if isinstance(r, Exception)]
@@ -186,7 +186,7 @@ async def api_batch_load(
             "total": len(request.clips),
             "successful": len(successful),
             "failed": len(failed),
-            "results": successful
+            "results": successful,
         }
 
     except Exception as e:

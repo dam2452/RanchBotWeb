@@ -1,54 +1,58 @@
+fail_fast: false
+exclude: '^(bot/RANCZO-WIDEO/|bot/RANCZO-TRANSKRYPCJE/)'
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
-    hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
-      - id: check-json
-      - id: check-merge-conflict
-      - id: check-added-large-files
-        args: ["--maxkb=1000"]
-      - id: mixed-line-ending
-        args: ["--fix=lf"]
-
-  # Python — backend
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.7
-    hooks:
-      - id: ruff
-        files: ^backend/
-        args: ["--fix"]
-      - id: ruff-format
-        files: ^backend/
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.15.0
-    hooks:
-      - id: mypy
-        files: ^backend/
-        args:
-          - "--ignore-missing-imports"
-          - "--strict"
-        additional_dependencies:
-          - "pydantic>=2.0"
-          - "fastapi>=0.115.0"
-
-  # Vue / TypeScript — frontend
   - repo: local
     hooks:
-      - id: eslint-vue
-        name: ESLint (vue-app)
-        language: node
-        entry: bash -c 'cd vue-app && npx eslint --max-warnings=0 "$@"' --
-        files: ^vue-app/src/.*\.(ts|vue)$
-        types_or: [ts, vue]
-        pass_filenames: true
-
-      - id: tsc-vue
-        name: TypeScript check (vue-app)
-        language: node
-        entry: bash -c 'cd vue-app && npx vue-tsc --noEmit'
-        files: ^vue-app/src/.*\.(ts|vue)$
-        types_or: [ts, vue]
+      - id: check-version-bump
+        name: Check VERSION bump
+        entry: .pre-commit-hooks/check-version-bump.py
+        language: script
         pass_filenames: false
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: pretty-format-json
+        args: [--autofix]
+      - id: check-yaml
+      - id: check-json
+      - id: check-ast
+      - id: trailing-whitespace
+      - id: check-xml
+      - id: check-added-large-files
+        args: ["--maxkb=2000"]
+      - id: check-symlinks
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: requirements-txt-fixer
+      - id: end-of-file-fixer
+      - id: detect-private-key
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.10
+    hooks:
+      - id: actionlint
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.0
+    hooks:
+      - id: gitleaks
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.6
+    hooks:
+      - id: chmod
+        args: ["755"]
+        files: (.*scripts\/.*.py$|\.sh$)
+      - id: remove-tabs
+        args: [--whitespaces-count, '4']
+  - repo: https://github.com/PyCQA/isort
+    rev: 7.0.0
+    hooks:
+      - id: isort
+        args: ["--trailing-comma", "--multi-line=3", "--force-grid-wrap=2", "--combine-as", "--use-parentheses",  "--force-sort-within-sections", "--line-length=140"]
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: v4.0.0
+    hooks:
+      - id: add-trailing-comma
+  - repo: https://github.com/PyCQA/pylint
+    rev: v4.0.4
+    hooks:
+      - id: pylint
+        args: ["--rcfile=./pylintrc"]

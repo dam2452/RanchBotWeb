@@ -1,12 +1,17 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from app.core.config import settings
-from app.core.logger import setup_logger
-from app.api import auth, proxy, clips
 import asyncio
+from contextlib import asynccontextmanager
 import os
 import time
-from contextlib import asynccontextmanager
+
+from app.api import (
+    auth,
+    clips,
+    proxy,
+)
+from app.core.config import settings
+from app.core.logger import setup_logger
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 logger = setup_logger(__name__)
 
@@ -54,7 +59,7 @@ app = FastAPI(
     lifespan=lifespan,
     docs_url="/docs" if settings.enable_api_docs else None,
     redoc_url="/redoc" if settings.enable_api_docs else None,
-    openapi_url="/openapi.json" if settings.enable_api_docs else None
+    openapi_url="/openapi.json" if settings.enable_api_docs else None,
 )
 
 # CORS middleware
@@ -74,11 +79,7 @@ app.include_router(clips.router)
 
 @app.get("/")
 async def root():
-    return {
-        "message": "RanchBot API",
-        "version": "2.0.0",
-        "status": "running"
-    }
+    return {"message": "RanchBot API", "version": "2.0.0", "status": "running"}
 
 
 @app.get("/health")
@@ -88,9 +89,5 @@ async def health():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(
-        "app.main:app",
-        host=settings.host,
-        port=settings.port,
-        reload=settings.reload
-    )
+
+    uvicorn.run("app.main:app", host=settings.host, port=settings.port, reload=settings.reload)

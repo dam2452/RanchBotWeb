@@ -1,7 +1,10 @@
 import asyncio
-import time
 from collections import OrderedDict
-from typing import Awaitable, Callable, Dict, List, Optional, Tuple
+from collections.abc import (
+    Awaitable,
+    Callable,
+)
+import time
 
 from app.core.config import settings
 from app.core.logger import setup_logger
@@ -13,11 +16,11 @@ class VideoStreamCache:
     def __init__(self, max_entries: int, ttl_seconds: int) -> None:
         self._max_entries = max_entries
         self._ttl_seconds = ttl_seconds
-        self._cache: OrderedDict[str, Dict[str, object]] = OrderedDict()
+        self._cache: OrderedDict[str, dict[str, object]] = OrderedDict()
         self._lock = asyncio.Lock()
-        self._pending: Dict[str, asyncio.Event] = {}
+        self._pending: dict[str, asyncio.Event] = {}
 
-    async def get(self, position_id: str) -> Optional[bytes]:
+    async def get(self, position_id: str) -> bytes | None:
         async with self._lock:
             entry = self._cache.get(position_id)
             if entry is None:
@@ -81,11 +84,12 @@ class VideoStreamCache:
             self._cache.clear()
             logger.info("Video stream cache cleared")
 
-    async def stats(self) -> Tuple[int, int, List[str]]:
+    async def stats(self) -> tuple[int, int, list[str]]:
         async with self._lock:
             now = time.monotonic()
             active = sum(
-                1 for entry in self._cache.values()
+                1
+                for entry in self._cache.values()
                 if now - entry["fetched_at"] <= self._ttl_seconds
             )
             return active, len(self._cache), list(self._cache.keys())

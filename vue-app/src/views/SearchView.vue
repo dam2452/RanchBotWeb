@@ -70,7 +70,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <UserButtons v-if="!isWatchView" fixed compact />
+  <UserButtons v-if="!isWatchView" fixed />
   <AppFooter v-if="!isWatchView" />
 
   <main class="search-page">

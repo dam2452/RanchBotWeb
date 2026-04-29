@@ -8,12 +8,15 @@
         <button
           id="user-welcome-link"
           :title="showTooltip ? 'Click to check your subscription' : ''"
-          :class="compact ? 'compact-user-btn' : 'border-none rounded-[15px] transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-hover active:shadow-active p-[1vh_2.5vw] text-[clamp(14px,1.4vw,16px)] font-bold max-[850px]:!p-[10px_20px] max-[850px]:!text-sm max-[400px]:!p-[5px_15px]'"
+          :class="compact ? 'compact-user-btn' : 'user-btn'"
           :style="compact ? '' : 'background: linear-gradient(145deg, #f2a94c, #e09340); color: #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);'"
           @click="handleTooltipClick"
         >
           <img v-if="compact" src="/images/ui/icons/wine-bottle.svg" alt="" class="compact-icon" />
-          <span v-else>Hi, {{ authStore.user?.username }}</span>
+          <template v-else>
+            <span class="user-btn-full">Hi, {{ authStore.user?.username }}</span>
+            <img src="/images/ui/icons/user.svg" alt="" class="user-btn-icon" />
+          </template>
         </button>
         <SubscriptionTooltip
           ref="tooltipRef"
@@ -25,25 +28,27 @@
         v-if="showMyClips"
         @click="$router.push('/my-clips')"
         style="background: linear-gradient(145deg, #aaaaaa, #999999); color: #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);"
-        class="border-none rounded-[15px] transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-hover active:shadow-active p-[1vh_2.5vw] text-[clamp(14px,1.4vw,16px)] font-bold max-[850px]:!p-[10px_20px] max-[850px]:!text-sm max-[400px]:!p-[5px_15px]"
+        class="btn-default clips-btn"
       >
-        My Clips
+        <span class="clips-btn-full">My Clips</span>
+        <img src="/images/ui/icons/clips.svg" alt="" class="clips-btn-icon" />
       </button>
       <button
         v-if="authStore.user && authStore.user.id < 0"
         @click="handleLinkTelegram"
         :disabled="linkTelegramLoading"
         style="background: linear-gradient(145deg, #5b9bd5, #4a87c1); color: #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);"
-        class="border-none rounded-[15px] transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-hover active:shadow-active p-[1vh_2.5vw] text-[clamp(14px,1.4vw,16px)] font-bold max-[850px]:!p-[10px_20px] max-[850px]:!text-sm max-[400px]:!p-[5px_15px]"
+        class="btn-default"
       >
         {{ linkTelegramLoading ? '...' : 'Link Telegram' }}
       </button>
       <button
         @click="handleLogout"
         style="background: linear-gradient(145deg, #aaaaaa, #999999); color: #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);"
-        class="border-none rounded-[15px] transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-hover active:shadow-active p-[1vh_2.5vw] text-[clamp(14px,1.4vw,16px)] font-bold max-[850px]:!p-[10px_20px] max-[850px]:!text-sm max-[400px]:!p-[5px_15px]"
+        class="btn-default logout-btn"
       >
-        Logout
+        <span class="logout-btn-full">Logout</span>
+        <img src="/images/ui/icons/logout.svg" alt="" class="logout-btn-icon" />
       </button>
 
       <div v-if="linkingCode" class="linking-overlay" @click.self="linkingCode = ''">
@@ -59,14 +64,14 @@
       <button
         @click="$router.push('/login')"
         style="background: linear-gradient(145deg, #aaaaaa, #999999); color: #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);"
-        class="border-none rounded-[15px] transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-hover active:shadow-active p-[1vh_2.5vw] text-[clamp(14px,1.4vw,16px)] font-bold max-[850px]:!p-[10px_20px] max-[850px]:!text-sm max-[400px]:!p-[5px_15px]"
+        class="btn-default"
       >
         Login
       </button>
       <button
         @click="$router.push('/register')"
         style="background: linear-gradient(145deg, #aaaaaa, #999999); color: #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);"
-        class="border-none rounded-[15px] transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-hover active:shadow-active p-[1vh_2.5vw] text-[clamp(14px,1.4vw,16px)] font-bold max-[850px]:!p-[10px_20px] max-[850px]:!text-sm max-[400px]:!p-[5px_15px]"
+        class="btn-default"
       >
         Register
       </button>
@@ -158,6 +163,141 @@ onUnmounted(() => {
   @include tablet-down {
     top: calc(15px + env(safe-area-inset-top)) !important;
     right: calc(15px + env(safe-area-inset-right)) !important;
+  }
+}
+
+.btn-default {
+  border: none;
+  border-radius: 15px;
+  transition: all 0.2s;
+  padding: 1vh 2.5vw;
+  font-size: clamp(14px, 1.4vw, 16px);
+  font-weight: bold;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  @include tablet-down {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+.user-btn {
+  border: none;
+  border-radius: 15px;
+  transition: all 0.2s;
+  padding: 1vh 2.5vw;
+  font-size: clamp(14px, 1.4vw, 16px);
+  font-weight: bold;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  @include tablet-down {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  @include small-mobile {
+    padding: 5px 15px;
+  }
+}
+
+.user-btn-icon {
+  display: none;
+}
+
+.user-btn-full {
+  display: inline;
+}
+
+.logout-btn-icon,
+.clips-btn-icon {
+  display: none;
+}
+
+.logout-btn-full,
+.clips-btn-full {
+  display: inline;
+}
+
+@include tablet-down {
+  .user-btn {
+    aspect-ratio: 1;
+    padding: 0 !important;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .user-btn-icon {
+    display: block;
+    width: 55%;
+    height: 55%;
+    filter: brightness(0) invert(1);
+  }
+
+  .user-btn-full {
+    display: none;
+  }
+
+  .logout-btn {
+    aspect-ratio: 1;
+    padding: 0 !important;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logout-btn-icon {
+    display: block;
+    width: 50%;
+    height: 50%;
+    filter: brightness(0) invert(1);
+  }
+
+  .logout-btn-full {
+    display: none;
+  }
+
+  .clips-btn {
+    aspect-ratio: 1;
+    padding: 0 !important;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .clips-btn-icon {
+    display: block;
+    width: 50%;
+    height: 50%;
+    filter: brightness(0) invert(1);
+  }
+
+  .clips-btn-full {
+    display: none;
   }
 }
 

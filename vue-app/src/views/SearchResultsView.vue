@@ -150,7 +150,7 @@ watch(() => route.query.mode, async () => {
     </svg>
   </button>
 
-  <UserButtons v-if="!isWatchView" fixed compact />
+  <UserButtons v-if="!isWatchView" fixed />
   <LogoHeader v-if="isDesktop" />
   <AppFooter v-if="!isWatchView" />
 

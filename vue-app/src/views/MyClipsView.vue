@@ -186,6 +186,14 @@ watch(activePage, pauseAllVideos)
   font-size: clamp(1.2rem, 2.5vw, 1.8rem);
   font-weight: bold;
   max-width: 600px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+
+  @include tablet-down {
+    font-size: clamp(0.9rem, 4vw, 1.2rem);
+    max-width: 85vw;
+  }
 }
 
 .error-text {

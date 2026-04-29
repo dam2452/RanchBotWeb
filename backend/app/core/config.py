@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     thumbnail_cache_max_size_mb: int = 500
     video_cache_max_age_hours: int = 1
 
+    # Video stream cache (in-memory LRU for Range request support)
+    video_stream_cache_max_entries: int = 50
+    video_stream_cache_ttl_seconds: int = 300
+
     class Config:
         env_file = ".env"
         case_sensitive = False

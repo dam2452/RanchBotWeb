@@ -33,6 +33,10 @@ class ClipService {
     return response.data
   }
 
+  getVideoStreamUrl(positionId: string, searchId: number): string {
+    return `/api/video/stream/${encodeURIComponent(positionId)}?s=${searchId}`
+  }
+
   async adjustVideo(clipIndex: string, leftAdjust: number, rightAdjust: number): Promise<Blob> {
     const response = await client.post(
       '/api/video',

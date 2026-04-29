@@ -2,17 +2,18 @@ import asyncio
 import traceback
 from typing import List, Any
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from app.core.dependencies import get_current_user
 from app.core.logger import setup_logger
-from app.core.responses import thumbnail_response, video_streaming_response
+from app.core.responses import thumbnail_response, video_streaming_response, range_video_response
 from app.models.user import UserSession
 from app.services.adjusted_video import adjusted_video_service
 from app.services.ranchbot_api import api_client
 from app.services.thumbnail import thumbnail_service
+from app.services.video_cache import video_cache
 
 logger = setup_logger(__name__)
 router = APIRouter(prefix="/api", tags=["api-proxy"])
@@ -39,13 +40,20 @@ class BatchLoadRequest(BaseModel):
     clips: List[ClipLoadItem]
 
 
+_CACHE_INVALIDATING_ENDPOINTS = {"szf", "sensklatki"}
+
+
 @router.post("/json")
 async def api_json(
     request: ApiRequest,
     user: UserSession = Depends(get_current_user)
 ):
     try:
-        return await api_client.call_api(endpoint=request.endpoint, args=request.args, token=user.jwt_token)
+        result = await api_client.call_api(endpoint=request.endpoint, args=request.args, token=user.jwt_token)
+        if request.endpoint in _CACHE_INVALIDATING_ENDPOINTS:
+            await video_cache.clear()
+            logger.debug("Video cache cleared after search")
+        return result
     except Exception as e:
         logger.error(f"API JSON error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -63,6 +71,28 @@ async def api_video(
         return video_streaming_response(video_data)
     except Exception as e:
         logger.error(f"API Video error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/video/stream/{position_id}")
+async def api_video_stream(
+    position_id: str,
+    request: Request,
+    user: UserSession = Depends(get_current_user),
+):
+    if not position_id.isdigit() or int(position_id) < 1:
+        raise HTTPException(status_code=400, detail="position_id must be a positive integer")
+
+    try:
+        video_data = await video_cache.get_or_fetch(
+            position_id,
+            lambda: api_client.call_api_for_blob(
+                endpoint="w", args=[position_id], token=user.jwt_token,
+            ),
+        )
+        return range_video_response(video_data, request.headers.get("range"))
+    except Exception as e:
+        logger.error(f"API Video Stream error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

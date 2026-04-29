@@ -80,6 +80,11 @@ const handlePause = () => {
   emit('paused')
 }
 
+const handleVideoError = () => {
+  isVideoLoading.value = false
+  isVideoPlaying.value = false
+}
+
 watch(() => props.videoUrl, (newUrl) => {
   if (newUrl && shouldLoadVideo.value) isVideoLoading.value = true
 })
@@ -138,7 +143,7 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
       playsinline
       webkit-playsinline
       :muted="IS_MOBILE"
-      preload="auto"
+      preload="metadata"
       :src="previewUrl || videoUrl"
       class="clip-video"
       :class="{ 'editing-video': isEditing, 'active-video': isActive && !isEditing }"
@@ -147,6 +152,7 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
       @canplay="handleCanPlay"
       @playing="handlePlaying"
       @pause="handlePause"
+      @error="handleVideoError"
     ></video>
 
     <div v-if="isVideoLoading && shouldLoadVideo && !videoUrl" class="video-loading-overlay">

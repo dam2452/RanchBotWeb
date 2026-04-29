@@ -1,5 +1,5 @@
 import { clipService } from '@/services/clipService'
-import { createClipFilename, downloadBlob, downloadFile } from '@/utils/formatters'
+import { createClipFilename, downloadBlob } from '@/utils/formatters'
 
 interface UseClipActionsOptions {
   clipIndex: number
@@ -12,10 +12,6 @@ export function useClipActions(options: UseClipActionsOptions) {
 
   const download = async (): Promise<void> => {
     const filename = createClipFilename(options.clipIndex, 0, 0, options.searchQuery)
-    if (options.videoUrl) {
-      downloadFile(options.videoUrl, filename)
-      return
-    }
     const blob = await clipService.getVideo(_clipId())
     downloadBlob(blob, filename)
   }

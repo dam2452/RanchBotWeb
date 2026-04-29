@@ -23,7 +23,7 @@ export function useClipLoader(options: UseClipLoaderOptions) {
 
   const revokeAll = () => {
     Object.values(clips.value).forEach(state => {
-      if (state.videoUrl) URL.revokeObjectURL(state.videoUrl)
+      if (state.videoUrl?.startsWith('blob:')) URL.revokeObjectURL(state.videoUrl)
       if (state.thumbnailUrl) URL.revokeObjectURL(state.thumbnailUrl)
     })
   }
@@ -44,21 +44,16 @@ export function useClipLoader(options: UseClipLoaderOptions) {
 
     try {
       const thumbnailPromise = clipService.getThumbnail(clipPositionId)
-      const videoPromise = clipService.getVideo(clipPositionId)
+
+      clips.value[i] = {
+        ...clips.value[i],
+        videoUrl: clipService.getVideoStreamUrl(clipPositionId, currentSearchId),
+      }
 
       const thumbnailBlob = await thumbnailPromise
       if (searchId.value !== currentSearchId) return
 
       clips.value[i] = { ...clips.value[i], thumbnailUrl: URL.createObjectURL(thumbnailBlob) }
-
-      const videoBlob = await videoPromise
-      if (searchId.value !== currentSearchId) {
-        const thumb = clips.value[i]?.thumbnailUrl
-        if (thumb) URL.revokeObjectURL(thumb)
-        return
-      }
-
-      clips.value[i] = { ...clips.value[i], videoUrl: URL.createObjectURL(videoBlob) }
     } catch (err) {
       console.error(`Failed to load clip ${i}:`, err)
       clips.value[i] = { ...clips.value[i], hasError: true }
@@ -85,16 +80,14 @@ export function useClipLoader(options: UseClipLoaderOptions) {
     lastLoadTime = Date.now()
   }
 
-  const loadVideoForClip = async (index: number) => {
+  const loadVideoForClip = (index: number): void => {
     if (clips.value[index]?.videoUrl) return
 
     const clipPositionId = (index + 1).toString()
-    try {
-      const blob = await clipService.getVideo(clipPositionId)
-      clips.value[index] = { ...clips.value[index], videoUrl: URL.createObjectURL(blob), hasError: false }
-    } catch (err) {
-      console.error(`Failed to load video for clip ${index}:`, err)
-      clips.value[index] = { ...clips.value[index], hasError: true }
+    clips.value[index] = {
+      ...clips.value[index],
+      videoUrl: clipService.getVideoStreamUrl(clipPositionId, searchId.value),
+      hasError: false,
     }
   }
 

@@ -54,8 +54,13 @@ class ClipService {
     return []
   }
 
-  async saveClip(clipName: string): Promise<void> {
-    await client.post('/api/json', { endpoint: 'z', args: [clipName] })
+  async saveClipByIndex(index: number, clipName: string, leftAdj?: number, rightAdj?: number): Promise<void> {
+    const args = [index.toString()]
+    if (leftAdj !== undefined && rightAdj !== undefined) {
+      args.push(leftAdj.toString(), rightAdj.toString())
+    }
+    args.push(clipName)
+    await client.post('/api/json', { endpoint: 'zn', args })
   }
 
   async deleteClip(clipName: string): Promise<void> {

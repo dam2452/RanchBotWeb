@@ -6,7 +6,7 @@ from app.core.config import settings
 
 class RanchBotAPIClient:
     ALLOWED_ENDPOINTS = {
-        'sz', 'szf', 'sensklatki', 'kf', 'w', 'ad', 'z', 'uk', 'mk', 'wys', 'serial',
+        'sz', 'szf', 'sensklatki', 'kf', 'w', 'ad', 'z', 'zn', 'uk', 'mk', 'wys', 'serial',
         'f', 'p', 'obj', 'e', 'odcinki',
         'klatka', 'frame', 'kl',
         '/auth/login', '/auth/logout-all', '/auth/register',
@@ -185,6 +185,15 @@ class RanchBotAPIClient:
 
     async def save_clip(self, clip_name: str, token: str) -> Dict[str, Any]:
         return await self.call_api("z", [clip_name], token)
+
+    async def save_clip_by_index(
+        self, index: int, clip_name: str, token: str, left_adj: float = 0, right_adj: float = 0,
+    ) -> Dict[str, Any]:
+        args = [str(index)]
+        if left_adj != 0 or right_adj != 0:
+            args.extend([str(left_adj), str(right_adj)])
+        args.append(clip_name)
+        return await self.call_api("zn", args, token)
 
     async def delete_clip(self, clip_name: str, token: str) -> Dict[str, Any]:
         return await self.call_api("uk", [clip_name], token)

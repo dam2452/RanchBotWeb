@@ -26,14 +26,12 @@ export function useClipActions(options: UseClipActionsOptions) {
 
   const save = async (clipName: string): Promise<void> => {
     if (!clipName?.trim()) throw new Error('Clip name is required')
-    await clipService.adjustVideo(_clipId(), 0, 0)
-    await clipService.saveClip(clipName.trim())
+    await clipService.saveClipByIndex(options.clipIndex + 1, clipName.trim())
   }
 
   const saveAdjusted = async (clipName: string, leftAdjust: number, rightAdjust: number): Promise<void> => {
     if (!clipName?.trim()) throw new Error('Clip name is required')
-    await clipService.adjustVideo(_clipId(), leftAdjust, rightAdjust)
-    await clipService.saveClip(clipName.trim())
+    await clipService.saveClipByIndex(options.clipIndex + 1, clipName.trim(), leftAdjust, rightAdjust)
   }
 
   return { download, downloadAdjusted, save, saveAdjusted }

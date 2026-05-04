@@ -9,7 +9,7 @@ from app.core.responses import (
 )
 from app.models.clip import ClipOperationRequest
 from app.models.user import UserSession
-from app.services.ranchbot_api import api_client
+from app.services.ranchbot_api import api_client, Endpoints
 from app.services.thumbnail import thumbnail_service
 from fastapi import (
     APIRouter,
@@ -37,7 +37,7 @@ async def get_clip_video(clip_id: str, user: UserSession = Depends(get_current_u
     try:
         logger.info(f"Fetching clip video: {decoded_clip_name}")
         video_data = await api_client.call_api_for_blob(
-            endpoint="wys", args=[decoded_clip_name], token=user.jwt_token,
+            endpoint=Endpoints.CLIP_SEND, args=[decoded_clip_name], token=user.jwt_token,
         )
         return video_streaming_response(video_data, filename=decoded_clip_name)
     except Exception as e:
@@ -54,7 +54,7 @@ async def get_clip_thumbnail(clip_id: str, user: UserSession = Depends(get_curre
         thumbnail_data = await thumbnail_service.get_or_generate(
             decoded_clip_name,
             lambda: api_client.call_api_for_blob(
-                endpoint="wys", args=[decoded_clip_name], token=user.jwt_token,
+                endpoint=Endpoints.CLIP_SEND, args=[decoded_clip_name], token=user.jwt_token,
             ),
         )
         return thumbnail_response(thumbnail_data)

@@ -21,6 +21,10 @@ const { windowWidth } = useWindowWidth()
 const isWatchView = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
 const isDesktop = computed(() => windowWidth.value > DESKTOP_BREAKPOINT)
 
+const _searchbarWidth = computed(() => Math.min(Math.max(280, windowWidth.value * 0.6), 720))
+const _searchbarLeftEdge = computed(() => (windowWidth.value - _searchbarWidth.value) / 2)
+const logoTextOverlapsSearchbar = computed(() => _searchbarLeftEdge.value < 420)
+
 const query = ref('')
 const results = ref<SearchResult[]>([])
 const loading = ref(false)
@@ -151,7 +155,7 @@ watch(() => route.query.mode, async () => {
   </button>
 
   <UserButtons v-if="!isWatchView" fixed />
-  <LogoHeader v-if="isDesktop" />
+  <LogoHeader v-if="isDesktop" :hide-text="logoTextOverlapsSearchbar" />
   <AppFooter v-if="!isWatchView" />
 
   <main class="results-main">

@@ -23,10 +23,6 @@ client.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    if (status >= 500) {
-      window.location.href = '/'
-    }
-
     return Promise.reject(error)
   }
 )

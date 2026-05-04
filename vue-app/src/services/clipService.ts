@@ -60,7 +60,11 @@ class ClipService {
       args.push(leftAdj.toString(), rightAdj.toString())
     }
     args.push(clipName)
-    await client.post('/api/json', { endpoint: 'zn', args })
+    const response = await client.post('/api/json', { endpoint: 'zn', args })
+    const content: string = response.data?.content ?? response.data?.data?.content ?? ''
+    if (content.includes('BŁĄD') || content.includes('ERROR') || content.includes('❌')) {
+      throw new Error(content.replace(/```/g, '').replace(/\xa0/g, ' ').trim())
+    }
   }
 
   async deleteClip(clipName: string): Promise<void> {

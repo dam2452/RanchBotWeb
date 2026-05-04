@@ -24,14 +24,16 @@ export function useClipActions(options: UseClipActionsOptions) {
     downloadBlob(blob, filename)
   }
 
+  const _sanitizeClipName = (name: string): string => name.trim().replace(/\s+/g, '_')
+
   const save = async (clipName: string): Promise<void> => {
     if (!clipName?.trim()) throw new Error('Clip name is required')
-    await clipService.saveClipByIndex(options.clipIndex + 1, clipName.trim())
+    await clipService.saveClipByIndex(options.clipIndex + 1, _sanitizeClipName(clipName))
   }
 
   const saveAdjusted = async (clipName: string, leftAdjust: number, rightAdjust: number): Promise<void> => {
     if (!clipName?.trim()) throw new Error('Clip name is required')
-    await clipService.saveClipByIndex(options.clipIndex + 1, clipName.trim(), leftAdjust, rightAdjust)
+    await clipService.saveClipByIndex(options.clipIndex + 1, _sanitizeClipName(clipName), leftAdjust, rightAdjust)
   }
 
   return { download, downloadAdjusted, save, saveAdjusted }

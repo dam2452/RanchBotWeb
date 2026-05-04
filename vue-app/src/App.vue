@@ -1,19 +1,13 @@
 <script setup lang="ts">
 import { RouterView, useRoute } from 'vue-router'
-import { computed, onMounted } from 'vue'
-import { useAuthStore } from './stores/auth'
+import { computed } from 'vue'
 import AppHeader from './components/layout/AppHeader.vue'
 
 const route = useRoute()
-const authStore = useAuthStore()
 
 const showHeader = computed(() => {
   const noHeaderRoutes = ['home', 'login', 'register', 'forgot-password', 'search', 'search-results', 'my-clips', 'error', 'not-found']
   return !noHeaderRoutes.includes(route.name as string)
-})
-
-onMounted(async () => {
-  await authStore.checkAuth()
 })
 </script>
 

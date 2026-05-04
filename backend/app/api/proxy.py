@@ -11,7 +11,7 @@ from app.core.responses import (
 )
 from app.models.user import UserSession
 from app.services.adjusted_video import adjusted_video_service
-from app.services.ranchbot_api import api_client
+from app.services.ranchbot_api import api_client, Endpoints
 from app.services.thumbnail import thumbnail_service
 from app.services.video_cache import video_cache
 from fastapi import (
@@ -47,7 +47,7 @@ class BatchLoadRequest(BaseModel):
     clips: list[ClipLoadItem]
 
 
-_CACHE_INVALIDATING_ENDPOINTS = {"szf", "sensklatki"}
+_CACHE_INVALIDATING_ENDPOINTS = {Endpoints.SEARCH_PHRASE, Endpoints.SEARCH_SEMANTIC_FRAMES}
 
 
 @router.post("/json")
@@ -59,6 +59,8 @@ async def api_json(request: ApiRequest, user: UserSession = Depends(get_current_
         if request.endpoint in _CACHE_INVALIDATING_ENDPOINTS:
             await video_cache.clear()
             logger.debug("Video cache cleared after search")
+        if request.endpoint == Endpoints.CLIP_SAVE_BY_INDEX:
+            logger.info(f"[zn] args={request.args} → {result}")
         return result
     except Exception as e:
         logger.error(f"API JSON error: {e}")
@@ -90,7 +92,7 @@ async def api_video_stream(
         video_data = await video_cache.get_or_fetch(
             position_id,
             lambda: api_client.call_api_for_blob(
-                endpoint="w",
+                endpoint=Endpoints.VIDEO_BY_INDEX,
                 args=[position_id],
                 token=user.jwt_token,
             ),
@@ -101,7 +103,7 @@ async def api_video_stream(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-_IMAGE_ENDPOINTS = {"klatka", "frame", "kl"}
+_IMAGE_ENDPOINTS = {Endpoints.FRAME, Endpoints.FRAME_ALT, Endpoints.FRAME_SHORT}
 _JPEG_MAGIC = b"\xff\xd8\xff"
 
 
@@ -168,7 +170,7 @@ async def api_batch_load(request: BatchLoadRequest, user: UserSession = Depends(
             clip_position_id = str(clip.index + 1)
             logger.debug(f"Loading clip {clip.index}...")
             video_data = await api_client.call_api_for_blob(
-                endpoint="/w", args=[clip_position_id], token=user.jwt_token,
+                endpoint=Endpoints.VIDEO_BY_INDEX, args=[clip_position_id], token=user.jwt_token,
             )
             thumbnail_service.extract_thumbnail(video_data, str(clip.id))
             logger.debug(f"Clip {clip.index} loaded ({len(video_data)} bytes)")

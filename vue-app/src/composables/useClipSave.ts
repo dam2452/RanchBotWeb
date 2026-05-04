@@ -56,13 +56,15 @@ export function useClipSave(options: UseClipSaveOptions) {
   const handleModalSave = async (clipName: string): Promise<void> => {
     showSaveModal.value = false
     try {
+      statusMessage.value = 'Saving clip...'
       if (isAdjustedSave.value) {
-        statusMessage.value = 'Saving clip...'
         await saveAdjusted(clipName, leftAdjust.value, rightAdjust.value)
         statusMessage.value = 'Clip saved successfully!'
         setTimeout(() => { resetAdjustments(); onCloseEditor() }, 1500)
       } else {
         await save(clipName)
+        statusMessage.value = 'Clip saved successfully!'
+        setTimeout(() => { statusMessage.value = '' }, 2000)
       }
     } catch (err: unknown) {
       statusMessage.value = 'Save failed: ' + (err instanceof Error ? err.message : String(err))

@@ -8,8 +8,8 @@ import LoginForm from '@/components/auth/LoginForm.vue'
 import ActionButtons from '@/components/common/ActionButtons.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 
-const router = useRouter()
 const authStore = useAuthStore()
+const router = useRouter()
 const { windowWidth } = useWindowWidth()
 
 const isWatchView = computed(() => windowWidth.value <= 196)
@@ -21,7 +21,7 @@ const handleSubmit = async (credentials: { login: string; password: string }) =>
   const success = await authStore.login(credentials)
 
   if (success) {
-    router.push('/search')
+    await router.push('/search')
   } else {
     errorMessage.value = authStore.error || 'Login failed'
   }

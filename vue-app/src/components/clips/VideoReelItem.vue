@@ -148,6 +148,12 @@ const handleClick = (event: MouseEvent) => {
         </ClipActionButton>
       </div>
 
+      <Transition name="status-fade">
+        <div v-if="!isEditing && statusMessage" class="status-toast" role="status" aria-live="polite">
+          {{ statusMessage }}
+        </div>
+      </Transition>
+
       <Transition name="panel-slide">
         <ClipEditor
           v-if="isEditing"
@@ -362,4 +368,26 @@ const handleClick = (event: MouseEvent) => {
 
 .panel-slide-enter-from,
 .panel-slide-leave-to { opacity: 0; transform: translateY(-10px); }
+
+.status-toast {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 1100;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.status-fade-enter-active,
+.status-fade-leave-active { transition: opacity 0.3s ease; }
+
+.status-fade-enter-from,
+.status-fade-leave-to { opacity: 0; }
 </style>

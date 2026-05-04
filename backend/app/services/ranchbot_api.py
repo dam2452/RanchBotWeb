@@ -4,34 +4,64 @@ from app.core.config import settings
 import httpx
 
 
+class Endpoints:
+    SEARCH = "sz"
+    SEARCH_PHRASE = "szf"
+    SEARCH_SEMANTIC_FRAMES = "sensklatki"
+    SEARCH_WITH_FILTERS = "kf"
+    VIDEO_BY_INDEX = "w"
+    VIDEO_ADJUST = "ad"
+    CLIP_SAVE = "z"
+    CLIP_SAVE_BY_INDEX = "zn"
+    CLIP_DELETE = "uk"
+    CLIP_LIST = "mk"
+    CLIP_SEND = "wys"
+    FRAME = "klatka"
+    FRAME_ALT = "frame"
+    FRAME_SHORT = "kl"
+    FILTERS = "f"
+    SERIES = "serial"
+    SEASONS = "p"
+    EPISODES = "odcinki"
+    OBJECTS = "obj"
+    EMOTIONS = "e"
+
+    AUTH_LOGIN = "/auth/login"
+    AUTH_LOGOUT_ALL = "/auth/logout-all"
+    AUTH_REGISTER = "/auth/register"
+    AUTH_FORGOT_PASSWORD = "/auth/forgot-password"
+    AUTH_RESET_PASSWORD = "/auth/reset-password"
+    AUTH_LINK_TELEGRAM = "/auth/link-telegram"
+
+
 class RanchBotAPIClient:
     ALLOWED_ENDPOINTS = {
-        "sz",
-        "szf",
-        "sensklatki",
-        "kf",
-        "w",
-        "ad",
-        "z",
-        "zn",
-        "uk",
-        "mk",
-        "wys",
-        "serial",
-        "f",
-        "p",
-        "obj",
-        "e",
-        "odcinki",
-        "klatka",
-        "frame",
-        "kl",
-        "/auth/login",
-        "/auth/logout-all",
-        "/auth/register",
-        "/auth/forgot-password",
-        "/auth/reset-password",
-        "/auth/link-telegram",
+        Endpoints.SEARCH,
+        Endpoints.SEARCH_PHRASE,
+        Endpoints.SEARCH_SEMANTIC_FRAMES,
+        Endpoints.SEARCH_WITH_FILTERS,
+        Endpoints.VIDEO_BY_INDEX,
+        Endpoints.VIDEO_ADJUST,
+        Endpoints.CLIP_SAVE,
+        Endpoints.CLIP_SAVE_BY_INDEX,
+        Endpoints.CLIP_DELETE,
+        Endpoints.CLIP_LIST,
+        Endpoints.CLIP_SEND,
+        Endpoints.FRAME,
+        Endpoints.FRAME_ALT,
+        Endpoints.FRAME_SHORT,
+        Endpoints.FILTERS,
+        Endpoints.SERIES,
+        Endpoints.SEASONS,
+        Endpoints.EPISODES,
+        Endpoints.OBJECTS,
+        Endpoints.EMOTIONS,
+        Endpoints.AUTH_LOGIN,
+        Endpoints.AUTH_LOGOUT_ALL,
+        Endpoints.AUTH_REGISTER,
+        Endpoints.AUTH_FORGOT_PASSWORD,
+        Endpoints.AUTH_RESET_PASSWORD,
+        Endpoints.AUTH_LINK_TELEGRAM,
     }
 
     def __init__(self):
@@ -104,7 +134,7 @@ class RanchBotAPIClient:
         return response.content
 
     async def authenticate(self, login: str, password: str) -> dict[str, Any]:
-        url = self._build_url("/auth/login")
+        url = self._build_url(Endpoints.AUTH_LOGIN)
         async with httpx.AsyncClient() as client:
             response = await client.post(url, json={"username": login, "password": password})
 
@@ -126,7 +156,7 @@ class RanchBotAPIClient:
                 raise Exception(f"Invalid JSON response from authentication API: {response.text}")
 
     async def logout_all_sessions(self, login: str, password: str) -> dict[str, Any]:
-        url = self._build_url("/auth/logout-all")
+        url = self._build_url(Endpoints.AUTH_LOGOUT_ALL)
         async with httpx.AsyncClient() as client:
             response = await client.post(url, json={"username": login, "password": password})
             response.raise_for_status()
@@ -138,7 +168,7 @@ class RanchBotAPIClient:
         password: str,
         full_name: str | None = None,
     ) -> dict[str, Any]:
-        url = self._build_url("/auth/register")
+        url = self._build_url(Endpoints.AUTH_REGISTER)
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 url,
@@ -149,7 +179,7 @@ class RanchBotAPIClient:
             return response.json()
 
     async def forgot_password(self, username: str) -> dict[str, Any]:
-        url = self._build_url("/auth/forgot-password")
+        url = self._build_url(Endpoints.AUTH_FORGOT_PASSWORD)
         async with httpx.AsyncClient() as client:
             response = await client.post(url, json={"username": username})
             if not response.is_success:
@@ -157,7 +187,7 @@ class RanchBotAPIClient:
             return response.json()
 
     async def reset_password(self, username: str, code: str, new_password: str) -> dict[str, Any]:
-        url = self._build_url("/auth/reset-password")
+        url = self._build_url(Endpoints.AUTH_RESET_PASSWORD)
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 url,
@@ -168,7 +198,7 @@ class RanchBotAPIClient:
             return response.json()
 
     async def link_telegram(self, jwt_token: str) -> dict[str, Any]:
-        url = self._build_url("/auth/link-telegram")
+        url = self._build_url(Endpoints.AUTH_LINK_TELEGRAM)
         async with httpx.AsyncClient() as client:
             response = await client.post(url, headers={"Authorization": f"Bearer {jwt_token}"})
             if not response.is_success:
@@ -176,23 +206,23 @@ class RanchBotAPIClient:
             return response.json()
 
     async def search_clips(self, query: str, token: str) -> list[dict[str, Any]]:
-        result = await self.call_api("szf", [query], token)
+        result = await self.call_api(Endpoints.SEARCH_PHRASE, [query], token)
         if result and result.get("data") and result["data"].get("results"):
             return result["data"]["results"]
         return []
 
     async def get_video(self, index: str, token: str) -> bytes:
-        return await self.call_api_for_blob("w", [index], token)
+        return await self.call_api_for_blob(Endpoints.VIDEO_BY_INDEX, [index], token)
 
     async def adjust_video(
         self, clip_index: str, left_adjust: int, right_adjust: int, token: str,
     ) -> bytes:
         return await self.call_api_for_blob(
-            "ad", [clip_index, str(left_adjust), str(right_adjust)], token,
+            Endpoints.VIDEO_ADJUST, [clip_index, str(left_adjust), str(right_adjust)], token,
         )
 
     async def save_clip(self, clip_name: str, token: str) -> dict[str, Any]:
-        return await self.call_api("z", [clip_name], token)
+        return await self.call_api(Endpoints.CLIP_SAVE, [clip_name], token)
 
     async def save_clip_by_index(
         self,
@@ -206,13 +236,13 @@ class RanchBotAPIClient:
         if left_adj != 0 or right_adj != 0:
             args.extend([str(left_adj), str(right_adj)])
         args.append(clip_name)
-        return await self.call_api("zn", args, token)
+        return await self.call_api(Endpoints.CLIP_SAVE_BY_INDEX, args, token)
 
     async def delete_clip(self, clip_name: str, token: str) -> dict[str, Any]:
-        return await self.call_api("uk", [clip_name], token)
+        return await self.call_api(Endpoints.CLIP_DELETE, [clip_name], token)
 
     async def get_user_clips(self, token: str) -> list[dict[str, Any]]:
-        result = await self.call_api("mk", [], token)
+        result = await self.call_api(Endpoints.CLIP_LIST, [], token)
         if result and result.get("status") == "success":
             return result.get("data", {}).get("clips", [])
         return []

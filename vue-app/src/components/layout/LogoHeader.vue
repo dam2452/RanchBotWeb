@@ -4,15 +4,23 @@ import BrandLogo from './BrandLogo.vue'
 import { useWindowWidth } from '@/composables/useWindowWidth'
 import { WATCH_BREAKPOINT } from '@/utils/formatters'
 
+interface Props {
+  hideText?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  hideText: false,
+})
+
 const { windowWidth } = useWindowWidth()
 
 const isWatchView = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
 </script>
 
 <template>
-  <router-link v-if="!isWatchView" to="/" class="logo-header">
+  <router-link v-if="!isWatchView" to="/" class="logo-header" :class="{ 'logo-header--compact': props.hideText }">
     <BrandLogo size="small" class="logo-brand" />
-    <span class="logo-text">RanchBot</span>
+    <span v-if="!props.hideText" class="logo-text">RanchBot</span>
   </router-link>
 </template>
 
@@ -41,6 +49,7 @@ const isWatchView = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
 .logo-brand {
   transform: scale(0.44);
   filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.3));
+  transition: transform 0.3s ease;
 }
 
 .logo-text {
@@ -65,6 +74,10 @@ const isWatchView = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
 
   .logo-text {
     display: block;
+  }
+
+  .logo-header--compact .logo-brand {
+    transform: scale(1.05);
   }
 }
 </style>

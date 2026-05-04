@@ -173,6 +173,7 @@ onUnmounted(() => {
   padding: 1vh 2.5vw;
   font-size: clamp(14px, 1.4vw, 16px);
   font-weight: bold;
+  color: white;
 
   &:hover {
     transform: scale(1.05);
@@ -195,6 +196,7 @@ onUnmounted(() => {
   padding: 1vh 2.5vw;
   font-size: clamp(14px, 1.4vw, 16px);
   font-weight: bold;
+  color: white;
 
   &:hover {
     transform: scale(1.05);
@@ -249,7 +251,6 @@ onUnmounted(() => {
     display: block;
     width: 55%;
     height: 55%;
-    filter: brightness(0) invert(1);
   }
 
   .user-btn-full {
@@ -271,7 +272,6 @@ onUnmounted(() => {
     display: block;
     width: 50%;
     height: 50%;
-    filter: brightness(0) invert(1);
   }
 
   .logout-btn-full {
@@ -293,7 +293,6 @@ onUnmounted(() => {
     display: block;
     width: 50%;
     height: 50%;
-    filter: brightness(0) invert(1);
   }
 
   .clips-btn-full {

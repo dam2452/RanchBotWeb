@@ -211,8 +211,10 @@ watch(activePage, pauseAllVideos)
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding: 140px 0 60px 0;
-  align-items: flex-start;
+  scroll-padding-top: 120px;
+  padding: 120px 0 60px;
+  align-items: center;
+  gap: 1.5rem;
 
   &::-webkit-scrollbar {
     display: none;
@@ -223,20 +225,20 @@ watch(activePage, pauseAllVideos)
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
+    scroll-padding-left: 0;
     padding: 0 10vw;
+    gap: 0;
     align-items: center;
   }
 }
 
 .page-item {
-  scroll-snap-align: center;
-  transition: all 0.3s;
+  scroll-snap-align: start;
+  transition: opacity 0.35s, transform 0.35s;
   flex-shrink: 0;
-  opacity: 1;
-  transform: scale(1);
-  width: 100%;
-  height: auto;
-  margin: 1rem 0;
+  width: 85vw;
+  height: 62vh;
+  height: 62dvh;
   padding: 0;
   position: relative;
   display: flex;
@@ -244,37 +246,53 @@ watch(activePage, pauseAllVideos)
   justify-content: center;
   cursor: pointer;
   z-index: 1;
-  pointer-events: none;
+  opacity: 0.45;
+  transform: scale(0.88);
+  pointer-events: auto;
 
   &.active-page {
     opacity: 1;
     transform: scale(1);
     z-index: 50;
-    pointer-events: auto;
   }
 
   @include tablet {
+    scroll-snap-align: center;
     width: auto;
     height: 100%;
-    min-width: auto;
-    max-width: none;
     margin: 0 2rem;
-    pointer-events: auto;
+    opacity: 1;
+    transform: scale(1);
 
     &:not(.active-page) {
       opacity: 0.5;
       transform: scale(0.9);
-      pointer-events: auto;
     }
+  }
+}
+
+:deep(.clip-card) {
+  @include tablet-down {
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+  }
+}
+
+:deep(.video-container) {
+  @include tablet-down {
+    min-height: 0;
+    max-height: none;
+    flex: 1;
   }
 }
 
 .clips-grid {
   width: 85vw;
-  height: auto;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   padding: 0;
   background: transparent;
   backdrop-filter: none;
@@ -321,7 +339,7 @@ watch(activePage, pauseAllVideos)
 
 .scroll-spacer {
   width: 100%;
-  height: 50vh;
+  height: 40vh;
   flex-shrink: 0;
   pointer-events: none;
 

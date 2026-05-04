@@ -11,7 +11,10 @@ from app.core.responses import (
 )
 from app.models.user import UserSession
 from app.services.adjusted_video import adjusted_video_service
-from app.services.ranchbot_api import api_client, Endpoints
+from app.services.ranchbot_api import (
+    Endpoints,
+    api_client,
+)
 from app.services.thumbnail import thumbnail_service
 from app.services.video_cache import video_cache
 from fastapi import (
@@ -59,8 +62,6 @@ async def api_json(request: ApiRequest, user: UserSession = Depends(get_current_
         if request.endpoint in _CACHE_INVALIDATING_ENDPOINTS:
             await video_cache.clear()
             logger.debug("Video cache cleared after search")
-        if request.endpoint == Endpoints.CLIP_SAVE_BY_INDEX:
-            logger.info(f"[zn] args={request.args} → {result}")
         return result
     except Exception as e:
         logger.error(f"API JSON error: {e}")

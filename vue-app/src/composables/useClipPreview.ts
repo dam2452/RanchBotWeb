@@ -2,7 +2,7 @@ import { ref, watch, toValue, type Ref, type MaybeRefOrGetter } from 'vue'
 import { clipService } from '@/services/clipService'
 import { formatAdjustmentValue } from '@/utils/formatters'
 
-const _DEFAULT_STATUS = 'Move sliders: negative values trim, positive extend'
+const _DEFAULT_STATUS = ''
 
 interface UseClipPreviewOptions {
   clipIndex: number

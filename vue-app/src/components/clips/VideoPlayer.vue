@@ -169,7 +169,7 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
 .video-wrapper {
   position: relative;
   width: 100%;
-  height: 100%;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -268,8 +268,8 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
 
 .clip-video {
   width: 100%;
-  height: 100%;
-  max-height: 100vh;
+  height: auto;
+  max-height: 35vh;
   max-width: calc(100vw - 20px);
   object-fit: contain;
   border-radius: 24px;
@@ -310,7 +310,7 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
     max-height: 100%;
     max-width: 100%;
     border-radius: 32px;
-    object-fit: contain;
+    object-fit: cover;
   }
 
   .video-loading-overlay {

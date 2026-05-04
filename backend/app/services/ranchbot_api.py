@@ -19,6 +19,7 @@ class Endpoints:
     FRAME = "klatka"
     FRAME_ALT = "frame"
     FRAME_SHORT = "kl"
+    CLIP_THUMBNAIL = "kk"
     FILTERS = "f"
     SERIES = "serial"
     SEASONS = "p"
@@ -50,6 +51,7 @@ class RanchBotAPIClient:
         Endpoints.FRAME,
         Endpoints.FRAME_ALT,
         Endpoints.FRAME_SHORT,
+        Endpoints.CLIP_THUMBNAIL,
         Endpoints.FILTERS,
         Endpoints.SERIES,
         Endpoints.SEASONS,
@@ -237,6 +239,9 @@ class RanchBotAPIClient:
             args.extend([str(left_adj), str(right_adj)])
         args.append(clip_name)
         return await self.call_api(Endpoints.CLIP_SAVE_BY_INDEX, args, token)
+
+    async def get_saved_clip_thumbnail(self, clip_name: str, token: str) -> bytes:
+        return await self.call_api_for_blob(Endpoints.CLIP_THUMBNAIL, [clip_name], token)
 
     async def delete_clip(self, clip_name: str, token: str) -> dict[str, Any]:
         return await self.call_api(Endpoints.CLIP_DELETE, [clip_name], token)

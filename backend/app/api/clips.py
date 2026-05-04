@@ -9,8 +9,10 @@ from app.core.responses import (
 )
 from app.models.clip import ClipOperationRequest
 from app.models.user import UserSession
-from app.services.ranchbot_api import api_client, Endpoints
-from app.services.thumbnail import thumbnail_service
+from app.services.ranchbot_api import (
+    Endpoints,
+    api_client,
+)
 from fastapi import (
     APIRouter,
     Depends,
@@ -51,12 +53,7 @@ async def get_clip_thumbnail(clip_id: str, user: UserSession = Depends(get_curre
     decoded_clip_name = unquote(clip_id)
     try:
         logger.info(f"Fetching clip thumbnail: {decoded_clip_name}")
-        thumbnail_data = await thumbnail_service.get_or_generate(
-            decoded_clip_name,
-            lambda: api_client.call_api_for_blob(
-                endpoint=Endpoints.CLIP_SEND, args=[decoded_clip_name], token=user.jwt_token,
-            ),
-        )
+        thumbnail_data = await api_client.get_saved_clip_thumbnail(decoded_clip_name, user.jwt_token)
         return thumbnail_response(thumbnail_data)
     except Exception as e:
         logger.error(f"Get clip thumbnail error for '{decoded_clip_name}': {e}")

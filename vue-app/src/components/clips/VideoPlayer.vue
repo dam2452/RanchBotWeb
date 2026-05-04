@@ -169,7 +169,7 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
 .video-wrapper {
   position: relative;
   width: 100%;
-  height: auto;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -299,12 +299,18 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
 }
 
 @include tablet {
+  .video-wrapper {
+    width: 100%;
+    height: 100%;
+  }
+
   .clip-video {
-    width: auto;
-    height: auto;
-    max-height: 50vh;
-    max-width: none;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
     border-radius: 32px;
+    object-fit: contain;
   }
 
   .video-loading-overlay {

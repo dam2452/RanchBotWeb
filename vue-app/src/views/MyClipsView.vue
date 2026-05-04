@@ -88,7 +88,7 @@ watch(activePage, pauseAllVideos)
 
 <template>
   <UserButtons fixed compact :show-my-clips="false" />
-  <LogoHeader v-if="!isMobile" />
+  <LogoHeader v-if="!isMobile" indent-left />
   <AppFooter />
 
   <button v-if="!isAppleWatch" class="back-button" @click="$router.back()">
@@ -290,6 +290,11 @@ watch(activePage, pauseAllVideos)
     background: rgba(255, 255, 255, 0.1);
     border-radius: 32px;
     backdrop-filter: blur(8px);
+
+    > * {
+      min-height: 0;
+      min-width: 0;
+    }
 
     &:has(> :nth-child(1):nth-last-child(1)),
     &:has(> :nth-child(1):nth-last-child(2)),

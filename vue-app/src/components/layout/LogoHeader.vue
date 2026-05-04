@@ -6,10 +6,12 @@ import { WATCH_BREAKPOINT } from '@/utils/formatters'
 
 interface Props {
   hideText?: boolean
+  indentLeft?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   hideText: false,
+  indentLeft: false,
 })
 
 const { windowWidth } = useWindowWidth()
@@ -18,7 +20,7 @@ const isWatchView = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
 </script>
 
 <template>
-  <router-link v-if="!isWatchView" to="/" class="logo-header" :class="{ 'logo-header--compact': props.hideText }">
+  <router-link v-if="!isWatchView" to="/" class="logo-header" :class="{ 'logo-header--compact': props.hideText, 'logo-header--indented': props.indentLeft }">
     <BrandLogo size="small" class="logo-brand" />
     <span v-if="!props.hideText" class="logo-text">RanchBot</span>
   </router-link>
@@ -78,6 +80,10 @@ const isWatchView = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
 
   .logo-header--compact .logo-brand {
     transform: scale(1.05);
+  }
+
+  .logo-header--indented {
+    left: calc(2rem + 44px + 1rem);
   }
 }
 </style>

@@ -100,6 +100,7 @@ const _handleDeleteClick = (): void => {
   @include tablet {
     gap: 0.5rem;
     height: 100%;
+    min-height: 0;
   }
 }
 
@@ -111,13 +112,14 @@ const _handleDeleteClick = (): void => {
   align-items: center;
   justify-content: center;
   border-radius: 12px;
+  overflow: hidden;
   min-height: 200px;
   max-height: 35vh;
   transition: all 0.3s;
 
   @include tablet {
-    border-radius: 16px;
-    min-height: initial;
+    border-radius: 32px;
+    min-height: 0;
     max-height: none;
   }
 }
@@ -126,6 +128,7 @@ const _handleDeleteClick = (): void => {
   position: relative;
   width: 100%;
   height: 100%;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;

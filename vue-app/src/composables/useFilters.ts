@@ -167,6 +167,10 @@ export function useFilters() {
   async function removeAppliedFilter(category: keyof ActiveFilters, value: string): Promise<void> {
     const updated = appliedFilters.value[category].filter(v => v !== value)
     const newFilters: ActiveFilters = { ...appliedFilters.value, [category]: updated }
+    if (category === 'season') {
+      newFilters.episode = []
+      episodes.value = []
+    }
     selectedFilters.value = { ...newFilters }
     appliedFilters.value = { ...newFilters }
 

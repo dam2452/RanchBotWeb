@@ -43,7 +43,6 @@ const handleToggleSemantic = (): void => {
 const handleFilters = () => {
   showFilterModal.value = true
   loadFilterOptions()
-  fetchFilterInfo()
 }
 
 const handleFilterToggle = (category: keyof ActiveFilters, value: string): void => {

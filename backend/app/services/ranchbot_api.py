@@ -1,7 +1,10 @@
 from typing import Any
 
 from app.core.config import settings
+from app.core.logger import setup_logger
 import httpx
+
+logger = setup_logger(__name__)
 
 
 class Endpoints:
@@ -99,12 +102,14 @@ class RanchBotAPIClient:
         jwt_token = token or self.default_token
         if not jwt_token:
             raise ValueError("JWT token is required")
+        logger.debug("API call: endpoint=%r args=%r url=%s", endpoint, args, url)
         async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(
                 url,
                 json={"args": args, "reply_json": reply_json},
                 headers=self._build_headers(jwt_token),
             )
+            logger.debug("API response: endpoint=%r status=%d", endpoint, response.status_code)
             response.raise_for_status()
             return response
 

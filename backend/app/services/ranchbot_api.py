@@ -246,8 +246,9 @@ class RanchBotAPIClient:
     async def delete_clip(self, clip_name: str, token: str) -> dict[str, Any]:
         return await self.call_api(Endpoints.CLIP_DELETE, [clip_name], token)
 
-    async def get_user_clips(self, token: str) -> list[dict[str, Any]]:
-        result = await self.call_api(Endpoints.CLIP_LIST, [], token)
+    async def get_user_clips(self, token: str, all_series: bool = False) -> list[dict[str, Any]]:
+        args = ["all"] if all_series else []
+        result = await self.call_api(Endpoints.CLIP_LIST, args, token)
         if result and result.get("status") == "success":
             return result.get("data", {}).get("clips", [])
         return []

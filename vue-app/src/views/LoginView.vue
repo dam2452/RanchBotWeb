@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useWindowWidth } from '@/composables/useWindowWidth'
 import LogoSection from '@/components/layout/LogoSection.vue'
@@ -9,7 +8,6 @@ import ActionButtons from '@/components/common/ActionButtons.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 
 const authStore = useAuthStore()
-const router = useRouter()
 const { windowWidth } = useWindowWidth()
 
 const isWatchView = computed(() => windowWidth.value <= 196)
@@ -21,7 +19,7 @@ const handleSubmit = async (credentials: { login: string; password: string }) =>
   const success = await authStore.login(credentials)
 
   if (success) {
-    await router.push('/search')
+    window.location.replace('/search')
   } else {
     errorMessage.value = authStore.error || 'Login failed'
   }

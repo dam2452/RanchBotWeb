@@ -1,3 +1,4 @@
+import { fetchWithProgress } from '@/utils/formatters'
 import { client } from './http'
 import {
   characterParser,
@@ -24,30 +25,52 @@ class ClipService {
     return searchResultsParser.parse(response.data)
   }
 
-  async getVideo(index: string): Promise<Blob> {
-    const response = await client.post(
+  async getVideo(index: string, onProgress?: (percent: number) => void): Promise<Blob> {
+    if (!onProgress) {
+      const response = await client.post('/api/video', { endpoint: 'w', args: [index] }, { responseType: 'blob' })
+      return response.data
+    }
+    return fetchWithProgress(
       '/api/video',
-      { endpoint: 'w', args: [index] },
-      { responseType: 'blob' }
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ endpoint: 'w', args: [index] }),
+      },
+      onProgress,
     )
-    return response.data
   }
 
   getVideoStreamUrl(positionId: string, searchId: number): string {
     return `/api/video/stream/${encodeURIComponent(positionId)}?s=${searchId}`
   }
 
-  async adjustVideo(clipIndex: string, leftAdjust: number, rightAdjust: number): Promise<Blob> {
-    const response = await client.post(
+  async adjustVideo(
+    clipIndex: string,
+    leftAdjust: number,
+    rightAdjust: number,
+    onProgress?: (percent: number) => void,
+  ): Promise<Blob> {
+    const body = { endpoint: 'ad', args: [clipIndex, leftAdjust.toString(), rightAdjust.toString()] }
+    if (!onProgress) {
+      const response = await client.post('/api/video', body, { responseType: 'blob' })
+      return response.data
+    }
+    return fetchWithProgress(
       '/api/video',
-      { endpoint: 'ad', args: [clipIndex, leftAdjust.toString(), rightAdjust.toString()] },
-      { responseType: 'blob' }
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body),
+      },
+      onProgress,
     )
-    return response.data
   }
 
-  async getUserClips(): Promise<Clip[]> {
-    const response = await client.get('/clips')
+  async getUserClips(allSeries = false): Promise<Clip[]> {
+    const response = await client.get('/clips', { params: allSeries ? { all_series: true } : undefined })
     if (response.data.status === 'success' && response.data.clips) {
       return response.data.clips
     }
@@ -61,6 +84,9 @@ class ClipService {
     }
     args.push(clipName)
     const response = await client.post('/api/json', { endpoint: 'zn', args })
+    if (response.data?.status === 'error') {
+      throw new Error(response.data?.message ?? 'Save failed')
+    }
     const content: string = response.data?.content ?? response.data?.data?.content ?? ''
     if (content.includes('BŁĄD') || content.includes('ERROR') || content.includes('❌')) {
       throw new Error(content.replace(/```/g, '').replace(/\xa0/g, ' ').trim())

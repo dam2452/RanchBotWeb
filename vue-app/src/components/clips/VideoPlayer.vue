@@ -121,7 +121,6 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
     <div
       v-if="!videoUrl && !thumbnailLoaded"
       class="thumbnail-placeholder"
-      :class="{ 'active-video': isActive && !isEditing }"
     ></div>
 
     <img
@@ -129,7 +128,7 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
       v-show="!isVideoPlaying"
       :src="thumbnailUrl"
       class="clip-video thumbnail-preview"
-      :class="{ 'editing-video': isEditing, 'active-video': isActive && !isEditing }"
+      :class="{ 'editing-video': isEditing }"
       alt="Video thumbnail"
       @load="handleThumbnailLoaded"
       @click="emit('click', $event)"
@@ -146,7 +145,7 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
       preload="metadata"
       :src="previewUrl || videoUrl"
       class="clip-video"
-      :class="{ 'editing-video': isEditing, 'active-video': isActive && !isEditing }"
+      :class="{ 'editing-video': isEditing }"
       @click="emit('click', $event)"
       @loadeddata="handleLoaded"
       @canplay="handleCanPlay"
@@ -279,10 +278,6 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
   cursor: pointer;
 }
 
-.active-video {
-  box-shadow: 0 0 0 3px #f2a94c, 0 0 40px rgba(242, 169, 76, 0.8);
-}
-
 .editing-video {
   max-height: 70vh;
   border-radius: 24px 24px 0 0;
@@ -311,6 +306,10 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
     max-width: 100%;
     border-radius: 32px;
     object-fit: cover;
+  }
+
+  .clip-video.editing-video {
+    border-radius: 32px 32px 0 0;
   }
 
   .video-loading-overlay {

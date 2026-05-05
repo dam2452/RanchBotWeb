@@ -7,6 +7,7 @@ interface Props {
   rightAdjust: number
   statusMessage: string
   isUpdatingPreview: boolean
+  downloadProgress?: number | null
 }
 
 interface Emits {
@@ -84,11 +85,13 @@ const formatValue = (value: number): string => {
       <div class="button-group">
         <button
           @click="emit('download')"
-          :disabled="isUpdatingPreview"
+          :disabled="isUpdatingPreview || downloadProgress !== null"
+          :style="downloadProgress !== null ? { '--dl-progress': `${downloadProgress}%` } : {}"
           class="edit-btn download-edit-btn"
+          :class="{ 'is-downloading': downloadProgress !== null }"
           aria-label="Download adjusted clip"
         >
-          Download
+          {{ downloadProgress !== null ? `${downloadProgress}%` : 'Download' }}
         </button>
         <button
           @click="emit('save')"
@@ -239,10 +242,27 @@ const formatValue = (value: number): string => {
 
 .download-edit-btn {
   background: #f2a94c;
+  overflow: hidden;
+  position: relative;
 }
 
-.download-edit-btn:hover:not(:disabled) {
+.download-edit-btn:hover:not(:disabled):not(.is-downloading) {
   background: #e09340;
+}
+
+.download-edit-btn.is-downloading {
+  opacity: 1;
+  cursor: default;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: var(--dl-progress, 0%);
+    background: rgba(255, 255, 255, 0.25);
+    transition: width 0.2s ease;
+    border-radius: inherit;
+  }
 }
 
 .save-edit-btn {

@@ -1,8 +1,8 @@
 import { ref, type Ref } from 'vue'
 
 interface UseClipSaveOptions {
-  download: () => Promise<void>
-  downloadAdjusted: (left: number, right: number) => Promise<void>
+  download: (onProgress?: (percent: number) => void) => Promise<void>
+  downloadAdjusted: (left: number, right: number, onProgress?: (percent: number) => void) => Promise<void>
   save: (name: string) => Promise<void>
   saveAdjusted: (name: string, left: number, right: number) => Promise<void>
   leftAdjust: Ref<number>
@@ -22,6 +22,7 @@ export function useClipSave(options: UseClipSaveOptions) {
 
   const showSaveModal = ref(false)
   const isAdjustedSave = ref(false)
+  const downloadProgress = ref<number | null>(null)
 
   const openSaveModal = (isAdjusted: boolean, onPauseAll: () => void): void => {
     onPauseAll()
@@ -33,10 +34,17 @@ export function useClipSave(options: UseClipSaveOptions) {
     showSaveModal.value = false
   }
 
+  const _onProgress = (percent: number): void => {
+    downloadProgress.value = percent
+    if (percent >= 100) setTimeout(() => { downloadProgress.value = null }, 600)
+  }
+
   const handleDownload = async (): Promise<void> => {
     try {
-      await download()
+      downloadProgress.value = 0
+      await download(_onProgress)
     } catch (err: unknown) {
+      downloadProgress.value = null
       console.error('Download failed:', err)
     }
   }
@@ -45,9 +53,11 @@ export function useClipSave(options: UseClipSaveOptions) {
     if (!validateAdjustment()) return
     try {
       statusMessage.value = 'Preparing download...'
-      await downloadAdjusted(leftAdjust.value, rightAdjust.value)
+      downloadProgress.value = 0
+      await downloadAdjusted(leftAdjust.value, rightAdjust.value, _onProgress)
       statusMessage.value = 'Download complete!'
     } catch (err: unknown) {
+      downloadProgress.value = null
       statusMessage.value = 'Download failed: ' + (err instanceof Error ? err.message : String(err))
       console.error('Download failed:', err)
     }
@@ -74,6 +84,7 @@ export function useClipSave(options: UseClipSaveOptions) {
 
   return {
     showSaveModal,
+    downloadProgress,
     openSaveModal,
     closeModal,
     handleDownload,

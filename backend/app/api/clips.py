@@ -25,9 +25,9 @@ router = APIRouter(prefix="/clips", tags=["clips"])
 
 
 @router.get("")
-async def get_clips(user: UserSession = Depends(get_current_user)):
+async def get_clips(user: UserSession = Depends(get_current_user), all_series: bool = False):
     try:
-        clips = await api_client.get_user_clips(user.jwt_token)
+        clips = await api_client.get_user_clips(user.jwt_token, all_series=all_series)
         return {"status": "success", "clips": clips}
     except Exception as e:
         logger.error(f"Get clips error: {e}")
@@ -76,11 +76,15 @@ async def save_clip(request: ClipOperationRequest, user: UserSession = Depends(g
     try:
         logger.info(f"Saving clip '{request.clip_name}'")
         result = await api_client.save_clip(request.clip_name, user.jwt_token)
+        if isinstance(result, dict) and result.get("status") == "error":
+            raise HTTPException(status_code=409, detail=result.get("message", "Clip save failed"))
         return {
             "status": "success",
             "message": f"Clip '{request.clip_name}' saved successfully",
             "data": result,
         }
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Save clip error: {e}")
         logger.debug(traceback.format_exc())

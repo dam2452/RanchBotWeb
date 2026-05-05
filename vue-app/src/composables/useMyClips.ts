@@ -12,7 +12,6 @@ export function useMyClips({ isMobile }: UseMyClipsOptions) {
   const loading = ref(true)
   const error = ref('')
   const clipErrors = ref<Record<string, boolean>>({})
-
   const clipsPerPage = computed(() => isMobile.value ? 2 : 6)
   const totalPages = computed(() => Math.ceil(clips.value.length / clipsPerPage.value))
 
@@ -26,7 +25,7 @@ export function useMyClips({ isMobile }: UseMyClipsOptions) {
     error.value = ''
 
     try {
-      clips.value = await clipService.getUserClips()
+      clips.value = await clipService.getUserClips(true)
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Failed to load clips'
     } finally {

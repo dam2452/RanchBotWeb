@@ -3,10 +3,14 @@ interface Props {
   variant: 'primary' | 'secondary' | 'danger' | 'success'
   position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
   size?: 'small' | 'medium' | 'large'
+  disabled?: boolean
+  progress?: number | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  size: 'small'
+  size: 'small',
+  disabled: false,
+  progress: null,
 })
 
 const emit = defineEmits<{
@@ -14,6 +18,7 @@ const emit = defineEmits<{
 }>()
 
 const handleClick = (event: MouseEvent) => {
+  if (props.disabled) return
   event.stopPropagation()
   emit('click')
 }
@@ -25,11 +30,15 @@ const handleClick = (event: MouseEvent) => {
     :class="[
       `variant-${variant}`,
       `position-${position}`,
-      `size-${size}`
+      `size-${size}`,
+      { 'is-disabled': disabled }
     ]"
+    :style="progress !== null ? { '--progress': `${progress}%` } : {}"
+    :disabled="disabled"
     @click="handleClick"
   >
-    <slot />
+    <span v-if="progress !== null" class="progress-fill" />
+    <span class="btn-content"><slot /></span>
   </button>
 </template>
 
@@ -45,14 +54,36 @@ const handleClick = (event: MouseEvent) => {
   z-index: 100;
   transition: all 0.2s ease;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
 
-  &:hover {
+  &:hover:not(:disabled) {
     transform: scale(1.05);
   }
 
-  &:active {
+  &:active:not(:disabled) {
     transform: scale(0.95);
   }
+
+  &.is-disabled,
+  &:disabled {
+    cursor: default;
+    opacity: 1;
+  }
+}
+
+.progress-fill {
+  position: absolute;
+  inset: 0;
+  width: var(--progress, 0%);
+  background: rgba(255, 255, 255, 0.25);
+  transition: width 0.2s ease;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.btn-content {
+  position: relative;
+  z-index: 1;
 }
 
 .variant-primary {

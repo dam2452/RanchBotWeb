@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AppFooter from '@/components/layout/AppFooter.vue'
 
 const authStore = useAuthStore()
-const router = useRouter()
 
 const username = ref('')
 const password = ref('')
@@ -34,7 +32,7 @@ const handleSubmit = async () => {
   })
 
   if (success) {
-    await router.push('/search')
+    window.location.replace('/search')
   } else {
     localError.value = authStore.error || 'Registration failed'
   }

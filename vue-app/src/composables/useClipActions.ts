@@ -10,17 +10,21 @@ interface UseClipActionsOptions {
 export function useClipActions(options: UseClipActionsOptions) {
   const _clipId = (): string => (options.clipIndex + 1).toString()
 
-  const download = async (): Promise<void> => {
+  const download = async (onProgress?: (percent: number) => void): Promise<void> => {
     const filename = createClipFilename(options.clipIndex, 0, 0, options.searchQuery)
-    const blob = await clipService.getVideo(_clipId())
+    const blob = await clipService.getVideo(_clipId(), onProgress)
     downloadBlob(blob, filename)
   }
 
-  const downloadAdjusted = async (leftAdjust: number, rightAdjust: number): Promise<void> => {
+  const downloadAdjusted = async (
+    leftAdjust: number,
+    rightAdjust: number,
+    onProgress?: (percent: number) => void,
+  ): Promise<void> => {
     const filename = createClipFilename(options.clipIndex, leftAdjust, rightAdjust, options.searchQuery)
     const blob = leftAdjust === 0 && rightAdjust === 0
-      ? await clipService.getVideo(_clipId())
-      : await clipService.adjustVideo(_clipId(), leftAdjust, rightAdjust)
+      ? await clipService.getVideo(_clipId(), onProgress)
+      : await clipService.adjustVideo(_clipId(), leftAdjust, rightAdjust, onProgress)
     downloadBlob(blob, filename)
   }
 

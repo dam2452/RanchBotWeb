@@ -48,3 +48,35 @@ export function downloadBlob(blob: Blob, filename: string): void {
   downloadFile(url, filename)
   URL.revokeObjectURL(url)
 }
+
+export async function fetchWithProgress(
+  url: string,
+  init: RequestInit,
+  onProgress: (percent: number) => void,
+): Promise<Blob> {
+  const response = await fetch(url, init)
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+
+  const contentLength = response.headers.get('Content-Length')
+  const total = contentLength ? parseInt(contentLength, 10) : 0
+
+  if (!response.body || total === 0) {
+    onProgress(100)
+    return response.blob()
+  }
+
+  const reader = response.body.getReader()
+  const chunks: Uint8Array<ArrayBuffer>[] = []
+  let received = 0
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    chunks.push(value)
+    received += value.length
+    onProgress(Math.min(Math.round((received / total) * 100), 99))
+  }
+
+  onProgress(100)
+  return new Blob(chunks, { type: response.headers.get('Content-Type') ?? 'video/mp4' })
+}

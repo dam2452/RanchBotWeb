@@ -33,7 +33,7 @@ const _handleDeleteClick = (): void => {
 
 <template>
   <div class="clip-card" :data-clip-id="clip.id">
-    <div class="video-container">
+    <div class="video-container" :class="{ 'active': isActive }">
       <div v-if="!hasError" class="video-wrapper">
         <VideoPlayer
           :video-url="videoUrl"
@@ -113,11 +113,18 @@ const _handleDeleteClick = (): void => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s;
+  transition: box-shadow 0.3s ease;
+  overflow: hidden;
+  border-radius: 12px;
+
+  &.active {
+    box-shadow: 0 0 0 3px #f2a94c, 0 0 40px rgba(242, 169, 76, 0.8);
+  }
 
   @include tablet {
     min-height: 0;
     max-height: none;
+    border-radius: 16px;
   }
 }
 
@@ -201,6 +208,13 @@ const _handleDeleteClick = (): void => {
 
 .action-button:hover {
   opacity: 1;
+}
+
+@media (hover: none) {
+  .action-button {
+    opacity: 0.75;
+    pointer-events: auto;
+  }
 }
 
 .clip-name {

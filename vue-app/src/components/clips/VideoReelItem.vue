@@ -50,6 +50,7 @@ const actions = useClipActions({
 
 const {
   showSaveModal,
+  downloadProgress,
   openSaveModal,
   closeModal,
   handleDownload,
@@ -139,8 +140,17 @@ const handleClick = (event: MouseEvent) => {
           Adjust
         </ClipActionButton>
 
-        <ClipActionButton v-if="!isEditing" variant="secondary" position="top-right" size="medium" class="download-btn" @click="handleDownload">
-          Download
+        <ClipActionButton
+          v-if="!isEditing"
+          variant="secondary"
+          position="top-right"
+          size="medium"
+          class="download-btn"
+          :disabled="downloadProgress !== null"
+          :progress="downloadProgress"
+          @click="handleDownload"
+        >
+          {{ downloadProgress !== null ? `${downloadProgress}%` : 'Download' }}
         </ClipActionButton>
 
         <ClipActionButton v-if="!isEditing" variant="success" position="bottom-left" size="medium" class="save-btn" @click="openSaveModal(false, () => emit('pause-all'))">
@@ -162,6 +172,7 @@ const handleClick = (event: MouseEvent) => {
           :right-adjust="rightAdjust"
           :status-message="statusMessage"
           :is-updating-preview="isUpdatingPreview"
+          :download-progress="downloadProgress"
           @update:left-adjust="leftAdjust = $event"
           @update:right-adjust="rightAdjust = $event"
           @close="() => { resetAdjustments(); emit('close-editor') }"

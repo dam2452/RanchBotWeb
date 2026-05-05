@@ -115,16 +115,17 @@ const _handleDeleteClick = (): void => {
   justify-content: center;
   transition: box-shadow 0.3s ease;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: $border-radius-video;
+  transition: box-shadow 0.3s ease;
 
   &.active {
-    box-shadow: 0 0 0 3px #f2a94c, 0 0 40px rgba(242, 169, 76, 0.8);
+    box-shadow: $active-glow;
   }
 
   @include tablet {
     min-height: 0;
     max-height: none;
-    border-radius: 16px;
+    border-radius: $border-radius-video-tablet;
   }
 }
 

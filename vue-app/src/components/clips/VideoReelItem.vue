@@ -264,8 +264,8 @@ const handleClick = (event: MouseEvent) => {
   }
 }
 
-.reel-item.last-loaded :deep(.clip-video) {
-  box-shadow: 0 0 16px rgba(242, 169, 76, 0.4);
+.reel-item.last-loaded .video-container {
+  box-shadow: $active-glow-soft;
 }
 
 .reel-item[data-idx="0"]:not(.z-editing) { margin-left: 0; margin-top: 0; }
@@ -362,10 +362,17 @@ const handleClick = (event: MouseEvent) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: $border-radius-video;
+  transition: box-shadow 0.5s ease;
 
   @include tablet {
     width: auto;
+    border-radius: $border-radius-video-tablet;
   }
+}
+
+.reel-item.active .video-container {
+  box-shadow: $active-glow;
 }
 
 .clip-wrapper {

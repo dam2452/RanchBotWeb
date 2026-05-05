@@ -95,6 +95,9 @@ export function useFilters() {
       emotions.value = []
       seasons.value = {}
       episodes.value = []
+      selectedFilters.value = { ...EMPTY_FILTERS }
+      appliedFilters.value = { ...EMPTY_FILTERS }
+      await clipService.resetFilters()
     } finally {
       seriesLoading.value = false
     }

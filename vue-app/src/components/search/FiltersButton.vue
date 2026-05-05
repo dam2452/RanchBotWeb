@@ -28,7 +28,7 @@ const handleClick = () => {
 <style scoped lang="scss">
 .filters-button {
   position: absolute;
-  bottom: -35px;
+  top: 50px;
   right: 0;
   padding: 8px 16px;
   font-size: 16px;
@@ -54,22 +54,22 @@ const handleClick = () => {
   }
 
   @include mobile {
-    bottom: -40px;
+    top: 55px;
     padding: clamp(10px, 1.5vw, 12px) clamp(18px, 2vw, 20px);
     font-size: clamp(16px, 2.5vw, 1.3rem);
-    transform: rotate(5deg) translateY(-5px);
+    transform: rotate(5deg);
 
     &:hover {
-      transform: rotate(5deg) translateY(-5px) scale(1.08);
+      transform: rotate(5deg) scale(1.08);
     }
 
     &:active {
-      transform: rotate(5deg) translateY(-5px) scale(0.95);
+      transform: rotate(5deg) scale(0.95);
     }
   }
 
   @include tablet {
-    bottom: -50px;
+    top: 65px;
     padding: clamp(12px, 1.5vw, 14px) clamp(20px, 2vw, 24px);
     font-size: clamp(1.3rem, 2.5vw, 1.6rem);
     transform: rotate(5deg);

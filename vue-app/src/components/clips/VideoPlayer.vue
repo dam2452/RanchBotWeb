@@ -271,7 +271,7 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
   max-height: 35vh;
   max-width: calc(100vw - 20px);
   object-fit: contain;
-  border-radius: 24px;
+  border-radius: $border-radius-video;
   display: block;
   transition: all 0.5s ease;
   box-sizing: border-box;
@@ -304,16 +304,16 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
     height: 100%;
     max-height: 100%;
     max-width: 100%;
-    border-radius: 32px;
+    border-radius: $border-radius-video-tablet;
     object-fit: cover;
   }
 
   .clip-video.editing-video {
-    border-radius: 32px 32px 0 0;
+    border-radius: $border-radius-video-tablet $border-radius-video-tablet 0 0;
   }
 
   .video-loading-overlay {
-    border-radius: 32px;
+    border-radius: $border-radius-video-tablet;
   }
 }
 </style>

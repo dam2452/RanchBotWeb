@@ -32,6 +32,7 @@ html {
   margin: 0;
   padding: 0;
   height: 100%;
+  font-size: clamp(13px, 1vw, 16px);
   background-color: #f2a94c;
   color-scheme: light only;
 }

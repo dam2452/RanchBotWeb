@@ -83,7 +83,7 @@ const isWatchView = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
   }
 
   .logo-header--indented {
-    left: calc(2rem + 44px + 1rem);
+    left: calc(2rem + 2.75rem + 1rem);
   }
 }
 </style>

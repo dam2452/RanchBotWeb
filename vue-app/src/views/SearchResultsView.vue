@@ -235,14 +235,14 @@ watch(() => route.query.mode, async () => {
 .search-bar-container {
   position: fixed;
   left: 50%;
-  top: calc(80px + env(safe-area-inset-top));
+  top: calc(5rem + env(safe-area-inset-top));
   transform: translateX(-50%);
   z-index: 1000;
   width: 85vw;
-  max-width: 500px;
+  max-width: min(500px, 60vw);
 
   @include mobile {
-    width: clamp(400px, 60vw, 550px);
+    width: clamp(min(400px, 80vw), 60vw, 550px);
   }
 
   @include tablet {
@@ -251,11 +251,11 @@ watch(() => route.query.mode, async () => {
   }
 
   @include desktop-up {
-    top: calc(90px + env(safe-area-inset-top));
+    top: calc(5.5rem + env(safe-area-inset-top));
   }
 
   @include large {
-    top: calc(100px + env(safe-area-inset-top));
+    top: calc(6.25rem + env(safe-area-inset-top));
   }
 }
 
@@ -271,18 +271,18 @@ watch(() => route.query.mode, async () => {
 }
 
 .error-overlay {
-  font-size: 20px;
+  font-size: clamp(1rem, 2vw, 1.25rem);
   color: #dc2626;
 }
 
 .no-results-overlay {
-  font-size: 20px;
+  font-size: clamp(1rem, 2vw, 1.25rem);
 }
 
 .back-button {
   position: fixed;
-  top: calc(20px + env(safe-area-inset-top));
-  left: calc(20px + env(safe-area-inset-left));
+  top: calc(1.25rem + env(safe-area-inset-top));
+  left: calc(1.25rem + env(safe-area-inset-left));
   z-index: 1015;
   display: flex;
   align-items: center;
@@ -298,8 +298,8 @@ watch(() => route.query.mode, async () => {
   transition: all 0.2s;
 
   @include tablet-down {
-    top: calc(15px + env(safe-area-inset-top));
-    left: calc(15px + env(safe-area-inset-left));
+    top: calc(0.9375rem + env(safe-area-inset-top));
+    left: calc(0.9375rem + env(safe-area-inset-left));
   }
 
   @media (max-width: 400px) {

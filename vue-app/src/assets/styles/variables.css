@@ -19,11 +19,11 @@
   --breakpoint-desktop: 1200px;
   --breakpoint-large: 1800px;
 
-  --spacing-xs: 5px;
-  --spacing-sm: 8px;
-  --spacing-md: 15px;
-  --spacing-lg: 20px;
-  --spacing-xl: 40px;
+  --spacing-xs: 0.3125rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.9375rem;
+  --spacing-lg: 1.25rem;
+  --spacing-xl: 2.5rem;
 
   --font-size-xs: 0.7rem;
   --font-size-sm: 0.9rem;

@@ -67,13 +67,13 @@ const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/l
   overflow: hidden;
   box-sizing: border-box;
   position: relative;
-  max-width: 1400px;
+  max-width: min(1400px, 92vw);
   margin: 0 auto;
   background: var(--gradient-main);
   text-align: center;
 
   @include desktop-up {
-    max-width: 1500px;
+    max-width: min(1500px, 92vw);
   }
 }
 
@@ -131,7 +131,7 @@ const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/l
 }
 
 .logo {
-  margin-top: -110px;
+  margin-top: -7rem;
   transform: scale(0.7);
 
   @include mobile {
@@ -146,7 +146,7 @@ const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/l
 
 .title {
   text-align: center;
-  margin: 3px 15px 2px;
+  margin: 0.2rem 1rem 0.125rem;
   font-size: 1.6rem;
   transition: all var(--transition-default);
 
@@ -157,7 +157,7 @@ const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/l
 
   @include desktop-up {
     font-size: clamp(3rem, 5vw, 5.5rem);
-    margin: 15px 0 10px;
+    margin: 1rem 0 0.625rem;
   }
 
   @include large {
@@ -167,7 +167,7 @@ const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/l
 
 .tagline {
   text-align: center;
-  margin: 0 15px 3px;
+  margin: 0 1rem 0.2rem;
   font-size: 0.8rem;
 
   @include mobile {
@@ -177,12 +177,12 @@ const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/l
 
   @include desktop-up {
     font-size: clamp(1.2rem, 2.5vw, 1.8rem);
-    margin: 10px 0 15px;
+    margin: 0.625rem 0 1rem;
   }
 }
 
 .cta-button {
-  margin-bottom: 3px;
+  margin-bottom: 0.2rem;
 
   @include desktop-up {
     margin-bottom: 0;
@@ -190,7 +190,7 @@ const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/l
 }
 
 .arrow-section {
-  margin: 15px auto;
+  margin: 1rem auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -203,27 +203,27 @@ const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/l
     position: relative;
     transform: none;
     z-index: 20;
-    margin: 0 20px;
+    margin: 0 1.25rem;
   }
 }
 
 .image-section {
   flex: 0 0 auto;
   width: 100%;
-  max-width: 420px;
+  max-width: min(420px, 90vw);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all var(--transition-default);
 
   @include mobile {
-    max-width: 600px;
-    margin-top: 15px;
+    max-width: min(600px, 90vw);
+    margin-top: 1rem;
   }
 
   @include desktop-up {
     flex: 0 0 auto;
-    max-width: 800px;
+    max-width: min(800px, 55vw);
     margin-right: 0;
     margin-top: 0;
     position: relative;
@@ -259,8 +259,8 @@ const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/l
   .full-view {
     flex-direction: column;
     justify-content: flex-start;
-    padding-top: 60px;
-    gap: 15px;
+    padding-top: 3.75rem;
+    gap: 1rem;
   }
 
   .content-section {
@@ -270,24 +270,24 @@ const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/l
 
   .title {
     font-size: clamp(2.5rem, 6vw, 4rem);
-    margin: 20px 0 15px;
+    margin: 1.25rem 0 1rem;
   }
 
   .tagline {
     font-size: clamp(1.2rem, 3vw, 2rem);
-    margin: 15px 0 20px;
+    margin: 1rem 0 1.25rem;
   }
 
   .arrow-section {
     position: static;
     transform: none;
-    margin: 15px auto;
+    margin: 1rem auto;
   }
 
   .image-section {
     margin-right: 0;
-    max-width: 600px;
-    margin-top: 20px;
+    max-width: min(600px, 90vw);
+    margin-top: 1.25rem;
   }
 }
 </style>

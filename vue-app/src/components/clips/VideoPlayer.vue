@@ -119,6 +119,11 @@ watch(videoRef, (video, _, onCleanup) => {
   const onVolumeChange = () => { isVideoMuted.value = video.muted }
   video.addEventListener('volumechange', onVolumeChange)
   onCleanup(() => video.removeEventListener('volumechange', onVolumeChange))
+
+  if (!props.loadOnActive && props.isActive && shouldLoadVideo.value) {
+    if (IS_MOBILE) video.muted = false
+    video.play().catch(() => {})
+  }
 })
 
 defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerLoad, togglePlayback })

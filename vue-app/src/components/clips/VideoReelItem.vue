@@ -3,10 +3,12 @@ import { ref, watch, computed } from 'vue'
 import ClipActionButton from './ClipActionButton.vue'
 import ClipEditor from './ClipEditor.vue'
 import SaveClipModal from './SaveClipModal.vue'
+import StatusToast from './StatusToast.vue'
 import VideoPlayer from './VideoPlayer.vue'
 import { useClipPreview } from '@/composables/useClipPreview'
 import { useClipActions } from '@/composables/useClipActions'
 import { useClipSave } from '@/composables/useClipSave'
+import { useToast } from '@/composables/useToast'
 import type { ClipInfo } from '@/types/clip'
 
 type Props = ClipInfo
@@ -25,6 +27,7 @@ const emit = defineEmits<Emits>()
 
 const wasEditing = ref(false)
 const playerRef = ref<InstanceType<typeof VideoPlayer> | null>(null)
+const toast = useToast()
 
 const _videoRef = computed(() => playerRef.value?.videoRef ?? null)
 
@@ -63,7 +66,7 @@ const {
   saveAdjusted: actions.saveAdjusted,
   leftAdjust,
   rightAdjust,
-  statusMessage,
+  showToast: toast.show,
   validateAdjustment,
   resetAdjustments,
   onCloseEditor: () => emit('close-editor')
@@ -158,11 +161,7 @@ const handleClick = (event: MouseEvent) => {
         </ClipActionButton>
       </div>
 
-      <Transition name="status-fade">
-        <div v-if="!isEditing && statusMessage" class="status-toast" role="status" aria-live="polite">
-          {{ statusMessage }}
-        </div>
-      </Transition>
+      <StatusToast :message="toast.message.value" :type="toast.type.value" :visible="toast.visible.value && !isEditing" />
 
       <Transition name="panel-slide">
         <ClipEditor
@@ -344,6 +343,9 @@ const handleClick = (event: MouseEvent) => {
   position: relative;
   transform: translateY(0) scale(1);
   filter: none;
+  outline: 3px solid $color-secondary;
+  outline-offset: 0;
+  border-radius: $border-radius-video $border-radius-video 32px 32px;
 
   @include tablet-down {
     padding-top: 200px;
@@ -352,6 +354,7 @@ const handleClick = (event: MouseEvent) => {
   @include tablet {
     transform: translateY(-5vh) scale(1.08);
     filter: drop-shadow(0 0 50px rgba(242, 169, 76, 1));
+    border-radius: $border-radius-video-tablet $border-radius-video-tablet 32px 32px;
   }
 }
 
@@ -379,7 +382,7 @@ const handleClick = (event: MouseEvent) => {
   }
 }
 
-.reel-item.active .video-container {
+.reel-item.active:not(.z-editing) .video-container {
   box-shadow: $active-glow;
 }
 
@@ -395,25 +398,4 @@ const handleClick = (event: MouseEvent) => {
 .panel-slide-enter-from,
 .panel-slide-leave-to { opacity: 0; transform: translateY(-10px); }
 
-.status-toast {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.75);
-  color: #fff;
-  padding: 8px 20px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  z-index: 1100;
-  pointer-events: none;
-  white-space: nowrap;
-}
-
-.status-fade-enter-active,
-.status-fade-leave-active { transition: opacity 0.3s ease; }
-
-.status-fade-enter-from,
-.status-fade-leave-to { opacity: 0; }
 </style>

@@ -1,5 +1,6 @@
 import { ref, type Ref } from 'vue'
 import { ApiWarningError } from '@/types'
+import type { ToastType } from '@/composables/useToast'
 
 interface UseClipSaveOptions {
   download: (onProgress?: (percent: number) => void) => Promise<void>
@@ -8,7 +9,7 @@ interface UseClipSaveOptions {
   saveAdjusted: (name: string, left: number, right: number) => Promise<void>
   leftAdjust: Ref<number>
   rightAdjust: Ref<number>
-  statusMessage: Ref<string>
+  showToast: (message: string, type?: ToastType, duration?: number) => void
   validateAdjustment: () => boolean
   resetAdjustments: () => void
   onCloseEditor: () => void
@@ -17,7 +18,7 @@ interface UseClipSaveOptions {
 export function useClipSave(options: UseClipSaveOptions) {
   const {
     download, downloadAdjusted, save, saveAdjusted,
-    leftAdjust, rightAdjust, statusMessage,
+    leftAdjust, rightAdjust, showToast,
     validateAdjustment, resetAdjustments, onCloseEditor
   } = options
 
@@ -53,13 +54,13 @@ export function useClipSave(options: UseClipSaveOptions) {
   const handleDownloadAdjusted = async (): Promise<void> => {
     if (!validateAdjustment()) return
     try {
-      statusMessage.value = 'Preparing download...'
+      showToast('Preparing download...', 'info')
       downloadProgress.value = 0
       await downloadAdjusted(leftAdjust.value, rightAdjust.value, _onProgress)
-      statusMessage.value = 'Download complete!'
+      showToast('Download complete!', 'success')
     } catch (err: unknown) {
       downloadProgress.value = null
-      statusMessage.value = 'Download failed: ' + (err instanceof Error ? err.message : String(err))
+      showToast('Download failed: ' + (err instanceof Error ? err.message : String(err)), 'error')
       console.error('Download failed:', err)
     }
   }
@@ -67,21 +68,20 @@ export function useClipSave(options: UseClipSaveOptions) {
   const handleModalSave = async (clipName: string): Promise<void> => {
     showSaveModal.value = false
     try {
-      statusMessage.value = 'Saving clip...'
+      showToast('Saving clip...', 'info')
       if (isAdjustedSave.value) {
         await saveAdjusted(clipName, leftAdjust.value, rightAdjust.value)
-        statusMessage.value = 'Clip saved successfully!'
+        showToast('Clip saved successfully!', 'success')
         setTimeout(() => { resetAdjustments(); onCloseEditor() }, 1500)
       } else {
         await save(clipName)
-        statusMessage.value = 'Clip saved successfully!'
-        setTimeout(() => { statusMessage.value = '' }, 2000)
+        showToast('Clip saved successfully!', 'success')
       }
     } catch (err: unknown) {
       if (err instanceof ApiWarningError) {
-        statusMessage.value = 'Nazwa zajęta: ' + err.message
+        showToast(err.message, 'warning')
       } else {
-        statusMessage.value = 'Save failed: ' + (err instanceof Error ? err.message : String(err))
+        showToast('Save failed: ' + (err instanceof Error ? err.message : String(err)), 'error')
         console.error('Save failed:', err)
       }
     }

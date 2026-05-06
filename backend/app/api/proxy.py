@@ -50,6 +50,10 @@ class BatchLoadRequest(BaseModel):
     clips: list[ClipLoadItem]
 
 
+class PrefetchRequest(BaseModel):
+    position_ids: list[str]
+
+
 _CACHE_INVALIDATING_ENDPOINTS = {Endpoints.SEARCH_PHRASE, Endpoints.SEARCH_SEMANTIC_FRAMES}
 
 
@@ -160,6 +164,30 @@ async def api_adjust_preview(
         logger.error(f"API Adjust Preview error: {e}")
         logger.debug(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/prefetch")
+async def api_prefetch(request: PrefetchRequest, user: UserSession = Depends(get_current_user)):
+    async def _fetch_one(position_id: str) -> None:
+        try:
+            await video_cache.get_or_fetch(
+                position_id,
+                lambda: api_client.call_api_for_blob(
+                    endpoint=Endpoints.VIDEO_BY_INDEX,
+                    args=[position_id],
+                    token=user.jwt_token,
+                ),
+            )
+        except Exception as e:
+            logger.warning(f"Prefetch failed for position {position_id}: {e}")
+
+    valid_ids = [pid for pid in request.position_ids if pid.isdigit() and int(pid) >= 1]
+
+    async def _run() -> None:
+        await asyncio.gather(*[_fetch_one(pid) for pid in valid_ids])
+
+    asyncio.create_task(_run())
+    return {"status": "prefetching", "count": len(valid_ids)}
 
 
 @router.post("/batch-load")

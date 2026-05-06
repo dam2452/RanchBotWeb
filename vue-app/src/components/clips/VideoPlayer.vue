@@ -39,10 +39,16 @@ const _unmute = () => {
   }
 }
 
+const _playMuted = () => {
+  if (!videoRef.value) return
+  videoRef.value.muted = true
+  isVideoMuted.value = true
+  videoRef.value.play().catch(() => {})
+}
+
 const triggerLoad = () => {
   shouldLoadVideo.value = true
   isVideoLoading.value = true
-  _unmute()
 }
 
 const _handleThumbnailClick = (event: MouseEvent) => {
@@ -55,8 +61,7 @@ const togglePlayback = () => {
   if (isVideoPlaying.value) {
     videoRef.value.pause()
   } else {
-    _unmute()
-    videoRef.value.play().catch(() => {})
+    _playMuted()
   }
 }
 
@@ -73,13 +78,12 @@ const handleLoaded = (event: Event) => {
 const handleCanPlay = () => {
   isVideoLoading.value = false
   if (!props.isActive || !shouldLoadVideo.value || !videoRef.value?.paused) return
-  _unmute()
-  videoRef.value.play().catch(() => {})
-  isVideoPlaying.value = true
+  _playMuted()
 }
 
 const handlePlaying = () => {
   isVideoPlaying.value = true
+  _unmute()
   emit('playing')
 }
 
@@ -104,6 +108,7 @@ watch(() => props.previewUrl, (newUrl) => {
 watch(() => props.isActive, (active) => {
   if (active && props.loadOnActive && !shouldLoadVideo.value && thumbnailLoaded.value && props.videoUrl) {
     shouldLoadVideo.value = true
+    if (videoRef.value) _playMuted()
   } else if (!active && videoRef.value) {
     videoRef.value.pause()
     isVideoPlaying.value = false
@@ -120,10 +125,7 @@ watch(videoRef, (video, _, onCleanup) => {
   video.addEventListener('volumechange', onVolumeChange)
   onCleanup(() => video.removeEventListener('volumechange', onVolumeChange))
 
-  if (!props.loadOnActive && props.isActive && shouldLoadVideo.value) {
-    if (IS_MOBILE) video.muted = false
-    video.play().catch(() => {})
-  }
+  if (props.isActive && shouldLoadVideo.value) _playMuted()
 })
 
 defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerLoad, togglePlayback })

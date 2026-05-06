@@ -47,6 +47,11 @@ class ClipService {
     return `/api/video/stream/${encodeURIComponent(positionId)}?s=${searchId}`
   }
 
+  prefetchVideos(positionIds: string[]): void {
+    if (positionIds.length === 0) return
+    client.post('/api/prefetch', { position_ids: positionIds }).catch(() => {})
+  }
+
   async adjustVideo(
     clipIndex: string,
     leftAdjust: number,

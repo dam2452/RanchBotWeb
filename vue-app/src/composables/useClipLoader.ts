@@ -78,6 +78,13 @@ export function useClipLoader(options: UseClipLoaderOptions) {
 
     loadingClips.value = false
     lastLoadTime = Date.now()
+
+    const prefetchStart = endIdx
+    const prefetchEnd = Math.min(prefetchStart + batchSize, results.value.length)
+    if (prefetchStart < prefetchEnd) {
+      const ids = Array.from({ length: prefetchEnd - prefetchStart }, (_, i) => String(prefetchStart + i + 1))
+      clipService.prefetchVideos(ids)
+    }
   }
 
   const loadVideoForClip = (index: number): void => {

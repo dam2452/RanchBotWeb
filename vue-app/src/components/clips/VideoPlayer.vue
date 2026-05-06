@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import LoadingSpinner from '../common/LoadingSpinner.vue'
 import { IS_MOBILE } from '@/utils/formatters'
 
@@ -97,8 +97,16 @@ const handleVideoError = () => {
   isVideoPlaying.value = false
 }
 
-watch(() => props.videoUrl, (newUrl) => {
-  if (newUrl && shouldLoadVideo.value) isVideoLoading.value = true
+watch(() => props.videoUrl, (newUrl, oldUrl) => {
+  if (!newUrl) {
+    shouldLoadVideo.value = false
+    thumbnailLoaded.value = false
+    isVideoPlaying.value = false
+    isVideoLoading.value = false
+  } else if (shouldLoadVideo.value && newUrl !== oldUrl) {
+    isVideoLoading.value = true
+    nextTick(() => videoRef.value?.load())
+  }
 })
 
 watch(() => props.previewUrl, (newUrl) => {

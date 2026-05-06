@@ -47,9 +47,18 @@ class ClipService {
     return `/api/video/stream/${encodeURIComponent(positionId)}?s=${searchId}`
   }
 
+  private _prefetchController: AbortController | null = null
+
   prefetchVideos(positionIds: string[]): void {
     if (positionIds.length === 0) return
-    client.post('/api/prefetch', { position_ids: positionIds }).catch(() => {})
+    this._prefetchController?.abort()
+    this._prefetchController = new AbortController()
+    client.post('/api/prefetch', { position_ids: positionIds }, { signal: this._prefetchController.signal }).catch(() => {})
+  }
+
+  cancelPrefetch(): void {
+    this._prefetchController?.abort()
+    this._prefetchController = null
   }
 
   async adjustVideo(

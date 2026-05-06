@@ -86,6 +86,7 @@ const _loadSearchResults = async (): Promise<void> => {
 }
 
 const _resetSearchState = (): void => {
+  clipService.cancelPrefetch()
   searchId.value++
   reset()
   results.value = []

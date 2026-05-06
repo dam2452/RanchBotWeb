@@ -27,9 +27,9 @@ router = APIRouter(prefix="/clips", tags=["clips"])
 
 
 @router.get("")
-async def get_clips(user: UserSession = Depends(get_current_user), all_series: bool = False):
+async def get_clips(user: UserSession = Depends(get_current_user), filter_by_serial: bool = False):
     try:
-        clips = await api_client.get_user_clips(user.jwt_token, all_series=all_series)
+        clips = await api_client.get_user_clips(user.jwt_token, filter_by_serial=filter_by_serial)
         return {"status": "success", "clips": clips}
     except Exception as e:
         logger.error(f"Get clips error: {e}")

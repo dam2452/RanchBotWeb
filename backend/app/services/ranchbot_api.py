@@ -36,6 +36,7 @@ class Endpoints:
     AUTH_FORGOT_PASSWORD = "/auth/forgot-password"
     AUTH_RESET_PASSWORD = "/auth/reset-password"
     AUTH_LINK_TELEGRAM = "/auth/link-telegram"
+    AUTH_ATTACH_CREDENTIALS = "/auth/attach-credentials"
 
 
 class RanchBotAPIClient:
@@ -67,6 +68,7 @@ class RanchBotAPIClient:
         Endpoints.AUTH_FORGOT_PASSWORD,
         Endpoints.AUTH_RESET_PASSWORD,
         Endpoints.AUTH_LINK_TELEGRAM,
+        Endpoints.AUTH_ATTACH_CREDENTIALS,
     }
 
     def __init__(self):
@@ -212,6 +214,17 @@ class RanchBotAPIClient:
                 raise Exception(self._extract_api_error(response))
             return response.json()
 
+    async def attach_credentials(self, token: str, username: str, password: str) -> dict[str, Any]:
+        url = self._build_url(Endpoints.AUTH_ATTACH_CREDENTIALS)
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                url,
+                json={"token": token, "username": username, "password": password},
+            )
+            if not response.is_success:
+                raise Exception(self._extract_api_error(response))
+            return response.json()
+
     async def search_clips(self, query: str, token: str) -> list[dict[str, Any]]:
         result = await self.call_api(Endpoints.SEARCH_PHRASE, [query], token)
         if result and result.get("data") and result["data"].get("results"):
@@ -251,8 +264,8 @@ class RanchBotAPIClient:
     async def delete_clip(self, clip_name: str, token: str) -> dict[str, Any]:
         return await self.call_api(Endpoints.CLIP_DELETE, [clip_name], token)
 
-    async def get_user_clips(self, token: str, all_series: bool = False) -> list[dict[str, Any]]:
-        args = ["all"] if all_series else []
+    async def get_user_clips(self, token: str, filter_by_serial: bool = False) -> list[dict[str, Any]]:
+        args = ["serial"] if filter_by_serial else []
         result = await self.call_api(Endpoints.CLIP_LIST, args, token)
         if result and result.get("status") == "success":
             return result.get("data", {}).get("clips", [])

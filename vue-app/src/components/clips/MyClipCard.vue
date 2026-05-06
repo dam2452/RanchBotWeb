@@ -34,8 +34,9 @@ const _handleDeleteClick = (): void => {
 <template>
   <div class="clip-card" :data-clip-id="clip.id">
     <div class="video-container" :class="{ 'active': isActive }">
-      <div v-if="!hasError" class="video-wrapper">
+      <div class="video-wrapper">
         <VideoPlayer
+          v-if="!hasError"
           :video-url="videoUrl"
           :thumbnail-url="thumbnailUrl"
           :preview-url="null"
@@ -44,35 +45,35 @@ const _handleDeleteClick = (): void => {
           :load-on-active="false"
           @click="emit('video-click', $event)"
         />
+
+        <div v-else class="error-placeholder">
+          <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+          </svg>
+          <p class="error-text">Can't play in browser</p>
+          <p class="error-subtext">Try downloading</p>
+        </div>
+
+        <ClipActionButton
+          variant="secondary"
+          position="top-right"
+          size="small"
+          class="action-button"
+          @click="emit('download')"
+        >
+          Download
+        </ClipActionButton>
+
+        <ClipActionButton
+          variant="danger"
+          position="bottom-right"
+          size="small"
+          class="action-button"
+          @click="_handleDeleteClick"
+        >
+          Delete
+        </ClipActionButton>
       </div>
-
-      <div v-else class="error-placeholder">
-        <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-        </svg>
-        <p class="error-text">Can't play in browser</p>
-        <p class="error-subtext">Try downloading</p>
-      </div>
-
-      <ClipActionButton
-        variant="secondary"
-        position="top-right"
-        size="small"
-        :class="['action-button', { 'error-download-button': hasError }]"
-        @click="emit('download')"
-      >
-        Download
-      </ClipActionButton>
-
-      <ClipActionButton
-        variant="danger"
-        position="bottom-right"
-        size="small"
-        :class="['action-button', { 'error-delete-button': hasError }]"
-        @click="_handleDeleteClick"
-      >
-        Delete
-      </ClipActionButton>
     </div>
 
     <div class="clip-name">
@@ -211,23 +212,9 @@ const _handleDeleteClick = (): void => {
   transition: opacity 0.2s;
 }
 
-.error-delete-button,
-.error-download-button {
-  opacity: 0.9 !important;
-  pointer-events: auto !important;
-
-  &:hover {
-    opacity: 1 !important;
-  }
-}
-
-.video-container:hover .action-button {
+.video-wrapper:hover .action-button {
   opacity: 0.8;
   pointer-events: auto;
-}
-
-.action-button:hover {
-  opacity: 1;
 }
 
 @media (hover: none) {
@@ -235,6 +222,10 @@ const _handleDeleteClick = (): void => {
     opacity: 0.75;
     pointer-events: auto;
   }
+}
+
+.action-button:hover {
+  opacity: 1;
 }
 
 .clip-name {

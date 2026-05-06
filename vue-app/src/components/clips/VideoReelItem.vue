@@ -264,7 +264,7 @@ const handleClick = (event: MouseEvent) => {
   }
 }
 
-.reel-item.last-loaded .video-container {
+.reel-item.last-loaded .video-container::after {
   box-shadow: $active-glow-soft;
 }
 
@@ -344,9 +344,17 @@ const handleClick = (event: MouseEvent) => {
   position: relative;
   transform: translateY(0) scale(1);
   filter: none;
-  outline: 3px solid $color-secondary;
-  outline-offset: 0;
   border-radius: $border-radius-video $border-radius-video 32px 32px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 3px solid $color-secondary;
+    pointer-events: none;
+    z-index: 10;
+  }
 
   @include tablet-down {
     padding-top: 200px;
@@ -367,7 +375,18 @@ const handleClick = (event: MouseEvent) => {
   align-items: center;
   justify-content: center;
   border-radius: $border-radius-video;
-  transition: box-shadow 0.5s ease, border-radius 0.3s ease;
+  transition: border-radius 0.3s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 3px solid transparent;
+    pointer-events: none;
+    transition: border-color 0.5s ease;
+    z-index: 1;
+  }
 
   &.editing {
     border-radius: $border-radius-video $border-radius-video 0 0;
@@ -383,8 +402,8 @@ const handleClick = (event: MouseEvent) => {
   }
 }
 
-.reel-item.active:not(.z-editing) .video-container {
-  box-shadow: $active-glow;
+.reel-item.active:not(.z-editing) .video-container::after {
+  border-color: $color-secondary;
 }
 
 .clip-wrapper {

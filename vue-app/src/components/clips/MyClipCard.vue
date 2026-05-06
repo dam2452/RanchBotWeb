@@ -116,15 +116,10 @@ const _handleDeleteClick = (): void => {
   justify-content: center;
   overflow: hidden;
   border-radius: $border-radius-video;
-  outline: $active-frame-width solid transparent;
-  outline-offset: $active-frame-offset;
-  transition: outline-color 0.3s ease;
-
-  &.active {
-    outline-color: $active-frame-color;
-  }
 
   @include tablet {
+    flex: 1;
+    width: auto;
     min-height: 0;
     max-height: none;
     border-radius: $border-radius-video-tablet;
@@ -134,11 +129,33 @@ const _handleDeleteClick = (): void => {
 .video-wrapper {
   position: relative;
   width: 100%;
-  height: 100%;
+  height: auto;
   min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: $border-radius-video;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 3px solid transparent;
+    pointer-events: none;
+    transition: border-color 0.3s ease;
+    z-index: 1;
+  }
+
+  @include tablet {
+    width: 100%;
+    height: 100%;
+    border-radius: $border-radius-video-tablet;
+  }
+}
+
+.video-container.active .video-wrapper::after {
+  border-color: $active-frame-color;
 }
 
 .error-placeholder {

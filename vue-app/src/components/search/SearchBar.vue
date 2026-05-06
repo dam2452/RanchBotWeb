@@ -19,7 +19,7 @@ interface Emits {
   (e: 'search', query: string): void
   (e: 'filters'): void
   (e: 'remove-filter', category: keyof ActiveFilters, value: string): void
-  (e: 'toggle-semantic'): void
+  (e: 'toggle-semantic', query: string): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -48,8 +48,8 @@ const handleRemoveFilter = (category: keyof ActiveFilters, value: string) => {
   emit('remove-filter', category, value)
 }
 
-const handleToggleSemantic = () => {
-  emit('toggle-semantic')
+const handleToggleSemantic = (query: string) => {
+  emit('toggle-semantic', query)
 }
 </script>
 

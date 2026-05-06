@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { isAxiosError } from 'axios'
 import { clipService } from '@/services/clipService'
 import type { SearchResult, ActiveFilters } from '@/types'
 import UserButtons from '@/components/layout/UserButtons.vue'
@@ -68,18 +69,24 @@ const _loadSearchResults = async (): Promise<void> => {
     return
   }
 
+  const capturedSearchId = searchId.value
   loading.value = true
   error.value = ''
 
   try {
-    results.value = semanticMode.value
+    const newResults = semanticMode.value
       ? await clipService.searchSemanticClips(query.value)
       : await clipService.searchClips(query.value)
+
+    if (searchId.value !== capturedSearchId) return
+
+    results.value = newResults
     loading.value = false
     if (results.value.length > 0) {
       await loadNextClips(2)
     }
   } catch (err: unknown) {
+    if (isAxiosError(err) && err.code === 'ERR_CANCELED') return
     error.value = err instanceof Error ? err.message : 'Failed to load search results'
     loading.value = false
   }
@@ -102,12 +109,14 @@ const handleSearch = (newQuery: string): void => {
   _loadSearchResults()
 }
 
-const handleToggleSemantic = (): void => {
+const handleToggleSemantic = (currentInput: string): void => {
+  const effectiveQuery = currentInput || query.value
   _resetSearchState()
+  query.value = effectiveQuery
   const newMode = !semanticMode.value
   router.push({
     name: 'search-results',
-    query: newMode ? { query: query.value, mode: 'semantic' } : { query: query.value },
+    query: newMode ? { query: effectiveQuery, mode: 'semantic' } : { query: effectiveQuery },
   })
 }
 

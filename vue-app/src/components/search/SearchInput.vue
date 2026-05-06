@@ -9,7 +9,7 @@ interface Props {
 
 interface Emits {
   (e: 'search', query: string): void
-  (e: 'toggle-semantic'): void
+  (e: 'toggle-semantic', query: string): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -39,7 +39,7 @@ const handleSubmit = () => {
       class="semantic-button"
       :class="{ active: semanticMode }"
       aria-label="Toggle semantic search"
-      @click="emit('toggle-semantic')"
+      @click="emit('toggle-semantic', query.trim())"
     >
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />

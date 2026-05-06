@@ -16,13 +16,23 @@ import { ApiWarningError } from '@/types'
 
 
 class ClipService {
+  private _searchController: AbortController | null = null
+
+  private _startSearch(): AbortSignal {
+    this._searchController?.abort()
+    this._searchController = new AbortController()
+    return this._searchController.signal
+  }
+
   async searchClips(query: string): Promise<SearchResult[]> {
-    const response = await client.post('/api/json', { endpoint: 'szf', args: query ? [query] : [] })
+    const signal = this._startSearch()
+    const response = await client.post('/api/json', { endpoint: 'szf', args: query ? [query] : [] }, { signal })
     return searchResultsParser.parse(response.data)
   }
 
   async searchSemanticClips(query: string): Promise<SearchResult[]> {
-    const response = await client.post('/api/json', { endpoint: 'sensklatki', args: [query] })
+    const signal = this._startSearch()
+    const response = await client.post('/api/json', { endpoint: 'sensklatki', args: [query] }, { signal })
     return searchResultsParser.parse(response.data)
   }
 

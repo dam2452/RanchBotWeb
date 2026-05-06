@@ -135,6 +135,7 @@ const handleClick = (event: MouseEvent) => {
           :preview-url="previewUrl"
           :is-active="isActive"
           :is-editing="isEditing ?? false"
+          :load-on-active="false"
           @click="handleClick"
           @loaded="emit('loaded', $event, index)"
         />

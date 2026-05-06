@@ -43,7 +43,7 @@ const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/l
       <div class="content-section">
         <BrandLogo class="logo" size="large" />
         <h1 class="title">RanchBot</h1>
-        <p class="tagline">Find, cut, and share your favorite series scene — in seconds.</p>
+        <p class="tagline">Find, cut, and share your favorite series scene - in seconds.</p>
         <PrimaryButton class="cta-button" size="large" @click="goToSearch">enter a quote</PrimaryButton>
       </div>
 
@@ -167,7 +167,7 @@ const goToSearch = () => router.push(authStore.isAuthenticated ? '/search' : '/l
 
 .tagline {
   text-align: center;
-  margin: 0 1rem 0.2rem;
+  margin: 0 1rem 0.75rem;
   font-size: 0.8rem;
 
   @include mobile {

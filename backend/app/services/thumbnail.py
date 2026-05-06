@@ -52,7 +52,7 @@ class ThumbnailService:
     @staticmethod
     def _validate_mp4(data: bytes) -> None:
         if len(data) < 8:
-            raise ValueError(f"Video data too small ({len(data)} bytes) — likely not a valid MP4")
+            raise ValueError(f"Video data too small ({len(data)} bytes) - likely not a valid MP4")
         box_type = data[4:8]
         valid_boxes = {b"ftyp", b"moov", b"mdat", b"wide", b"free", b"skip"}
         if box_type not in valid_boxes:

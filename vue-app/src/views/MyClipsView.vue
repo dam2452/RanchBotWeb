@@ -284,7 +284,6 @@ watch(activePage, pauseAllVideos)
     min-height: 0;
     max-height: none;
     flex: 1;
-    border-radius: 12px;
   }
 }
 

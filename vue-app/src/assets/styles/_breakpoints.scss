@@ -3,6 +3,9 @@ $border-radius-video: 24px;
 $border-radius-video-tablet: 32px;
 $active-glow: 0 0 0 3px #{$color-secondary}, 0 0 40px rgba(242, 169, 76, 0.8);
 $active-glow-soft: 0 0 16px rgba(242, 169, 76, 0.4);
+$active-frame-color: $color-secondary;
+$active-frame-width: 3px;
+$active-frame-offset: 3px;
 
 $breakpoint-mobile: 481px;
 $breakpoint-tablet: 851px;

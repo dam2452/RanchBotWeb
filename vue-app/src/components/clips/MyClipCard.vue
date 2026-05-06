@@ -113,13 +113,14 @@ const _handleDeleteClick = (): void => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: box-shadow 0.3s ease;
   overflow: hidden;
   border-radius: $border-radius-video;
-  transition: box-shadow 0.3s ease;
+  outline: $active-frame-width solid transparent;
+  outline-offset: $active-frame-offset;
+  transition: outline-color 0.3s ease;
 
   &.active {
-    box-shadow: $active-glow;
+    outline-color: $active-frame-color;
   }
 
   @include tablet {

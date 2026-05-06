@@ -238,11 +238,12 @@ watch(() => route.query.mode, async () => {
   top: calc(5rem + env(safe-area-inset-top));
   transform: translateX(-50%);
   z-index: 1000;
-  width: 85vw;
-  max-width: min(500px, 60vw);
+  width: 95vw;
+  max-width: 600px;
 
   @include mobile {
-    width: clamp(min(400px, 80vw), 60vw, 550px);
+    width: 95vw;
+    max-width: 660px;
   }
 
   @include tablet {

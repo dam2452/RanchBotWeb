@@ -16,9 +16,9 @@ client.interceptors.response.use(
     const status = error.response?.status
 
     if (status === 401) {
-      const authPaths = ['/login', '/register', '/forgot-password']
-      if (!authPaths.includes(window.location.pathname)) {
-        window.location.href = '/login'
+      const publicPaths = ['/', '/login', '/register', '/forgot-password']
+      if (!publicPaths.includes(window.location.pathname)) {
+        window.location.href = '/'
       }
       return Promise.reject(error)
     }

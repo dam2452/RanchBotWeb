@@ -12,7 +12,9 @@
           :style="compact ? '' : 'background: linear-gradient(145deg, #f2a94c, #e09340); color: #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);'"
           @click="handleTooltipClick"
         >
-          <img v-if="compact" src="/images/ui/icons/wine-bottle.svg" alt="" class="compact-icon" />
+          <template v-if="compact">
+            <img src="/images/ui/icons/user.svg" alt="" class="compact-icon" />
+          </template>
           <template v-else>
             <span class="user-btn-full">Hi, {{ authStore.user?.username }}</span>
             <img src="/images/ui/icons/user.svg" alt="" class="user-btn-icon" />
@@ -249,8 +251,8 @@ onUnmounted(() => {
 
   .user-btn-icon {
     display: block;
-    width: 55%;
-    height: 55%;
+    width: 68%;
+    height: 68%;
   }
 
   .user-btn-full {
@@ -270,8 +272,10 @@ onUnmounted(() => {
 
   .logout-btn-icon {
     display: block;
-    width: 50%;
-    height: 50%;
+    width: 26px;
+    height: 26px;
+    max-width: none;
+    max-height: none;
   }
 
   .logout-btn-full {
@@ -291,12 +295,27 @@ onUnmounted(() => {
 
   .clips-btn-icon {
     display: block;
-    width: 50%;
-    height: 50%;
+    width: 26px;
+    height: 26px;
+    max-width: none;
+    max-height: none;
   }
 
   .clips-btn-full {
     display: none;
+  }
+
+  .btn-default {
+    height: 40px;
+    padding: 0 14px !important;
+    font-size: 13px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .compact-user-btn {
+    width: 40px;
+    height: 40px;
   }
 }
 
@@ -315,8 +334,8 @@ onUnmounted(() => {
 }
 
 .compact-icon {
-  width: 55%;
-  height: 55%;
+  width: 68%;
+  height: 68%;
   object-fit: contain;
   filter: brightness(0) invert(1);
 }

@@ -113,7 +113,7 @@ const formatValue = (value: number): string => {
   background: #f0f0f0;
   border-radius: 0 0 32px 32px;
   padding: 14px;
-  border-top: 2px solid #f2a94c;
+  border: 2px solid #f2a94c;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
 }
 

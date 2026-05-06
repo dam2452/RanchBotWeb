@@ -202,7 +202,7 @@ watch(() => props.show, (val) => {
   background: #f0f0f0;
   border-radius: 32px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-  border-top: 2px solid var(--color-secondary);
+  border: 2px solid var(--color-secondary);
   width: 90%;
   max-width: 500px;
   max-height: 85vh;

@@ -12,6 +12,7 @@ import {
 } from './clipParsers'
 import type { SeriesInfo } from './clipParsers'
 import type { ActiveFilters, Clip, EpisodeInfo, FilterOption, SearchResult, SeasonInfo } from '@/types'
+import { ApiWarningError } from '@/types'
 
 
 class ClipService {
@@ -87,9 +88,8 @@ class ClipService {
     if (response.data?.status === 'error') {
       throw new Error(response.data?.message ?? 'Save failed')
     }
-    const content: string = response.data?.content ?? response.data?.data?.content ?? ''
-    if (content.includes('BŁĄD') || content.includes('ERROR') || content.includes('❌')) {
-      throw new Error(content.replace(/```/g, '').replace(/\xa0/g, ' ').trim())
+    if (response.data?.status === 'warning') {
+      throw new ApiWarningError(response.data?.message ?? 'Warning')
     }
   }
 

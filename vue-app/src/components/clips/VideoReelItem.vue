@@ -124,7 +124,7 @@ const handleClick = (event: MouseEvent) => {
     @click="handleClick"
   >
     <div v-if="!hasError" class="clip-wrapper" :class="{ 'editing-wrapper': isEditing }">
-      <div class="video-container">
+      <div class="video-container" :class="{ 'editing': isEditing }">
         <VideoPlayer
           ref="playerRef"
           :video-url="videoUrl"
@@ -363,11 +363,19 @@ const handleClick = (event: MouseEvent) => {
   align-items: center;
   justify-content: center;
   border-radius: $border-radius-video;
-  transition: box-shadow 0.5s ease;
+  transition: box-shadow 0.5s ease, border-radius 0.3s ease;
+
+  &.editing {
+    border-radius: $border-radius-video $border-radius-video 0 0;
+  }
 
   @include tablet {
     width: auto;
     border-radius: $border-radius-video-tablet;
+
+    &.editing {
+      border-radius: $border-radius-video-tablet $border-radius-video-tablet 0 0;
+    }
   }
 }
 

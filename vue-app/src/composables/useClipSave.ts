@@ -1,4 +1,5 @@
 import { ref, type Ref } from 'vue'
+import { ApiWarningError } from '@/types'
 
 interface UseClipSaveOptions {
   download: (onProgress?: (percent: number) => void) => Promise<void>
@@ -77,8 +78,12 @@ export function useClipSave(options: UseClipSaveOptions) {
         setTimeout(() => { statusMessage.value = '' }, 2000)
       }
     } catch (err: unknown) {
-      statusMessage.value = 'Save failed: ' + (err instanceof Error ? err.message : String(err))
-      console.error('Save failed:', err)
+      if (err instanceof ApiWarningError) {
+        statusMessage.value = 'Nazwa zajęta: ' + err.message
+      } else {
+        statusMessage.value = 'Save failed: ' + (err instanceof Error ? err.message : String(err))
+        console.error('Save failed:', err)
+      }
     }
   }
 

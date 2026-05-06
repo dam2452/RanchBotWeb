@@ -32,9 +32,16 @@ export interface RegisterData {
 }
 
 export interface ApiResponse<T> {
-  status: 'success' | 'error'
+  status: 'success' | 'error' | 'warning'
   data?: T
   message?: string
+}
+
+export class ApiWarningError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ApiWarningError'
+  }
 }
 
 export interface FilterOption {

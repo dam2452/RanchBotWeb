@@ -4,8 +4,8 @@ from urllib.parse import unquote
 from app.core.dependencies import get_current_user
 from app.core.logger import setup_logger
 from app.core.responses import (
+    range_video_response,
     thumbnail_response,
-    video_streaming_response,
 )
 from app.models.clip import ClipOperationRequest
 from app.models.user import UserSession
@@ -18,6 +18,7 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
+    Request,
 )
 
 logger = setup_logger(__name__)
@@ -35,14 +36,15 @@ async def get_clips(user: UserSession = Depends(get_current_user), all_series: b
 
 
 @router.get("/video/{clip_id}")
-async def get_clip_video(clip_id: str, user: UserSession = Depends(get_current_user)):
+async def get_clip_video(request: Request, clip_id: str, user: UserSession = Depends(get_current_user)):
     decoded_clip_name = unquote(clip_id)
     try:
         logger.info(f"Fetching clip video: {decoded_clip_name}")
         video_data = await api_client.call_api_for_blob(
             endpoint=Endpoints.CLIP_SEND, args=[decoded_clip_name], token=user.jwt_token,
         )
-        return video_streaming_response(video_data, filename=decoded_clip_name)
+        range_header = request.headers.get("Range")
+        return range_video_response(video_data, range_header)
     except Exception as e:
         logger.error(f"Get clip video error for '{decoded_clip_name}': {e}")
         logger.debug(traceback.format_exc())

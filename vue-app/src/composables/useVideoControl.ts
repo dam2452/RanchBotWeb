@@ -122,7 +122,11 @@ export function useVideoControl(options: UseVideoControlOptions) {
       }
     }
 
-    if (!targetVideo) return false
+    if (!targetVideo) {
+      pauseAllVideos()
+      activeVideoId.value = String(clipId)
+      return false
+    }
 
     if (activeVideoId.value === String(clipId)) {
       if (targetVideo.paused) {

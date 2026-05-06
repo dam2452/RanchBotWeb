@@ -41,6 +41,7 @@ const _handleDeleteClick = (): void => {
           :preview-url="null"
           :is-active="isActive"
           :is-editing="false"
+          :load-on-active="false"
           @click="emit('video-click', $event)"
         />
       </div>

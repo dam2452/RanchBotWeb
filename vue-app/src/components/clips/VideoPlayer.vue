@@ -9,6 +9,7 @@ interface Props {
   previewUrl: string | null | undefined
   isActive: boolean
   isEditing: boolean
+  loadOnActive?: boolean
 }
 
 interface Emits {
@@ -19,7 +20,9 @@ interface Emits {
   (e: 'paused'): void
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  loadOnActive: true,
+})
 const emit = defineEmits<Emits>()
 
 const videoRef = ref<HTMLVideoElement | null>(null)
@@ -40,6 +43,11 @@ const triggerLoad = () => {
   shouldLoadVideo.value = true
   isVideoLoading.value = true
   _unmute()
+}
+
+const _handleThumbnailClick = (event: MouseEvent) => {
+  if (!props.loadOnActive && !shouldLoadVideo.value) triggerLoad()
+  emit('click', event)
 }
 
 const togglePlayback = () => {
@@ -94,7 +102,7 @@ watch(() => props.previewUrl, (newUrl) => {
 })
 
 watch(() => props.isActive, (active) => {
-  if (active && !shouldLoadVideo.value && thumbnailLoaded.value && props.videoUrl) {
+  if (active && props.loadOnActive && !shouldLoadVideo.value && thumbnailLoaded.value && props.videoUrl) {
     shouldLoadVideo.value = true
   } else if (!active && videoRef.value) {
     videoRef.value.pause()
@@ -131,11 +139,11 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
       :class="{ 'editing-video': isEditing }"
       alt="Video thumbnail"
       @load="handleThumbnailLoaded"
-      @click="emit('click', $event)"
+      @click="_handleThumbnailClick"
     />
 
     <video
-      v-if="videoUrl || shouldLoadVideo"
+      v-if="shouldLoadVideo || (loadOnActive && videoUrl)"
       v-show="!thumbnailUrl || isVideoPlaying"
       ref="videoRef"
       loop
@@ -154,7 +162,7 @@ defineExpose({ videoRef, isVideoPlaying, shouldLoadVideo, isVideoMuted, triggerL
       @error="handleVideoError"
     ></video>
 
-    <div v-if="isVideoLoading && shouldLoadVideo && !videoUrl" class="video-loading-overlay">
+    <div v-if="isVideoLoading && shouldLoadVideo" class="video-loading-overlay">
       <LoadingSpinner size="small" />
     </div>
 

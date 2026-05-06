@@ -35,6 +35,7 @@ html {
   font-size: clamp(13px, 1vw, 16px);
   background-color: #f2a94c;
   color-scheme: light only;
+  touch-action: pan-x pan-y;
 }
 
 body {
@@ -48,6 +49,11 @@ body {
   position: fixed;
   width: 100%;
   color-scheme: light only;
+  touch-action: pan-x pan-y;
+}
+
+button, a, input, select, textarea, [role="button"] {
+  touch-action: manipulation;
 }
 
 #app {

@@ -160,9 +160,3 @@ class AuthService:
             )
 
 
-def _create_auth_service() -> AuthService:
-    from app.integrations.ranchbot import api_client
-    return AuthService(api_client.auth)
-
-
-auth_service = _create_auth_service()

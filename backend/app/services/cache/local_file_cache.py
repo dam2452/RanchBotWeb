@@ -1,5 +1,7 @@
 import os
 
+import aiofiles
+
 from app.core.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -15,22 +17,22 @@ class LocalFileCacheManager:
         safe_key = key.replace("/", "_").replace("..", "_")
         return os.path.join(self._cache_dir, f"{safe_key}{self._extension}")
 
-    def get(self, key: str) -> bytes | None:
+    async def get(self, key: str) -> bytes | None:
         path = self._cache_path(key)
         if not os.path.exists(path):
             return None
         try:
-            with open(path, "rb") as f:
-                return f.read()
+            async with aiofiles.open(path, "rb") as f:
+                return await f.read()
         except Exception as e:
             logger.error(f"Cache read error [{key}]: {e}")
             return None
 
-    def put(self, key: str, data: bytes) -> None:
+    async def put(self, key: str, data: bytes) -> None:
         path = self._cache_path(key)
         try:
-            with open(path, "wb") as f:
-                f.write(data)
+            async with aiofiles.open(path, "wb") as f:
+                await f.write(data)
         except Exception as e:
             logger.error(f"Cache write error [{key}]: {e}")
 

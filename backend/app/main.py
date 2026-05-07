@@ -3,11 +3,7 @@ from contextlib import asynccontextmanager
 import os
 import time
 
-from app.api import (
-    auth,
-    clips,
-    proxy,
-)
+from app.api.v1 import auth, clips, proxy
 from app.core.config import settings
 from app.core.exceptions import RanchBotAPIError
 from app.core.logger import setup_logger
@@ -35,7 +31,7 @@ def _cleanup_cache_dirs(cache_dirs: list[str], max_age_seconds: float) -> None:
             logger.info(f"[Cleanup] Removed {removed} old files from {cache_dir}")
 
 
-async def cleanup_cache_task() -> None:
+async def _cleanup_cache_task() -> None:
     cache_dirs = [settings.thumbnail_cache_dir, settings.adjusted_video_cache_dir]
     max_age = settings.video_cache_max_age_hours * 3600
     loop = asyncio.get_running_loop()
@@ -53,7 +49,7 @@ async def cleanup_cache_task() -> None:
 async def lifespan(app: FastAPI):
     http_client = httpx.AsyncClient()
     api_client.set_shared_client(http_client)
-    cleanup_task = asyncio.create_task(cleanup_cache_task())
+    cleanup_task = asyncio.create_task(_cleanup_cache_task())
     try:
         yield
     finally:
@@ -86,9 +82,9 @@ async def ranchbot_api_error_handler(request: Request, exc: RanchBotAPIError) ->
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
 
-app.include_router(auth.router)
-app.include_router(proxy.router)
-app.include_router(clips.router)
+app.include_router(auth.router, prefix="/api/v1")
+app.include_router(clips.router, prefix="/api/v1")
+app.include_router(proxy.router, prefix="/api/v1")
 
 
 @app.get("/")

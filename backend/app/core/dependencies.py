@@ -31,36 +31,25 @@ async def get_current_user_optional(
 
 
 @lru_cache
-def get_api_client():
-    from app.integrations.ranchbot import api_client
-    return api_client
-
-
-@lru_cache
-def get_thumbnail_service():
-    from app.services.thumbnail import thumbnail_service
-    return thumbnail_service
-
-
-@lru_cache
-def get_adjusted_video_service():
-    from app.services.adjusted_video import adjusted_video_service
-    return adjusted_video_service
-
-
-@lru_cache
-def get_video_cache():
-    from app.services.video_cache import video_cache
-    return video_cache
-
-
-@lru_cache
 def get_auth_service():
-    from app.services.auth_service import auth_service
-    return auth_service
+    from app.integrations.ranchbot import api_client
+    from app.services.auth_service import AuthService
+    return AuthService(api_client.auth)
 
 
 @lru_cache
 def get_clip_service():
-    from app.services.clip_service import clip_service
-    return clip_service
+    from app.integrations.ranchbot import api_client
+    from app.services.clip_service import ClipService
+    from app.services.thumbnail import thumbnail_service
+    return ClipService(api_client.clips, thumbnail_service)
+
+
+@lru_cache
+def get_proxy_service():
+    from app.integrations.ranchbot import api_client
+    from app.services.adjusted_video import adjusted_video_service
+    from app.services.proxy_service import ProxyService
+    from app.services.thumbnail import thumbnail_service
+    from app.services.video_cache import video_cache
+    return ProxyService(api_client, video_cache, adjusted_video_service, thumbnail_service)

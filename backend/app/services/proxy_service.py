@@ -40,21 +40,18 @@ class ProxyService:
         self._thumbnail = thumbnail_svc
 
     async def call_json(self, endpoint: str, args: list[Any], token: str) -> dict[str, Any]:
-        result = await self._api.call_api(endpoint=endpoint, args=args, token=token)
-        if endpoint in _CACHE_INVALIDATING_ENDPOINTS:
-            await self._video_cache.clear()
-            logger.debug("Video cache cleared after search")
-        return result
+        return await self._api.call_api(endpoint=endpoint, args=args, token=token)
 
     async def get_video(self, endpoint: str, args: list[Any], token: str) -> Response:
         video_data = await self._api.call_api_for_blob(endpoint=endpoint, args=args, token=token)
         return video_streaming_response(video_data)
 
     async def stream_video(
-        self, position_id: str, token: str, range_header: str | None,
+        self, position_id: str, search_id: int, token: str, range_header: str | None,
     ) -> Response:
+        cache_key = f"{position_id}:{search_id}"
         video_data = await self._video_cache.get_or_fetch(
-            position_id,
+            cache_key,
             lambda: self._api.call_api_for_blob(
                 endpoint=Endpoints.VIDEO_BY_INDEX,
                 args=[position_id],
@@ -92,14 +89,19 @@ class ProxyService:
         return video_streaming_response(video_data)
 
     def start_prefetch(
-        self, position_ids: list[str], token: str, background_tasks: BackgroundTasks,
+        self,
+        position_ids: list[str],
+        search_id: int,
+        token: str,
+        background_tasks: BackgroundTasks,
     ) -> int:
         valid_ids = [pid for pid in position_ids if pid.isdigit() and int(pid) >= 1]
 
         async def _fetch_one(position_id: str) -> None:
+            cache_key = f"{position_id}:{search_id}"
             try:
                 await self._video_cache.get_or_fetch(
-                    position_id,
+                    cache_key,
                     lambda: self._api.call_api_for_blob(
                         endpoint=Endpoints.VIDEO_BY_INDEX,
                         args=[position_id],

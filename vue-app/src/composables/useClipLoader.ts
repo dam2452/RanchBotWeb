@@ -83,7 +83,7 @@ export function useClipLoader(options: UseClipLoaderOptions) {
     const prefetchEnd = Math.min(prefetchStart + batchSize, results.value.length)
     if (prefetchStart < prefetchEnd) {
       const ids = Array.from({ length: prefetchEnd - prefetchStart }, (_, i) => String(prefetchStart + i + 1))
-      clipService.prefetchVideos(ids)
+      clipService.prefetchVideos(ids, currentSearchId)
     }
   }
 

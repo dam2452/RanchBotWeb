@@ -71,12 +71,12 @@ class ClipService {
 
   private _prefetchController: AbortController | null = null
 
-  prefetchVideos(positionIds: string[]): void {
+  prefetchVideos(positionIds: string[], searchId: number): void {
     if (positionIds.length === 0) return
     this._prefetchController?.abort()
     this._prefetchController = new AbortController()
     client
-      .post(`${API_BASE}/prefetch`, { position_ids: positionIds }, { signal: this._prefetchController.signal })
+      .post(`${API_BASE}/prefetch`, { position_ids: positionIds, search_id: searchId }, { signal: this._prefetchController.signal })
       .catch(() => {})
   }
 

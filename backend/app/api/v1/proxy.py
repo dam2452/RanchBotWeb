@@ -11,6 +11,7 @@ from fastapi import (
     BackgroundTasks,
     Depends,
     HTTPException,
+    Query,
     Request,
 )
 from pydantic import BaseModel
@@ -41,6 +42,7 @@ class BatchLoadRequest(BaseModel):
 
 class PrefetchRequest(BaseModel):
     position_ids: list[str]
+    search_id: int = 0
 
 
 @router.post("/json")
@@ -65,13 +67,14 @@ async def api_video(
 async def api_video_stream(
     position_id: str,
     request: Request,
+    s: int = Query(0, ge=0),
     user: UserSession = Depends(get_current_user),
     proxy_svc: ProxyService = Depends(get_proxy_service),
 ):
     if not position_id.isdigit() or int(position_id) < 1:
         raise HTTPException(status_code=400, detail="position_id must be a positive integer")
     return await proxy_svc.stream_video(
-        position_id, user.jwt_token, request.headers.get("range"),
+        position_id, s, user.jwt_token, request.headers.get("range"),
     )
 
 
@@ -106,7 +109,7 @@ async def api_prefetch(
     user: UserSession = Depends(get_current_user),
     proxy_svc: ProxyService = Depends(get_proxy_service),
 ):
-    count = proxy_svc.start_prefetch(request.position_ids, user.jwt_token, background_tasks)
+    count = proxy_svc.start_prefetch(request.position_ids, request.search_id, user.jwt_token, background_tasks)
     return {"status": "prefetching", "count": count}
 
 

@@ -19,7 +19,7 @@ services:
 
   frontend:
     build:
-      context: ./vue-app
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: ranchbot-frontend
     restart: unless-stopped

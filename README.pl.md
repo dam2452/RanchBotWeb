@@ -171,7 +171,7 @@ cp .env.example .env
 # Edytuj .env z własnymi ustawieniami
 
 # 3. Konfiguracja Frontend
-cd ../vue-app
+cd ../frontend
 npm install
 ```
 
@@ -186,7 +186,7 @@ python -m uvicorn app.main:app --reload --port 8000
 
 **Terminal 2 - Frontend:**
 ```bash
-cd vue-app
+cd frontend
 npm run dev
 ```
 
@@ -283,7 +283,7 @@ python -m uvicorn app.main:app --reload
 ### Rozwój Frontend
 
 ```bash
-cd vue-app
+cd frontend
 
 # Sprawdzanie typów
 npm run type-check

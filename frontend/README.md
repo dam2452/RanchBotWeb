@@ -10,7 +10,7 @@ Modern Vue.js frontend for RanchBot application.
 ## Quick Start
 
 ```bash
-cd vue-app
+cd frontend
 
 # Install dependencies (first time only)
 npm install

@@ -1,5 +1,5 @@
 import { isAxiosError } from 'axios'
-import { client } from './http'
+import { client, API_BASE } from './http'
 import type { User, LoginCredentials, RegisterData } from '@/types'
 
 class AuthService {
@@ -11,9 +11,11 @@ class AuthService {
   }
 
   async login(credentials: LoginCredentials): Promise<{ user: User; success: boolean }> {
-    const response = await client.post('/auth/login', AuthService._makeFormData(credentials), {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    })
+    const response = await client.post(
+      `${API_BASE}/auth/login`,
+      AuthService._makeFormData(credentials),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
+    )
 
     if (response.data.status === 'success') {
       return { success: true, user: response.data.user }
@@ -23,7 +25,7 @@ class AuthService {
   }
 
   async register(data: RegisterData): Promise<{ user: User; success: boolean }> {
-    const response = await client.post('/auth/register', {
+    const response = await client.post(`${API_BASE}/auth/register`, {
       username: data.username,
       password: data.password,
       full_name: data.full_name || null,
@@ -37,12 +39,12 @@ class AuthService {
   }
 
   async forgotPassword(username: string): Promise<string> {
-    const response = await client.post('/auth/forgot-password', { username })
+    const response = await client.post(`${API_BASE}/auth/forgot-password`, { username })
     return response.data.message ?? ''
   }
 
   async resetPassword(username: string, code: string, newPassword: string): Promise<string> {
-    const response = await client.post('/auth/reset-password', {
+    const response = await client.post(`${API_BASE}/auth/reset-password`, {
       username,
       code,
       new_password: newPassword,
@@ -51,7 +53,7 @@ class AuthService {
   }
 
   async linkTelegram(): Promise<{ linking_code: string; message: string }> {
-    const response = await client.post('/auth/link-telegram')
+    const response = await client.post(`${API_BASE}/auth/link-telegram`)
     return {
       linking_code: response.data.linking_code,
       message: response.data.message,
@@ -59,13 +61,17 @@ class AuthService {
   }
 
   async logout(): Promise<void> {
-    await client.get('/auth/logout')
+    await client.get(`${API_BASE}/auth/logout`)
   }
 
-  async logoutAll(credentials: LoginCredentials): Promise<{ message: string; revokedCount: number }> {
-    const response = await client.post('/auth/logout-all', AuthService._makeFormData(credentials), {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    })
+  async logoutAll(
+    credentials: LoginCredentials,
+  ): Promise<{ message: string; revokedCount: number }> {
+    const response = await client.post(
+      `${API_BASE}/auth/logout-all`,
+      AuthService._makeFormData(credentials),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
+    )
 
     if (response.data.status === 'success') {
       return { message: response.data.message, revokedCount: response.data.revoked_count }
@@ -76,7 +82,7 @@ class AuthService {
 
   async getCurrentUser(): Promise<User | null> {
     try {
-      const response = await client.get('/auth/user')
+      const response = await client.get(`${API_BASE}/auth/user`)
       if (response.data.status === 'success') {
         return response.data.user
       }
@@ -90,7 +96,7 @@ class AuthService {
   }
 
   async getSubscription(): Promise<{ subscriptionEnd: string; daysRemaining: number }> {
-    const response = await client.post('/api/json', { endpoint: 'sub', args: [] })
+    const response = await client.post(`${API_BASE}/json`, { endpoint: 'sub', args: [] })
 
     if (response.data?.status === 'success' && response.data.data) {
       return {

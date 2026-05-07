@@ -1,5 +1,5 @@
 import { fetchWithProgress } from '@/utils/formatters'
-import { client } from './http'
+import { client, API_BASE } from './http'
 import {
   characterParser,
   emotionParser,
@@ -8,7 +8,7 @@ import {
   objectParser,
   searchResultsParser,
   seasonInfoParser,
-  seriesInfoParser
+  seriesInfoParser,
 } from './clipParsers'
 import type { SeriesInfo } from './clipParsers'
 import type { ActiveFilters, Clip, EpisodeInfo, FilterOption, SearchResult, SeasonInfo } from '@/types'
@@ -26,23 +26,35 @@ class ClipService {
 
   async searchClips(query: string): Promise<SearchResult[]> {
     const signal = this._startSearch()
-    const response = await client.post('/api/json', { endpoint: 'szf', args: query ? [query] : [] }, { signal })
+    const response = await client.post(
+      `${API_BASE}/json`,
+      { endpoint: 'szf', args: query ? [query] : [] },
+      { signal },
+    )
     return searchResultsParser.parse(response.data)
   }
 
   async searchSemanticClips(query: string): Promise<SearchResult[]> {
     const signal = this._startSearch()
-    const response = await client.post('/api/json', { endpoint: 'sensklatki', args: [query] }, { signal })
+    const response = await client.post(
+      `${API_BASE}/json`,
+      { endpoint: 'sensklatki', args: [query] },
+      { signal },
+    )
     return searchResultsParser.parse(response.data)
   }
 
   async getVideo(index: string, onProgress?: (percent: number) => void): Promise<Blob> {
     if (!onProgress) {
-      const response = await client.post('/api/video', { endpoint: 'w', args: [index] }, { responseType: 'blob' })
+      const response = await client.post(
+        `${API_BASE}/video`,
+        { endpoint: 'w', args: [index] },
+        { responseType: 'blob' },
+      )
       return response.data
     }
     return fetchWithProgress(
-      '/api/video',
+      `${API_BASE}/video`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,7 +66,7 @@ class ClipService {
   }
 
   getVideoStreamUrl(positionId: string, searchId: number): string {
-    return `/api/video/stream/${encodeURIComponent(positionId)}?s=${searchId}`
+    return `${API_BASE}/video/stream/${encodeURIComponent(positionId)}?s=${searchId}`
   }
 
   private _prefetchController: AbortController | null = null
@@ -63,7 +75,9 @@ class ClipService {
     if (positionIds.length === 0) return
     this._prefetchController?.abort()
     this._prefetchController = new AbortController()
-    client.post('/api/prefetch', { position_ids: positionIds }, { signal: this._prefetchController.signal }).catch(() => {})
+    client
+      .post(`${API_BASE}/prefetch`, { position_ids: positionIds }, { signal: this._prefetchController.signal })
+      .catch(() => {})
   }
 
   cancelPrefetch(): void {
@@ -79,11 +93,11 @@ class ClipService {
   ): Promise<Blob> {
     const body = { endpoint: 'ad', args: [clipIndex, leftAdjust.toString(), rightAdjust.toString()] }
     if (!onProgress) {
-      const response = await client.post('/api/video', body, { responseType: 'blob' })
+      const response = await client.post(`${API_BASE}/video`, body, { responseType: 'blob' })
       return response.data
     }
     return fetchWithProgress(
-      '/api/video',
+      `${API_BASE}/video`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -95,20 +109,27 @@ class ClipService {
   }
 
   async getUserClips(allSeries = false): Promise<Clip[]> {
-    const response = await client.get('/clips', { params: allSeries ? { all_series: true } : undefined })
+    const response = await client.get(`${API_BASE}/clips`, {
+      params: allSeries ? { all_series: true } : undefined,
+    })
     if (response.data.status === 'success' && response.data.clips) {
       return response.data.clips
     }
     return []
   }
 
-  async saveClipByIndex(index: number, clipName: string, leftAdj?: number, rightAdj?: number): Promise<void> {
+  async saveClipByIndex(
+    index: number,
+    clipName: string,
+    leftAdj?: number,
+    rightAdj?: number,
+  ): Promise<void> {
     const args = [index.toString()]
     if (leftAdj !== undefined && rightAdj !== undefined) {
       args.push(leftAdj.toString(), rightAdj.toString())
     }
     args.push(clipName)
-    const response = await client.post('/api/json', { endpoint: 'zn', args })
+    const response = await client.post(`${API_BASE}/json`, { endpoint: 'zn', args })
     if (response.data?.status === 'error') {
       throw new Error(response.data?.message ?? 'Save failed')
     }
@@ -118,71 +139,71 @@ class ClipService {
   }
 
   async deleteClip(clipName: string): Promise<void> {
-    await client.post('/api/json', { endpoint: 'uk', args: [clipName] })
+    await client.post(`${API_BASE}/json`, { endpoint: 'uk', args: [clipName] })
   }
 
   getVideoUrl(clipId: string): string {
-    return `/clips/video/${encodeURIComponent(clipId)}`
+    return `${API_BASE}/clips/video/${encodeURIComponent(clipId)}`
   }
 
   getThumbnailUrl(clipId: string): string {
-    return `/clips/thumbnail/${encodeURIComponent(clipId)}`
+    return `${API_BASE}/clips/thumbnail/${encodeURIComponent(clipId)}`
   }
 
   async getThumbnail(clipPositionId: string): Promise<Blob> {
     const response = await client.post(
-      '/api/thumbnail',
+      `${API_BASE}/thumbnail`,
       { endpoint: 'klatka', args: [clipPositionId, 'p'] },
-      { responseType: 'blob' }
+      { responseType: 'blob' },
     )
     return response.data
   }
 
   async getCharacters(): Promise<FilterOption[]> {
-    const response = await client.post('/api/json', { endpoint: 'p', args: [] })
+    const response = await client.post(`${API_BASE}/json`, { endpoint: 'p', args: [] })
     return characterParser.parse(response.data)
   }
 
   async getObjects(): Promise<FilterOption[]> {
-    const response = await client.post('/api/json', { endpoint: 'obj', args: [] })
+    const response = await client.post(`${API_BASE}/json`, { endpoint: 'obj', args: [] })
     return objectParser.parse(response.data)
   }
 
   async getEmotions(): Promise<FilterOption[]> {
-    const response = await client.post('/api/json', { endpoint: 'e', args: [] })
+    const response = await client.post(`${API_BASE}/json`, { endpoint: 'e', args: [] })
     return emotionParser.parse(response.data)
   }
 
   async getSeasons(): Promise<SeasonInfo> {
-    const response = await client.post('/api/json', { endpoint: 'odcinki', args: [] })
+    const response = await client.post(`${API_BASE}/json`, { endpoint: 'odcinki', args: [] })
     return seasonInfoParser.parse(response.data)
   }
 
   async getEpisodes(season: string): Promise<EpisodeInfo[]> {
-    const response = await client.post('/api/json', { endpoint: 'odcinki', args: [season] })
+    const response = await client.post(`${API_BASE}/json`, { endpoint: 'odcinki', args: [season] })
     return episodeListParser.parse(response.data)
   }
 
   async setFilters(filterString: string): Promise<void> {
-    await client.post('/api/json', { endpoint: 'f', args: [filterString] })
+    await client.post(`${API_BASE}/json`, { endpoint: 'f', args: [filterString] })
   }
 
   async resetFilters(): Promise<void> {
-    await client.post('/api/json', { endpoint: 'f', args: ['reset'] })
+    await client.post(`${API_BASE}/json`, { endpoint: 'f', args: ['reset'] })
   }
 
   async getFilterInfo(): Promise<ActiveFilters | null> {
-    const response = await client.post('/api/json', { endpoint: 'f', args: ['info'] })
+    const response = await client.post(`${API_BASE}/json`, { endpoint: 'f', args: ['info'] })
     return filterInfoParser.parse(response.data)
   }
 
   async getSeries(): Promise<SeriesInfo> {
-    const response = await client.post('/api/json', { endpoint: 'serial', args: [] })
+    const response = await client.post(`${API_BASE}/json`, { endpoint: 'serial', args: [] })
     return seriesInfoParser.parse(response.data)
   }
 
   async setSeries(name: string): Promise<SeriesInfo> {
-    const response = await client.post('/api/json', { endpoint: 'serial', args: [name] })
+    const response = await client.post(`${API_BASE}/json`, { endpoint: 'serial', args: [name] })
     return seriesInfoParser.parse(response.data)
   }
 }

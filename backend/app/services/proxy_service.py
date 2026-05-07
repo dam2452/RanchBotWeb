@@ -1,6 +1,8 @@
 import asyncio
 from typing import Any
 
+from fastapi import BackgroundTasks
+
 from app.core.logger import setup_logger
 from app.core.responses import (
     range_video_response,
@@ -22,12 +24,6 @@ _CACHE_INVALIDATING_ENDPOINTS = frozenset({
 })
 _IMAGE_ENDPOINTS = frozenset({Endpoints.FRAME, Endpoints.FRAME_ALT, Endpoints.FRAME_SHORT})
 _JPEG_MAGIC = b"\xff\xd8\xff"
-
-
-class ClipLoadItem:
-    def __init__(self, id: str, index: int) -> None:
-        self.id = id
-        self.index = index
 
 
 class ProxyService:
@@ -95,7 +91,9 @@ class ProxyService:
         await self._adjusted_video.save_to_cache(clip_index, left_adjust, right_adjust, video_data)
         return video_streaming_response(video_data)
 
-    def start_prefetch(self, position_ids: list[str], token: str) -> int:
+    def start_prefetch(
+        self, position_ids: list[str], token: str, background_tasks: BackgroundTasks,
+    ) -> int:
         valid_ids = [pid for pid in position_ids if pid.isdigit() and int(pid) >= 1]
 
         async def _fetch_one(position_id: str) -> None:
@@ -114,7 +112,7 @@ class ProxyService:
         async def _run() -> None:
             await asyncio.gather(*[_fetch_one(pid) for pid in valid_ids])
 
-        asyncio.create_task(_run())
+        background_tasks.add_task(_run)
         return len(valid_ids)
 
     async def batch_load(self, clips: list[Any], token: str) -> dict[str, Any]:

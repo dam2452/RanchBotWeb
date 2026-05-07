@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     dev_jwt_token: str = ""
 
     # Security
-    secret_key: str = "your-secret-key-change-this-in-production"
+    secret_key: str
     session_max_age: int = 86400  # 24 hours
 
     # CORS - will be split by comma if from env

@@ -8,6 +8,7 @@ from app.models.user import UserSession
 from app.services.proxy_service import ProxyService
 from fastapi import (
     APIRouter,
+    BackgroundTasks,
     Depends,
     HTTPException,
     Request,
@@ -101,10 +102,11 @@ async def api_adjust_preview(
 @router.post("/prefetch")
 async def api_prefetch(
     request: PrefetchRequest,
+    background_tasks: BackgroundTasks,
     user: UserSession = Depends(get_current_user),
     proxy_svc: ProxyService = Depends(get_proxy_service),
 ):
-    count = proxy_svc.start_prefetch(request.position_ids, user.jwt_token)
+    count = proxy_svc.start_prefetch(request.position_ids, user.jwt_token, background_tasks)
     return {"status": "prefetching", "count": count}
 
 

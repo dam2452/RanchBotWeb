@@ -9,9 +9,13 @@ from app.api import (
     proxy,
 )
 from app.core.config import settings
+from app.core.exceptions import RanchBotAPIError
 from app.core.logger import setup_logger
-from fastapi import FastAPI
+from app.integrations.ranchbot import api_client
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+import httpx
 
 logger = setup_logger(__name__)
 
@@ -47,9 +51,15 @@ async def cleanup_cache_task() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    http_client = httpx.AsyncClient()
+    api_client.set_shared_client(http_client)
     cleanup_task = asyncio.create_task(cleanup_cache_task())
-    yield
-    cleanup_task.cancel()
+    try:
+        yield
+    finally:
+        cleanup_task.cancel()
+        api_client.set_shared_client(None)
+        await http_client.aclose()
 
 
 app = FastAPI(
@@ -62,7 +72,6 @@ app = FastAPI(
     openapi_url="/openapi.json" if settings.enable_api_docs else None,
 )
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.get_allowed_origins(),
@@ -71,7 +80,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
+
+@app.exception_handler(RanchBotAPIError)
+async def ranchbot_api_error_handler(request: Request, exc: RanchBotAPIError) -> JSONResponse:
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+
+
 app.include_router(auth.router)
 app.include_router(proxy.router)
 app.include_router(clips.router)

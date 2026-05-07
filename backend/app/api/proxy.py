@@ -2,6 +2,7 @@ import asyncio
 import traceback
 from typing import Any
 
+import httpx
 from app.core.dependencies import get_current_user
 from app.core.logger import setup_logger
 from app.core.responses import (
@@ -57,6 +58,13 @@ class PrefetchRequest(BaseModel):
 _CACHE_INVALIDATING_ENDPOINTS = {Endpoints.SEARCH_PHRASE, Endpoints.SEARCH_SEMANTIC_FRAMES}
 
 
+def _raise_from_httpx(e: Exception, context: str) -> None:
+    if isinstance(e, httpx.HTTPStatusError) and e.response.status_code == 401:
+        raise HTTPException(status_code=401, detail="API token expired or invalid")
+    logger.error(f"{context}: {e}")
+    raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/json")
 async def api_json(request: ApiRequest, user: UserSession = Depends(get_current_user)):
     try:
@@ -68,8 +76,7 @@ async def api_json(request: ApiRequest, user: UserSession = Depends(get_current_
             logger.debug("Video cache cleared after search")
         return result
     except Exception as e:
-        logger.error(f"API JSON error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        _raise_from_httpx(e, "API JSON error")
 
 
 @router.post("/video")
@@ -80,8 +87,7 @@ async def api_video(request: ApiRequest, user: UserSession = Depends(get_current
         )
         return video_streaming_response(video_data)
     except Exception as e:
-        logger.error(f"API Video error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        _raise_from_httpx(e, "API Video error")
 
 
 @router.get("/video/stream/{position_id}")
@@ -104,8 +110,7 @@ async def api_video_stream(
         )
         return range_video_response(video_data, request.headers.get("range"))
     except Exception as e:
-        logger.error(f"API Video Stream error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        _raise_from_httpx(e, "API Video Stream error")
 
 
 _IMAGE_ENDPOINTS = {Endpoints.FRAME, Endpoints.FRAME_ALT, Endpoints.FRAME_SHORT}
@@ -126,9 +131,8 @@ async def api_thumbnail(request: ApiRequest, user: UserSession = Depends(get_cur
         )
         return thumbnail_response(thumbnail_data, etag=content_hash)
     except Exception as e:
-        logger.error(f"API Thumbnail error: {e}")
         logger.debug(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=str(e))
+        _raise_from_httpx(e, "API Thumbnail error")
 
 
 async def _resolve_bytes(data: bytes) -> bytes:
@@ -161,9 +165,8 @@ async def api_adjust_preview(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"API Adjust Preview error: {e}")
         logger.debug(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=str(e))
+        _raise_from_httpx(e, "API Adjust Preview error")
 
 
 @router.post("/prefetch")
@@ -221,6 +224,5 @@ async def api_batch_load(request: BatchLoadRequest, user: UserSession = Depends(
         }
 
     except Exception as e:
-        logger.error(f"API Batch Load error: {e}")
         logger.debug(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=str(e))
+        _raise_from_httpx(e, "API Batch Load error")

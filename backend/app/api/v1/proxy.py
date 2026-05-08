@@ -45,6 +45,10 @@ class PrefetchRequest(BaseModel):
     search_id: int = 0
 
 
+class BatchApiRequest(BaseModel):
+    commands: list[dict[str, Any]]
+
+
 @router.post("/json")
 async def api_json(
     request: ApiRequest,
@@ -111,6 +115,15 @@ async def api_prefetch(
 ):
     count = proxy_svc.start_prefetch(request.position_ids, request.search_id, user.jwt_token, background_tasks)
     return {"status": "prefetching", "count": count}
+
+
+@router.post("/batch")
+async def api_batch(
+    request: BatchApiRequest,
+    user: UserSession = Depends(get_current_user),
+    proxy_svc: ProxyService = Depends(get_proxy_service),
+):
+    return await proxy_svc.call_batch_json(request.commands, user.jwt_token)
 
 
 @router.post("/batch-load")

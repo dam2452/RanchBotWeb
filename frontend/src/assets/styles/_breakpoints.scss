@@ -51,3 +51,18 @@ $breakpoint-large: 1800px;
     @content;
   }
 }
+
+$breakpoint-short-height: 700px;
+$breakpoint-tall-height: 900px;
+
+@mixin short-height {
+  @media (max-height: $breakpoint-short-height) {
+    @content;
+  }
+}
+
+@mixin tall-height {
+  @media (min-height: $breakpoint-tall-height) {
+    @content;
+  }
+}

@@ -29,7 +29,7 @@ const isWatchView = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
 <style scoped lang="scss">
 .logo-header {
   position: fixed;
-  top: 1.5rem;
+  top: calc(var(--layout-header-top, 1.5rem) + env(safe-area-inset-top));
   left: 1.5rem;
   z-index: 1010;
   display: flex;
@@ -65,7 +65,6 @@ const isWatchView = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
 
 @include tablet {
   .logo-header {
-    top: 2rem;
     left: 2rem;
     gap: 2rem;
   }

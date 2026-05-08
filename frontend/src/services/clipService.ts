@@ -15,6 +15,15 @@ import type { ActiveFilters, Clip, EpisodeInfo, FilterOption, SearchResult, Seas
 import { ApiWarningError } from '@/types'
 
 
+export interface FilterOptionsBatch {
+  characters?: FilterOption[]
+  objects?: FilterOption[]
+  emotions?: FilterOption[]
+  seasons?: SeasonInfo
+  series?: SeriesInfo
+}
+
+
 class ClipService {
   private _searchController: AbortController | null = null
 
@@ -172,6 +181,46 @@ class ClipService {
   async getEmotions(): Promise<FilterOption[]> {
     const response = await client.post(`${API_BASE}/json`, { endpoint: 'e', args: [] })
     return emotionParser.parse(response.data)
+  }
+
+  async getFilterOptionsBatch(): Promise<FilterOptionsBatch> {
+    const commands = [
+      { command: 'p', args: [] },
+      { command: 'obj', args: [] },
+      { command: 'e', args: [] },
+      { command: 'odcinki', args: [] },
+      { command: 'serial', args: [] },
+    ]
+    const response = await client.post(`${API_BASE}/batch`, { commands })
+    const results = response.data.results as Array<{
+      command: string
+      index: number
+      status: string
+      response?: unknown
+    }>
+
+    const batch: FilterOptionsBatch = {}
+    for (const result of results) {
+      if (result.status !== 'success' || result.response == null) continue
+      switch (result.command) {
+        case 'p':
+          batch.characters = characterParser.parse(result.response)
+          break
+        case 'obj':
+          batch.objects = objectParser.parse(result.response)
+          break
+        case 'e':
+          batch.emotions = emotionParser.parse(result.response)
+          break
+        case 'odcinki':
+          batch.seasons = seasonInfoParser.parse(result.response)
+          break
+        case 'serial':
+          batch.series = seriesInfoParser.parse(result.response)
+          break
+      }
+    }
+    return batch
   }
 
   async getSeasons(): Promise<SeasonInfo> {

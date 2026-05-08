@@ -82,6 +82,18 @@ async def ranchbot_api_error_handler(request: Request, exc: RanchBotAPIError) ->
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
 
+@app.exception_handler(httpx.ConnectError)
+async def upstream_connect_error_handler(request: Request, exc: httpx.ConnectError) -> JSONResponse:
+    logger.error(f"Upstream API unreachable: {exc}")
+    return JSONResponse(status_code=502, content={"detail": "Upstream API is unreachable"})
+
+
+@app.exception_handler(httpx.TimeoutException)
+async def upstream_timeout_error_handler(request: Request, exc: httpx.TimeoutException) -> JSONResponse:
+    logger.error(f"Upstream API timeout: {exc}")
+    return JSONResponse(status_code=504, content={"detail": "Upstream API timeout"})
+
+
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(clips.router, prefix="/api/v1")
 app.include_router(proxy.router, prefix="/api/v1")

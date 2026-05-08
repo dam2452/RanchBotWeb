@@ -42,6 +42,9 @@ class ProxyService:
     async def call_json(self, endpoint: str, args: list[Any], token: str) -> dict[str, Any]:
         return await self._api.call_api(endpoint=endpoint, args=args, token=token)
 
+    async def call_batch_json(self, commands: list[dict[str, Any]], token: str) -> dict[str, Any]:
+        return await self._api.call_batch(commands=commands, token=token)
+
     async def get_video(self, endpoint: str, args: list[Any], token: str) -> Response:
         video_data = await self._api.call_api_for_blob(endpoint=endpoint, args=args, token=token)
         return video_streaming_response(video_data)

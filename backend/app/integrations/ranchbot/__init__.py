@@ -26,6 +26,11 @@ class RanchBotClient:
     ) -> bytes:
         return await self._base.call_api_for_blob(endpoint, args, token, timeout)
 
+    async def call_batch(
+        self, commands: list[dict[str, Any]], token: str | None = None, timeout: int = 60,
+    ) -> dict[str, Any]:
+        return await self._base.call_batch(commands, token, timeout)
+
 
 api_client = RanchBotClient()
 

@@ -64,20 +64,14 @@ export function useFilters() {
     if (optionsLoading.value) return
     optionsLoading.value = true
     try {
-      const [chars, objs, emts, seass, seriesResult] = await Promise.allSettled([
-        clipService.getCharacters(),
-        clipService.getObjects(),
-        clipService.getEmotions(),
-        clipService.getSeasons(),
-        clipService.getSeries(),
-      ])
-      if (chars.status === 'fulfilled') characters.value = chars.value
-      if (objs.status === 'fulfilled') objects.value = objs.value
-      if (emts.status === 'fulfilled') emotions.value = emts.value
-      if (seass.status === 'fulfilled') seasons.value = seass.value
-      if (seriesResult.status === 'fulfilled') {
-        availableSeries.value = seriesResult.value.availableSeries
-        currentSeries.value = seriesResult.value.currentSeries
+      const batch = await clipService.getFilterOptionsBatch()
+      if (batch.characters) characters.value = batch.characters
+      if (batch.objects) objects.value = batch.objects
+      if (batch.emotions) emotions.value = batch.emotions
+      if (batch.seasons) seasons.value = batch.seasons
+      if (batch.series) {
+        availableSeries.value = batch.series.availableSeries
+        currentSeries.value = batch.series.currentSeries
       }
     } finally {
       optionsLoading.value = false

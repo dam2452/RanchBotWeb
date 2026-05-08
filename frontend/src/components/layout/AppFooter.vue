@@ -8,7 +8,7 @@ const year = new Date().getFullYear()
   </footer>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .app-footer {
   position: fixed;
   bottom: calc(1rem + env(safe-area-inset-bottom));
@@ -16,6 +16,10 @@ const year = new Date().getFullYear()
   right: env(safe-area-inset-right);
   z-index: 1000;
   text-align: center;
+
+  @include short-height {
+    display: none;
+  }
 }
 
 .app-footer p {

@@ -241,7 +241,8 @@ const handleClick = (event: MouseEvent) => {
 
   @include tablet {
     width: auto;
-    height: 50vh;
+    height: calc(var(--layout-available-height, 50vh) - 1rem);
+    max-height: 65vh;
     max-width: none;
     margin: 0 20px;
     border-radius: 32px;

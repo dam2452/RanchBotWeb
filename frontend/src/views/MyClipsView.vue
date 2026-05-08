@@ -211,8 +211,8 @@ watch(activePage, pauseAllVideos)
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  scroll-padding-top: 120px;
-  padding: 120px 0 60px;
+  scroll-padding-top: calc(var(--layout-header-offset, 120px) + 0.5rem);
+  padding: calc(var(--layout-header-offset, 120px) + 0.5rem) 0 60px;
   align-items: center;
   gap: 1.5rem;
 
@@ -237,8 +237,8 @@ watch(activePage, pauseAllVideos)
   transition: opacity 0.35s, transform 0.35s;
   flex-shrink: 0;
   width: 85vw;
-  height: 62vh;
-  height: 62dvh;
+  height: calc(var(--layout-available-height, 62dvh) - 2rem);
+  max-height: 70dvh;
   padding: 0;
   position: relative;
   display: flex;
@@ -351,7 +351,7 @@ watch(activePage, pauseAllVideos)
 
 .search-button {
   position: fixed;
-  top: calc(80px + env(safe-area-inset-top));
+  top: calc(var(--layout-header-offset, 80px) + env(safe-area-inset-top));
   left: 50%;
   transform: translateX(-50%);
   z-index: 999;
@@ -380,12 +380,6 @@ watch(activePage, pauseAllVideos)
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   }
 
-  @include tablet-down {
-    top: calc(65px + env(safe-area-inset-top));
-    padding: 8px 14px;
-    font-size: 14px;
-  }
-
   @include small-mobile {
     padding: 6px 12px;
     font-size: 13px;
@@ -404,8 +398,8 @@ watch(activePage, pauseAllVideos)
 
 .back-button {
   position: fixed;
-  top: calc(20px + env(safe-area-inset-top));
-  left: calc(20px + env(safe-area-inset-left));
+  top: calc(var(--layout-header-top, 1.25rem) + env(safe-area-inset-top));
+  left: calc(1.25rem + env(safe-area-inset-left));
   z-index: 1015;
   display: flex;
   align-items: center;
@@ -419,11 +413,6 @@ watch(activePage, pauseAllVideos)
   cursor: pointer;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
   transition: all 0.2s;
-
-  @include tablet-down {
-    top: calc(15px + env(safe-area-inset-top));
-    left: calc(15px + env(safe-area-inset-left));
-  }
 
   @media (max-width: 400px) {
     width: 32px;

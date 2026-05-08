@@ -18,7 +18,7 @@ import { DESKTOP_BREAKPOINT, WATCH_BREAKPOINT } from '@/utils/formatters'
 
 const route = useRoute()
 const router = useRouter()
-const { windowWidth } = useWindowWidth()
+const { windowWidth, measureSearchbar } = useWindowWidth()
 const isWatchView = computed(() => windowWidth.value <= WATCH_BREAKPOINT)
 const isDesktop = computed(() => windowWidth.value > DESKTOP_BREAKPOINT)
 
@@ -32,6 +32,7 @@ const loading = ref(false)
 const error = ref('')
 const searchId = ref(0)
 const showFilterModal = ref(false)
+const searchbarRef = ref<HTMLElement | null>(null)
 const semanticMode = computed(() => route.query.mode === 'semantic')
 
 const {
@@ -56,6 +57,7 @@ onMounted(async () => {
     await fetchFilterInfo()
   }
   await _loadSearchResults()
+  measureSearchbar(searchbarRef.value)
 })
 
 onUnmounted(() => {
@@ -169,7 +171,7 @@ watch(() => route.query.mode, async () => {
   <AppFooter v-if="!isWatchView" />
 
   <main class="results-main">
-    <div v-if="!isWatchView" class="search-bar-container">
+    <div v-if="!isWatchView" ref="searchbarRef" class="search-bar-container">
       <SearchBar
         :initial-query="query"
         :active-filter-count="activeFilterCount"
@@ -245,7 +247,7 @@ watch(() => route.query.mode, async () => {
 .search-bar-container {
   position: fixed;
   left: 50%;
-  top: calc(5rem + env(safe-area-inset-top));
+  top: calc(var(--layout-header-top, 5rem) + env(safe-area-inset-top));
   transform: translateX(-50%);
   z-index: 1000;
   width: 95vw;
@@ -259,14 +261,6 @@ watch(() => route.query.mode, async () => {
   @include tablet {
     width: clamp(280px, 60vw, 720px);
     max-width: 90vw;
-  }
-
-  @include desktop-up {
-    top: calc(5.5rem + env(safe-area-inset-top));
-  }
-
-  @include large {
-    top: calc(6.25rem + env(safe-area-inset-top));
   }
 }
 
@@ -292,7 +286,7 @@ watch(() => route.query.mode, async () => {
 
 .back-button {
   position: fixed;
-  top: calc(1.25rem + env(safe-area-inset-top));
+  top: calc(var(--layout-header-top, 1.25rem) + env(safe-area-inset-top));
   left: calc(1.25rem + env(safe-area-inset-left));
   z-index: 1015;
   display: flex;
@@ -307,11 +301,6 @@ watch(() => route.query.mode, async () => {
   cursor: pointer;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
   transition: all 0.2s;
-
-  @include tablet-down {
-    top: calc(0.9375rem + env(safe-area-inset-top));
-    left: calc(0.9375rem + env(safe-area-inset-left));
-  }
 
   @media (max-width: 400px) {
     width: 32px;

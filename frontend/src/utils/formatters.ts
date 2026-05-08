@@ -2,6 +2,7 @@ export const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 export const MOBILE_BREAKPOINT = 850
 export const WATCH_BREAKPOINT = 196
 export const DESKTOP_BREAKPOINT = MOBILE_BREAKPOINT
+export const SHORT_HEIGHT_BREAKPOINT = 700
 
 export function isScreenWidthMobile(): boolean {
   return window.innerWidth <= MOBILE_BREAKPOINT

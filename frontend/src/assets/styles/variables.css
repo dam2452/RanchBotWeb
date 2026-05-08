@@ -30,6 +30,11 @@
   --font-size-md: 1rem;
   --font-size-lg: 1.5rem;
   --font-size-xl: 2rem;
+
+  --layout-header-top: 1.5rem;
+  --layout-header-offset: 120px;
+  --layout-footer-offset: 2rem;
+  --layout-available-height: 100vh;
 }
 
 @media (prefers-color-scheme: dark) {

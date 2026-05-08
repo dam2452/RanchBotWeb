@@ -231,16 +231,8 @@ watch(activeIndex, handleActiveIndexChange)
     overflow-x: scroll;
     overflow-y: hidden;
     flex-direction: row;
-    padding: 120px 10vw 0 10vw;
+    padding: calc(var(--layout-header-offset, 120px) + 0.5rem) 10vw 0 10vw;
     overscroll-behavior-x: auto;
-  }
-
-  @include desktop-up {
-    padding: 130px 10vw 0 10vw;
-  }
-
-  @include large {
-    padding: 140px 10vw 0 10vw;
   }
 }
 
@@ -250,7 +242,8 @@ watch(activeIndex, handleActiveIndexChange)
   @include tablet {
     display: flex;
     width: auto;
-    height: 55vh;
+    height: calc(var(--layout-available-height, 55vh) - 1rem);
+    max-height: 65vh;
     max-width: none;
     margin: 0 20px;
     opacity: 0.5;
@@ -299,7 +292,8 @@ watch(activeIndex, handleActiveIndexChange)
   }
 
   @include tablet {
-    height: 55vh;
+    height: calc(var(--layout-available-height, 55vh) - 1rem);
+    max-height: 65vh;
     padding: 0 40px;
     margin: 0 20px;
     opacity: 0.5;
@@ -336,7 +330,7 @@ watch(activeIndex, handleActiveIndexChange)
   @include tablet {
     width: auto;
     height: 100%;
-    max-height: 55vh;
+    max-height: calc(var(--layout-available-height, 55vh) - 1rem);
     object-fit: contain;
     border-radius: 32px;
     display: flex;

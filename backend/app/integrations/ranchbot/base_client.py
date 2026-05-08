@@ -100,3 +100,26 @@ class RanchBotBaseClient:
                 detail = response.text[:200]
             raise ValueError(f"Expected binary response from '{endpoint}', got JSON: {detail}")
         return response.content
+
+    async def call_batch(
+        self, commands: list[dict[str, Any]], token: str | None = None, timeout: int = 60,
+    ) -> dict[str, Any]:
+        url = self._build_url(Endpoints.BATCH)
+        jwt_token = token or self._default_token
+        if not jwt_token:
+            raise ValueError("JWT token is required")
+        logger.debug("Batch API call: %d commands url=%s", len(commands), url)
+        async with self._client_context(timeout) as client:
+            response = await client.post(
+                url,
+                json={"commands": commands},
+                headers=self._build_headers(jwt_token),
+            )
+        logger.debug("Batch API response: status=%d", response.status_code)
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 401:
+                raise RanchBotAuthError("API token expired or invalid") from e
+            raise RanchBotAPIError(self._extract_api_error(e.response)) from e
+        return response.json()

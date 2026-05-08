@@ -72,7 +72,9 @@ class RanchBotBaseClient:
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 401:
                 raise RanchBotAuthError("API token expired or invalid") from e
-            raise RanchBotAPIError(self._extract_api_error(e.response)) from e
+            raise RanchBotAPIError(
+                self._extract_api_error(e.response), status_code=e.response.status_code,
+            ) from e
         return response
 
     async def call_api(
@@ -121,5 +123,7 @@ class RanchBotBaseClient:
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 401:
                 raise RanchBotAuthError("API token expired or invalid") from e
-            raise RanchBotAPIError(self._extract_api_error(e.response)) from e
+            raise RanchBotAPIError(
+                self._extract_api_error(e.response), status_code=e.response.status_code,
+            ) from e
         return response.json()

@@ -4,13 +4,12 @@
     :class="{ 'fixed': fixed }"
   >
     <template v-if="authStore.isAuthenticated">
-      <div class="tooltip-container relative inline-block">
+      <div class="relative inline-block">
         <button
           id="user-welcome-link"
-          :title="showTooltip ? 'Click to check your subscription' : ''"
           :class="compact ? 'compact-user-btn' : 'user-btn'"
           :style="compact ? '' : 'background: linear-gradient(145deg, #f2a94c, #e09340); color: #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);'"
-          @click="handleTooltipClick"
+          @click="togglePopup"
         >
           <template v-if="compact">
             <img src="/images/ui/icons/user.svg" alt="" class="compact-icon" />
@@ -20,45 +19,102 @@
             <img src="/images/ui/icons/user.svg" alt="" class="user-btn-icon" />
           </template>
         </button>
-        <SubscriptionTooltip
-          ref="tooltipRef"
-          :visible="tooltipVisible"
-          @close="tooltipVisible = false"
-        />
+
+        <div v-if="popupOpen" class="profile-popup">
+          <div class="popup-header">
+            <span class="popup-username">{{ authStore.user?.username }}</span>
+          </div>
+
+          <div class="popup-section">
+            <div class="popup-section-title">Subscription</div>
+            <div v-if="subLoading" class="popup-loading">Checking...</div>
+            <template v-else-if="subDays !== null">
+              <div class="popup-sub-active">
+                Active until: <strong>{{ subEnd }}</strong>
+              </div>
+              <div class="popup-sub-days" :class="subDays <= 7 ? 'expiring' : ''">
+                {{ subDays }} days remaining
+              </div>
+            </template>
+            <div v-else class="popup-sub-none">No active subscription</div>
+          </div>
+
+          <div class="popup-section">
+            <div class="popup-section-title">Activate Key</div>
+            <div class="popup-key-row">
+              <input
+                v-model="keyInput"
+                type="text"
+                placeholder="Enter key"
+                class="popup-input"
+                @keyup.enter="handleRedeemKey"
+              />
+              <button
+                class="popup-btn-small popup-btn-green"
+                :disabled="keyLoading || !keyInput.trim()"
+                @click="handleRedeemKey"
+              >
+                {{ keyLoading ? '...' : 'Go' }}
+              </button>
+            </div>
+            <p v-if="keyError" class="popup-message popup-message-error">{{ keyError }}</p>
+            <p v-if="keySuccess" class="popup-message popup-message-success">{{ keySuccess }}</p>
+          </div>
+
+          <div class="popup-section">
+            <div class="popup-section-title">Change Password</div>
+            <input
+              v-model="oldPassword"
+              type="password"
+              placeholder="Current password"
+              class="popup-input"
+            />
+            <input
+              v-model="newPassword"
+              type="password"
+              placeholder="New password"
+              class="popup-input"
+            />
+            <button
+              class="popup-btn-full"
+              :disabled="pwLoading || !oldPassword || !newPassword"
+              @click="handleChangePassword"
+            >
+              {{ pwLoading ? 'Changing...' : 'Change Password' }}
+            </button>
+            <p v-if="pwError" class="popup-message popup-message-error">{{ pwError }}</p>
+            <p v-if="pwSuccess" class="popup-message popup-message-success">{{ pwSuccess }}</p>
+          </div>
+
+          <div class="popup-actions">
+            <button
+              v-if="authStore.user && authStore.user.id < 0"
+              class="popup-btn-full popup-btn-blue"
+              :disabled="linkTelegramLoading"
+              @click="handleLinkTelegram"
+            >
+              {{ linkTelegramLoading ? '...' : 'Link Telegram' }}
+            </button>
+            <button
+              v-if="showMyClips"
+              class="popup-btn-full"
+              @click="popupOpen = false; $router.push('/my-clips')"
+            >
+              My Clips
+            </button>
+            <button class="popup-btn-full popup-btn-red" @click="handleLogout">
+              Logout
+            </button>
+          </div>
+        </div>
       </div>
-      <button
-        v-if="showMyClips"
-        @click="$router.push('/my-clips')"
-        style="background: linear-gradient(145deg, #aaaaaa, #999999); color: #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);"
-        class="btn-default clips-btn"
-      >
-        <span class="clips-btn-full">My Clips</span>
-        <img src="/images/ui/icons/clips.svg" alt="" class="clips-btn-icon" />
-      </button>
-      <button
-        v-if="authStore.user && authStore.user.id < 0"
-        @click="handleLinkTelegram"
-        :disabled="linkTelegramLoading"
-        style="background: linear-gradient(145deg, #5b9bd5, #4a87c1); color: #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);"
-        class="btn-default"
-      >
-        {{ linkTelegramLoading ? '...' : 'Link Telegram' }}
-      </button>
-      <button
-        @click="handleLogout"
-        style="background: linear-gradient(145deg, #aaaaaa, #999999); color: #fff; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);"
-        class="btn-default logout-btn"
-      >
-        <span class="logout-btn-full">Logout</span>
-        <img src="/images/ui/icons/logout.svg" alt="" class="logout-btn-icon" />
-      </button>
 
       <div v-if="linkingCode" class="linking-overlay" @click.self="linkingCode = ''">
         <div class="linking-card">
           <p class="linking-instruction">Send this command to the Telegram bot:</p>
           <code class="linking-code">/link {{ linkingCode }}</code>
           <p class="linking-note">Valid for 30 minutes. After linking, log out and back in.</p>
-          <button class="linking-close" @click="linkingCode = ''">Close</button>
+          <button class="linking-close-btn" @click="linkingCode = ''">Close</button>
         </div>
       </div>
     </template>
@@ -86,42 +142,100 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import { authService } from '@/services/authService'
-import SubscriptionTooltip from '../clips/SubscriptionTooltip.vue'
+import { formatDate } from '@/utils/subscription'
 
 interface Props {
   fixed?: boolean
   showMyClips?: boolean
-  showTooltip?: boolean
   compact?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   fixed: false,
   showMyClips: true,
-  showTooltip: true,
   compact: false
 })
 
 const authStore = useAuthStore()
 const router = useRouter()
-const tooltipVisible = ref(false)
-const tooltipRef = ref<InstanceType<typeof SubscriptionTooltip> | null>(null)
+
+const popupOpen = ref(false)
 const linkingCode = ref('')
 const linkTelegramLoading = ref(false)
 
-const handleLogout = async () => {
-  await authStore.logout()
-  router.push('/login')
+const subLoading = ref(false)
+const subEnd = ref('')
+const subDays = ref<number | null>(null)
+
+const keyInput = ref('')
+const keyError = ref('')
+const keySuccess = ref('')
+const keyLoading = ref(false)
+
+const oldPassword = ref('')
+const newPassword = ref('')
+const pwError = ref('')
+const pwSuccess = ref('')
+const pwLoading = ref(false)
+
+const togglePopup = async () => {
+  popupOpen.value = !popupOpen.value
+  if (popupOpen.value) {
+    keyError.value = ''
+    keySuccess.value = ''
+    pwError.value = ''
+    pwSuccess.value = ''
+    await loadSubscription()
+  }
 }
 
-const handleTooltipClick = async (e: Event) => {
-  e.stopPropagation()
+const loadSubscription = async () => {
+  subLoading.value = true
+  try {
+    const data = await authService.getSubscription()
+    subEnd.value = formatDate(data.subscriptionEnd)
+    subDays.value = data.daysRemaining
+  } catch {
+    subEnd.value = ''
+    subDays.value = null
+  } finally {
+    subLoading.value = false
+  }
+}
 
-  if (tooltipVisible.value) {
-    tooltipVisible.value = false
-  } else {
-    tooltipVisible.value = true
-    await tooltipRef.value?.loadSubscription()
+const handleRedeemKey = async () => {
+  if (!keyInput.value.trim()) return
+  keyError.value = ''
+  keySuccess.value = ''
+  keyLoading.value = true
+
+  try {
+    const result = await authService.redeemKey(keyInput.value.trim())
+    keySuccess.value = `Activated! +${result.days} days`
+    keyInput.value = ''
+    await loadSubscription()
+  } catch (err) {
+    keyError.value = err instanceof Error ? err.message : 'Failed to activate key'
+  } finally {
+    keyLoading.value = false
+  }
+}
+
+const handleChangePassword = async () => {
+  if (!oldPassword.value || !newPassword.value) return
+  pwError.value = ''
+  pwSuccess.value = ''
+  pwLoading.value = true
+
+  try {
+    await authService.changePassword(oldPassword.value, newPassword.value)
+    pwSuccess.value = 'Password changed successfully.'
+    oldPassword.value = ''
+    newPassword.value = ''
+  } catch (err) {
+    pwError.value = err instanceof Error ? err.message : 'Failed to change password'
+  } finally {
+    pwLoading.value = false
   }
 }
 
@@ -130,6 +244,7 @@ const handleLinkTelegram = async () => {
   try {
     const result = await authService.linkTelegram()
     linkingCode.value = result.linking_code
+    popupOpen.value = false
   } catch (err) {
     console.error('Link Telegram error:', err)
   } finally {
@@ -137,22 +252,22 @@ const handleLinkTelegram = async () => {
   }
 }
 
+const handleLogout = async () => {
+  popupOpen.value = false
+  await authStore.logout()
+  router.push('/login')
+}
+
 const handleOutsideClick = (e: Event) => {
   const target = e.target as HTMLElement
   const welcomeLink = document.getElementById('user-welcome-link')
-
-  if (tooltipVisible.value && !target.closest('.subscription-tooltip') && target !== welcomeLink) {
-    tooltipVisible.value = false
+  if (popupOpen.value && !target.closest('.profile-popup') && target !== welcomeLink) {
+    popupOpen.value = false
   }
 }
 
-onMounted(() => {
-  document.addEventListener('click', handleOutsideClick)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleOutsideClick)
-})
+onMounted(() => document.addEventListener('click', handleOutsideClick))
+onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
 </script>
 
 <style scoped lang="scss">
@@ -177,13 +292,8 @@ onUnmounted(() => {
   font-weight: bold;
   color: white;
 
-  &:hover {
-    transform: scale(1.05);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
+  &:hover { transform: scale(1.05); }
+  &:active { transform: scale(0.95); }
 
   @include tablet-down {
     padding: 10px 20px;
@@ -200,13 +310,8 @@ onUnmounted(() => {
   font-weight: bold;
   color: white;
 
-  &:hover {
-    transform: scale(1.05);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
+  &:hover { transform: scale(1.05); }
+  &:active { transform: scale(0.95); }
 
   @include tablet-down {
     padding: 10px 20px;
@@ -218,23 +323,8 @@ onUnmounted(() => {
   }
 }
 
-.user-btn-icon {
-  display: none;
-}
-
-.user-btn-full {
-  display: inline;
-}
-
-.logout-btn-icon,
-.clips-btn-icon {
-  display: none;
-}
-
-.logout-btn-full,
-.clips-btn-full {
-  display: inline;
-}
+.user-btn-icon { display: none; }
+.user-btn-full { display: inline; }
 
 @include tablet-down {
   .user-btn {
@@ -255,55 +345,7 @@ onUnmounted(() => {
     height: 68%;
   }
 
-  .user-btn-full {
-    display: none;
-  }
-
-  .logout-btn {
-    aspect-ratio: 1;
-    padding: 0 !important;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .logout-btn-icon {
-    display: block;
-    width: 26px;
-    height: 26px;
-    max-width: none;
-    max-height: none;
-  }
-
-  .logout-btn-full {
-    display: none;
-  }
-
-  .clips-btn {
-    aspect-ratio: 1;
-    padding: 0 !important;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .clips-btn-icon {
-    display: block;
-    width: 26px;
-    height: 26px;
-    max-width: none;
-    max-height: none;
-  }
-
-  .clips-btn-full {
-    display: none;
-  }
+  .user-btn-full { display: none; }
 
   .btn-default {
     height: 40px;
@@ -313,9 +355,12 @@ onUnmounted(() => {
     flex-shrink: 0;
   }
 
-  .compact-user-btn {
-    width: 40px;
-    height: 40px;
+  .compact-user-btn { width: 40px; height: 40px; }
+
+  .profile-popup {
+    right: -10px;
+    min-width: 260px;
+    font-size: 13px;
   }
 }
 
@@ -338,6 +383,160 @@ onUnmounted(() => {
   height: 68%;
   object-fit: contain;
   filter: brightness(0) invert(1);
+}
+
+.profile-popup {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  min-width: 300px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 16px;
+  padding: 0;
+  z-index: 20000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    right: 20px;
+    border-width: 0 8px 8px 8px;
+    border-style: solid;
+    border-color: transparent transparent #2a2a2a transparent;
+  }
+}
+
+.popup-header {
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #f2a94c, #e09340);
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.popup-section {
+  padding: 14px 18px;
+  border-bottom: 1px solid #3a3a3a;
+}
+
+.popup-section-title {
+  color: #999;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.popup-loading {
+  color: #888;
+  font-size: 13px;
+}
+
+.popup-sub-active {
+  color: #ddd;
+  font-size: 13px;
+}
+
+.popup-sub-days {
+  color: #27ae60;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 2px;
+
+  &.expiring { color: #ffb142; }
+}
+
+.popup-sub-none {
+  color: #ff6b6b;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.popup-key-row {
+  display: flex;
+  gap: 8px;
+}
+
+.popup-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #333;
+  color: #eee;
+  font-size: 13px;
+  box-sizing: border-box;
+
+  &::placeholder { color: #777; }
+  &:focus { outline: 1px solid #f2a94c; border-color: #f2a94c; }
+}
+
+.popup-btn-small {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { transform: scale(1.03); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.popup-btn-green {
+  background: linear-gradient(135deg, #5ba85b, #4a974a);
+  color: #fff;
+}
+
+.popup-btn-full {
+  width: 100%;
+  padding: 8px;
+  margin-top: 6px;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background: #3a3a3a;
+  color: #ddd;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { background: #444; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.popup-btn-blue {
+  background: linear-gradient(135deg, #5b9bd5, #4a87c1);
+  border-color: #4a87c1;
+  color: #fff;
+}
+
+.popup-btn-red {
+  background: linear-gradient(135deg, #c0392b, #a93226);
+  border-color: #a93226;
+  color: #fff;
+}
+
+.popup-message {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 6px 0 0;
+}
+
+.popup-message-error { color: #ff6b6b; }
+.popup-message-success { color: #27ae60; }
+
+.popup-actions {
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .linking-overlay {
@@ -390,7 +589,7 @@ onUnmounted(() => {
   line-height: 1.5;
 }
 
-.linking-close {
+.linking-close-btn {
   padding: 10px 32px;
   border: 2px solid #aa9169;
   border-radius: 12px;

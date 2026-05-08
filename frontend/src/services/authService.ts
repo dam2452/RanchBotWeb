@@ -107,6 +107,26 @@ class AuthService {
 
     throw new Error('Failed to fetch subscription data')
   }
+
+  async redeemKey(key: string): Promise<{ days: number }> {
+    const response = await client.post(`${API_BASE}/auth/redeem-key`, { key })
+
+    if (response.data?.data?.days) {
+      return { days: response.data.data.days }
+    }
+
+    const detail = response.data?.detail || response.data?.content || 'Failed to redeem key'
+    throw new Error(detail)
+  }
+
+  async changePassword(oldPassword: string, newPassword: string): Promise<string> {
+    const response = await client.post(`${API_BASE}/auth/change-password`, {
+      old_password: oldPassword,
+      new_password: newPassword,
+    })
+
+    return response.data?.message || 'Password changed successfully.'
+  }
 }
 
 export const authService = new AuthService()

@@ -4,6 +4,8 @@ import { isAxiosError } from 'axios'
 import { authService } from '@/services/authService'
 import type { User, LoginCredentials, RegisterData } from '@/types'
 
+const SUBSCRIPTION_KEY_ERROR_PREFIX = 'SUB_KEY:'
+
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const loading = ref(false)
@@ -49,6 +51,16 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await authService.register(data)
       if (response.success) {
         user.value = response.user
+
+        if (data.subscriptionKey) {
+          try {
+            await authService.redeemKey(data.subscriptionKey)
+          } catch (keyErr) {
+            console.error('Subscription key redemption failed:', keyErr)
+            error.value = `${SUBSCRIPTION_KEY_ERROR_PREFIX}Account created, but subscription key failed: ${keyErr instanceof Error ? keyErr.message : 'Unknown error'}`
+          }
+        }
+
         return true
       }
       error.value = 'Registration failed'

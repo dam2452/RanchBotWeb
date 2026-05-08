@@ -1,9 +1,11 @@
 from app.core.dependencies import (
     get_auth_service,
     get_current_user,
+    get_proxy_service,
 )
 from app.models.user import UserSession
 from app.services.auth_service import AuthService
+from app.services.proxy_service import ProxyService
 from fastapi import (
     APIRouter,
     Depends,
@@ -22,6 +24,15 @@ class RegisterBody(BaseModel):
     username: str = Field(..., min_length=3, max_length=64)
     password: str = Field(..., min_length=8, max_length=128)
     full_name: str | None = None
+
+
+class RedeemKeyBody(BaseModel):
+    key: str = Field(..., min_length=1, max_length=128)
+
+
+class ChangePasswordBody(BaseModel):
+    old_password: str = Field(..., min_length=8, max_length=128)
+    new_password: str = Field(..., min_length=8, max_length=128)
 
 
 class ForgotPasswordBody(BaseModel):
@@ -75,6 +86,26 @@ async def link_telegram(
     auth_svc: AuthService = Depends(get_auth_service),
 ):
     return await auth_svc.link_telegram(user.jwt_token, user.username)
+
+
+@router.post("/redeem-key")
+async def redeem_key(
+    data: RedeemKeyBody,
+    user: UserSession = Depends(get_current_user),
+    proxy_svc: ProxyService = Depends(get_proxy_service),
+):
+    return await proxy_svc.call_json("klucz", [data.key], user.jwt_token)
+
+
+@router.post("/change-password")
+async def change_password(
+    data: ChangePasswordBody,
+    user: UserSession = Depends(get_current_user),
+    auth_svc: AuthService = Depends(get_auth_service),
+):
+    return await auth_svc.change_password(
+        user.jwt_token, user.username, data.old_password, data.new_password,
+    )
 
 
 @router.get("/logout")

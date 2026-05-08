@@ -102,3 +102,15 @@ class RanchBotAuthAPI:
         if not response.is_success:
             raise RanchBotAPIError(self._base._extract_api_error(response))
         return response.json()
+
+    async def change_password(self, jwt_token: str, old_password: str, new_password: str) -> dict[str, Any]:
+        url = self._base._build_url(Endpoints.AUTH_CHANGE_PASSWORD)
+        async with self._base._client_context(30) as client:
+            response = await client.post(
+                url,
+                json={"old_password": old_password, "new_password": new_password},
+                headers={"Authorization": f"Bearer {jwt_token}"},
+            )
+        if not response.is_success:
+            raise RanchBotAPIError(self._base._extract_api_error(response))
+        return response.json()

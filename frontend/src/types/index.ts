@@ -29,6 +29,7 @@ export interface RegisterData {
   password: string
   confirmPassword: string
   full_name?: string
+  subscriptionKey?: string
 }
 
 export interface ApiResponse<T> {

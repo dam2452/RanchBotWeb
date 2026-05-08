@@ -141,6 +141,18 @@ class AuthService:
             logger.error(f"Link Telegram error for user '{username}': {e.detail}")
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.detail)
 
+    async def change_password(self, jwt_token: str, username: str, old_password: str, new_password: str) -> dict:
+        try:
+            await self._auth_api.change_password(jwt_token, old_password, new_password)
+            return {"status": "success", "message": "Password changed successfully."}
+        except RanchBotAuthError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Current password is incorrect.",
+            )
+        except RanchBotAPIError as e:
+            logger.error(f"Change password error for user '{username}': {e.detail}")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.detail)
+
     async def logout_all(self, login: str, password: str) -> dict:
         try:
             result = await self._auth_api.logout_all_sessions(login, password)

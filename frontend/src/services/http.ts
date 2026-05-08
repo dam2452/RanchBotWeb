@@ -8,6 +8,8 @@ const client: AxiosInstance = axios.create({
   withCredentials: true,
 })
 
+const PUBLIC_PATHS = ['/', '/login', '/register', '/forgot-password']
+
 client.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -18,9 +20,9 @@ client.interceptors.response.use(
     const status = error.response?.status
 
     if (status === 401) {
-      const publicPaths = ['/', '/login', '/register', '/forgot-password']
-      if (!publicPaths.includes(window.location.pathname)) {
-        window.location.href = '/'
+      if (!PUBLIC_PATHS.includes(window.location.pathname)) {
+        client.get(`${API_BASE}/auth/logout`).catch(() => {})
+        window.location.href = '/login'
       }
       return Promise.reject(error)
     }

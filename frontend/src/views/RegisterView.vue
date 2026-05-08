@@ -9,6 +9,7 @@ const username = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const fullName = ref('')
+const subscriptionKey = ref('')
 const localError = ref('')
 
 const handleSubmit = async () => {
@@ -29,9 +30,14 @@ const handleSubmit = async () => {
     password: password.value,
     confirmPassword: confirmPassword.value,
     full_name: fullName.value || undefined,
+    subscriptionKey: subscriptionKey.value || undefined,
   })
 
   if (success) {
+    if (authStore.error?.startsWith('SUB_KEY:')) {
+      localError.value = authStore.error.replace('SUB_KEY:', '')
+      return
+    }
     window.location.replace('/search')
   } else {
     localError.value = authStore.error || 'Registration failed'
@@ -81,6 +87,14 @@ const handleSubmit = async () => {
           placeholder="Confirm password"
           autocomplete="new-password"
           required
+          class="form-input"
+        />
+
+        <input
+          v-model="subscriptionKey"
+          type="text"
+          placeholder="Subscription key (optional)"
+          autocomplete="off"
           class="form-input"
         />
 

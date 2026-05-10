@@ -3,12 +3,19 @@ from contextlib import asynccontextmanager
 import os
 import time
 
-from app.api.v1 import auth, clips, proxy
+from app.api.v1 import (
+    auth,
+    clips,
+    proxy,
+)
 from app.core.config import settings
 from app.core.exceptions import RanchBotAPIError
 from app.core.logger import setup_logger
 from app.integrations.ranchbot import api_client
-from fastapi import FastAPI, Request
+from fastapi import (
+    FastAPI,
+    Request,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import httpx
@@ -47,7 +54,10 @@ async def _cleanup_cache_task() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    http_client = httpx.AsyncClient()
+    http_client = httpx.AsyncClient(
+        timeout=httpx.Timeout(60.0, connect=10.0),
+        limits=httpx.Limits(max_connections=20, max_keepalive_connections=10),
+    )
     api_client.set_shared_client(http_client)
     cleanup_task = asyncio.create_task(_cleanup_cache_task())
     try:

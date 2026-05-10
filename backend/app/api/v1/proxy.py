@@ -88,7 +88,10 @@ async def api_thumbnail(
     user: UserSession = Depends(get_current_user),
     proxy_svc: ProxyService = Depends(get_proxy_service),
 ):
-    return await proxy_svc.get_thumbnail(request.endpoint, request.args, user.jwt_token)
+    try:
+        return await proxy_svc.get_thumbnail(request.endpoint, request.args, user.jwt_token)
+    except ValueError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
 
 
 @router.post("/adjust-preview")

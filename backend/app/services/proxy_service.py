@@ -1,8 +1,6 @@
 import asyncio
 from typing import Any
 
-from fastapi import BackgroundTasks
-
 from app.core.logger import setup_logger
 from app.core.responses import (
     range_video_response,
@@ -14,7 +12,10 @@ from app.integrations.ranchbot.endpoints import Endpoints
 from app.services.adjusted_video import AdjustedVideoService
 from app.services.thumbnail import ThumbnailService
 from app.services.video_cache import VideoStreamCache
-from fastapi import Response
+from fastapi import (
+    BackgroundTasks,
+    Response,
+)
 
 logger = setup_logger(__name__)
 
@@ -121,27 +122,36 @@ class ProxyService:
         return len(valid_ids)
 
     async def batch_load(self, clips: list[Any], token: str) -> dict[str, Any]:
-        logger.info(f"Batch loading {len(clips)} clips...")
+        logger.info("Batch loading %d clips...", len(clips))
+        commands = [
+            {"command": Endpoints.VIDEO_BY_INDEX, "args": [str(clip.index + 1)]}
+            for clip in clips
+        ]
 
-        async def _load_one(clip: Any) -> dict:
-            clip_position_id = str(clip.index + 1)
-            logger.debug(f"Loading clip {clip.index}...")
-            video_data = await self._api.call_api_for_blob(
-                endpoint=Endpoints.VIDEO_BY_INDEX,
-                args=[clip_position_id],
-                token=token,
-            )
-            logger.debug(f"Clip {clip.index} loaded ({len(video_data)} bytes)")
-            return {"clip_id": clip.id, "clip_index": clip.index, "status": "loaded"}
+        try:
+            batch_result = await self._api.call_batch(commands=commands, token=token)
+        except Exception:
+            logger.exception("Batch load failed")
+            return {
+                "status": "failed",
+                "total": len(clips),
+                "successful": 0,
+                "failed": len(clips),
+                "results": [],
+            }
 
-        results = await asyncio.gather(*[_load_one(clip) for clip in clips], return_exceptions=True)
-        successful = [r for r in results if not isinstance(r, Exception)]
-        failed = [r for r in results if isinstance(r, Exception)]
+        results = batch_result.get("results", [])
+        successful: list[dict[str, Any]] = []
+        for i, clip in enumerate(clips):
+            result = results[i] if i < len(results) else None
+            if isinstance(result, dict) and result.get("status") == "success":
+                successful.append({"clip_id": clip.id, "clip_index": clip.index, "status": "loaded"})
 
+        logger.info("Batch load done: %d/%d successful", len(successful), len(clips))
         return {
             "status": "completed",
             "total": len(clips),
             "successful": len(successful),
-            "failed": len(failed),
+            "failed": len(clips) - len(successful),
             "results": successful,
         }

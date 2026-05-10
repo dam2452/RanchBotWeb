@@ -1,3 +1,7 @@
-from . import auth, clips, proxy
+from . import (
+    auth,
+    clips,
+    proxy,
+)
 
 __all__ = ["auth", "clips", "proxy"]

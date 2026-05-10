@@ -1,4 +1,5 @@
 import axios, { type AxiosInstance } from 'axios'
+import { useAuthStore } from '@/stores/auth'
 
 export const API_BASE = '/api/v1'
 
@@ -20,6 +21,8 @@ client.interceptors.response.use(
     const status = error.response?.status
 
     if (status === 401) {
+      const authStore = useAuthStore()
+      authStore.$patch({ user: null })
       if (!PUBLIC_PATHS.includes(window.location.pathname)) {
         client.get(`${API_BASE}/auth/logout`).catch(() => {})
         window.location.href = '/login'

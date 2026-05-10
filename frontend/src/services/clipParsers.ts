@@ -123,7 +123,7 @@ export const filterInfoParser = new FilterInfoParser()
 
 
 export interface SeriesInfo {
-  currentSeries: string
+  currentSeries: string[]
   availableSeries: string[]
 }
 
@@ -131,8 +131,9 @@ class SeriesInfoParser implements ResponseParser<SeriesInfo> {
   parse(data: unknown): SeriesInfo {
     const obj = _data(data)
     const inner = _data(obj.data)
+    const raw = inner.current_series
     return {
-      currentSeries: inner.current_series as string,
+      currentSeries: Array.isArray(raw) ? raw : (raw ? [raw as string] : []),
       availableSeries: _requireArray(inner, 'available_series') as string[],
     }
   }

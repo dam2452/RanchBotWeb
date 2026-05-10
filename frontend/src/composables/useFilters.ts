@@ -18,7 +18,7 @@ export function useFilters() {
   const episodes = ref<EpisodeInfo[]>([])
 
   const availableSeries = ref<string[]>([])
-  const currentSeries = ref<string>('')
+  const currentSeries = ref<string[]>([])
   const seriesLoading = ref(false)
 
   const optionsLoading = ref(false)
@@ -26,6 +26,8 @@ export function useFilters() {
 
   const selectedFilters = ref<ActiveFilters>({ ...EMPTY_FILTERS })
   const appliedFilters = ref<ActiveFilters>({ ...EMPTY_FILTERS })
+
+  const isSingleSeries = computed(() => currentSeries.value.length === 1)
 
   const hasActiveFilters = computed(() => {
     const f = appliedFilters.value
@@ -64,25 +66,27 @@ export function useFilters() {
     if (optionsLoading.value) return
     optionsLoading.value = true
     try {
-      const batch = await clipService.getFilterOptionsBatch()
-      if (batch.characters) characters.value = batch.characters
-      if (batch.objects) objects.value = batch.objects
-      if (batch.emotions) emotions.value = batch.emotions
-      if (batch.seasons) seasons.value = batch.seasons
+      const batch = await clipService.getFilterOptionsBatch(true)
       if (batch.series) {
         availableSeries.value = batch.series.availableSeries
         currentSeries.value = batch.series.currentSeries
+      }
+      if (isSingleSeries.value) {
+        if (batch.characters) characters.value = batch.characters
+        if (batch.objects) objects.value = batch.objects
+        if (batch.emotions) emotions.value = batch.emotions
+        if (batch.seasons) seasons.value = batch.seasons
       }
     } finally {
       optionsLoading.value = false
     }
   }
 
-  async function selectSeries(name: string): Promise<void> {
-    if (seriesLoading.value || name === currentSeries.value) return
+  async function selectSeries(names: string[]): Promise<void> {
+    if (seriesLoading.value) return
     seriesLoading.value = true
     try {
-      const result = await clipService.setSeries(name)
+      const result = await clipService.setSeries(names)
       currentSeries.value = result.currentSeries
       characters.value = []
       objects.value = []
@@ -95,7 +99,9 @@ export function useFilters() {
     } finally {
       seriesLoading.value = false
     }
-    await loadFilterOptions()
+    if (names.length === 1) {
+      await loadFilterOptions()
+    }
   }
 
   async function loadEpisodes(season: string): Promise<void> {
@@ -179,6 +185,7 @@ export function useFilters() {
   return {
     characters, objects, emotions, seasons, episodes,
     availableSeries, currentSeries, seriesLoading,
+    isSingleSeries,
     selectedFilters, appliedFilters,
     hasActiveFilters, activeFilterCount,
     optionsLoading, applyLoading,

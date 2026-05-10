@@ -34,7 +34,7 @@ export function useClipLoader(options: UseClipLoaderOptions) {
     loadedClips.value = 0
   }
 
-  const _loadSingleClip = async (i: number, currentSearchId: number): Promise<void> => {
+  const _loadSingleClip = async (i: number, currentSearchId: number, retries = 1): Promise<void> => {
     const clipResult = results.value[i]
     if (!clipResult) return
 
@@ -55,6 +55,10 @@ export function useClipLoader(options: UseClipLoaderOptions) {
 
       clips.value[i] = { ...clips.value[i], thumbnailUrl: URL.createObjectURL(thumbnailBlob) }
     } catch (err) {
+      if (retries > 0 && searchId.value === currentSearchId) {
+        await new Promise(r => setTimeout(r, 500))
+        return _loadSingleClip(i, currentSearchId, retries - 1)
+      }
       console.error(`Failed to load clip ${i}:`, err)
       clips.value[i] = { ...clips.value[i], hasError: true }
     }

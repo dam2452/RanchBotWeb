@@ -12,7 +12,11 @@ from app.core.logger import setup_logger
 from app.core.sessions import encode_session
 from app.integrations.ranchbot.auth_api import RanchBotAuthAPI
 from app.models.user import UserSession
-from fastapi import HTTPException, Response, status
+from fastapi import (
+    HTTPException,
+    Response,
+    status,
+)
 
 logger = setup_logger(__name__)
 
@@ -170,5 +174,3 @@ class AuthService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to logout from all sessions: {e.detail}",
             )
-
-

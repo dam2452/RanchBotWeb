@@ -4,10 +4,12 @@ from datetime import (
     timezone,
 )
 
-from jose import JWTError, jwt
-
 from app.core.config import settings
 from app.models.user import UserSession
+from jose import (
+    JWTError,
+    jwt,
+)
 
 _ALGORITHM = "HS256"
 

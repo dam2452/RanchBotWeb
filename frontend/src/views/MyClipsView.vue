@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, nextTick, onUnmounted, watch } from 'vue'
-import UserButtons from '@/components/layout/UserButtons.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import LogoHeader from '@/components/layout/LogoHeader.vue'
 import MyClipCard from '@/components/clips/MyClipCard.vue'
@@ -87,8 +86,7 @@ watch(activePage, pauseAllVideos)
 </script>
 
 <template>
-  <UserButtons fixed compact :show-my-clips="false" />
-  <LogoHeader v-if="!isMobile" indent-left />
+<LogoHeader v-if="!isMobile" indent-left />
   <AppFooter />
 
   <button v-if="!isAppleWatch" class="back-button" @click="$router.back()">
@@ -124,6 +122,13 @@ watch(activePage, pauseAllVideos)
 
     <div v-else-if="clips.length === 0" class="center-message">
       <p class="message-text">You don't have any clips yet. Use the quote search to create your first clips!</p>
+      <button class="search-button" @click="$router.push('/search')">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="10" cy="10" r="7"></circle>
+          <path d="M15 15 L21 21"></path>
+        </svg>
+        Search
+      </button>
     </div>
 
     <div

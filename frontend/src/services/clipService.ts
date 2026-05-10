@@ -183,14 +183,18 @@ class ClipService {
     return emotionParser.parse(response.data)
   }
 
-  async getFilterOptionsBatch(): Promise<FilterOptionsBatch> {
-    const commands = [
-      { command: 'p', args: [] },
-      { command: 'obj', args: [] },
-      { command: 'e', args: [] },
-      { command: 'odcinki', args: [] },
+  async getFilterOptionsBatch(includeFilters: boolean): Promise<FilterOptionsBatch> {
+    const commands: Array<{ command: string; args: string[] }> = [
       { command: 'serial', args: [] },
     ]
+    if (includeFilters) {
+      commands.push(
+        { command: 'p', args: [] },
+        { command: 'obj', args: [] },
+        { command: 'e', args: [] },
+        { command: 'odcinki', args: [] },
+      )
+    }
     const response = await client.post(`${API_BASE}/batch`, { commands })
     const results = response.data.results as Array<{
       command: string
@@ -251,8 +255,9 @@ class ClipService {
     return seriesInfoParser.parse(response.data)
   }
 
-  async setSeries(name: string): Promise<SeriesInfo> {
-    const response = await client.post(`${API_BASE}/json`, { endpoint: 'serial', args: [name] })
+  async setSeries(names: string[]): Promise<SeriesInfo> {
+    const arg = names.length === 0 ? 'all' : names.join(',')
+    const response = await client.post(`${API_BASE}/json`, { endpoint: 'serial', args: [arg] })
     return seriesInfoParser.parse(response.data)
   }
 }

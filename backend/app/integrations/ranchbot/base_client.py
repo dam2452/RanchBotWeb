@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -9,6 +10,10 @@ from app.core.exceptions import (
 from app.core.logger import setup_logger
 from app.integrations.ranchbot.endpoints import Endpoints
 import httpx
+
+_TRANSIENT_ERRORS = (httpx.RemoteProtocolError, httpx.ConnectError)
+_RETRY_DELAY = 0.5
+_MAX_RETRIES = 2
 
 logger = setup_logger(__name__)
 
@@ -60,12 +65,20 @@ class RanchBotBaseClient:
         if not jwt_token:
             raise ValueError("JWT token is required")
         logger.debug("API call: endpoint=%r args=%r url=%s", endpoint, args, url)
-        async with self._client_context(timeout) as client:
-            response = await client.post(
-                url,
-                json={"args": args, "reply_json": reply_json},
-                headers=self._build_headers(jwt_token),
-            )
+        for attempt in range(_MAX_RETRIES + 1):
+            try:
+                async with self._client_context(timeout) as client:
+                    response = await client.post(
+                        url,
+                        json={"args": args, "reply_json": reply_json},
+                        headers=self._build_headers(jwt_token),
+                    )
+                break
+            except _TRANSIENT_ERRORS:
+                if attempt >= _MAX_RETRIES:
+                    raise
+                logger.warning("Transient error on endpoint=%r, retrying (%d/%d)", endpoint, attempt + 1, _MAX_RETRIES)
+                await asyncio.sleep(_RETRY_DELAY)
         logger.debug("API response: endpoint=%r status=%d", endpoint, response.status_code)
         try:
             response.raise_for_status()
@@ -111,12 +124,20 @@ class RanchBotBaseClient:
         if not jwt_token:
             raise ValueError("JWT token is required")
         logger.debug("Batch API call: %d commands url=%s", len(commands), url)
-        async with self._client_context(timeout) as client:
-            response = await client.post(
-                url,
-                json={"commands": commands},
-                headers=self._build_headers(jwt_token),
-            )
+        for attempt in range(_MAX_RETRIES + 1):
+            try:
+                async with self._client_context(timeout) as client:
+                    response = await client.post(
+                        url,
+                        json={"commands": commands},
+                        headers=self._build_headers(jwt_token),
+                    )
+                break
+            except _TRANSIENT_ERRORS:
+                if attempt >= _MAX_RETRIES:
+                    raise
+                logger.warning("Transient error on batch, retrying (%d/%d)", attempt + 1, _MAX_RETRIES)
+                await asyncio.sleep(_RETRY_DELAY)
         logger.debug("Batch API response: status=%d", response.status_code)
         try:
             response.raise_for_status()

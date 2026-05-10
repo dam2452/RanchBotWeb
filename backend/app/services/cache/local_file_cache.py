@@ -1,7 +1,6 @@
 import os
 
 import aiofiles
-
 from app.core.logger import setup_logger
 
 logger = setup_logger(__name__)

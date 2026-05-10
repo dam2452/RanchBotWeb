@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { isAxiosError } from 'axios'
 import { clipService } from '@/services/clipService'
 import type { SearchResult, ActiveFilters } from '@/types'
-import UserButtons from '@/components/layout/UserButtons.vue'
 import SearchBar from '@/components/search/SearchBar.vue'
 import FilterModal from '@/components/search/FilterModal.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
@@ -38,6 +37,7 @@ const semanticMode = computed(() => route.query.mode === 'semantic')
 const {
   characters, objects, emotions, seasons, episodes,
   availableSeries, currentSeries, seriesLoading,
+  isSingleSeries,
   selectedFilters, appliedFilters,
   hasActiveFilters, activeFilterCount,
   optionsLoading, applyLoading,
@@ -140,6 +140,8 @@ const handleFilterRemove = async (category: keyof ActiveFilters, value: string):
 const handleFilterApply = async (): Promise<void> => {
   await applyFilters()
   showFilterModal.value = false
+  _resetSearchState()
+  _loadSearchResults()
 }
 
 const handleFilterReset = async (): Promise<void> => {
@@ -166,7 +168,6 @@ watch(() => route.query.mode, async () => {
     </svg>
   </button>
 
-  <UserButtons v-if="!isWatchView" fixed />
   <LogoHeader v-if="isDesktop" :hide-text="logoTextOverlapsSearchbar" />
   <AppFooter v-if="!isWatchView" />
 
@@ -198,6 +199,7 @@ watch(() => route.query.mode, async () => {
       :available-series="availableSeries"
       :current-series="currentSeries"
       :series-loading="seriesLoading"
+      :is-single-series="isSingleSeries"
       @close="showFilterModal = false"
       @applied="handleFilterApply"
       @toggle="handleFilterToggle"

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import UserButtons from '@/components/layout/UserButtons.vue'
 import LogoSection from '@/components/layout/LogoSection.vue'
 import SearchBar from '@/components/search/SearchBar.vue'
 import FilterModal from '@/components/search/FilterModal.vue'
@@ -21,6 +20,7 @@ const semanticMode = ref(false)
 const {
   characters, objects, emotions, seasons, episodes,
   availableSeries, currentSeries, seriesLoading,
+  isSingleSeries,
   selectedFilters, appliedFilters,
   hasActiveFilters, activeFilterCount,
   optionsLoading, applyLoading,
@@ -69,8 +69,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <UserButtons v-if="!isWatchView" fixed />
-  <AppFooter v-if="!isWatchView" />
+<AppFooter v-if="!isWatchView" />
 
   <main class="search-page">
     <div v-if="isWatchView" class="watch-content">
@@ -113,6 +112,7 @@ onMounted(() => {
       :available-series="availableSeries"
       :current-series="currentSeries"
       :series-loading="seriesLoading"
+      :is-single-series="isSingleSeries"
       @close="showFilterModal = false"
       @applied="handleFilterApply"
       @toggle="handleFilterToggle"

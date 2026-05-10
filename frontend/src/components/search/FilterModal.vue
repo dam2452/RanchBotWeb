@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { ActiveFilters } from '@/types'
 import SeasonTab from './SeasonTab.vue'
 import ChipTab from './ChipTab.vue'
@@ -16,8 +16,9 @@ interface Props {
   loading: boolean
   applyLoading: boolean
   availableSeries?: string[]
-  currentSeries?: string
+  currentSeries?: string[]
   seriesLoading?: boolean
+  isSingleSeries?: boolean
 }
 
 interface Emits {
@@ -27,25 +28,36 @@ interface Emits {
   (e: 'remove', category: keyof ActiveFilters, value: string): void
   (e: 'apply'): void
   (e: 'reset'): void
-  (e: 'select-series', series: string): void
+  (e: 'select-series', series: string[]): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
   availableSeries: () => [],
-  currentSeries: '',
+  currentSeries: () => [],
   seriesLoading: false,
+  isSingleSeries: false,
 })
 const emit = defineEmits<Emits>()
 
-const activeTab = ref<keyof ActiveFilters>('season')
+type TabKey = keyof ActiveFilters | 'serial'
 
-const tabs: { key: keyof ActiveFilters; label: string }[] = [
-  { key: 'season', label: 'Sezon' },
-  { key: 'episode', label: 'Odcinek' },
-  { key: 'character', label: 'Postacie' },
-  { key: 'emotion', label: 'Emocje' },
-  { key: 'object', label: 'Obiekty' }
-]
+const activeTab = ref<TabKey>('serial')
+
+const tabs = computed<{ key: TabKey; label: string }[]>(() => {
+  const serialTab = props.availableSeries.length > 1
+    ? [{ key: 'serial' as const, label: 'Serial' }]
+    : []
+  const filterTabs = props.isSingleSeries
+    ? [
+        { key: 'season' as TabKey, label: 'Sezon' },
+        { key: 'episode' as TabKey, label: 'Odcinek' },
+        { key: 'character' as TabKey, label: 'Postacie' },
+        { key: 'emotion' as TabKey, label: 'Emocje' },
+        { key: 'object' as TabKey, label: 'Obiekty' },
+      ]
+    : []
+  return [...serialTab, ...filterTabs]
+})
 
 const _formatSeriesName = (name: string): string =>
   name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
@@ -58,9 +70,39 @@ const isSelected = (category: keyof ActiveFilters, value: string): boolean => {
   return props.selectedFilters[category].includes(value)
 }
 
+const isSeriesSelected = (name: string): boolean => {
+  return props.currentSeries.includes(name)
+}
+
+const toggleSeries = (name: string): void => {
+  if (props.seriesLoading) return
+  const current = [...props.currentSeries]
+  if (isSeriesSelected(name)) {
+    const updated = current.filter(s => s !== name)
+    emit('select-series', updated.length === 0 ? [] : updated)
+  } else {
+    emit('select-series', [...current, name])
+  }
+}
+
+const selectAll = (): void => {
+  if (props.seriesLoading) return
+  emit('select-series', [])
+}
+
 watch(() => props.show, (val) => {
   if (val) {
-    activeTab.value = 'season'
+    if (props.availableSeries.length > 1) {
+      activeTab.value = 'serial'
+    } else {
+      activeTab.value = 'season'
+    }
+  }
+})
+
+watch(() => props.availableSeries, (val) => {
+  if (val.length > 1 && activeTab.value !== 'serial') {
+    activeTab.value = 'serial'
   }
 })
 </script>
@@ -80,19 +122,7 @@ watch(() => props.show, (val) => {
             <button class="close-btn" aria-label="Close" @click="emit('close')">&times;</button>
           </div>
 
-          <div v-if="availableSeries.length > 1" class="series-bar">
-            <button
-              v-for="s in availableSeries"
-              :key="s"
-              :class="['series-btn', { active: s === currentSeries, loading: seriesLoading && s === currentSeries }]"
-              :disabled="seriesLoading"
-              @click="emit('select-series', s)"
-            >
-              {{ _formatSeriesName(s) }}
-            </button>
-          </div>
-
-          <div class="tab-bar">
+          <div v-if="tabs.length" class="tab-bar">
             <button
               v-for="tab in tabs"
               :key="tab.key"
@@ -100,8 +130,11 @@ watch(() => props.show, (val) => {
               @click="activeTab = tab.key"
             >
               {{ tab.label }}
-              <span v-if="selectedFilters[tab.key].length" class="tab-badge">
-                {{ selectedFilters[tab.key].length }}
+              <span v-if="tab.key === 'serial' && currentSeries.length" class="tab-badge">
+                {{ currentSeries.length }}
+              </span>
+              <span v-else-if="tab.key !== 'serial' && selectedFilters[tab.key as keyof ActiveFilters].length" class="tab-badge">
+                {{ selectedFilters[tab.key as keyof ActiveFilters].length }}
               </span>
             </button>
           </div>
@@ -110,57 +143,82 @@ watch(() => props.show, (val) => {
             <div v-if="loading" class="loading">Loading...</div>
 
             <template v-else>
-              <SeasonTab
-                v-if="activeTab === 'season'"
-                :selected-filters="selectedFilters"
-                :seasons="seasons"
-                @toggle="(cat, val) => emit('toggle', cat, val)"
-              />
-
-              <div v-if="activeTab === 'episode'" class="chip-grid">
-                <template v-if="!selectedFilters.season.length">
-                  <div class="empty-msg">Najpierw wybierz sezon</div>
-                </template>
-                <template v-else>
-                  <button
-                    v-for="ep in episodes"
-                    :key="ep.number"
-                    :class="['chip', { selected: isSelected('episode', String(ep.number)) }]"
-                    @click="emit('toggle', 'episode', String(ep.number))"
-                  >
-                    {{ ep.title ? `E${ep.number} - ${ep.title}` : `Odcinek ${ep.number}` }}
-                  </button>
-                  <div v-if="!episodes.length" class="empty-msg">Brak odcinkow</div>
-                </template>
+              <div v-if="activeTab === 'serial'" class="serial-list">
+                <button
+                  :class="['serial-item', { active: currentSeries.length === 0 }]"
+                  :disabled="seriesLoading"
+                  @click="selectAll"
+                >
+                  Wszystkie
+                </button>
+                <button
+                  v-for="s in availableSeries"
+                  :key="s"
+                  :class="['serial-item', { active: isSeriesSelected(s) }]"
+                  :disabled="seriesLoading"
+                  @click="toggleSeries(s)"
+                >
+                  {{ _formatSeriesName(s) }}
+                </button>
               </div>
 
-              <SearchableTab
-                v-if="activeTab === 'character'"
-                :selected-filters="selectedFilters"
-                category="character"
-                :items="characters"
-                search-placeholder="Szukaj postaci..."
-                @toggle="(cat, val) => emit('toggle', cat, val)"
-                @remove="(cat, val) => emit('remove', cat, val)"
-              />
+              <div v-if="!isSingleSeries && activeTab !== 'serial'" class="empty-msg">
+                Wybierz jeden serial, aby uzyc filtrow
+              </div>
 
-              <ChipTab
-                v-if="activeTab === 'emotion'"
-                :selected-filters="selectedFilters"
-                category="emotion"
-                :items="emotions"
-                @toggle="(cat, val) => emit('toggle', cat, val)"
-              />
+              <template v-if="isSingleSeries">
+                <SeasonTab
+                  v-if="activeTab === 'season'"
+                  :selected-filters="selectedFilters"
+                  :seasons="seasons"
+                  @toggle="(cat, val) => emit('toggle', cat, val)"
+                />
 
-              <SearchableTab
-                v-if="activeTab === 'object'"
-                :selected-filters="selectedFilters"
-                category="object"
-                :items="objects"
-                search-placeholder="Szukaj obiektu..."
-                @toggle="(cat, val) => emit('toggle', cat, val)"
-                @remove="(cat, val) => emit('remove', cat, val)"
-              />
+                <div v-if="activeTab === 'episode'" class="chip-grid">
+                  <template v-if="!selectedFilters.season.length">
+                    <div class="empty-msg">Najpierw wybierz sezon</div>
+                  </template>
+                  <template v-else>
+                    <button
+                      v-for="ep in episodes"
+                      :key="ep.number"
+                      :class="['chip', { selected: isSelected('episode', String(ep.number)) }]"
+                      @click="emit('toggle', 'episode', String(ep.number))"
+                    >
+                      {{ ep.title ? `E${ep.number} - ${ep.title}` : `Odcinek ${ep.number}` }}
+                    </button>
+                    <div v-if="!episodes.length" class="empty-msg">Brak odcinkow</div>
+                  </template>
+                </div>
+
+                <SearchableTab
+                  v-if="activeTab === 'character'"
+                  :selected-filters="selectedFilters"
+                  category="character"
+                  :items="characters"
+                  search-placeholder="Szukaj postaci..."
+                  @toggle="(cat, val) => emit('toggle', cat, val)"
+                  @remove="(cat, val) => emit('remove', cat, val)"
+                />
+
+                <ChipTab
+                  v-if="activeTab === 'emotion'"
+                  :selected-filters="selectedFilters"
+                  category="emotion"
+                  :items="emotions"
+                  @toggle="(cat, val) => emit('toggle', cat, val)"
+                />
+
+                <SearchableTab
+                  v-if="activeTab === 'object'"
+                  :selected-filters="selectedFilters"
+                  category="object"
+                  :items="objects"
+                  search-placeholder="Szukaj obiektu..."
+                  @toggle="(cat, val) => emit('toggle', cat, val)"
+                  @remove="(cat, val) => emit('remove', cat, val)"
+                />
+              </template>
             </template>
           </div>
 
@@ -245,45 +303,6 @@ watch(() => props.show, (val) => {
 
   &:hover {
     background: #d0d0d0;
-  }
-}
-
-.series-bar {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background: #f0f0f0;
-  border-bottom: 1px solid #e0e0e0;
-  flex-shrink: 0;
-  overflow-x: auto;
-}
-
-.series-btn {
-  padding: 0.35rem 1rem;
-  border-radius: 20px;
-  border: 2px solid #d0d0d0;
-  background: #fff;
-  color: #555;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s;
-
-  &:hover:not(:disabled) {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-  }
-
-  &.active {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-    color: #fff;
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.7;
   }
 }
 
@@ -381,6 +400,44 @@ watch(() => props.show, (val) => {
   font-size: 0.85rem;
   padding: 1rem;
   text-align: center;
+}
+
+.serial-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 0.25rem;
+}
+
+.serial-item {
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  border: 2px solid #d0d0d0;
+  background: #fff;
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  &.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
 }
 
 .modal-footer {

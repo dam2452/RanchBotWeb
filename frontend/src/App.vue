@@ -1,19 +1,13 @@
 <script setup lang="ts">
-import { RouterView, useRoute } from 'vue-router'
-import { computed } from 'vue'
-import AppHeader from './components/layout/AppHeader.vue'
-
-const route = useRoute()
-
-const showHeader = computed(() => {
-  const noHeaderRoutes = ['home', 'login', 'register', 'forgot-password', 'search', 'search-results', 'my-clips', 'error', 'not-found']
-  return !noHeaderRoutes.includes(route.name as string)
-})
+import { RouterView } from 'vue-router'
+import BurgerMenu from './components/layout/BurgerMenu.vue'
+import InstallBanner from './components/common/InstallBanner.vue'
 </script>
 
 <template>
   <div id="app">
-    <AppHeader v-if="showHeader" />
+    <InstallBanner />
+    <BurgerMenu />
     <RouterView />
   </div>
 </template>

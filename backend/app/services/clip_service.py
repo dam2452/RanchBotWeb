@@ -6,7 +6,10 @@ from app.core.responses import (
 )
 from app.integrations.ranchbot.clips_api import RanchBotClipsAPI
 from app.services.thumbnail import ThumbnailService
-from fastapi import HTTPException, Response
+from fastapi import (
+    HTTPException,
+    Response,
+)
 
 logger = setup_logger(__name__)
 
